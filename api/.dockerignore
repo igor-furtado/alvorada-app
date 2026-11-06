@@ -1,0 +1,5 @@
+.git/
+.gitignore
+.dart_tool/
+coverage.out
+bin/

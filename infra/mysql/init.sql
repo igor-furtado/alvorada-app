@@ -1,0 +1,41 @@
+CREATE DATABASE IF NOT EXISTS estudos
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE estudos;
+
+CREATE TABLE IF NOT EXISTS subjects (
+  id CHAR(36) PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  difficulty TINYINT UNSIGNED NOT NULL DEFAULT 3,
+  color CHAR(7) NOT NULL DEFAULT '#6657D9',
+  position INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT chk_subject_difficulty CHECK (difficulty BETWEEN 1 AND 5),
+  INDEX idx_subject_position (position, created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS topics (
+  id CHAR(36) PRIMARY KEY,
+  subject_id CHAR(36) NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  position INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_topic_subject FOREIGN KEY (subject_id)
+    REFERENCES subjects(id) ON DELETE CASCADE,
+  INDEX idx_topic_subject_position (subject_id, position, created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS subtopics (
+  id CHAR(36) PRIMARY KEY,
+  topic_id CHAR(36) NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  position INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_subtopic_topic FOREIGN KEY (topic_id)
+    REFERENCES topics(id) ON DELETE CASCADE,
+  INDEX idx_subtopic_topic_position (topic_id, position, created_at)
+) ENGINE=InnoDB;

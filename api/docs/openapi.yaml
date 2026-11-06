@@ -1,0 +1,336 @@
+openapi: 3.1.0
+info:
+  title: Foco API
+  version: 1.0.0
+  description: API para organização de disciplinas, tópicos e subtópicos de estudo.
+  contact:
+    name: Foco
+servers:
+  - url: /
+    description: Mesmo endereço que serve a documentação
+security: []
+tags:
+  - name: Health
+    description: Disponibilidade do serviço
+  - name: Disciplinas
+    description: Organização das disciplinas
+  - name: Tópicos
+    description: Conteúdo pertencente a uma disciplina
+  - name: Subtópicos
+    description: Detalhamento de um tópico
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Verifica a disponibilidade da API
+      operationId: getHealth
+      responses:
+        '200':
+          description: API disponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /api/v1/subjects:
+    get:
+      tags: [Disciplinas]
+      summary: Lista o catálogo completo de estudos
+      description: Retorna disciplinas com seus tópicos e subtópicos aninhados.
+      operationId: listSubjects
+      responses:
+        '200':
+          description: Catálogo atual
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subject'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Disciplinas]
+      summary: Cria uma disciplina
+      operationId: createSubject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubject'
+      responses:
+        '201':
+          description: Disciplina criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedResource'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/subjects/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    patch:
+      tags: [Disciplinas]
+      summary: Atualiza uma disciplina
+      operationId: updateSubject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubject'
+      responses:
+        '204':
+          description: Disciplina atualizada
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Disciplinas]
+      summary: Exclui uma disciplina
+      description: Os tópicos e subtópicos relacionados também são excluídos.
+      operationId: deleteSubject
+      responses:
+        '204':
+          description: Disciplina excluída
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/subjects/{id}/topics:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    post:
+      tags: [Tópicos]
+      summary: Adiciona um tópico a uma disciplina
+      operationId: createTopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NameInput'
+      responses:
+        '201':
+          description: Tópico criado
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/topics/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    patch:
+      tags: [Tópicos]
+      summary: Renomeia um tópico
+      operationId: updateTopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NameInput'
+      responses:
+        '204':
+          description: Tópico atualizado
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Tópicos]
+      summary: Exclui um tópico
+      description: Seus subtópicos também são excluídos.
+      operationId: deleteTopic
+      responses:
+        '204':
+          description: Tópico excluído
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/topics/{id}/subtopics:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    post:
+      tags: [Subtópicos]
+      summary: Adiciona um subtópico a um tópico
+      operationId: createSubtopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NameInput'
+      responses:
+        '201':
+          description: Subtópico criado
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/subtopics/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    patch:
+      tags: [Subtópicos]
+      summary: Renomeia um subtópico
+      operationId: updateSubtopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NameInput'
+      responses:
+        '204':
+          description: Subtópico atualizado
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Subtópicos]
+      summary: Exclui um subtópico
+      operationId: deleteSubtopic
+      responses:
+        '204':
+          description: Subtópico excluído
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      description: Identificador UUID do recurso
+      schema:
+        type: string
+        format: uuid
+  responses:
+    ValidationError:
+      description: Dados inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Erro interno
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Health:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: ok
+    CreatedResource:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+    CreateSubject:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          examples: [Direito Constitucional]
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        color:
+          $ref: '#/components/schemas/Color'
+    UpdateSubject:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        color:
+          $ref: '#/components/schemas/Color'
+    NameInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          examples: [Controle de constitucionalidade]
+    Difficulty:
+      type: integer
+      minimum: 1
+      maximum: 5
+      default: 3
+      description: 1 representa muito fácil e 5 representa muito difícil.
+    Color:
+      type: string
+      pattern: '^#[0-9A-Fa-f]{6}$'
+      default: '#6657D9'
+      examples: ['#3178C6']
+    Subject:
+      type: object
+      required: [id, name, difficulty, color, topics]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        color:
+          $ref: '#/components/schemas/Color'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+    Topic:
+      type: object
+      required: [id, name, subtopics]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subtopics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subtopic'
+    Subtopic:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

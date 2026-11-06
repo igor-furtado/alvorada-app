@@ -1,0 +1,117 @@
+package studies
+
+import (
+	"context"
+	"errors"
+	"regexp"
+	"strings"
+
+	domain "concursosapp/api/internal/domain/studies"
+)
+
+var (
+	ErrNameRequired      = errors.New("informe um nome")
+	ErrNameTooLong       = errors.New("o nome deve ter no máximo 120 caracteres")
+	ErrInvalidDifficulty = errors.New("a dificuldade deve estar entre 1 e 5")
+	ErrInvalidColor      = errors.New("a cor deve estar no formato hexadecimal #RRGGBB")
+	colorPattern         = regexp.MustCompile(`^#[0-9A-Fa-f]{6}$`)
+)
+
+type Service struct {
+	repository domain.Repository
+}
+
+func NewService(repository domain.Repository) *Service {
+	return &Service{repository: repository}
+}
+
+func (s *Service) Catalog(ctx context.Context) ([]domain.Subject, error) {
+	return s.repository.FindCatalog(ctx)
+}
+
+func (s *Service) CreateSubject(ctx context.Context, input domain.CreateSubjectInput) (string, error) {
+	name, err := validateName(input.Name)
+	if err != nil {
+		return "", err
+	}
+	if !input.Difficulty.Valid() {
+		return "", ErrInvalidDifficulty
+	}
+	if !colorPattern.MatchString(input.Color) {
+		return "", ErrInvalidColor
+	}
+	input.Name = name
+	return s.repository.CreateSubject(ctx, input)
+}
+
+func (s *Service) UpdateSubject(ctx context.Context, id string, input domain.UpdateSubjectInput) error {
+	if input.Name != nil {
+		name, err := validateName(*input.Name)
+		if err != nil {
+			return err
+		}
+		input.Name = &name
+	}
+	if input.Difficulty != nil && !input.Difficulty.Valid() {
+		return ErrInvalidDifficulty
+	}
+	if input.Color != nil && !colorPattern.MatchString(*input.Color) {
+		return ErrInvalidColor
+	}
+	return s.repository.UpdateSubject(ctx, id, input)
+}
+
+func (s *Service) DeleteSubject(ctx context.Context, id string) error {
+	return s.repository.DeleteSubject(ctx, id)
+}
+
+func (s *Service) CreateTopic(ctx context.Context, subjectID, name string) error {
+	value, err := validateName(name)
+	if err != nil {
+		return err
+	}
+	return s.repository.CreateTopic(ctx, subjectID, value)
+}
+
+func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {
+	value, err := validateName(name)
+	if err != nil {
+		return err
+	}
+	return s.repository.UpdateTopic(ctx, id, value)
+}
+
+func (s *Service) DeleteTopic(ctx context.Context, id string) error {
+	return s.repository.DeleteTopic(ctx, id)
+}
+
+func (s *Service) CreateSubtopic(ctx context.Context, topicID, name string) error {
+	value, err := validateName(name)
+	if err != nil {
+		return err
+	}
+	return s.repository.CreateSubtopic(ctx, topicID, value)
+}
+
+func (s *Service) UpdateSubtopic(ctx context.Context, id, name string) error {
+	value, err := validateName(name)
+	if err != nil {
+		return err
+	}
+	return s.repository.UpdateSubtopic(ctx, id, value)
+}
+
+func (s *Service) DeleteSubtopic(ctx context.Context, id string) error {
+	return s.repository.DeleteSubtopic(ctx, id)
+}
+
+func validateName(name string) (string, error) {
+	value := strings.TrimSpace(name)
+	if value == "" {
+		return "", ErrNameRequired
+	}
+	if len([]rune(value)) > 120 {
+		return "", ErrNameTooLong
+	}
+	return value, nil
+}
