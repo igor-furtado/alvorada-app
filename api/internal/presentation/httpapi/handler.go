@@ -93,7 +93,7 @@ func (h *Handler) createSubject(w http.ResponseWriter, r *http.Request) {
 		body.Difficulty = int(domain.DifficultyMedium)
 	}
 	if body.Color == "" {
-		body.Color = "#6657D9"
+		body.Color = "#E8742A"
 	}
 	id, err := h.studies.CreateSubject(r.Context(), domain.CreateSubjectInput{
 		Name: body.Name, Difficulty: domain.Difficulty(body.Difficulty), Color: body.Color,

@@ -11,7 +11,7 @@ Issues e especificações deste repositório são armazenados como GitHub Issues
 - **Adicionar ou remover labels**: `gh issue edit <number> --add-label "..."` ou `gh issue edit <number> --remove-label "..."`.
 - **Encerrar**: `gh issue close <number> --comment "..."`.
 
-O repositório deve ser inferido pelo remote Git. Enquanto não houver um remote configurado, informe `--repo <owner>/<repo>` nos comandos `gh`.
+O repositório é `igor-furtado/alvorada-app` e deve ser inferido automaticamente pelo remote `origin` ao executar comandos `gh` dentro deste diretório.
 
 ## Pull requests as a triage surface
 

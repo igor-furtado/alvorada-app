@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 112" role="img" aria-labelledby="title">
+  <title id="title">Alvorada.app</title>
+  <g transform="translate(8 8)">
+    <path d="M24 58a24 24 0 0 1 48 0Z" fill="#E8742A"/>
+    <path d="M12 58h72M18 68h60" fill="none" stroke="#1E1B18" stroke-width="4" stroke-linecap="round"/>
+    <path d="M48 20v10M27 29l7 7M69 29l-7 7" fill="none" stroke="#E8742A" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <text x="112" y="69" fill="#1E1B18" font-family="Fraunces, Georgia, serif" font-size="48" font-weight="600">Alvorada</text>
+  <text x="318" y="69" fill="#E8742A" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
+</svg>

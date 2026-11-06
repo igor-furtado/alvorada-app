@@ -15,7 +15,7 @@ func TestCreateSubjectNormalizesName(t *testing.T) {
 	_, err := service.CreateSubject(context.Background(), domain.CreateSubjectInput{
 		Name:       "  Direito Constitucional  ",
 		Difficulty: domain.DifficultyHard,
-		Color:      "#6657D9",
+		Color:      "#E8742A",
 	})
 
 	if err != nil {
@@ -39,7 +39,7 @@ func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 	_, err := service.CreateSubject(context.Background(), domain.CreateSubjectInput{
 		Name:       "Português",
 		Difficulty: 6,
-		Color:      "#6657D9",
+		Color:      "#E8742A",
 	})
 	if !errors.Is(err, ErrInvalidDifficulty) {
 		t.Fatalf("CreateSubject() error = %v, want %v", err, ErrInvalidDifficulty)

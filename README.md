@@ -1,6 +1,6 @@
-# Foco — gerenciador de estudos
+# Alvorada.app — gerenciamento de estudos
 
-Aplicação Flutter Web para organizar disciplinas, tópicos e subtópicos, com uma API Go e persistência em MySQL. O projeto foi separado por funcionalidades e camadas para permitir que planejamento, sessões de estudo, revisões, questões e métricas sejam adicionados sem acoplar o domínio à interface ou ao banco.
+Aplicação Flutter Web para organizar estudos para concursos, com uma API Go e persistência em MySQL. Nesta etapa, as telas principais são protótipos navegáveis com dados demonstrativos. A integração com dados será feita depois que os fluxos centrais estiverem validados.
 
 ## Executar localmente
 
@@ -33,11 +33,11 @@ As credenciais de desenvolvimento podem ser alteradas copiando `.env.example` pa
 
 ```text
 app/                         Flutter Web
-  lib/src/core/              tema e configuração transversal
-  lib/src/features/studies/
-    domain/                  entidades e contratos, sem infraestrutura
-    data/                    JSON, HTTP e implementação do repositório
-    presentation/            estado Riverpod, páginas e componentes
+  lib/src/core/              tema e navegação compartilhada
+  lib/src/features/today/    tela Hoje, somente apresentação
+  lib/src/features/week/     tela Esta semana, somente apresentação
+  lib/src/features/horizons/ tela Horizontes, somente apresentação
+  lib/src/features/reviews/  tela Revisões, somente apresentação
 
 api/                         API REST em Go
   cmd/server/                composição e inicialização
@@ -52,7 +52,7 @@ infra/mysql/init.sql         esquema inicial versionável
 docker-compose.yml           MySQL e API
 ```
 
-O domínio não conhece Flutter, HTTP ou MySQL. As dependências apontam para dentro: apresentação e infraestrutura dependem dos contratos do domínio. Novas funcionalidades devem entrar como novos módulos em `features`, compartilhando apenas elementos realmente transversais em `core`.
+As funcionalidades Flutter atuais têm apenas `presentation` e dados demonstrativos. Camadas `domain` e `data` serão adicionadas quando começarem a conter regras e integrações reais. A API Go mantém sua arquitetura em camadas e continua disponível, mas ainda não alimenta as novas telas.
 
 ## Endpoints principais
 
