@@ -18,14 +18,14 @@
 | Cinco linhas de memória | **De cabeça** | Mantido; nomeia a ação de recuperar antes de conferir. |
 | Visão semanal do Plano | **Esta semana** | Forma um par direto com “Hoje” e dispensa metáfora. |
 | Sessão delimitada | **Turno** | Mantido; adulto e sem linguagem de jogo. |
-| Lista de gatilhos finais | **Véspera** | Mantido; curto e diretamente ligado ao método. |
+| Tópico final obrigatório da Disciplina | **Revisão de Véspera** | O conteúdo fica no material; o app acompanha apenas planejamento e realização. |
 | Registro de questões erradas | **Caderno de Erros** | Mantido por ser o nome do método. |
 | Área de conhecimento | **Disciplina** | Termo canônico; “matéria” aparece apenas em fala natural. |
 | Unidade compartilhada entre editais | **Tópico** | Um tópico tem um único ciclo, mesmo em vários Horizontes. |
 | Disciplina de maior peso | **Disciplina principal** | Substitui “peso-pesado”, que soa informal e infantilizado. |
 | Prova cronometrada | **Simulado** | Termo conhecido, sem metáfora desnecessária. |
 | Questão respondida incorretamente | **Questão a corrigir** | Direciona para a ação; evita rotular a pessoa pelo erro. |
-| Explicação do erro | **Motivo do erro** | Mantido; exige palavras da própria pessoa. |
+| Explicação do erro | **Por que eu caí** | Nomeia o mecanismo específico do erro, com palavras da própria pessoa. |
 | Métricas | **Seu ritmo** | Prefere processo a performance competitiva. |
 | Entrada inicial | **Primeiros passos** | Mais direto que “onboarding” e coerente com o tom. |
 | Preferências | **Ajustes** | Curto e cotidiano; “Configurações” permanece no sistema. |
@@ -55,13 +55,13 @@ Com duas provas em datas diferentes, cada Horizonte mantém sua fase. Esta seman
 | Saudação matinal | **Bom dia. Sua alvorada começa pelo que mais pesa.** |
 | Lembrete de Revisão | **Sua Revisão de 7 dias chegou: relembre antes de reler.** |
 | Passo De cabeça | **Feche o material. Escreva cinco linhas só de cabeça.** |
-| Motivo do erro | **O que levou você a escolher essa resposta?** |
+| Por que eu caí | **O que levou você a escolher essa resposta?** |
 | Dia sem estudo | **O dia mudou. Reorganizamos esta semana sem culpa.** |
 | Domingo | **Hoje é descanso. O método também acontece quando você para.** |
 | Plano cumprido | **Alvorada concluída. Agora deixe o estudo assentar.** |
 | Sem Horizonte | **Escolha um Horizonte para o plano ganhar direção.** |
 | Horas superestimadas | **Conte o dia ruim também. Planejar menos protege sua constância.** |
-| Véspera à noite | **Hoje, pare. Separe o necessário e durma cedo.** |
+| Revisão de Véspera programada | **Programada. Faça a Revisão de Véspera no seu material.** |
 | Tópico Fixado | **Fixado: mais de 80% na Revisão de 30 dias.** |
 | Conexão | **Não conectamos agora. Seu plano continua guardado.** |
 
@@ -124,7 +124,7 @@ Com duas provas em datas diferentes, cada Horizonte mantém sua fase. Esta seman
 >
 > Cada tópico segue um ciclo claro: leitura corrida, cinco linhas De cabeça, conferência, caixas Memorize e Atenção, questões e registro do motivo de cada erro. Depois, o Alvorada agenda três Revisões: no dia seguinte, em 7 dias e em 30 dias. Na Revisão de 30 dias, mais de 80% de acerto deixa o tópico Fixado; abaixo disso, ele volta ao ciclo sem culpa.
 >
-> O Caderno de Erros transforma respostas incorretas em aprendizado útil. A Véspera reúne prazos, percentuais, quóruns e pegadinhas como gatilhos de memória — nunca como material novo. Para quem estuda para mais de um concurso, tópicos compartilhados contam uma única vez e o peso combinado organiza prioridades sem duplicar trabalho.
+> O Caderno de Erros transforma respostas incorretas em aprendizado útil. Toda Disciplina inclui o Tópico obrigatório Revisão de Véspera, que o Plano pode programar perto da prova; seu conteúdo continua no material de estudo. Para quem estuda para mais de um concurso, tópicos compartilhados contam uma única vez e o peso combinado organiza prioridades sem duplicar trabalho.
 >
 > Acompanhe sua Alvorada do dia, suas Revisões, seu ritmo semanal e as fases Fundação, Consolidação e Reta final. Sem pontos, rankings ou promessas fáceis: apenas processo, regularidade e descanso no lugar certo.
 >
@@ -237,7 +237,7 @@ Padrão: `regular` em navegação e ações; `light` em estados secundários; `d
 | Horizontes | `target` |
 | Revisões | `arrowsClockwise` |
 | Caderno de Erros | `notebook` |
-| Véspera | `bookmarkSimple` |
+| Tópico obrigatório | `lockSimple` |
 | Seu ritmo | `chartLineUp` |
 | Ajustes | `slidersHorizontal` |
 | Adicionar | `plus` |
@@ -263,8 +263,8 @@ Padrão: `regular` em navegação e ações; `light` em estados secundários; `d
 - Campo: fundo `papelElevado`, borda `linha`; foco com 2 px `sol`; erro com mensagem explicativa.
 - Card de Revisão: intervalo, duração e ação; atraso aparece como “para hoje”, não “atrasado”.
 - De cabeça: área pautada, material oculto, contador de cinco linhas e botão “Conferir”.
-- Caderno de Erros: enunciado resumido, resposta, motivo obrigatório e próxima consulta.
-- Véspera: item marcável com contador discreto de revisões sem dúvida; desmarca automaticamente na terceira.
+- Caderno de Erros: diagnóstico, Regra certa, Por que eu caí e próxima Revisão do Caderno.
+- Revisão de Véspera: último Tópico da Disciplina, com cadeado e sem ação de excluir; nunca mostra conteúdo do material.
 - Chip de Disciplina: superfície neutra com ponto de cor; nunca usar arco-íris de chips juntos.
 - Progresso do Horizonte: cobertura do Edital, não chance de aprovação.
 - Bottom navigation: cinco itens no máximo; Hoje, Esta semana, Horizontes, Revisões e Mais.
@@ -351,38 +351,36 @@ Material fechado
 [Conferir com o material]
 ```
 
-O material permanece invisível no passo De cabeça. Questões erradas só contam como corrigidas depois do Motivo do erro. Ao final, mostrar as três datas de Revisão.
+O material permanece invisível no passo De cabeça. Questões erradas só contam como corrigidas depois da Regra certa e do Por que eu caí. Ao final, mostrar as três datas de Revisão.
 
 ### 5.4 Caderno de Erros
 
 ```text
-Caderno de Erros      [Disciplina ▾] [Tipo ▾]
+Caderno de Erros             [Caderno ativo] [Arquivo]
+[Todos] [Conteúdo] [Leitura] [Pressa] [Armadilha]
 
-Questão a corrigir · Tópico
-Sua resposta / resposta correta
-Motivo do erro* __________________________
-[Salvar correção]
+Tópico · Disciplina · Questão
+Tipo do erro: Leitura
+A regra certa, com minhas palavras __________
+Por que eu caí ______________________________
+Próxima Revisão do Caderno: 7 dias
 ```
 
-Filtros de tipo: esquecimento, troca de conceito, leitura apressada, exceção ignorada e raciocínio incompleto. A categoria ajuda a filtrar, mas nunca substitui o texto pessoal.
+Os quatro diagnósticos são Conteúdo, Leitura, Pressa e Armadilha. A categoria nunca substitui os dois campos pessoais: Regra certa e Por que eu caí. Em 1 dia, o aluno lê a regra; em 7 dias, recupera-a de memória; em 30 dias, refaz a questão. Acerto seguro move o registro para o Arquivo; reincidência o torna prioridade máxima.
 
-### 5.5 Véspera
+### 5.5 Edital — Tópico Revisão de Véspera
 
 ```text
-Véspera · Disciplina principal
-12 itens ainda marcados
-☑ 1. Prazo…              dúvida em 1 revisão
-☐ 2. Percentual…         sem dúvida em 2 revisões
+Disciplina
+1. Tópico cadastrado
+2. Tópico cadastrado
+3. Revisão de Véspera        [Obrigatório 🔒]
 
-Roteiro das 48 h
-2 dias antes → maior peso
-Véspera manhã → restantes
-Véspera tarde → atualizações
-Véspera noite → parar
-Dia da prova → marcados, máximo 30 min
+Conteúdo no material de estudo
+Planejamento e realização acompanhados pelo Alvorada
 ```
 
-Item sem dúvida por três revisões seguidas é desmarcado automaticamente. À noite, a única ação é “Ver checklist para amanhã”.
+O Tópico é criado automaticamente em toda Disciplina, permanece sempre na última posição e não pode ser excluído. O Plano pode programá-lo perto da prova, mas o app não armazena listas, teses, prazos, pegadinhas ou anotações da revisão.
 
 ### 5.6 Esta semana
 
@@ -423,9 +421,12 @@ app/lib/src/features/horizons/presentation/
 
 app/lib/src/features/reviews/presentation/
 └── reviews_page.dart
+
+app/lib/src/features/errors/presentation/
+└── error_notebook_page.dart
 ```
 
-Dependências: `google_fonts`, `phosphor_flutter` e `flutter_svg`. O tema usa Material 3, modo claro e escuro, componentes com aparência de papel e tipografia por função. Hoje, Esta semana, Horizontes e Revisões formam o primeiro fluxo navegável com dados demonstrativos.
+Dependências: `google_fonts`, `phosphor_flutter` e `flutter_svg`. O tema usa Material 3, modo claro e escuro, componentes com aparência de papel e tipografia por função. Hoje, Esta semana, Horizontes, Revisões e Caderno de Erros formam o primeiro fluxo navegável com dados demonstrativos.
 
 Nota de compatibilidade: na versão atual do Flutter, `IconData` é final e a classe de ícone do pacote ainda tenta estendê-la. Por isso, `AppIcons` referencia diretamente os glifos e as fontes oficiais distribuídos pelo próprio `phosphor_flutter`; o pacote continua sendo a fonte visual, sem bloquear o build release.
 
@@ -453,7 +454,7 @@ Nota de compatibilidade: na versão atual do Flutter, `IconData` é final e a cl
 
 ## Linguagem
 
-- Horizonte, Edital, Plano, Esta semana, Alvorada do dia, Turno, De cabeça, Revisão programada, Fixado, Caderno de Erros, Véspera e Dias de sol.
+- Horizonte, Edital, Plano, Esta semana, Alvorada do dia, Turno, De cabeça, Revisão programada, Fixado, Caderno de Erros, Revisão de Véspera e Dias de sol.
 - “Dias de sol” mostra a semana; não é streak.
 - “Disciplina principal” substitui “peso-pesado”.
 - Nunca: “você falhou”, “você está atrasado”, “não quebre sua sequência”.
@@ -472,4 +473,4 @@ Nota de compatibilidade: na versão atual do Flutter, `IconData` é final e a cl
 9. Planejar com horas reais, incluindo dias ruins e imprevistos.
 10. Nunca tratar grifo como evidência de domínio.
 11. Nunca duplicar o ciclo de um Tópico compartilhado entre Horizontes.
-12. Na Véspera à noite, mandar parar.
+12. Tratar Revisão de Véspera como Tópico obrigatório, nunca como área de conteúdo do app.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/theme/app_theme.dart';
+import 'features/errors/presentation/error_notebook_page.dart';
 import 'features/horizons/presentation/horizons_page.dart';
 import 'features/reviews/presentation/reviews_page.dart';
 import 'features/today/presentation/today_page.dart';
@@ -18,6 +19,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/revisoes',
       builder: (context, state) => const ReviewsPage(),
+    ),
+    GoRoute(
+      path: '/caderno-de-erros',
+      builder: (context, state) => const ErrorNotebookPage(),
     ),
   ],
 );

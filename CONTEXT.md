@@ -31,7 +31,7 @@ _Evitar_: Meta diária, tarefas obrigatórias, desafio
 ## Conteúdo
 
 **Disciplina**:
-Uma área de conhecimento presente em um ou mais Editais.
+Uma área de conhecimento presente em um ou mais Editais e que contém, obrigatoriamente, o Tópico Revisão de Véspera.
 _Evitar_: Matéria, curso, módulo
 
 **Disciplina principal**:
@@ -41,6 +41,10 @@ _Evitar_: Peso-pesado, matéria difícil
 **Tópico**:
 A unidade de estudo compartilhável entre Editais, com um único ciclo e um único histórico de Revisões programadas.
 _Evitar_: Capítulo, assunto duplicado, unidade por edital
+
+**Revisão de Véspera**:
+O Tópico estrutural, obrigatório e sempre último de cada Disciplina. Seu conteúdo permanece no material de estudo; o Alvorada registra somente seu planejamento e sua realização.
+_Evitar_: Menu Véspera, lista de gatilhos no app, conteúdo de revisão no app
 
 **Subtópico**:
 Um detalhamento de um tópico usado para organizar seu escopo.
@@ -73,19 +77,35 @@ O estado calculado de um Tópico que superou 80% de acerto na Revisão de 30 dia
 _Evitar_: Concluído, dominado, marcado como pronto
 
 **Caderno de Erros**:
-O registro de questões erradas acompanhado, obrigatoriamente, do motivo escrito pela própria pessoa.
+O conjunto de questões erradas ou acertadas com dúvida que ainda precisam de diagnóstico e Revisão do Caderno. Cada registro exige Tipo do erro, Regra certa e Por que eu caí.
 _Evitar_: Lista de erros, histórico de falhas
 
-**Motivo do erro**:
-A explicação pessoal do raciocínio, esquecimento ou troca que levou a uma resposta incorreta.
-_Evitar_: Justificativa automática, categoria sem explicação
+**Tipo do erro**:
+O diagnóstico de uma resposta entre Conteúdo, Leitura, Pressa ou Armadilha. “Falta de atenção” não é um diagnóstico válido.
+_Evitar_: Motivo do erro, falha genérica, falta de atenção
 
-**Véspera**:
-A lista de gatilhos de memória de uma disciplina e o roteiro de consulta das 48 horas anteriores à prova.
-_Evitar_: Resumo final, material novo, revisão completa
+**Regra certa**:
+A regra que resolve a questão, reescrita pela própria pessoa com o gabarito fechado.
+_Evitar_: Cópia do gabarito, resumo do assunto
+
+**Por que eu caí**:
+A explicação específica, escrita pela própria pessoa, da decisão, palavra ou condição que a levou ao erro.
+_Evitar_: Motivo automático, sentimento, categoria sem explicação
+
+**Revisão do Caderno**:
+O ciclo próprio de um registro: ler a Regra certa em 1 dia, recuperá-la de memória em 7 dias e refazer a questão em 30 dias.
+_Evitar_: Releitura do Caderno, Revisão programada do Tópico
+
+**Caderno ativo**:
+Os registros que ainda estão no ciclo de Revisão do Caderno.
+_Evitar_: Pendências, erros não resolvidos
+
+**Arquivo do Caderno**:
+Os registros retirados do Caderno ativo após a questão ser refeita com segurança na revisão de 30 dias.
+_Evitar_: Lixeira, histórico morto, erros concluídos
 
 **Simulado**:
-Um bloco cronometrado de questões corrigido com registro dos motivos no Caderno de Erros.
+Um bloco cronometrado de questões corrigido com Regra certa e Por que eu caí para cada erro.
 _Evitar_: Quiz, jogo, desafio
 
 ## Ritmo e descanso
@@ -107,9 +127,9 @@ A fase em que entram as Revisões programadas, as disciplinas restantes e a pred
 _Evitar_: Fase intermediária
 
 **Reta final**:
-A fase de atualizações, jurisprudência, simulado, correção e Véspera.
+A fase de atualizações, jurisprudência, simulado, correção e planejamento do Tópico Revisão de Véspera perto da prova.
 _Evitar_: Sprint, maratona final
 
 **Rota de 30 dias**:
-A preparação curta que prioriza Véspera, atualizações, jurisprudência e simulado em vez do plano longo.
+A preparação curta que prioriza o Tópico Revisão de Véspera, atualizações, jurisprudência e simulado em vez do plano longo.
 _Evitar_: Modo desespero, plano acelerado

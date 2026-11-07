@@ -38,6 +38,7 @@ app/                         Flutter Web
   lib/src/features/week/     tela Esta semana, somente apresentação
   lib/src/features/horizons/ tela Horizontes, somente apresentação
   lib/src/features/reviews/  tela Revisões, somente apresentação
+  lib/src/features/errors/   tela Caderno de Erros, somente apresentação
 
 api/                         API REST em Go
   cmd/server/                composição e inicialização

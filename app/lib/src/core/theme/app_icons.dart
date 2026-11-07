@@ -10,9 +10,10 @@ abstract final class AppIcons {
   static const double standard = 24;
   static const double prominent = 28;
 
-  static const String _regular = 'PhosphorRegular';
+  static const String _regular = 'AlvoradaPhosphor';
   static const String _fill = 'PhosphorFill';
-  static const String _package = 'phosphor_flutter';
+  static const String? _package = null;
+  static const String _fillPackage = 'phosphor_flutter';
 
   static const today = IconData(
     0xe5b6,
@@ -22,7 +23,7 @@ abstract final class AppIcons {
   static const todayActive = IconData(
     0xe5b6,
     fontFamily: _fill,
-    fontPackage: _package,
+    fontPackage: _fillPackage,
   );
   static const calendar = IconData(
     0xe7b4,
@@ -32,7 +33,7 @@ abstract final class AppIcons {
   static const calendarActive = IconData(
     0xe7b4,
     fontFamily: _fill,
-    fontPackage: _package,
+    fontPackage: _fillPackage,
   );
   static const horizons = IconData(
     0xe47c,
@@ -42,7 +43,7 @@ abstract final class AppIcons {
   static const horizonsActive = IconData(
     0xe47c,
     fontFamily: _fill,
-    fontPackage: _package,
+    fontPackage: _fillPackage,
   );
   static const reviews = IconData(
     0xe094,
@@ -52,15 +53,20 @@ abstract final class AppIcons {
   static const reviewsActive = IconData(
     0xe094,
     fontFamily: _fill,
-    fontPackage: _package,
+    fontPackage: _fillPackage,
   );
   static const errorNotebook = IconData(
     0xe34e,
     fontFamily: _regular,
     fontPackage: _package,
   );
-  static const eve = IconData(
-    0xeadc,
+  static const errorNotebookActive = IconData(
+    0xe34e,
+    fontFamily: _fill,
+    fontPackage: _fillPackage,
+  );
+  static const lockedTopic = IconData(
+    0xe308,
     fontFamily: _regular,
     fontPackage: _package,
   );
@@ -145,7 +151,7 @@ abstract final class AppIcons {
   static const play = IconData(
     0xe3d0,
     fontFamily: _fill,
-    fontPackage: _package,
+    fontPackage: _fillPackage,
   );
   static const check = IconData(
     0xe182,

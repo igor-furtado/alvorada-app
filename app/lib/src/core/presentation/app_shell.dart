@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../theme/app_theme.dart';
 
-enum AppSection { today, week, horizons, reviews, errors, eve, settings }
+enum AppSection { today, week, horizons, reviews, errors, settings }
 
 typedef AppShellBuilder = Widget Function(BuildContext context, bool desktop);
 
@@ -86,14 +86,9 @@ class _SideNavigation extends StatelessWidget {
             _SideItem(
               label: 'Caderno de Erros',
               icon: AppIcons.errorNotebook,
+              activeIcon: AppIcons.errorNotebookActive,
               selected: section == AppSection.errors,
               onTap: () => _open(context, AppSection.errors),
-            ),
-            _SideItem(
-              label: 'Véspera',
-              icon: AppIcons.eve,
-              selected: section == AppSection.eve,
-              onTap: () => _open(context, AppSection.eve),
             ),
             const Spacer(),
             _SideItem(
@@ -226,6 +221,7 @@ void _open(BuildContext context, AppSection destination) {
     AppSection.week => '/semana',
     AppSection.horizons => '/horizontes',
     AppSection.reviews => '/revisoes',
+    AppSection.errors => '/caderno-de-erros',
     _ => null,
   };
 

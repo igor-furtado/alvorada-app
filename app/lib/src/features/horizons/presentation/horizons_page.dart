@@ -32,6 +32,29 @@ class HorizonsPage extends StatelessWidget {
     ),
   ];
 
+  static const _disciplines = [
+    _DisciplinePreview(
+      title: 'Direito Constitucional',
+      topics: [
+        'Princípios fundamentais',
+        'Direitos e garantias fundamentais',
+        'Controle de constitucionalidade',
+      ],
+    ),
+    _DisciplinePreview(
+      title: 'Direito Administrativo',
+      topics: [
+        'Atos administrativos',
+        'Responsabilidade civil do Estado',
+        'Serviços públicos',
+      ],
+    ),
+    _DisciplinePreview(
+      title: 'Língua Portuguesa',
+      topics: ['Interpretação de textos', 'Concordância', 'Regência'],
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) => AppShell(
     section: AppSection.horizons,
@@ -246,6 +269,32 @@ class _HorizonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final progress = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Cobertura do Edital',
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+            const Spacer(),
+            Text(
+              '${(horizon.progress * 100).round()}%',
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        LinearProgressIndicator(value: horizon.progress, minHeight: 7),
+      ],
+    );
+    final editalButton = OutlinedButton(
+      onPressed: () =>
+          _showEditalDialog(context, horizon, HorizonsPage._disciplines),
+      child: const Text('Ver Edital'),
+    );
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -256,132 +305,120 @@ class _HorizonCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (horizon.isPrimary) Container(width: 6, color: scheme.primary),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
+      child: Stack(
+        children: [
+          if (horizon.isPrimary)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 6,
+              child: ColoredBox(color: scheme.primary),
+            ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              horizon.isPrimary ? 26 : 20,
+              20,
+              20,
+              20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: scheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            horizon.isPrimary
-                                ? AppIcons.horizonsActive
-                                : AppIcons.horizons,
-                            color: scheme.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (horizon.isPrimary) ...[
-                                const _PrimaryBadge(),
-                                const SizedBox(height: 8),
-                              ],
-                              Text(
-                                horizon.title,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.headlineSmall,
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                horizon.area,
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: 'Mais opções',
-                          onPressed: () => _showPreviewMessage(context),
-                          icon: const Icon(Icons.more_horiz),
-                        ),
-                      ],
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: scheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        horizon.isPrimary
+                            ? AppIcons.horizonsActive
+                            : AppIcons.horizons,
+                        color: scheme.primary,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      spacing: 18,
-                      runSpacing: 12,
-                      children: [
-                        _MetaItem(
-                          label: 'Prova',
-                          value:
-                              '${horizon.examDate} · ${horizon.daysUntilExam} dias',
-                        ),
-                        _MetaItem(label: 'Fase', value: horizon.phase),
-                        _MetaItem(
-                          label: 'Edital',
-                          value:
-                              '${horizon.disciplines} disciplinas · ${horizon.topics} tópicos',
-                        ),
-                        _MetaItem(
-                          label: 'Esta semana',
-                          value: '${horizon.weeklyHours} h por semana',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'Cobertura do Edital',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium,
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    '${(horizon.progress * 100).round()}%',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              LinearProgressIndicator(
-                                value: horizon.progress,
-                                minHeight: 7,
-                              ),
-                            ],
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (horizon.isPrimary) ...[
+                            const _PrimaryBadge(),
+                            const SizedBox(height: 8),
+                          ],
+                          Text(
+                            horizon.title,
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        OutlinedButton(
-                          onPressed: () => _showPreviewMessage(context),
-                          child: const Text('Ver Edital'),
-                        ),
-                      ],
+                          const SizedBox(height: 3),
+                          Text(
+                            horizon.area,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Mais opções',
+                      onPressed: () => _showPreviewMessage(context),
+                      icon: const Icon(Icons.more_horiz),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 18,
+                  runSpacing: 12,
+                  children: [
+                    _MetaItem(
+                      label: 'Prova',
+                      value:
+                          '${horizon.examDate} · ${horizon.daysUntilExam} dias',
+                    ),
+                    _MetaItem(label: 'Fase', value: horizon.phase),
+                    _MetaItem(
+                      label: 'Edital',
+                      value:
+                          '${horizon.disciplines} disciplinas · ${horizon.topics} tópicos',
+                    ),
+                    _MetaItem(
+                      label: 'Esta semana',
+                      value: '${horizon.weeklyHours} h por semana',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 420) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          progress,
+                          const SizedBox(height: 16),
+                          editalButton,
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(child: progress),
+                        const SizedBox(width: 20),
+                        editalButton,
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -582,6 +619,300 @@ class _SharedTopicsCard extends StatelessWidget {
   );
 }
 
+class _EditalDialog extends StatelessWidget {
+  const _EditalDialog({required this.horizon, required this.disciplines});
+
+  final _HorizonPreview horizon;
+  final List<_DisciplinePreview> disciplines;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final availableHeight = MediaQuery.sizeOf(context).height * .88;
+
+    return Dialog(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 760, maxHeight: availableHeight),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Edital',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          horizon.title,
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Fechar Edital',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: scheme.outlineVariant),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _EveReviewBoundaryCard(),
+                    const SizedBox(height: 24),
+                    Text(
+                      '${disciplines.length} disciplinas nesta prévia',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Cada Disciplina recebe automaticamente o Tópico obrigatório na última posição.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    for (
+                      var index = 0;
+                      index < disciplines.length;
+                      index++
+                    ) ...[
+                      _DisciplineTopicsCard(discipline: disciplines[index]),
+                      if (index < disciplines.length - 1)
+                        const SizedBox(height: 14),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EveReviewBoundaryCard extends StatelessWidget {
+  const _EveReviewBoundaryCard();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          AppIcons.lockedTopic,
+          size: 22,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'O conteúdo permanece no material',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'O Alvorada não guarda listas ou anotações da Revisão de Véspera. O Plano pode programar o Tópico perto da prova e o app registra apenas seu planejamento e sua realização.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _DisciplineTopicsCard extends StatelessWidget {
+  const _DisciplineTopicsCard({required this.discipline});
+
+  final _DisciplinePreview discipline;
+
+  @override
+  Widget build(BuildContext context) {
+    final topics = discipline.orderedTopics;
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      key: ValueKey('discipline-${discipline.title}'),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        border: Border.all(color: scheme.outlineVariant),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: scheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(AppIcons.book, color: scheme.primary, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        discipline.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${discipline.topics.length} cadastrados · 1 obrigatório',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _showPreviewMessage(context),
+                  icon: const Icon(AppIcons.add, size: 17),
+                  label: const Text('Tópico'),
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 1, color: scheme.outlineVariant),
+          for (var index = 0; index < topics.length; index++) ...[
+            _TopicRow(
+              topic: topics[index],
+              position: index + 1,
+              discipline: discipline.title,
+            ),
+            if (index < topics.length - 1)
+              Divider(height: 1, indent: 54, color: scheme.outlineVariant),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TopicRow extends StatelessWidget {
+  const _TopicRow({
+    required this.topic,
+    required this.position,
+    required this.discipline,
+  });
+
+  final _TopicPreview topic;
+  final int position;
+  final String discipline;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      key: ValueKey(
+        topic.isRequired
+            ? 'required-eve-review-$discipline'
+            : 'topic-$discipline-${topic.title}',
+      ),
+      color: topic.isRequired
+          ? scheme.primaryContainer.withValues(alpha: .44)
+          : Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(16, 11, 12, 11),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 26,
+            child: Text(
+              '$position.',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          Icon(
+            topic.isRequired ? AppIcons.lockedTopic : AppIcons.bookText,
+            size: 18,
+            color: topic.isRequired ? scheme.primary : scheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  topic.title,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                if (topic.isRequired) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'Planejamento e realização acompanhados pelo Alvorada.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (topic.isRequired)
+            Tooltip(
+              message: 'Tópico obrigatório: não pode ser excluído',
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Obrigatório',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: scheme.primary),
+                ),
+              ),
+            )
+          else
+            IconButton(
+              tooltip: 'Excluir Tópico',
+              visualDensity: VisualDensity.compact,
+              onPressed: () => _showPreviewMessage(context),
+              icon: const Icon(Icons.delete_outline, size: 19),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _NewHorizonDialog extends StatelessWidget {
   const _NewHorizonDialog();
 
@@ -640,12 +971,22 @@ Future<void> _showNewHorizonDialog(BuildContext context) async {
   );
 }
 
+Future<void> _showEditalDialog(
+  BuildContext context,
+  _HorizonPreview horizon,
+  List<_DisciplinePreview> disciplines,
+) => showDialog<void>(
+  context: context,
+  builder: (context) =>
+      _EditalDialog(horizon: horizon, disciplines: disciplines),
+);
+
 void _showPreviewMessage(BuildContext context) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
       const SnackBar(
-        content: Text('O Edital será detalhado em uma das próximas telas.'),
+        content: Text('Esta ação será conectada aos dados depois.'),
       ),
     );
 }
@@ -674,4 +1015,30 @@ class _HorizonPreview {
   final int topics;
   final int weeklyHours;
   final bool isPrimary;
+}
+
+class _DisciplinePreview {
+  const _DisciplinePreview({required this.title, required this.topics});
+
+  static const _requiredEveReview = _TopicPreview(
+    title: 'Revisão de Véspera',
+    isRequired: true,
+  );
+
+  final String title;
+  final List<String> topics;
+
+  /// A regra estrutural fica na composição da Disciplina: quem a apresenta
+  /// sempre recebe o Tópico obrigatório depois dos Tópicos cadastrados.
+  List<_TopicPreview> get orderedTopics => [
+    for (final topic in topics) _TopicPreview(title: topic),
+    _requiredEveReview,
+  ];
+}
+
+class _TopicPreview {
+  const _TopicPreview({required this.title, this.isRequired = false});
+
+  final String title;
+  final bool isRequired;
 }
