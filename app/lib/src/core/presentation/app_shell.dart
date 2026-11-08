@@ -215,6 +215,64 @@ class AppBrandLogo extends StatelessWidget {
   }
 }
 
+class AppBreadcrumbItem {
+  const AppBreadcrumbItem({required this.label, this.route});
+
+  final String label;
+  final String? route;
+}
+
+/// Navegação estrutural para telas internas do aplicativo.
+///
+/// O último item representa a tela atual; os anteriores permanecem clicáveis
+/// para que a pessoa retorne rapidamente ao nível anterior.
+class AppBreadcrumbs extends StatelessWidget {
+  const AppBreadcrumbs({required this.items, super.key});
+
+  final List<AppBreadcrumbItem> items;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Rota de navegação',
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (var index = 0; index < items.length; index++) ...[
+            if (index > 0) ...[
+              Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 4),
+            ],
+            if (items[index].route case final route?)
+              TextButton(
+                onPressed: () => context.go(route),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, 36),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                ),
+                child: Text(items[index].label),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text(
+                  items[index].label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
 void _open(BuildContext context, AppSection destination) {
   final route = switch (destination) {
     AppSection.today => '/',

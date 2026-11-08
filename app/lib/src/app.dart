@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/errors/presentation/error_notebook_page.dart';
+import 'features/horizons/presentation/discipline_details_page.dart';
+import 'features/horizons/presentation/horizon_details_page.dart';
+import 'features/horizons/presentation/horizon_view_data.dart';
 import 'features/horizons/presentation/horizons_page.dart';
 import 'features/reviews/presentation/reviews_page.dart';
 import 'features/today/presentation/today_page.dart';
@@ -15,6 +18,29 @@ final _router = GoRouter(
     GoRoute(
       path: '/horizontes',
       builder: (context, state) => const HorizonsPage(),
+      routes: [
+        GoRoute(
+          path: ':horizonId',
+          builder: (context, state) => HorizonDetailsPage(
+            horizonId: state.pathParameters['horizonId']!,
+            horizonOverride: state.extra is HorizonViewData
+                ? state.extra! as HorizonViewData
+                : null,
+          ),
+          routes: [
+            GoRoute(
+              path: 'disciplinas/:disciplineName',
+              builder: (context, state) => DisciplineDetailsPage(
+                horizonId: state.pathParameters['horizonId']!,
+                disciplineName: state.pathParameters['disciplineName']!,
+                arguments: state.extra is DisciplineDetailsArguments
+                    ? state.extra! as DisciplineDetailsArguments
+                    : null,
+              ),
+            ),
+          ],
+        ),
+      ],
     ),
     GoRoute(
       path: '/revisoes',
