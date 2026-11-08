@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 import 'discipline_details_page.dart';
 import 'horizon_view_data.dart';
 
@@ -50,76 +51,62 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final horizon = _horizon;
-    return AppShell(
+    return AppPageTemplate(
       section: AppSection.horizons,
-      builder: (context, desktop) => SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.xl,
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.huge,
+      maxWidth: context.tokens.sizes.horizonPage,
+      builder: (context, desktop) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!desktop) ...[
+            AppBrandLogo(width: context.tokens.layout.brandWidth),
+            SizedBox(height: context.tokens.spacing.xxl),
+          ],
+          AppBreadcrumbs(
+            items: [
+              const AppBreadcrumbItem(
+                label: 'Horizontes',
+                route: '/horizontes',
+              ),
+              AppBreadcrumbItem(
+                label: horizon?.shortName ?? 'Não encontrado',
+              ),
+            ],
           ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: context.tokens.sizes.horizonPage),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!desktop) ...[
-                    AppBrandLogo(width: context.tokens.layout.brandWidth),
-                    SizedBox(height: context.tokens.spacing.xxl),
-                  ],
-                  AppBreadcrumbs(
-                    items: [
-                      const AppBreadcrumbItem(
-                        label: 'Horizontes',
-                        route: '/horizontes',
-                      ),
-                      AppBreadcrumbItem(
-                        label: horizon?.shortName ?? 'Não encontrado',
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: context.tokens.spacing.xl),
-                  if (horizon == null)
-                    const _NotFound()
-                  else ...[
-                    _HorizonSummary(
-                      horizon: horizon,
-                      disciplineCount: _disciplines.length,
-                    ),
-                    SizedBox(height: context.tokens.spacing.xl),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: FilledButton.icon(
-                        onPressed: _addDiscipline,
-                        icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-                        label: const Text('Nova Disciplina'),
-                      ),
-                    ),
-                    SizedBox(height: context.tokens.spacing.lg),
-                    _VerticalizedEdital(
-                      disciplines: _visibleDisciplines,
-                      sort: _sort,
-                      sortAscending: _sortAscending,
-                      onSort: _setSort,
-                      onChangeWeight: _changeWeight,
-                      onRemove: _remove,
-                      onOpen: (discipline) => context.go(
-                        '/horizontes/${Uri.encodeComponent(horizon.id)}/disciplinas/${Uri.encodeComponent(discipline.name)}',
-                        extra: DisciplineDetailsArguments(
-                          horizon: horizon,
-                          discipline: discipline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+          SizedBox(height: context.tokens.spacing.xl),
+          if (horizon == null)
+            const _NotFound()
+          else ...[
+            _HorizonSummary(
+              horizon: horizon,
+              disciplineCount: _disciplines.length,
+            ),
+            SizedBox(height: context.tokens.spacing.xl),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.icon(
+                onPressed: _addDiscipline,
+                icon: Icon(AppIcons.add, size: context.tokens.icons.md),
+                label: const Text('Nova Disciplina'),
               ),
             ),
-          ),
-        ),
+            SizedBox(height: context.tokens.spacing.lg),
+            _VerticalizedEdital(
+              disciplines: _visibleDisciplines,
+              sort: _sort,
+              sortAscending: _sortAscending,
+              onSort: _setSort,
+              onChangeWeight: _changeWeight,
+              onRemove: _remove,
+              onOpen: (discipline) => context.go(
+                '/horizontes/${Uri.encodeComponent(horizon.id)}/disciplinas/${Uri.encodeComponent(discipline.name)}',
+                extra: DisciplineDetailsArguments(
+                  horizon: horizon,
+                  discipline: discipline,
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

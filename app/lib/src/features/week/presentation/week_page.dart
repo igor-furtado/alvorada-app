@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 
 class WeekPage extends StatelessWidget {
   const WeekPage({super.key});
@@ -191,32 +192,9 @@ class WeekPage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) => AppShell(
+  Widget build(BuildContext context) => AppPageTemplate(
     section: AppSection.week,
-    builder: (context, desktop) => SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.xl,
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.huge,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: context.tokens.layout.contentMaxWidth,
-                  ),
-                  child: _WeekContent(days: _days, desktop: desktop),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
+    builder: (context, desktop) => _WeekContent(days: _days, desktop: desktop),
   );
 }
 
@@ -247,7 +225,7 @@ class _WeekContent extends StatelessWidget {
               : constraints.maxWidth >= context.tokens.layout.twoColumn
               ? 2
               : 1;
-          final gaps = 16.0 * (columns - 1);
+          final gaps = context.tokens.spacing.lg * (columns - 1);
           final width = (constraints.maxWidth - gaps) / columns;
           return Wrap(
             spacing: context.tokens.spacing.lg,
@@ -744,13 +722,7 @@ Future<void> _showAdjustmentDialog(BuildContext context) => showDialog<void>(
 );
 
 void _showPreviewMessage(BuildContext context) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      const SnackBar(
-        content: Text('As outras semanas entram na próxima etapa.'),
-      ),
-    );
+  AppSnackbar.show(context, message: 'As outras semanas entram na próxima etapa.');
 }
 
 enum _DayStatus { done, today, planned }

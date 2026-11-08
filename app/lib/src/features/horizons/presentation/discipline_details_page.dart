@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 import 'horizon_view_data.dart';
 
 class DisciplineDetailsArguments {
@@ -63,65 +64,51 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
   Widget build(BuildContext context) {
     final horizon = _horizon;
     final discipline = _discipline;
-    return AppShell(
+    return AppPageTemplate(
       section: AppSection.horizons,
-      builder: (context, desktop) => SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.xl,
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.huge,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: context.tokens.sizes.disciplinePage),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!desktop) ...[
-                    AppBrandLogo(width: context.tokens.layout.brandWidth),
-                    SizedBox(height: context.tokens.spacing.xxl),
-                  ],
-                  AppBreadcrumbs(
-                    items: [
-                      const AppBreadcrumbItem(
-                        label: 'Horizontes',
-                        route: '/horizontes',
-                      ),
-                      AppBreadcrumbItem(
-                        label: horizon?.shortName ?? 'Horizonte',
-                        route: horizon == null ? null : '/horizontes/${Uri.encodeComponent(horizon.id)}',
-                      ),
-                      AppBreadcrumbItem(
-                        label: _nameController.text.isEmpty ? 'Disciplina' : _nameController.text,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: context.tokens.spacing.xl),
-                  if (horizon == null || discipline == null)
-                    const _NotFound()
-                  else ...[
-                    _EditableDisciplineHeader(
-                      horizon: horizon,
-                      discipline: discipline,
-                      nameController: _nameController,
-                      weightController: _weightController,
-                      onNameChanged: (_) => setState(() {}),
-                    ),
-                    SizedBox(height: context.tokens.spacing.xxl),
-                    _VerticalizedTopics(
-                      topics: _topics,
-                      completed: _completedUnits,
-                      total: _totalUnits,
-                      onChanged: () => setState(() {}),
-                    ),
-                  ],
-                ],
+      maxWidth: context.tokens.sizes.disciplinePage,
+      builder: (context, desktop) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!desktop) ...[
+            AppBrandLogo(width: context.tokens.layout.brandWidth),
+            SizedBox(height: context.tokens.spacing.xxl),
+          ],
+          AppBreadcrumbs(
+            items: [
+              const AppBreadcrumbItem(
+                label: 'Horizontes',
+                route: '/horizontes',
               ),
-            ),
+              AppBreadcrumbItem(
+                label: horizon?.shortName ?? 'Horizonte',
+                route: horizon == null ? null : '/horizontes/${Uri.encodeComponent(horizon.id)}',
+              ),
+              AppBreadcrumbItem(
+                label: _nameController.text.isEmpty ? 'Disciplina' : _nameController.text,
+              ),
+            ],
           ),
-        ),
+          SizedBox(height: context.tokens.spacing.xl),
+          if (horizon == null || discipline == null)
+            const _NotFound()
+          else ...[
+            _EditableDisciplineHeader(
+              horizon: horizon,
+              discipline: discipline,
+              nameController: _nameController,
+              weightController: _weightController,
+              onNameChanged: (_) => setState(() {}),
+            ),
+            SizedBox(height: context.tokens.spacing.xxl),
+            _VerticalizedTopics(
+              topics: _topics,
+              completed: _completedUnits,
+              total: _totalUnits,
+              onChanged: () => setState(() {}),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 
 class ReviewsPage extends StatelessWidget {
   const ReviewsPage({super.key});
@@ -40,32 +41,9 @@ class ReviewsPage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) => AppShell(
+  Widget build(BuildContext context) => AppPageTemplate(
     section: AppSection.reviews,
-    builder: (context, desktop) => SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.xl,
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.huge,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: context.tokens.layout.contentMaxWidth,
-                  ),
-                  child: _ReviewsContent(reviews: _reviews, desktop: desktop),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
+    builder: (context, desktop) => _ReviewsContent(reviews: _reviews, desktop: desktop),
   );
 }
 
@@ -85,7 +63,13 @@ class _ReviewsContent extends StatelessWidget {
       ],
       const _Header(),
       SizedBox(height: context.tokens.spacing.xxxl),
-      const _Overview(),
+      const AppMetricOverview(
+        items: [
+          AppMetricData(icon: AppIcons.reviews, value: '3', label: 'Revisões para hoje'),
+          AppMetricData(icon: AppIcons.mockExam, value: '33 min', label: 'Tempo previsto'),
+          AppMetricData(icon: AppIcons.calendar, value: '7', label: 'Revisões nesta semana'),
+        ],
+      ),
       SizedBox(height: context.tokens.spacing.xxl),
       const _Filters(),
       SizedBox(height: context.tokens.spacing.xl),
@@ -160,10 +144,11 @@ class _Header extends StatelessWidget {
           ),
         ],
       );
-      final button = OutlinedButton.icon(
+      final button = AppButton(
         onPressed: () => _showMethodDialog(context),
-        icon: Icon(AppIcons.observation, size: context.tokens.icons.md),
-        label: const Text('Como funciona'),
+        variant: AppButtonVariant.outline,
+        icon: AppIcons.observation,
+        label: 'Como funciona',
       );
 
       if (compact) {
@@ -184,81 +169,6 @@ class _Header extends StatelessWidget {
         ],
       );
     },
-  );
-}
-
-class _Overview extends StatelessWidget {
-  const _Overview();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.all(context.tokens.spacing.xl),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: context.tokens.borders.lg,
-    ),
-    child: Wrap(
-      spacing: context.tokens.spacing.xxxl,
-      runSpacing: context.tokens.spacing.lg,
-      children: const [
-        _OverviewItem(
-          icon: AppIcons.reviews,
-          value: '3',
-          label: 'Revisões para hoje',
-        ),
-        _OverviewItem(
-          icon: AppIcons.mockExam,
-          value: '33 min',
-          label: 'Tempo previsto',
-        ),
-        _OverviewItem(
-          icon: AppIcons.calendar,
-          value: '7',
-          label: 'Revisões nesta semana',
-        ),
-      ],
-    ),
-  );
-}
-
-class _OverviewItem extends StatelessWidget {
-  const _OverviewItem({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: context.tokens.sizes.overviewPanel,
-    child: Row(
-      children: [
-        Container(
-          width: context.tokens.layout.topicSelectionIndent,
-          height: context.tokens.sizes.iconContainerMd,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: context.tokens.borders.md,
-          ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        ),
-        SizedBox(width: context.tokens.spacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value, style: Theme.of(context).textTheme.titleMedium),
-              Text(label, style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
-        ),
-      ],
-    ),
   );
 }
 
@@ -728,13 +638,7 @@ Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
 );
 
 void _showFilterMessage(BuildContext context) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      const SnackBar(
-        content: Text('Os filtros serão conectados aos dados depois.'),
-      ),
-    );
+  AppSnackbar.show(context, message: 'Os filtros serão conectados aos dados depois.');
 }
 
 IconData _instructionIcon(_ReviewType type) => switch (type) {

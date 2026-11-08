@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 
 class ErrorNotebookPage extends StatefulWidget {
   const ErrorNotebookPage({super.key});
@@ -64,59 +65,40 @@ class _ErrorNotebookPageState extends State<ErrorNotebookPage> {
       _entries.where((entry) => _kind == null || entry.kind == _kind).toList(growable: false);
 
   @override
-  Widget build(BuildContext context) => AppShell(
+  Widget build(BuildContext context) => AppPageTemplate(
     section: AppSection.errors,
-    builder: (context, desktop) => SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.xl,
-              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.huge,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: context.tokens.layout.contentMaxWidth,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (!desktop) ...[
-                        AppBrandLogo(width: context.tokens.layout.brandWidth),
-                        SizedBox(height: context.tokens.spacing.xxxl),
-                      ],
-                      _Header(
-                        onAdd: () => _showRegisterDialog(context),
-                        onLearn: () => _showMethodDialog(context),
-                      ),
-                      SizedBox(height: context.tokens.spacing.xxxl),
-                      const _Overview(),
-                      SizedBox(height: context.tokens.spacing.xxl),
-                      _Filters(
-                        view: _view,
-                        kind: _kind,
-                        onViewChanged: (value) => setState(() => _view = value),
-                        onKindChanged: (value) => setState(() => _kind = value),
-                      ),
-                      SizedBox(height: context.tokens.spacing.xxl),
-                      if (_view == _NotebookView.active)
-                        _ActiveNotebook(entries: _visibleEntries)
-                      else
-                        const _ArchivePreview(),
-                      SizedBox(height: context.tokens.spacing.xxxl),
-                      const _MonthlyReading(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+    builder: (context, desktop) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!desktop) ...[
+          AppBrandLogo(width: context.tokens.layout.brandWidth),
+          SizedBox(height: context.tokens.spacing.xxxl),
         ],
-      ),
+        _Header(
+          onAdd: () => _showRegisterDialog(context),
+          onLearn: () => _showMethodDialog(context),
+        ),
+        SizedBox(height: context.tokens.spacing.xxxl),
+        const AppMetricOverview(
+          tone: AppMetricTone.error,
+          items: [
+            AppMetricData(icon: AppIcons.errorNotebook, value: '24', label: 'Registros ativos'),
+            AppMetricData(icon: AppIcons.reviews, value: '3', label: 'Para revisar hoje'),
+            AppMetricData(icon: AppIcons.statistics, value: 'Leitura', label: 'Causa mais frequente'),
+          ],
+        ),
+        SizedBox(height: context.tokens.spacing.xxl),
+        _Filters(
+          view: _view,
+          kind: _kind,
+          onViewChanged: (value) => setState(() => _view = value),
+          onKindChanged: (value) => setState(() => _kind = value),
+        ),
+        SizedBox(height: context.tokens.spacing.xxl),
+        if (_view == _NotebookView.active) _ActiveNotebook(entries: _visibleEntries) else const _ArchivePreview(),
+        SizedBox(height: context.tokens.spacing.xxxl),
+        const _MonthlyReading(),
+      ],
     ),
   );
 }
@@ -151,15 +133,16 @@ class _Header extends StatelessWidget {
         spacing: context.tokens.spacing.md,
         runSpacing: context.tokens.spacing.md,
         children: [
-          OutlinedButton.icon(
+          AppButton(
             onPressed: onLearn,
-            icon: Icon(AppIcons.observation, size: context.tokens.icons.md),
-            label: const Text('Como funciona'),
+            variant: AppButtonVariant.outline,
+            icon: AppIcons.observation,
+            label: 'Como funciona',
           ),
-          FilledButton.icon(
+          AppButton(
             onPressed: onAdd,
-            icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-            label: const Text('Registrar erro'),
+            icon: AppIcons.add,
+            label: 'Registrar erro',
           ),
         ],
       );
@@ -181,83 +164,6 @@ class _Header extends StatelessWidget {
         ],
       );
     },
-  );
-}
-
-class _Overview extends StatelessWidget {
-  const _Overview();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.all(context.tokens.spacing.xl),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: context.tokens.borders.lg,
-    ),
-    child: Wrap(
-      spacing: context.tokens.spacing.xxxl,
-      runSpacing: context.tokens.spacing.lg,
-      children: const [
-        _OverviewItem(
-          icon: AppIcons.errorNotebook,
-          value: '24',
-          label: 'Registros ativos',
-        ),
-        _OverviewItem(
-          icon: AppIcons.reviews,
-          value: '3',
-          label: 'Para revisar hoje',
-        ),
-        _OverviewItem(
-          icon: AppIcons.statistics,
-          value: 'Leitura',
-          label: 'Causa mais frequente',
-        ),
-      ],
-    ),
-  );
-}
-
-class _OverviewItem extends StatelessWidget {
-  const _OverviewItem({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: context.tokens.sizes.overviewPanel,
-    child: Row(
-      children: [
-        Container(
-          width: context.tokens.layout.topicSelectionIndent,
-          height: context.tokens.sizes.iconContainerMd,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.error.withValues(
-              alpha: context.tokens.opacity.tintStrong,
-            ),
-            borderRadius: context.tokens.borders.md,
-          ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface),
-        ),
-        SizedBox(width: context.tokens.spacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value, style: Theme.of(context).textTheme.titleMedium),
-              Text(label, style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
-        ),
-      ],
-    ),
   );
 }
 
@@ -908,13 +814,7 @@ Future<void> _showReviewPreview(
 );
 
 void _showDataMessage(BuildContext context) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      const SnackBar(
-        content: Text('Esta área será conectada aos dados depois.'),
-      ),
-    );
+  AppSnackbar.show(context, message: 'Esta área será conectada aos dados depois.');
 }
 
 String? _requiredText(String? value) =>

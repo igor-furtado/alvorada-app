@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 
 class TodayPage extends StatelessWidget {
   const TodayPage({super.key});
@@ -11,34 +12,10 @@ class TodayPage extends StatelessWidget {
     final now = DateTime.now();
     final isSunday = now.weekday == DateTime.sunday;
 
-    return AppShell(
+    return AppPageTemplate(
       section: AppSection.today,
-      builder: (context, desktop) => SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-                context.tokens.spacing.xl,
-                desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-                context.tokens.spacing.huge,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: context.tokens.layout.contentMaxWidth,
-                    ),
-                    child: isSunday
-                        ? _SundayView(date: now, desktop: desktop)
-                        : _TodayContent(date: now, desktop: desktop),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      builder: (context, desktop) =>
+          isSunday ? _SundayView(date: now, desktop: desktop) : _TodayContent(date: now, desktop: desktop),
     );
   }
 }

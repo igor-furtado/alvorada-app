@@ -57,6 +57,16 @@ abstract final class AppIcons {
     fontFamily: _regular,
     fontPackage: _package,
   );
+  static const search = IconData(
+    0xe30c,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const close = IconData(
+    0xe4f6,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
 
   static const today = IconData(
     0xe5b6,

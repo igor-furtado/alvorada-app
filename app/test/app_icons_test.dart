@@ -15,6 +15,8 @@ void main() {
       AppIcons.delete,
       AppIcons.sortAscending,
       AppIcons.sortDescending,
+      AppIcons.search,
+      AppIcons.close,
     ];
 
     for (final icon in icons) {

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/ui/app_ui.dart';
 import 'horizon_view_data.dart';
 
 class HorizonsPage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _HorizonsPageState extends State<HorizonsPage> {
   final _horizons = List<HorizonViewData>.of(demoHorizons);
 
   @override
-  Widget build(BuildContext context) => AppShell(
+  Widget build(BuildContext context) => AppPageTemplate(
     section: AppSection.horizons,
     builder: (context, desktop) {
       final callbacks = _Callbacks(
@@ -26,32 +27,15 @@ class _HorizonsPageState extends State<HorizonsPage> {
         archive: _archive,
         delete: _delete,
       );
-      return SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.xl,
-            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-            context.tokens.spacing.huge,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: context.tokens.layout.contentMaxWidth,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!desktop) ...[
-                    AppBrandLogo(width: context.tokens.layout.brandWidth),
-                    SizedBox(height: context.tokens.spacing.xxxl),
-                  ],
-                  _TimelineContent(horizons: _horizons, callbacks: callbacks),
-                ],
-              ),
-            ),
-          ),
-        ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!desktop) ...[
+            AppBrandLogo(width: context.tokens.layout.brandWidth),
+            SizedBox(height: context.tokens.spacing.xxxl),
+          ],
+          _TimelineContent(horizons: _horizons, callbacks: callbacks),
+        ],
       );
     },
   );
@@ -94,17 +78,12 @@ class _HorizonsPageState extends State<HorizonsPage> {
   void _archive(HorizonViewData horizon) {
     final index = _horizons.indexOf(horizon);
     setState(() => _horizons.remove(horizon));
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('${horizon.shortName} foi arquivado.'),
-          action: SnackBarAction(
-            label: 'Desfazer',
-            onPressed: () => setState(() => _horizons.insert(index, horizon)),
-          ),
-        ),
-      );
+    AppSnackbar.show(
+      context,
+      message: '${horizon.shortName} foi arquivado.',
+      actionLabel: 'Desfazer',
+      onAction: () => setState(() => _horizons.insert(index, horizon)),
+    );
   }
 
   Future<void> _delete(HorizonViewData horizon) async {
