@@ -23,9 +23,7 @@ final _router = GoRouter(
           path: ':horizonId',
           builder: (context, state) => HorizonDetailsPage(
             horizonId: state.pathParameters['horizonId']!,
-            horizonOverride: state.extra is HorizonViewData
-                ? state.extra! as HorizonViewData
-                : null,
+            horizonOverride: state.extra is HorizonViewData ? state.extra! as HorizonViewData : null,
           ),
           routes: [
             GoRoute(

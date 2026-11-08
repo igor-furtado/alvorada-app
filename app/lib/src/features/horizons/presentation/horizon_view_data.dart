@@ -37,13 +37,12 @@ class HorizonDisciplineProgress {
   final double performance;
   final int weight;
 
-  HorizonDisciplineProgress copyWith({int? weight}) =>
-      HorizonDisciplineProgress(
-        name: name,
-        progress: progress,
-        performance: performance,
-        weight: weight ?? this.weight,
-      );
+  HorizonDisciplineProgress copyWith({int? weight}) => HorizonDisciplineProgress(
+    name: name,
+    progress: progress,
+    performance: performance,
+    weight: weight ?? this.weight,
+  );
 }
 
 const demoHorizons = [
