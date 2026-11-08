@@ -1,4 +1,5 @@
 import 'package:estudos_app/src/core/theme/app_theme.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,6 +35,32 @@ void main() {
         Color.lerp(light.colors.canvas, dark.colors.canvas, .5),
       );
       expect(middle.spacing.lg, light.spacing.lg);
+    });
+
+    test('cores funcionais atendem contraste WCAG AA', () {
+      for (final tokens in [AppTokens.light(), AppTokens.dark()]) {
+        final colors = tokens.colors;
+        final textCombinations = [
+          (colors.onSurface, colors.surface),
+          (colors.onSurfaceMuted, colors.surface),
+          (colors.onPrimary, colors.primary),
+          (colors.onPrimaryContainer, colors.primaryContainer),
+          (colors.onSuccess, colors.success),
+          (colors.success, colors.successContainer),
+          (colors.onError, colors.error),
+          (colors.onSurface, colors.errorContainer),
+          (colors.onInfo, colors.info),
+          (colors.info, colors.infoContainer),
+          (colors.actionForeground, colors.surface),
+          (colors.errorForeground, colors.errorContainer),
+        ];
+        for (final (foreground, background) in textCombinations) {
+          expect(AppAccessibility.contrastRatio(foreground, background), greaterThanOrEqualTo(4.5));
+        }
+        for (final foreground in [colors.controlOutline, colors.focusRing]) {
+          expect(AppAccessibility.contrastRatio(foreground, colors.surface), greaterThanOrEqualTo(3));
+        }
+      }
     });
 
     testWidgets('fica acessível pelo BuildContext', (tester) async {

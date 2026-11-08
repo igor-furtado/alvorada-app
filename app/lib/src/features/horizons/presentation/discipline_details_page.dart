@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -65,7 +66,6 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
     final horizon = _horizon;
     final discipline = _discipline;
     return AppPageTemplate(
-      section: AppSection.horizons,
       maxWidth: context.tokens.sizes.disciplinePage,
       builder: (context, desktop) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +77,7 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
-                label: 'Horizontes',
+                label: AppMessages.navigationHorizons,
                 route: '/horizontes',
               ),
               AppBreadcrumbItem(
@@ -149,7 +149,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
               ),
               child: Icon(
                 AppIcons.bookText,
-                color: Theme.of(context).colorScheme.primary,
+                color: context.tokens.colors.actionForeground,
               ),
             ),
             SizedBox(width: context.tokens.spacing.lg),
@@ -163,7 +163,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
                     onChanged: onNameChanged,
                     style: Theme.of(context).textTheme.headlineSmall,
                     decoration: InputDecoration(
-                      labelText: 'Nome da Disciplina',
+                      labelText: AppMessages.disciplineName,
                       suffixIcon: Icon(
                         AppIcons.edit,
                         size: context.tokens.icons.md,
@@ -194,7 +194,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  labelText: 'Peso no Edital',
+                  labelText: AppMessages.disciplineWeight,
                   suffixIcon: Icon(
                     AppIcons.edit,
                     size: context.tokens.icons.md,
@@ -411,7 +411,7 @@ class _TopicRow extends StatelessWidget {
                 child: Text(
                   '$position',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: context.tokens.colors.actionForeground,
                   ),
                 ),
               ),
@@ -497,7 +497,7 @@ class _SubtopicRow extends StatelessWidget {
                 child: Text(
                   position,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: context.tokens.colors.actionForeground,
                   ),
                 ),
               ),
@@ -676,7 +676,7 @@ class _NotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.giant),
-    child: const Center(child: Text('Disciplina não encontrada')),
+    child: const Center(child: Text(AppMessages.disciplineNotFound)),
   );
 }
 

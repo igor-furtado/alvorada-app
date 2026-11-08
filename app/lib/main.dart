@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
 import 'src/app.dart';
@@ -16,4 +18,5 @@ Future<void> main() async {
   await phosphorFont.load();
 
   runApp(const EstudosApp());
+  if (kIsWeb) SemanticsBinding.instance.ensureSemantics();
 }

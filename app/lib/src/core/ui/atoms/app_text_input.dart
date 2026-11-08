@@ -14,6 +14,7 @@ class AppTextInput extends StatelessWidget {
     this.keyboardType,
     this.textInputAction,
     this.validator,
+    this.autovalidateMode = AutovalidateMode.onUnfocus,
     this.onChanged,
     this.onSubmitted,
     this.minLines = 1,
@@ -34,6 +35,7 @@ class AppTextInput extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final FormFieldValidator<String>? validator;
+  final AutovalidateMode autovalidateMode;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final int minLines;
@@ -54,6 +56,7 @@ class AppTextInput extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       validator: validator,
+      autovalidateMode: autovalidateMode,
       onChanged: onChanged,
       onFieldSubmitted: onSubmitted,
       minLines: minLines,

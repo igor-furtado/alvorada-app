@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -18,7 +19,6 @@ class _HorizonsPageState extends State<HorizonsPage> {
 
   @override
   Widget build(BuildContext context) => AppPageTemplate(
-    section: AppSection.horizons,
     builder: (context, desktop) {
       final callbacks = _Callbacks(
         add: _add,
@@ -80,8 +80,8 @@ class _HorizonsPageState extends State<HorizonsPage> {
     setState(() => _horizons.remove(horizon));
     AppSnackbar.show(
       context,
-      message: '${horizon.shortName} foi arquivado.',
-      actionLabel: 'Desfazer',
+      message: AppMessages.horizonArchived(horizon.shortName),
+      actionLabel: AppMessages.undo,
       onAction: () => setState(() => _horizons.insert(index, horizon)),
     );
   }
@@ -89,21 +89,14 @@ class _HorizonsPageState extends State<HorizonsPage> {
   Future<void> _delete(HorizonViewData horizon) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Excluir Horizonte?'),
-        content: Text(
-          '${horizon.shortName} e seu Edital serão removidos. Esta ação não pode ser desfeita.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Excluir'),
-          ),
-        ],
+      builder: (dialogContext) => AppDialog(
+        title: AppMessages.deleteHorizonQuestion,
+        content: Text(AppMessages.deleteHorizonImpact(horizon.shortName)),
+        secondaryLabel: AppMessages.cancel,
+        onSecondary: () => Navigator.pop(dialogContext, false),
+        primaryLabel: AppMessages.deleteHorizon,
+        onPrimary: () => Navigator.pop(dialogContext, true),
+        destructive: true,
       ),
     );
     if (confirmed == true && mounted) {
@@ -139,8 +132,10 @@ class _TimelineContent extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final compact = constraints.maxWidth < context.tokens.layout.compact;
-      final railWidth = compact ? 64.0 : 112.0;
-      final gap = compact ? 12.0 : 18.0;
+      final railWidth = compact
+          ? context.tokens.layout.timelineRailCompact
+          : context.tokens.layout.timelineRailExpanded;
+      final gap = compact ? context.tokens.layout.timelineGapCompact : context.tokens.layout.timelineGapExpanded;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,7 +217,7 @@ class _TimelineItem extends StatelessWidget {
                   '${horizon.days}',
                   style: compact ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.headlineMedium,
                 ),
-                Text('dias', style: Theme.of(context).textTheme.bodySmall),
+                Text(AppMessages.days, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
           ),
@@ -300,7 +295,7 @@ class _TimelineItem extends StatelessWidget {
                       TextButton.icon(
                         onPressed: () => callbacks.edital(horizon),
                         icon: Icon(AppIcons.bookText, size: context.tokens.icons.md),
-                        label: const Text('Abrir Edital'),
+                        label: const Text(AppMessages.openNotice),
                       ),
                     ],
                   ),
@@ -347,7 +342,7 @@ class _Header extends StatelessWidget {
       final heading = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Horizontes', style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.navigationHorizons, style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             subtitle,
@@ -360,7 +355,7 @@ class _Header extends StatelessWidget {
       final button = FilledButton.icon(
         onPressed: onAdd,
         icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-        label: const Text('Novo Horizonte'),
+        label: const Text(AppMessages.newHorizon),
       );
       if (constraints.maxWidth < context.tokens.layout.toolbar) {
         return Column(
@@ -461,16 +456,16 @@ class _Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<_MenuAction>(
-    tooltip: 'Mais ações',
+    tooltip: AppMessages.moreActions,
     onSelected: (action) => switch (action) {
       _MenuAction.details => callbacks.details(horizon),
       _MenuAction.archive => callbacks.archive(horizon),
       _MenuAction.delete => callbacks.delete(horizon),
     },
     itemBuilder: (_) => const [
-      PopupMenuItem(value: _MenuAction.details, child: Text('Ver detalhes')),
-      PopupMenuItem(value: _MenuAction.archive, child: Text('Arquivar')),
-      PopupMenuItem(value: _MenuAction.delete, child: Text('Excluir')),
+      PopupMenuItem(value: _MenuAction.details, child: Text(AppMessages.seeDetails)),
+      PopupMenuItem(value: _MenuAction.archive, child: Text(AppMessages.archive)),
+      PopupMenuItem(value: _MenuAction.delete, child: Text(AppMessages.delete)),
     ],
   );
 }
@@ -488,7 +483,7 @@ class _Empty extends StatelessWidget {
           Icon(
             AppIcons.horizons,
             size: context.tokens.icons.hero,
-            color: Theme.of(context).colorScheme.primary,
+            color: context.tokens.colors.actionForeground,
           ),
           SizedBox(height: context.tokens.spacing.lg),
           Text(
@@ -496,9 +491,9 @@ class _Empty extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           SizedBox(height: context.tokens.spacing.sm),
-          const Text('Adicione um concurso-alvo para começar.'),
+          const Text(AppMessages.emptyHorizons),
           SizedBox(height: context.tokens.spacing.xl),
-          FilledButton(onPressed: onAdd, child: const Text('Novo Horizonte')),
+          FilledButton(onPressed: onAdd, child: const Text(AppMessages.newHorizon)),
         ],
       ),
     ),
@@ -511,7 +506,7 @@ class _EditalDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Edital'),
+    title: const Text(AppMessages.notice),
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.layout.dialogMaxWidth),
       child: Column(
@@ -541,7 +536,7 @@ class _EditalDialog extends StatelessWidget {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Fechar'),
+        child: const Text(AppMessages.close),
       ),
     ],
   );
@@ -554,67 +549,83 @@ class _NewHorizonDialog extends StatefulWidget {
 }
 
 class _NewHorizonDialogState extends State<_NewHorizonDialog> {
+  final _formKey = GlobalKey<FormState>();
   final institution = TextEditingController();
   final role = TextEditingController();
   final board = TextEditingController();
+  final institutionFocus = FocusNode();
+  final roleFocus = FocusNode();
 
   @override
   void dispose() {
     institution.dispose();
     role.dispose();
     board.dispose();
+    institutionFocus.dispose();
+    roleFocus.dispose();
     super.dispose();
   }
 
+  String? _required(String? value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null;
+
+  FocusNode? _firstInvalidFocus() {
+    if (institution.text.trim().isEmpty) return institutionFocus;
+    if (role.text.trim().isEmpty) return roleFocus;
+    return null;
+  }
+
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Novo Horizonte'),
-    content: SizedBox(
-      width: context.tokens.sizes.noteMaxWidth,
-      child: Column(
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.newHorizon,
+    maxWidth: context.tokens.sizes.noteMaxWidth,
+    content: AppValidatedForm(
+      formKey: _formKey,
+      firstInvalidFocusNode: _firstInvalidFocus,
+      onSubmit: () async => Navigator.pop(
+        context,
+        _NewHorizon(
+          institution: institution.text.trim(),
+          role: role.text.trim(),
+          board: board.text.trim().isEmpty ? AppMessages.toBeDefined : board.text.trim(),
+        ),
+      ),
+      builder: (context, submitting, submit) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
+          AppFormField(
+            label: AppMessages.institution,
             controller: institution,
-            decoration: const InputDecoration(
-              labelText: 'Órgão ou instituição',
-            ),
+            focusNode: institutionFocus,
+            required: true,
+            validator: _required,
           ),
           SizedBox(height: context.tokens.spacing.lg),
-          TextField(
+          AppFormField(
+            label: AppMessages.role,
             controller: role,
-            decoration: const InputDecoration(labelText: 'Cargo'),
+            focusNode: roleFocus,
+            required: true,
+            validator: _required,
           ),
           SizedBox(height: context.tokens.spacing.lg),
-          TextField(
-            controller: board,
-            decoration: const InputDecoration(labelText: 'Banca'),
+          AppFormField(label: AppMessages.board, controller: board),
+          SizedBox(height: context.tokens.spacing.xl),
+          Wrap(
+            spacing: context.tokens.spacing.sm,
+            runSpacing: context.tokens.spacing.sm,
+            alignment: WrapAlignment.end,
+            children: [
+              AppButton(
+                label: AppMessages.cancel,
+                variant: AppButtonVariant.text,
+                onPressed: submitting ? null : () => Navigator.pop(context),
+              ),
+              AppButton(label: AppMessages.createHorizon, loading: submitting, onPressed: submit),
+            ],
           ),
         ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
-      ),
-      FilledButton(
-        onPressed: () {
-          if (institution.text.trim().isEmpty || role.text.trim().isEmpty) {
-            return;
-          }
-          Navigator.pop(
-            context,
-            _NewHorizon(
-              institution: institution.text.trim(),
-              role: role.text.trim(),
-              board: board.text.trim().isEmpty ? 'A definir' : board.text.trim(),
-            ),
-          );
-        },
-        child: const Text('Adicionar'),
-      ),
-    ],
   );
 }
 

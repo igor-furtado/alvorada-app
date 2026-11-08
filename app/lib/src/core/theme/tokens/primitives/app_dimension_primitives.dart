@@ -15,10 +15,12 @@ abstract final class AppDimensionPrimitives {
   static const size40 = 40.0;
   static const size48 = 48.0;
   static const size64 = 64.0;
+  static const size240 = 240.0;
   static const full = 999.0;
 
   static const breakpointCompact = 600.0;
-  static const breakpointMedium = 760.0;
-  static const breakpointExpanded = 980.0;
-  static const breakpointWide = 1120.0;
+  static const breakpointMedium = 840.0;
+  static const breakpointExpanded = 1200.0;
+  static const breakpointWide = 1600.0;
+  static const contentMaxWidth = 1120.0;
 }

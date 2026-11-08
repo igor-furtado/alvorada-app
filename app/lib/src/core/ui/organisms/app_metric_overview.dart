@@ -16,7 +16,7 @@ class AppMetricOverview extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final colors = context.tokens.colors;
     final (background, foreground) = switch (tone) {
-      AppMetricTone.primary => (scheme.primaryContainer, scheme.primary),
+      AppMetricTone.primary => (scheme.primaryContainer, colors.actionForeground),
       AppMetricTone.error => (
         scheme.error.withValues(alpha: context.tokens.opacity.tintStrong),
         scheme.onSurface,

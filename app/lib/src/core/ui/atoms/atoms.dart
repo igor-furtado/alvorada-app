@@ -1,3 +1,4 @@
+export 'app_accessible_icon_button.dart';
 export 'app_avatar.dart';
 export 'app_badge.dart';
 export 'app_button.dart';
@@ -7,5 +8,6 @@ export 'app_icon.dart';
 export 'app_label.dart';
 export 'app_loading_indicator.dart';
 export 'app_radio.dart';
+export 'app_skeleton.dart';
 export 'app_switch.dart';
 export 'app_text_input.dart';

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../../presentation/app_shell.dart';
 import '../../theme/app_theme.dart';
+import '../responsive/app_responsive.dart';
 
 typedef AppPageContentBuilder = Widget Function(BuildContext context, bool desktop);
 
 class AppPageTemplate extends StatelessWidget {
-  const AppPageTemplate({required this.section, required this.builder, this.maxWidth, super.key});
+  const AppPageTemplate({required this.builder, this.maxWidth, super.key});
 
-  final AppSection section;
   final AppPageContentBuilder builder;
   final double? maxWidth;
 
   @override
-  Widget build(BuildContext context) => AppShell(
-    section: section,
-    builder: (context, desktop) => SafeArea(
+  Widget build(BuildContext context) {
+    final desktop = context.windowClass.isExpanded;
+    return SafeArea(
       child: CustomScrollView(
+        key: PageStorageKey<String>(ModalRoute.of(context)?.settings.name ?? 'app-page'),
         slivers: [
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
@@ -36,6 +36,6 @@ class AppPageTemplate extends StatelessWidget {
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import '../atoms/app_button.dart';
+import '../responsive/app_responsive.dart';
 
 class AppDialog extends StatelessWidget {
   const AppDialog({
@@ -28,13 +29,8 @@ class AppDialog extends StatelessWidget {
   final double? maxWidth;
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(title),
-    content: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth ?? context.tokens.layout.dialogMaxWidth),
-      child: content,
-    ),
-    actions: [
+  Widget build(BuildContext context) {
+    final actions = <Widget>[
       if (secondaryLabel != null)
         AppButton(label: secondaryLabel!, variant: AppButtonVariant.text, onPressed: onSecondary),
       if (primaryLabel != null)
@@ -44,6 +40,40 @@ class AppDialog extends StatelessWidget {
           onPressed: onPrimary,
           loading: loading,
         ),
-    ],
-  );
+    ];
+    if (context.windowClass.isCompact) {
+      return Dialog.fullscreen(
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(context.tokens.spacing.xl),
+            child: FocusTraversalGroup(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                  SizedBox(height: context.tokens.spacing.xl),
+                  Expanded(child: SingleChildScrollView(child: content)),
+                  SizedBox(height: context.tokens.spacing.xl),
+                  Wrap(
+                    spacing: context.tokens.spacing.sm,
+                    runSpacing: context.tokens.spacing.sm,
+                    alignment: WrapAlignment.end,
+                    children: actions,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return AlertDialog(
+      title: Text(title),
+      content: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth ?? context.tokens.layout.dialogMaxWidth),
+        child: content,
+      ),
+      actions: actions,
+    );
+  }
 }

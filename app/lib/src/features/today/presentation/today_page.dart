@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -13,7 +14,6 @@ class TodayPage extends StatelessWidget {
     final isSunday = now.weekday == DateTime.sunday;
 
     return AppPageTemplate(
-      section: AppSection.today,
       builder: (context, desktop) =>
           isSunday ? _SundayView(date: now, desktop: desktop) : _TodayContent(date: now, desktop: desktop),
     );
@@ -65,7 +65,7 @@ class _TodayContent extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const Spacer(),
-          TextButton(onPressed: () {}, child: const Text('Ver todos')),
+          TextButton(onPressed: () {}, child: const Text(AppMessages.seeAll)),
         ],
       ),
       SizedBox(height: context.tokens.spacing.md),
@@ -111,7 +111,7 @@ class _Header extends StatelessWidget {
             ),
           ),
           IconButton.filledTonal(
-            tooltip: 'Lembretes',
+            tooltip: AppMessages.reminders,
             onPressed: () {},
             icon: Icon(AppIcons.notification, size: context.tokens.icons.lg),
           ),
@@ -151,7 +151,7 @@ class _HorizonStrip extends StatelessWidget {
           ),
           child: Icon(
             AppIcons.horizons,
-            color: Theme.of(context).colorScheme.primary,
+            color: context.tokens.colors.actionForeground,
           ),
         ),
         SizedBox(width: context.tokens.spacing.md),
@@ -269,7 +269,7 @@ class _DailyPlanCard extends StatelessWidget {
                           AppIcons.play,
                           size: context.tokens.icons.md,
                         ),
-                        label: const Text('Começar próximo turno'),
+                        label: const Text(AppMessages.startNextTurn),
                       ),
                     ),
                   ],
@@ -315,7 +315,7 @@ class _PlanRow extends StatelessWidget {
           child: Icon(
             icon,
             size: context.tokens.icons.md,
-            color: current ? Theme.of(context).colorScheme.primary : null,
+            color: current ? context.tokens.colors.actionForeground : null,
           ),
         ),
         SizedBox(width: context.tokens.spacing.md),
@@ -362,7 +362,7 @@ class _SunnyDaysCard extends StatelessWidget {
             children: [
               Icon(
                 AppIcons.sunnyDays,
-                color: Theme.of(context).colorScheme.primary,
+                color: context.tokens.colors.actionForeground,
               ),
               SizedBox(width: context.tokens.spacing.sm),
               Text(
@@ -609,7 +609,7 @@ class _MethodNote extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(AppIcons.fromMemory, color: Theme.of(context).colorScheme.primary),
+        Icon(AppIcons.fromMemory, color: context.tokens.colors.actionForeground),
         SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Text(
@@ -632,7 +632,9 @@ class _SundayView extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if (!desktop) AppBrandLogo(width: context.tokens.layout.brandWidth),
-      SizedBox(height: desktop ? 72 : 48),
+      SizedBox(
+        height: desktop ? context.tokens.layout.sundayContentOffset : context.tokens.spacing.huge,
+      ),
       Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: context.tokens.layout.dialogMaxWidth),

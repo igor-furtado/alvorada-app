@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../content/app_messages.dart';
 import '../../theme/app_icons.dart';
+import '../atoms/app_accessible_icon_button.dart';
 import '../atoms/app_icon.dart';
 import '../atoms/app_text_input.dart';
 
@@ -8,7 +10,7 @@ class AppSearchField extends StatelessWidget {
   const AppSearchField({
     this.controller,
     this.focusNode,
-    this.placeholder = 'Buscar',
+    this.placeholder = AppMessages.search,
     this.onChanged,
     this.onSubmitted,
     this.onClear,
@@ -37,10 +39,10 @@ class AppSearchField extends StatelessWidget {
     prefixIcon: const AppIcon(AppIcons.search, size: AppIconSize.sm),
     suffixIcon: onClear == null
         ? null
-        : IconButton(
-            tooltip: 'Limpar busca',
+        : AppAccessibleIconButton(
+            label: AppMessages.clearSearch,
             onPressed: onClear,
-            icon: const AppIcon(AppIcons.close, size: AppIconSize.sm),
+            icon: AppIcons.close,
           ),
   );
 }

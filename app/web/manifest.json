@@ -6,7 +6,6 @@
     "background_color": "#F6F0E4",
     "theme_color": "#E8742A",
     "description": "Cronograma realista e revisão espaçada para concursos.",
-    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {

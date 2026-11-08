@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -193,7 +194,6 @@ class WeekPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppPageTemplate(
-    section: AppSection.week,
     builder: (context, desktop) => _WeekContent(days: _days, desktop: desktop),
   );
 }
@@ -261,7 +261,7 @@ class _WeekHeader extends StatelessWidget {
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Esta semana', style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.thisWeek, style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             '2 a 8 de novembro · Consolidação',
@@ -275,13 +275,13 @@ class _WeekHeader extends StatelessWidget {
         mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
         children: [
           IconButton.outlined(
-            tooltip: 'Semana anterior',
+            tooltip: AppMessages.previousWeek,
             onPressed: () => _showPreviewMessage(context),
             icon: const Icon(AppIcons.chevronLeft),
           ),
           SizedBox(width: context.tokens.spacing.sm),
           IconButton.outlined(
-            tooltip: 'Próxima semana',
+            tooltip: AppMessages.nextWeek,
             onPressed: () => _showPreviewMessage(context),
             icon: const Icon(AppIcons.chevronRight),
           ),
@@ -291,7 +291,7 @@ class _WeekHeader extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () => _showAdjustmentDialog(context),
               icon: Icon(AppIcons.settings, size: context.tokens.icons.md),
-              label: const Text('Ajustar semana'),
+              label: const Text(AppMessages.adjustWeek),
             ),
           ),
         ],
@@ -407,7 +407,7 @@ class _SummaryItem extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: context.tokens.icons.md, color: Theme.of(context).colorScheme.primary),
+        Icon(icon, size: context.tokens.icons.md, color: context.tokens.colors.actionForeground),
         SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
@@ -433,11 +433,11 @@ class _Legend extends StatelessWidget {
     children: [
       _LegendDot(color: Theme.of(context).colorScheme.secondary),
       SizedBox(width: context.tokens.spacing.xs),
-      Text('feito', style: Theme.of(context).textTheme.labelSmall),
+      Text(AppMessages.done, style: Theme.of(context).textTheme.labelSmall),
       SizedBox(width: context.tokens.spacing.md),
       _LegendDot(color: Theme.of(context).colorScheme.primary),
       SizedBox(width: context.tokens.spacing.xs),
-      Text('hoje', style: Theme.of(context).textTheme.labelSmall),
+      Text(AppMessages.today, style: Theme.of(context).textTheme.labelSmall),
     ],
   );
 }
@@ -553,7 +553,7 @@ class _StudyDayCard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: () => context.go('/'),
                 icon: Icon(AppIcons.today, size: context.tokens.icons.md),
-                label: const Text('Ver Hoje'),
+                label: const Text(AppMessages.seeToday),
               ),
             ),
           ],
@@ -660,7 +660,7 @@ class _ReplanningNote extends StatelessWidget {
       children: [
         Icon(
           AppIcons.observation,
-          color: Theme.of(context).colorScheme.primary,
+          color: context.tokens.colors.actionForeground,
         ),
         SizedBox(width: context.tokens.spacing.md),
         Expanded(
@@ -679,7 +679,7 @@ class _AdjustmentDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Ajustar esta semana'),
+    title: const Text(AppMessages.adjustThisWeek),
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.sizes.noteMaxWidth),
       child: Column(
@@ -693,15 +693,15 @@ class _AdjustmentDialog extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(AppIcons.calendar),
-            title: const Text('Tive menos tempo'),
-            subtitle: const Text('Reduzir o escopo e preservar as Revisões.'),
+            title: const Text(AppMessages.lessTime),
+            subtitle: const Text(AppMessages.lessTimeHint),
             onTap: () => Navigator.of(context).pop(),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(AppIcons.questions),
-            title: const Text('Tenho tempo extra'),
-            subtitle: const Text('Usar a sobra para questões.'),
+            title: const Text(AppMessages.extraTime),
+            subtitle: const Text(AppMessages.extraTimeHint),
             onTap: () => Navigator.of(context).pop(),
           ),
         ],
@@ -710,7 +710,7 @@ class _AdjustmentDialog extends StatelessWidget {
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Fechar'),
+        child: const Text(AppMessages.close),
       ),
     ],
   );
@@ -722,7 +722,7 @@ Future<void> _showAdjustmentDialog(BuildContext context) => showDialog<void>(
 );
 
 void _showPreviewMessage(BuildContext context) {
-  AppSnackbar.show(context, message: 'As outras semanas entram na próxima etapa.');
+  AppSnackbar.show(context, message: AppMessages.otherWeeksUnavailable);
 }
 
 enum _DayStatus { done, today, planned }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -66,7 +67,6 @@ class _ErrorNotebookPageState extends State<ErrorNotebookPage> {
 
   @override
   Widget build(BuildContext context) => AppPageTemplate(
-    section: AppSection.errors,
     builder: (context, desktop) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -137,12 +137,12 @@ class _Header extends StatelessWidget {
             onPressed: onLearn,
             variant: AppButtonVariant.outline,
             icon: AppIcons.observation,
-            label: 'Como funciona',
+            label: AppMessages.howItWorks,
           ),
           AppButton(
             onPressed: onAdd,
             icon: AppIcons.add,
-            label: 'Registrar erro',
+            label: AppMessages.registerError,
           ),
         ],
       );
@@ -188,12 +188,12 @@ class _Filters extends StatelessWidget {
         segments: [
           ButtonSegment(
             value: _NotebookView.active,
-            label: const Text('Caderno ativo'),
+            label: const Text(AppMessages.activeNotebook),
             icon: Icon(AppIcons.bookText, size: context.tokens.icons.md),
           ),
           ButtonSegment(
             value: _NotebookView.archived,
-            label: const Text('Arquivo'),
+            label: const Text(AppMessages.notebookArchive),
             icon: Icon(AppIcons.check, size: context.tokens.icons.md),
           ),
         ],
@@ -208,7 +208,7 @@ class _Filters extends StatelessWidget {
             FilterChip(
               selected: kind == null,
               onSelected: (_) => onKindChanged(null),
-              label: const Text('Todos os tipos'),
+              label: const Text(AppMessages.allErrorTypes),
             ),
             for (final value in _ErrorKind.values) ...[
               SizedBox(width: context.tokens.spacing.sm),
@@ -236,7 +236,7 @@ class _ActiveNotebook extends StatelessWidget {
       final notebook = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Em revisão', style: Theme.of(context).textTheme.headlineSmall),
+          Text(AppMessages.underReview, style: Theme.of(context).textTheme.headlineSmall),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             'O caderno ativo guarda somente o que ainda precisa voltar.',
@@ -315,9 +315,9 @@ class _ErrorCard extends StatelessWidget {
                   runSpacing: context.tokens.spacing.sm,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    _Tag(label: entry.kind.label, color: accent),
-                    _Tag(label: entry.reviewStage, color: scheme.primary),
-                    if (entry.priority) _Tag(label: 'Errou novamente', color: scheme.error),
+                    _Tag(label: entry.kind.label, color: _kindColor(entry.kind, context)),
+                    _Tag(label: entry.reviewStage, color: context.tokens.colors.actionForeground),
+                    if (entry.priority) _Tag(label: 'Errou novamente', color: context.tokens.colors.errorForeground),
                   ],
                 ),
                 SizedBox(height: context.tokens.spacing.lg),
@@ -332,13 +332,13 @@ class _ErrorCard extends StatelessWidget {
                 ),
                 SizedBox(height: context.tokens.spacing.lg),
                 _LinedField(
-                  label: 'A regra certa, com minhas palavras',
+                  label: AppMessages.correctRule,
                   value: entry.correctRule,
                   icon: AppIcons.fromMemory,
                 ),
                 SizedBox(height: context.tokens.spacing.md),
                 _LinedField(
-                  label: 'Por que eu caí',
+                  label: AppMessages.whyIFell,
                   value: entry.whyIFell,
                   icon: AppIcons.errorNotebook,
                 ),
@@ -357,7 +357,7 @@ class _ErrorCard extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () => _showReviewPreview(context, entry),
-                      child: const Text('Abrir registro'),
+                      child: const Text(AppMessages.openEntry),
                     ),
                   ],
                 ),
@@ -455,7 +455,7 @@ class _DiagnosisGuide extends StatelessWidget {
         Icon(
           AppIcons.observation,
           size: context.tokens.icons.xl,
-          color: Theme.of(context).colorScheme.primary,
+          color: context.tokens.colors.actionForeground,
         ),
         SizedBox(height: context.tokens.spacing.lg),
         Text(
@@ -543,7 +543,7 @@ class _ArchivePreview extends StatelessWidget {
           size: context.tokens.icons.xl,
         ),
         SizedBox(height: context.tokens.spacing.md),
-        Text('Arquivo', style: Theme.of(context).textTheme.headlineSmall),
+        Text(AppMessages.notebookArchive, style: Theme.of(context).textTheme.headlineSmall),
         SizedBox(height: context.tokens.spacing.xs),
         Text(
           '18 registros já saíram do caderno ativo. Eles voltam apenas na semana da prova, com uma leitura de “Por que eu caí”.',
@@ -552,7 +552,7 @@ class _ArchivePreview extends StatelessWidget {
         SizedBox(height: context.tokens.spacing.lg),
         OutlinedButton(
           onPressed: () => _showDataMessage(context),
-          child: const Text('Ver registros arquivados'),
+          child: const Text(AppMessages.seeArchivedEntries),
         ),
       ],
     ),
@@ -588,7 +588,7 @@ class _MonthlyReading extends StatelessWidget {
         final button = OutlinedButton.icon(
           onPressed: () => _showDataMessage(context),
           icon: Icon(AppIcons.statistics, size: context.tokens.icons.md),
-          label: const Text('Ver relatório mensal'),
+          label: const Text(AppMessages.seeMonthlyReport),
         );
         if (constraints.maxWidth < context.tokens.layout.reading) {
           return Column(
@@ -624,7 +624,7 @@ class _EmptyFilter extends StatelessWidget {
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       borderRadius: context.tokens.borders.lg,
     ),
-    child: const Text('Nenhum registro com esse diagnóstico.'),
+    child: const Text(AppMessages.noEntryForDiagnosis),
   );
 }
 
@@ -637,125 +637,129 @@ class _RegisterErrorDialog extends StatefulWidget {
 
 class _RegisterErrorDialogState extends State<_RegisterErrorDialog> {
   final _formKey = GlobalKey<FormState>();
+  final _ruleController = TextEditingController();
+  final _reasonController = TextEditingController();
+  final _ruleFocus = FocusNode();
+  final _reasonFocus = FocusNode();
   _ErrorKind _kind = _ErrorKind.content;
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Registrar erro'),
-    content: SizedBox(
-      width: context.tokens.sizes.dialogWide,
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+  void dispose() {
+    _ruleController.dispose();
+    _reasonController.dispose();
+    _ruleFocus.dispose();
+    _reasonFocus.dispose();
+    super.dispose();
+  }
+
+  FocusNode? _firstInvalidFocus() {
+    if (_ruleController.text.trim().isEmpty) return _ruleFocus;
+    if (_reasonController.text.trim().isEmpty) return _reasonFocus;
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.registerError,
+    maxWidth: context.tokens.sizes.dialogWide,
+    content: AppValidatedForm(
+      formKey: _formKey,
+      firstInvalidFocusNode: _firstInvalidFocus,
+      onSubmit: () async => Navigator.of(context).pop(true),
+      builder: (context, submitting, submit) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppMessages.registerErrorIntro,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          SizedBox(height: context.tokens.spacing.xl),
+          const AppFormField(label: AppMessages.date),
+          SizedBox(height: context.tokens.spacing.md),
+          const AppFormField(label: AppMessages.disciplineAndTopic),
+          SizedBox(height: context.tokens.spacing.md),
+          const AppFormField(label: AppMessages.boardAndYear),
+          SizedBox(height: context.tokens.spacing.lg),
+          Text(
+            AppMessages.errorType,
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          SizedBox(height: context.tokens.spacing.sm),
+          Wrap(
+            spacing: context.tokens.spacing.sm,
+            runSpacing: context.tokens.spacing.sm,
             children: [
-              Text(
-                'Sete campos, cerca de noventa segundos. Escreva antes de voltar ao gabarito.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              SizedBox(height: context.tokens.spacing.xl),
-              Row(
-                children: [
-                  const Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(labelText: 'Data'),
-                    ),
-                  ),
-                  SizedBox(width: context.tokens.spacing.md),
-                  const Expanded(
-                    flex: 2,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Disciplina e Tópico',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: context.tokens.spacing.md),
-              const TextField(
-                decoration: InputDecoration(labelText: 'Banca e ano'),
-              ),
-              SizedBox(height: context.tokens.spacing.lg),
-              Text(
-                'Tipo do erro',
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-              SizedBox(height: context.tokens.spacing.sm),
-              Wrap(
-                spacing: context.tokens.spacing.sm,
-                runSpacing: context.tokens.spacing.sm,
-                children: [
-                  for (final kind in _ErrorKind.values)
-                    ChoiceChip(
-                      label: Text(kind.label),
-                      selected: _kind == kind,
-                      onSelected: (_) => setState(() => _kind = kind),
-                    ),
-                ],
-              ),
-              SizedBox(height: context.tokens.spacing.lg),
-              TextFormField(
-                minLines: 2,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'A regra certa, com minhas palavras',
-                  helperText: 'Feche o gabarito antes de escrever.',
-                  alignLabelWithHint: true,
+              for (final kind in _ErrorKind.values)
+                ChoiceChip(
+                  label: Text(kind.label),
+                  selected: _kind == kind,
+                  onSelected: (_) => setState(() => _kind = kind),
                 ),
-                validator: _requiredText,
+            ],
+          ),
+          SizedBox(height: context.tokens.spacing.lg),
+          AppFormField(
+            label: AppMessages.correctRule,
+            helperText: AppMessages.correctRuleHint,
+            controller: _ruleController,
+            focusNode: _ruleFocus,
+            required: true,
+            minLines: 2,
+            maxLines: 4,
+            validator: _requiredText,
+          ),
+          SizedBox(height: context.tokens.spacing.md),
+          AppFormField(
+            label: AppMessages.whyIFell,
+            helperText: AppMessages.whyIFellHint,
+            controller: _reasonController,
+            focusNode: _reasonFocus,
+            required: true,
+            minLines: 2,
+            maxLines: 4,
+            validator: _requiredText,
+          ),
+          SizedBox(height: context.tokens.spacing.lg),
+          Text(
+            AppMessages.revisionsWillBeScheduled,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          SizedBox(height: context.tokens.spacing.xl),
+          Wrap(
+            spacing: context.tokens.spacing.sm,
+            runSpacing: context.tokens.spacing.sm,
+            alignment: WrapAlignment.end,
+            children: [
+              AppButton(
+                label: AppMessages.cancel,
+                variant: AppButtonVariant.text,
+                onPressed: submitting ? null : () => Navigator.of(context).pop(false),
               ),
-              SizedBox(height: context.tokens.spacing.md),
-              TextFormField(
-                minLines: 2,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Por que eu caí',
-                  helperText: 'Nomeie o mecanismo do erro, não o sentimento.',
-                  alignLabelWithHint: true,
-                ),
-                validator: _requiredText,
-              ),
-              SizedBox(height: context.tokens.spacing.lg),
-              Text(
-                'As Revisões de 1, 7 e 30 dias serão programadas ao salvar.',
-                style: Theme.of(context).textTheme.bodySmall,
+              AppButton(
+                label: AppMessages.saveAndScheduleReviews,
+                loading: submitting,
+                onPressed: submit,
               ),
             ],
           ),
-        ),
+        ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancelar'),
-      ),
-      FilledButton(
-        onPressed: () {
-          if (!(_formKey.currentState?.validate() ?? false)) return;
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registro demonstrativo concluído.')),
-          );
-        },
-        child: const Text('Salvar e programar Revisões'),
-      ),
-    ],
   );
 }
 
-Future<void> _showRegisterDialog(BuildContext context) => showDialog<void>(
-  context: context,
-  builder: (context) => const _RegisterErrorDialog(),
-);
+Future<void> _showRegisterDialog(BuildContext context) async {
+  final saved = await showDialog<bool>(context: context, builder: (context) => const _RegisterErrorDialog());
+  if (saved == true && context.mounted) {
+    AppSnackbar.show(context, message: AppMessages.errorRegistered, variant: AppSnackbarVariant.success);
+  }
+}
 
 Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
   context: context,
   builder: (context) => AlertDialog(
-    title: const Text('Como funciona o Caderno de Erros'),
+    title: const Text(AppMessages.howErrorNotebookWorks),
     content: SizedBox(
       width: context.tokens.sizes.dialogMedium,
       child: const Text(
@@ -765,7 +769,7 @@ Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Entendi'),
+        child: const Text(AppMessages.understand),
       ),
     ],
   ),
@@ -803,18 +807,18 @@ Future<void> _showReviewPreview(
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Fechar'),
+        child: const Text(AppMessages.close),
       ),
       FilledButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Começar Revisão'),
+        child: const Text(AppMessages.startNotebookReview),
       ),
     ],
   ),
 );
 
 void _showDataMessage(BuildContext context) {
-  AppSnackbar.show(context, message: 'Esta área será conectada aos dados depois.');
+  AppSnackbar.show(context, message: AppMessages.areaNotConnected);
 }
 
 String? _requiredText(String? value) =>
@@ -828,8 +832,8 @@ String _reviewInstruction(String stage) => switch (stage) {
 };
 
 Color _kindColor(_ErrorKind kind, BuildContext context) => switch (kind) {
-  _ErrorKind.content => Theme.of(context).colorScheme.error,
-  _ErrorKind.reading => Theme.of(context).colorScheme.primary,
+  _ErrorKind.content => context.tokens.colors.errorForeground,
+  _ErrorKind.reading => context.tokens.colors.actionForeground,
   _ErrorKind.rush => Theme.of(context).colorScheme.tertiary,
   _ErrorKind.trap => context.tokens.colors.info,
 };

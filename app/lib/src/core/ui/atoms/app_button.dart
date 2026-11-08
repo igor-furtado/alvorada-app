@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../content/app_messages.dart';
 import '../../theme/app_theme.dart';
 
 enum AppButtonVariant { primary, secondary, outline, text, destructive }
@@ -37,11 +38,11 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.primary => scheme.onPrimary,
       AppButtonVariant.secondary => scheme.onSecondaryContainer,
       AppButtonVariant.outline => scheme.onSurface,
-      AppButtonVariant.text => scheme.primary,
+      AppButtonVariant.text => tokens.colors.actionForeground,
       AppButtonVariant.destructive => scheme.onError,
     };
     final background = switch (variant) {
-      AppButtonVariant.primary => scheme.primary,
+      AppButtonVariant.primary => tokens.colors.primary,
       AppButtonVariant.secondary => scheme.secondaryContainer,
       AppButtonVariant.destructive => scheme.error,
       AppButtonVariant.outline || AppButtonVariant.text => tokens.colors.transparent,
@@ -79,10 +80,13 @@ class AppButton extends StatelessWidget {
         return tokens.colors.transparent;
       }),
       side: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.focused)) {
+          return BorderSide(color: tokens.colors.focusRing, width: tokens.borders.widthStrong);
+        }
         if (variant != AppButtonVariant.outline) return BorderSide.none;
         return BorderSide(
-          color: states.contains(WidgetState.focused) ? scheme.primary : scheme.outline,
-          width: states.contains(WidgetState.focused) ? tokens.borders.widthStrong : tokens.borders.widthHairline,
+          color: scheme.outline,
+          width: tokens.borders.widthHairline,
         );
       }),
     );
@@ -115,11 +119,24 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.text => TextButton(onPressed: callback, autofocus: autofocus, style: style, child: content),
       _ => FilledButton(onPressed: callback, autofocus: autofocus, style: style, child: content),
     };
+    if (loading) {
+      return Semantics(
+        label: '${semanticLabel ?? label}, ${AppMessages.loading}',
+        button: true,
+        enabled: false,
+        liveRegion: true,
+        excludeSemantics: true,
+        child: button,
+      );
+    }
+    if (semanticLabel == null) return button;
     return Semantics(
-      label: semanticLabel ?? label,
+      label: semanticLabel,
       button: true,
       enabled: enabled,
-      child: ExcludeSemantics(child: button),
+      onTap: callback,
+      excludeSemantics: true,
+      child: button,
     );
   }
 }

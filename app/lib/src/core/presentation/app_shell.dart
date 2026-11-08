@@ -2,40 +2,73 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../brand/app_brand.dart';
+import '../content/app_messages.dart';
 import '../theme/app_theme.dart';
-
-enum AppSection { today, week, horizons, reviews, errors, settings }
-
-typedef AppShellBuilder = Widget Function(BuildContext context, bool desktop);
+import '../ui/responsive/app_responsive.dart';
 
 /// Estrutura de navegação compartilhada pelas telas principais.
 class AppShell extends StatelessWidget {
-  const AppShell({required this.section, required this.builder, super.key});
+  const AppShell({required this.navigationShell, super.key});
 
-  final AppSection section;
-  final AppShellBuilder builder;
+  final StatefulNavigationShell navigationShell;
+
+  void _select(int index) => navigationShell.goBranch(
+    index,
+    initialLocation: index == navigationShell.currentIndex,
+  );
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final desktop = constraints.maxWidth >= context.tokens.layout.expanded;
-      return Scaffold(
-        bottomNavigationBar: desktop ? null : _BottomNavigation(section: section),
+  Widget build(BuildContext context) => ResponsiveBuilder(
+    builder: (context, windowClass) => FocusTraversalGroup(
+      child: Scaffold(
+        bottomNavigationBar: windowClass.isCompact
+            ? _CompactNavigation(selectedIndex: navigationShell.currentIndex, onSelected: _select)
+            : null,
         body: Row(
           children: [
-            if (desktop) _SideNavigation(section: section),
-            Expanded(child: builder(context, desktop)),
+            if (windowClass.isMedium)
+              _MediumNavigation(selectedIndex: navigationShell.currentIndex, onSelected: _select)
+            else if (windowClass.isExpanded)
+              _SideNavigation(selectedIndex: navigationShell.currentIndex, onSelected: _select),
+            Expanded(child: navigationShell),
           ],
         ),
-      );
-    },
+      ),
+    ),
   );
 }
 
-class _SideNavigation extends StatelessWidget {
-  const _SideNavigation({required this.section});
+@immutable
+class _AppDestination {
+  const _AppDestination({required this.label, required this.icon, required this.selectedIcon});
 
-  final AppSection section;
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+}
+
+const _destinations = [
+  _AppDestination(label: AppMessages.navigationToday, icon: AppIcons.today, selectedIcon: AppIcons.todayActive),
+  _AppDestination(label: AppMessages.navigationWeek, icon: AppIcons.calendar, selectedIcon: AppIcons.calendarActive),
+  _AppDestination(
+    label: AppMessages.navigationHorizons,
+    icon: AppIcons.horizons,
+    selectedIcon: AppIcons.horizonsActive,
+  ),
+  _AppDestination(label: AppMessages.navigationReviews, icon: AppIcons.reviews, selectedIcon: AppIcons.reviewsActive),
+  _AppDestination(
+    label: AppMessages.navigationErrors,
+    icon: AppIcons.errorNotebook,
+    selectedIcon: AppIcons.errorNotebookActive,
+  ),
+];
+
+class _SideNavigation extends StatelessWidget {
+  const _SideNavigation({required this.selectedIndex, required this.onSelected});
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -58,48 +91,12 @@ class _SideNavigation extends StatelessWidget {
           children: [
             AppBrandLogo(width: context.tokens.sizes.navigationBrand),
             SizedBox(height: context.tokens.spacing.xxxl),
-            _SideItem(
-              label: 'Hoje',
-              icon: AppIcons.today,
-              activeIcon: AppIcons.todayActive,
-              selected: section == AppSection.today,
-              onTap: () => _open(context, AppSection.today),
-            ),
-            _SideItem(
-              label: 'Esta semana',
-              icon: AppIcons.calendar,
-              activeIcon: AppIcons.calendarActive,
-              selected: section == AppSection.week,
-              onTap: () => _open(context, AppSection.week),
-            ),
-            _SideItem(
-              label: 'Horizontes',
-              icon: AppIcons.horizons,
-              activeIcon: AppIcons.horizonsActive,
-              selected: section == AppSection.horizons,
-              onTap: () => _open(context, AppSection.horizons),
-            ),
-            _SideItem(
-              label: 'Revisões',
-              icon: AppIcons.reviews,
-              activeIcon: AppIcons.reviewsActive,
-              selected: section == AppSection.reviews,
-              onTap: () => _open(context, AppSection.reviews),
-            ),
-            _SideItem(
-              label: 'Caderno de Erros',
-              icon: AppIcons.errorNotebook,
-              activeIcon: AppIcons.errorNotebookActive,
-              selected: section == AppSection.errors,
-              onTap: () => _open(context, AppSection.errors),
-            ),
-            const Spacer(),
-            _SideItem(
-              label: 'Ajustes',
-              icon: AppIcons.settings,
-              selected: section == AppSection.settings,
-              onTap: () => _open(context, AppSection.settings),
-            ),
+            for (var index = 0; index < _destinations.length; index++)
+              _SideItem(
+                destination: _destinations[index],
+                selected: selectedIndex == index,
+                onTap: () => onSelected(index),
+              ),
           ],
         ),
       ),
@@ -109,16 +106,12 @@ class _SideNavigation extends StatelessWidget {
 
 class _SideItem extends StatelessWidget {
   const _SideItem({
-    required this.label,
-    required this.icon,
+    required this.destination,
     required this.selected,
     required this.onTap,
-    this.activeIcon,
   });
 
-  final String label;
-  final IconData icon;
-  final IconData? activeIcon;
+  final _AppDestination destination;
   final bool selected;
   final VoidCallback onTap;
 
@@ -131,66 +124,56 @@ class _SideItem extends StatelessWidget {
         selected: selected,
         selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
         shape: RoundedRectangleBorder(borderRadius: context.tokens.borders.md),
-        leading: Icon(selected ? activeIcon ?? icon : icon, size: context.tokens.icons.md),
-        title: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        leading: Icon(
+          selected ? destination.selectedIcon : destination.icon,
+          size: context.tokens.icons.md,
+        ),
+        title: Text(destination.label, style: Theme.of(context).textTheme.labelLarge),
         onTap: onTap,
       ),
     ),
   );
 }
 
-class _BottomNavigation extends StatelessWidget {
-  const _BottomNavigation({required this.section});
+class _MediumNavigation extends StatelessWidget {
+  const _MediumNavigation({required this.selectedIndex, required this.onSelected});
 
-  final AppSection section;
-
-  int get _currentIndex => switch (section) {
-    AppSection.today => 0,
-    AppSection.week => 1,
-    AppSection.horizons => 2,
-    AppSection.reviews => 3,
-    _ => 4,
-  };
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => BottomNavigationBar(
-    currentIndex: _currentIndex,
-    onTap: (index) => _open(context, switch (index) {
-      0 => AppSection.today,
-      1 => AppSection.week,
-      2 => AppSection.horizons,
-      3 => AppSection.reviews,
-      _ => AppSection.settings,
-    }),
-    items: [
-      BottomNavigationBarItem(
-        icon: Icon(
-          section == AppSection.today ? AppIcons.todayActive : AppIcons.today,
+  Widget build(BuildContext context) => NavigationRail(
+    selectedIndex: selectedIndex,
+    onDestinationSelected: onSelected,
+    labelType: NavigationRailLabelType.all,
+    destinations: [
+      for (final destination in _destinations)
+        NavigationRailDestination(
+          icon: Icon(destination.icon),
+          selectedIcon: Icon(destination.selectedIcon),
+          label: Text(destination.label),
         ),
-        label: 'Hoje',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(
-          section == AppSection.week ? AppIcons.calendarActive : AppIcons.calendar,
+    ],
+  );
+}
+
+class _CompactNavigation extends StatelessWidget {
+  const _CompactNavigation({required this.selectedIndex, required this.onSelected});
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) => NavigationBar(
+    selectedIndex: selectedIndex,
+    onDestinationSelected: onSelected,
+    destinations: [
+      for (final destination in _destinations)
+        NavigationDestination(
+          icon: Icon(destination.icon),
+          selectedIcon: Icon(destination.selectedIcon),
+          label: destination.label,
         ),
-        label: 'Esta semana',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(
-          section == AppSection.horizons ? AppIcons.horizonsActive : AppIcons.horizons,
-        ),
-        label: 'Horizontes',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(
-          section == AppSection.reviews ? AppIcons.reviewsActive : AppIcons.reviews,
-        ),
-        label: 'Revisões',
-      ),
-      const BottomNavigationBarItem(
-        icon: Icon(AppIcons.settings),
-        label: 'Mais',
-      ),
     ],
   );
 }
@@ -204,8 +187,9 @@ class AppBrandLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return SvgPicture.asset(
-      dark ? 'assets/brand/alvorada-monochrome-paper.svg' : 'assets/brand/alvorada-horizontal.svg',
+      dark ? AppBrand.logoDark : AppBrand.logoLight,
       width: width,
+      semanticsLabel: AppBrand.productName,
     );
   }
 }
@@ -228,7 +212,7 @@ class AppBreadcrumbs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    label: 'Rota de navegação',
+    label: AppMessages.navigationPath,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -246,7 +230,7 @@ class AppBreadcrumbs extends StatelessWidget {
               TextButton(
                 onPressed: () => context.go(route),
                 style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 36),
+                  minimumSize: Size(0, context.tokens.layout.controlHeight),
                   padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xs),
                 ),
                 child: Text(items[index].label),
@@ -266,26 +250,4 @@ class AppBreadcrumbs extends StatelessWidget {
       ),
     ),
   );
-}
-
-void _open(BuildContext context, AppSection destination) {
-  final route = switch (destination) {
-    AppSection.today => '/',
-    AppSection.week => '/semana',
-    AppSection.horizons => '/horizontes',
-    AppSection.reviews => '/revisoes',
-    AppSection.errors => '/caderno-de-erros',
-    _ => null,
-  };
-
-  if (route != null) {
-    context.go(route);
-    return;
-  }
-
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      const SnackBar(content: Text('Esta área entra nas próximas telas.')),
-    );
 }

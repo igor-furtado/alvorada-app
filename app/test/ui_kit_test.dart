@@ -1,3 +1,4 @@
+import 'package:estudos_app/src/core/content/app_messages.dart';
 import 'package:estudos_app/src/core/theme/app_theme.dart';
 import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
@@ -67,5 +68,27 @@ void main() {
     expect(find.text('Disciplina'), findsOneWidget);
     expect(find.text('Nome da disciplina'), findsOneWidget);
     expect(find.text('Use o nome do edital.'), findsOneWidget);
+  });
+
+  testWidgets('AppInfiniteListView apresenta itens e encerra a paginação', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: SizedBox(
+            height: AppTokens.light().sizes.overviewPanel,
+            child: AppInfiniteListView<int>(
+              loadPage: (_) async => const AppInfinitePage(items: [1, 2]),
+              itemBuilder: (context, item, index) => Text('Item $item'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Item 1'), findsOneWidget);
+    expect(find.text('Item 2'), findsOneWidget);
+    expect(find.text(AppMessages.noMoreResults), findsOneWidget);
   });
 }

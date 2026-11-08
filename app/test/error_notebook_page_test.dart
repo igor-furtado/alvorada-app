@@ -11,7 +11,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Caderno de Erros'));
+    await tester.tap(find.widgetWithText(ListTile, 'Caderno'));
     await tester.pumpAndSettle();
 
     expect(find.text('Em revisão'), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Caderno de Erros'));
+    await tester.tap(find.widgetWithText(ListTile, 'Caderno'));
     await tester.pumpAndSettle();
     tester.view.physicalSize = const Size(390, 844);
     await tester.pumpAndSettle();
@@ -42,7 +42,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Registrar erro'));
     await tester.pumpAndSettle();
 
-    final dialog = find.byType(AlertDialog);
+    final dialog = find.byType(Dialog);
     expect(
       find.descendant(of: dialog, matching: find.text('Tipo do erro')),
       findsOneWidget,
@@ -54,18 +54,18 @@ void main() {
     expect(
       find.descendant(
         of: dialog,
-        matching: find.text('A regra certa, com minhas palavras'),
+        matching: find.text('A regra certa, com minhas palavras *'),
       ),
       findsOneWidget,
     );
     expect(
-      find.descendant(of: dialog, matching: find.text('Por que eu caí')),
+      find.descendant(of: dialog, matching: find.text('Por que eu caí *')),
       findsOneWidget,
     );
 
-    await tester.tap(
-      find.widgetWithText(FilledButton, 'Salvar e programar Revisões'),
-    );
+    final submit = find.widgetWithText(FilledButton, 'Salvar e programar Revisões');
+    await tester.ensureVisible(submit);
+    await tester.tap(submit);
     await tester.pumpAndSettle();
     expect(
       find.text('Escreva com suas palavras para concluir o registro.'),

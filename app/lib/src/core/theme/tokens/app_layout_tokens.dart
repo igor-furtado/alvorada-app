@@ -11,7 +11,7 @@ class AppLayoutTokens {
     this.medium = AppDimensionPrimitives.breakpointMedium,
     this.expanded = AppDimensionPrimitives.breakpointExpanded,
     this.wide = AppDimensionPrimitives.breakpointWide,
-    this.contentMaxWidth = AppDimensionPrimitives.breakpointWide,
+    this.contentMaxWidth = AppDimensionPrimitives.contentMaxWidth,
     this.dialogMaxWidth = 600,
     this.sideNavigationWidth = 232,
     this.brandWidth = 178,
@@ -26,6 +26,12 @@ class AppLayoutTokens {
     this.detail = 820,
     this.contentSplit = 860,
     this.threeColumn = 1040,
+    this.infiniteScrollExtent = AppDimensionPrimitives.size240,
+    this.timelineRailCompact = AppDimensionPrimitives.size64,
+    this.timelineRailExpanded = 112,
+    this.timelineGapCompact = AppDimensionPrimitives.size12,
+    this.timelineGapExpanded = 18,
+    this.sundayContentOffset = 72,
   });
 
   final double compact;
@@ -47,6 +53,12 @@ class AppLayoutTokens {
   final double detail;
   final double contentSplit;
   final double threeColumn;
+  final double infiniteScrollExtent;
+  final double timelineRailCompact;
+  final double timelineRailExpanded;
+  final double timelineGapCompact;
+  final double timelineGapExpanded;
+  final double sundayContentOffset;
 
   AppLayoutTokens lerp(AppLayoutTokens other, double t) => AppLayoutTokens(
     compact: lerpDouble(compact, other.compact, t)!,
@@ -80,5 +92,11 @@ class AppLayoutTokens {
     detail: lerpDouble(detail, other.detail, t)!,
     contentSplit: lerpDouble(contentSplit, other.contentSplit, t)!,
     threeColumn: lerpDouble(threeColumn, other.threeColumn, t)!,
+    infiniteScrollExtent: lerpDouble(infiniteScrollExtent, other.infiniteScrollExtent, t)!,
+    timelineRailCompact: lerpDouble(timelineRailCompact, other.timelineRailCompact, t)!,
+    timelineRailExpanded: lerpDouble(timelineRailExpanded, other.timelineRailExpanded, t)!,
+    timelineGapCompact: lerpDouble(timelineGapCompact, other.timelineGapCompact, t)!,
+    timelineGapExpanded: lerpDouble(timelineGapExpanded, other.timelineGapExpanded, t)!,
+    sundayContentOffset: lerpDouble(sundayContentOffset, other.sundayContentOffset, t)!,
   );
 }

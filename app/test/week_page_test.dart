@@ -11,7 +11,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Esta semana').first);
+    await tester.tap(find.text('Semana').first);
     await tester.pumpAndSettle();
 
     expect(find.text('2 a 8 de novembro · Consolidação'), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Esta semana').last);
+    await tester.tap(find.text('Semana').last);
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Ajustar semana'));
     await tester.pumpAndSettle();

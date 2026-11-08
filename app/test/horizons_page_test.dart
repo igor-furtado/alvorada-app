@@ -44,8 +44,8 @@ void main() {
 
     await tester.tap(find.widgetWithText(FilledButton, 'Novo Horizonte'));
     await tester.pumpAndSettle();
-    expect(find.text('Órgão ou instituição'), findsOneWidget);
-    expect(find.text('Cargo'), findsOneWidget);
+    expect(find.text('Órgão ou instituição *'), findsOneWidget);
+    expect(find.text('Cargo *'), findsOneWidget);
     expect(find.text('Banca'), findsWidgets);
 
     await tester.tap(find.text('Cancelar'));

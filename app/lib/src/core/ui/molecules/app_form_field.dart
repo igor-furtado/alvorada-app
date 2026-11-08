@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../content/app_messages.dart';
 import '../../theme/app_theme.dart';
 import '../atoms/app_text_input.dart';
 
@@ -17,6 +18,7 @@ class AppFormField extends StatelessWidget {
     this.keyboardType,
     this.textInputAction,
     this.validator,
+    this.autovalidateMode = AutovalidateMode.onUnfocus,
     this.onChanged,
     this.onSubmitted,
     this.minLines = 1,
@@ -38,6 +40,7 @@ class AppFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final FormFieldValidator<String>? validator;
+  final AutovalidateMode autovalidateMode;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final int minLines;
@@ -63,13 +66,14 @@ class AppFormField extends StatelessWidget {
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           validator: validator,
+          autovalidateMode: autovalidateMode,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           minLines: minLines,
           maxLines: maxLines,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
-          semanticLabel: label,
+          semanticLabel: required ? '$label, ${AppMessages.requiredSuffix}' : label,
         ),
         if (description != null && errorText == null) ...[
           SizedBox(height: context.tokens.spacing.xxs),

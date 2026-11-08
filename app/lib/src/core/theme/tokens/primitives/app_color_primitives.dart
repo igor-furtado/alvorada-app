@@ -17,6 +17,7 @@ abstract final class AppColorPrimitives {
 
   static const red100 = Color(0xFFF3D8D3);
   static const red500 = Color(0xFFC0392B);
+  static const red700 = Color(0xFF8B2E24);
   static const red300 = Color(0xFFF08A7E);
 
   static const sage100 = Color(0xFFE2E9E3);

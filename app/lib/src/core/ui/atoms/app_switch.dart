@@ -8,11 +8,9 @@ class AppSwitch extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: semanticLabel,
-    toggled: value,
-    enabled: onChanged != null,
-    child: ExcludeSemantics(
+  Widget build(BuildContext context) => MergeSemantics(
+    child: Semantics(
+      label: semanticLabel,
       child: Switch(value: value, onChanged: onChanged),
     ),
   );

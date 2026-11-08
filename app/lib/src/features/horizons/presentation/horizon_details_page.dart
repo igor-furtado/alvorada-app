@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -52,7 +53,6 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
   Widget build(BuildContext context) {
     final horizon = _horizon;
     return AppPageTemplate(
-      section: AppSection.horizons,
       maxWidth: context.tokens.sizes.horizonPage,
       builder: (context, desktop) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +64,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
-                label: 'Horizontes',
+                label: AppMessages.navigationHorizons,
                 route: '/horizontes',
               ),
               AppBreadcrumbItem(
@@ -86,7 +86,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
               child: FilledButton.icon(
                 onPressed: _addDiscipline,
                 icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-                label: const Text('Nova Disciplina'),
+                label: const Text(AppMessages.newDiscipline),
               ),
             ),
             SizedBox(height: context.tokens.spacing.lg),
@@ -153,9 +153,9 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('${discipline.name} foi removida deste Edital.'),
+          content: Text(AppMessages.disciplineRemoved(discipline.name)),
           action: SnackBarAction(
-            label: 'Desfazer',
+            label: AppMessages.undo,
             onPressed: () => setState(
               () => _disciplines.insert(
                 index.clamp(0, _disciplines.length),
@@ -197,7 +197,7 @@ class _HorizonSummary extends StatelessWidget {
               ),
               child: Icon(
                 AppIcons.horizonsActive,
-                color: Theme.of(context).colorScheme.primary,
+                color: context.tokens.colors.actionForeground,
                 size: context.tokens.icons.xl,
               ),
             ),
@@ -319,7 +319,7 @@ class _VerticalizedEdital extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(context.tokens.spacing.huge),
         decoration: _cardDecoration(context),
-        child: const Center(child: Text('Nenhuma Disciplina encontrada.')),
+        child: const Center(child: Text(AppMessages.noDiscipline)),
       );
     }
     return Container(
@@ -454,7 +454,7 @@ class _DisciplineRow extends StatelessWidget {
                     child: Icon(
                       AppIcons.bookText,
                       size: context.tokens.icons.md,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: context.tokens.colors.actionForeground,
                     ),
                   ),
                   SizedBox(width: context.tokens.spacing.lg),
@@ -522,7 +522,7 @@ class _DisciplineRow extends StatelessWidget {
             SizedBox(
               width: context.tokens.layout.tableActionsColumn,
               child: IconButton(
-                tooltip: 'Remover Disciplina',
+                tooltip: AppMessages.removeDiscipline,
                 onPressed: () => onRemove(discipline),
                 icon: Icon(AppIcons.delete, size: context.tokens.icons.md),
               ),
@@ -603,7 +603,7 @@ class _StatusBadge extends StatelessWidget {
       color: Theme.of(context).colorScheme.secondaryContainer,
       borderRadius: context.tokens.borders.full,
     ),
-    child: Text('Principal', style: Theme.of(context).textTheme.labelSmall),
+    child: Text(AppMessages.main, style: Theme.of(context).textTheme.labelSmall),
   );
 }
 
@@ -659,21 +659,21 @@ class _AddDisciplineDialogState extends State<_AddDisciplineDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Nova Disciplina'),
+    title: const Text(AppMessages.newDiscipline),
     content: TextField(
       controller: controller,
       autofocus: true,
-      decoration: const InputDecoration(labelText: 'Nome da Disciplina'),
+      decoration: const InputDecoration(labelText: AppMessages.disciplineName),
       onSubmitted: (value) => Navigator.pop(context, value),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: const Text(AppMessages.cancel),
       ),
       FilledButton(
         onPressed: () => Navigator.pop(context, controller.text),
-        child: const Text('Adicionar'),
+        child: const Text(AppMessages.add),
       ),
     ],
   );
@@ -684,7 +684,7 @@ class _NotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.giant),
-    child: const Center(child: Text('Horizonte não encontrado')),
+    child: const Center(child: Text(AppMessages.horizonNotFound)),
   );
 }
 

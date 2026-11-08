@@ -15,11 +15,9 @@ class AppCheckbox extends StatelessWidget {
   final bool tristate;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: semanticLabel,
-    checked: value,
-    enabled: onChanged != null,
-    child: ExcludeSemantics(
+  Widget build(BuildContext context) => MergeSemantics(
+    child: Semantics(
+      label: semanticLabel,
       child: Checkbox(value: value, onChanged: onChanged, tristate: tristate),
     ),
   );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
+import '../accessibility/app_accessibility.dart';
 import '../atoms/app_icon.dart';
 
 enum AppSnackbarVariant { neutral, success, error, info }
@@ -21,6 +22,7 @@ abstract final class AppSnackbar {
       AppSnackbarVariant.error => (scheme.error, scheme.onError, AppIcons.attention),
       AppSnackbarVariant.info => (colors.info, colors.onInfo, AppIcons.observation),
     };
+    AppAccessibility.announce(context, message);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(

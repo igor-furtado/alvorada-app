@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
@@ -42,7 +43,6 @@ class ReviewsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppPageTemplate(
-    section: AppSection.reviews,
     builder: (context, desktop) => _ReviewsContent(reviews: _reviews, desktop: desktop),
   );
 }
@@ -134,7 +134,7 @@ class _Header extends StatelessWidget {
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Revisões', style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.reviews, style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             'Revise no momento certo, do jeito certo.',
@@ -148,7 +148,7 @@ class _Header extends StatelessWidget {
         onPressed: () => _showMethodDialog(context),
         variant: AppButtonVariant.outline,
         icon: AppIcons.observation,
-        label: 'Como funciona',
+        label: AppMessages.howItWorks,
       );
 
       if (compact) {
@@ -183,31 +183,31 @@ class _Filters extends StatelessWidget {
         const FilterChip(
           selected: true,
           onSelected: null,
-          label: Text('Todas'),
+          label: Text(AppMessages.all),
         ),
         SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
-          label: const Text('1 dia'),
+          label: const Text(AppMessages.oneDay),
         ),
         SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
-          label: const Text('7 dias'),
+          label: const Text(AppMessages.sevenDays),
         ),
         SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           onSelected: (_) => _showFilterMessage(context),
-          label: const Text('30 dias'),
+          label: const Text(AppMessages.thirtyDays),
         ),
         SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           avatar: Icon(AppIcons.horizons, size: context.tokens.icons.sm),
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
-          label: const Text('Todos os Horizontes'),
+          label: const Text(AppMessages.allHorizons),
         ),
       ],
     ),
@@ -227,6 +227,7 @@ class _ReviewCard extends StatelessWidget {
       _ReviewType.sevenDays => scheme.tertiary,
       _ReviewType.thirtyDays => scheme.secondary,
     };
+    final labelColor = review.type == _ReviewType.oneDay ? context.tokens.colors.actionForeground : accent;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -269,7 +270,7 @@ class _ReviewCard extends StatelessWidget {
                           'Revisão de ${review.interval}',
                           style: Theme.of(
                             context,
-                          ).textTheme.labelMedium?.copyWith(color: accent),
+                          ).textTheme.labelMedium?.copyWith(color: labelColor),
                         ),
                       ),
                       Text(
@@ -332,7 +333,7 @@ class _ReviewCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => _showReviewDialog(context, review),
                       icon: Icon(AppIcons.play, size: context.tokens.icons.md),
-                      label: const Text('Começar revisão'),
+                      label: const Text(AppMessages.startReview),
                     ),
                   ),
                 ],
@@ -362,7 +363,7 @@ class _MethodGuide extends StatelessWidget {
         Icon(
           AppIcons.reviews,
           size: context.tokens.icons.xl,
-          color: Theme.of(context).colorScheme.primary,
+          color: context.tokens.colors.actionForeground,
         ),
         SizedBox(height: context.tokens.spacing.lg),
         Text(
@@ -553,7 +554,7 @@ class _UpcomingRow extends StatelessWidget {
       Icon(
         AppIcons.calendar,
         size: context.tokens.icons.md,
-        color: Theme.of(context).colorScheme.primary,
+        color: context.tokens.colors.actionForeground,
       ),
       SizedBox(width: context.tokens.spacing.md),
       Expanded(
@@ -580,7 +581,7 @@ class _ReviewDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text('Revisão de ${review.interval}'),
+    title: Text(AppMessages.reviewOf(review.interval)),
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.sizes.guideMaxWidth),
       child: Column(
@@ -595,7 +596,7 @@ class _ReviewDialog extends StatelessWidget {
             children: [
               Icon(AppIcons.mockExam, size: context.tokens.icons.md),
               SizedBox(width: context.tokens.spacing.sm),
-              Text('${review.duration} previstos'),
+              Text(AppMessages.expectedDuration(review.duration)),
             ],
           ),
           SizedBox(height: context.tokens.spacing.md),
@@ -606,11 +607,11 @@ class _ReviewDialog extends StatelessWidget {
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Agora não'),
+        child: const Text(AppMessages.notNow),
       ),
       FilledButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Começar'),
+        child: const Text(AppMessages.start),
       ),
     ],
   );
@@ -624,21 +625,21 @@ Future<void> _showReviewDialog(BuildContext context, _ReviewPreview review) => s
 Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
   context: context,
   builder: (context) => AlertDialog(
-    title: const Text('Como funcionam as Revisões'),
+    title: const Text(AppMessages.howReviewsWork),
     content: const Text(
       'Cada Tópico volta em 1, 7 e 30 dias. A atividade muda em cada intervalo para recuperar antes de reler.',
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Entendi'),
+        child: const Text(AppMessages.understand),
       ),
     ],
   ),
 );
 
 void _showFilterMessage(BuildContext context) {
-  AppSnackbar.show(context, message: 'Os filtros serão conectados aos dados depois.');
+  AppSnackbar.show(context, message: AppMessages.filtersNotConnected);
 }
 
 IconData _instructionIcon(_ReviewType type) => switch (type) {

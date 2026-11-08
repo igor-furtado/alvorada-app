@@ -14,4 +14,4 @@ O projeto usa documentação de domínio single-context. Consulte `docs/agents/d
 
 ### Flutter UI
 
-Ao criar ou alterar widgets Flutter, siga `app/docs/agents/design-system.md`.
+Ao alterar widget, fluxo, texto, navegação, responsividade ou acessibilidade Flutter, siga `app/docs/agents/design-system/index.md`.

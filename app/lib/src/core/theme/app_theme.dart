@@ -39,7 +39,7 @@ abstract final class AppTheme {
       surface: colors.surface,
       onSurface: colors.onSurface,
       surfaceContainerHighest: colors.surfaceSubtle,
-      outline: colors.border,
+      outline: colors.controlOutline,
       outlineVariant: colors.border.withValues(alpha: tokens.opacity.border),
       shadow: colors.shadow,
       scrim: colors.scrim,
@@ -51,7 +51,7 @@ abstract final class AppTheme {
     final radius = tokens.borders.md;
     final inputBorder = OutlineInputBorder(
       borderRadius: radius,
-      borderSide: BorderSide(color: colors.border),
+      borderSide: BorderSide(color: colors.controlOutline),
     );
 
     return ThemeData(
@@ -62,6 +62,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: colors.canvas,
       textTheme: textTheme,
       dividerColor: colors.border,
+      focusColor: colors.focusRing.withValues(alpha: tokens.opacity.tintStrong),
       splashFactory: InkSparkle.splashFactory,
       appBarTheme: AppBarTheme(
         backgroundColor: colors.canvas,
@@ -109,7 +110,7 @@ abstract final class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: dark ? colors.primary : colors.onSurface,
+          foregroundColor: colors.actionForeground,
           textStyle: textTheme.labelLarge,
           shape: RoundedRectangleBorder(borderRadius: radius),
         ),
@@ -120,14 +121,12 @@ abstract final class AppTheme {
         labelStyle: textTheme.bodyMedium?.copyWith(
           color: colors.onSurfaceMuted,
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(
-          color: colors.onSurfaceMuted.withValues(alpha: tokens.opacity.hint),
-        ),
+        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceMuted),
         border: inputBorder,
         enabledBorder: inputBorder,
         focusedBorder: inputBorder.copyWith(
           borderSide: BorderSide(
-            color: colors.primary,
+            color: colors.focusRing,
             width: tokens.borders.widthStrong,
           ),
         ),
