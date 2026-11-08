@@ -18,11 +18,9 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final desktop = constraints.maxWidth >= 980;
+      final desktop = constraints.maxWidth >= context.tokens.layout.expanded;
       return Scaffold(
-        bottomNavigationBar: desktop
-            ? null
-            : _BottomNavigation(section: section),
+        bottomNavigationBar: desktop ? null : _BottomNavigation(section: section),
         body: Row(
           children: [
             if (desktop) _SideNavigation(section: section),
@@ -41,7 +39,7 @@ class _SideNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 232,
+    width: context.tokens.layout.sideNavigationWidth,
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border(
@@ -50,11 +48,16 @@ class _SideNavigation extends StatelessWidget {
     ),
     child: SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
+        padding: EdgeInsets.fromLTRB(
+          context.tokens.spacing.xl,
+          context.tokens.spacing.xxl,
+          context.tokens.spacing.xl,
+          context.tokens.spacing.xl,
+        ),
         child: Column(
           children: [
-            const AppBrandLogo(width: 184),
-            const SizedBox(height: 32),
+            AppBrandLogo(width: context.tokens.sizes.navigationBrand),
+            SizedBox(height: context.tokens.spacing.xxxl),
             _SideItem(
               label: 'Hoje',
               icon: AppIcons.today,
@@ -121,14 +124,14 @@ class _SideItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 4),
+    padding: EdgeInsets.only(bottom: context.tokens.spacing.xxs),
     child: Material(
-      color: Colors.transparent,
+      color: context.tokens.colors.transparent,
       child: ListTile(
         selected: selected,
         selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        leading: Icon(selected ? activeIcon ?? icon : icon, size: 22),
+        shape: RoundedRectangleBorder(borderRadius: context.tokens.borders.md),
+        leading: Icon(selected ? activeIcon ?? icon : icon, size: context.tokens.icons.md),
         title: Text(label, style: Theme.of(context).textTheme.labelLarge),
         onTap: onTap,
       ),
@@ -168,25 +171,19 @@ class _BottomNavigation extends StatelessWidget {
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          section == AppSection.week
-              ? AppIcons.calendarActive
-              : AppIcons.calendar,
+          section == AppSection.week ? AppIcons.calendarActive : AppIcons.calendar,
         ),
         label: 'Esta semana',
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          section == AppSection.horizons
-              ? AppIcons.horizonsActive
-              : AppIcons.horizons,
+          section == AppSection.horizons ? AppIcons.horizonsActive : AppIcons.horizons,
         ),
         label: 'Horizontes',
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          section == AppSection.reviews
-              ? AppIcons.reviewsActive
-              : AppIcons.reviews,
+          section == AppSection.reviews ? AppIcons.reviewsActive : AppIcons.reviews,
         ),
         label: 'Revisões',
       ),
@@ -207,9 +204,7 @@ class AppBrandLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return SvgPicture.asset(
-      dark
-          ? 'assets/brand/alvorada-monochrome-paper.svg'
-          : 'assets/brand/alvorada-horizontal.svg',
+      dark ? 'assets/brand/alvorada-monochrome-paper.svg' : 'assets/brand/alvorada-horizontal.svg',
       width: width,
     );
   }
@@ -241,24 +236,24 @@ class AppBreadcrumbs extends StatelessWidget {
           for (var index = 0; index < items.length; index++) ...[
             if (index > 0) ...[
               Icon(
-                Icons.chevron_right,
-                size: 18,
+                AppIcons.chevronRight,
+                size: context.tokens.icons.md,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: context.tokens.spacing.xxs),
             ],
             if (items[index].route case final route?)
               TextButton(
                 onPressed: () => context.go(route),
                 style: TextButton.styleFrom(
                   minimumSize: const Size(0, 36),
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xs),
                 ),
                 child: Text(items[index].label),
               )
             else
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xs),
                 child: Text(
                   items[index].label,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(

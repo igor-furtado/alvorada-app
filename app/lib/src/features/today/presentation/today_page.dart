@@ -18,15 +18,17 @@ class TodayPage extends StatelessWidget {
           slivers: [
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
-                desktop ? 40 : 20,
-                20,
-                desktop ? 40 : 20,
-                48,
+                desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+                context.tokens.spacing.xl,
+                desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+                context.tokens.spacing.huge,
               ),
               sliver: SliverToBoxAdapter(
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1120),
+                    constraints: BoxConstraints(
+                      maxWidth: context.tokens.layout.contentMaxWidth,
+                    ),
                     child: isSunday
                         ? _SundayView(date: now, desktop: desktop)
                         : _TodayContent(date: now, desktop: desktop),
@@ -51,28 +53,34 @@ class _TodayContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _Header(date: date, showBrand: !desktop),
-      const SizedBox(height: 28),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _HorizonStrip(),
-      const SizedBox(height: 24),
+      SizedBox(height: context.tokens.spacing.xxl),
       LayoutBuilder(
         builder: (context, constraints) {
-          final twoColumns = constraints.maxWidth >= 820;
-          final plan = const _DailyPlanCard();
-          final rhythm = const _SunnyDaysCard();
+          final twoColumns = constraints.maxWidth >= context.tokens.layout.detail;
+          const plan = _DailyPlanCard();
+          const rhythm = _SunnyDaysCard();
           if (!twoColumns) {
-            return Column(children: [plan, const SizedBox(height: 20), rhythm]);
+            return Column(
+              children: [
+                plan,
+                SizedBox(height: context.tokens.spacing.xl),
+                rhythm,
+              ],
+            );
           }
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(flex: 7, child: plan),
-              const SizedBox(width: 20),
-              Expanded(flex: 4, child: rhythm),
+              const Expanded(flex: 7, child: plan),
+              SizedBox(width: context.tokens.spacing.xl),
+              const Expanded(flex: 4, child: rhythm),
             ],
           );
         },
       ),
-      const SizedBox(height: 32),
+      SizedBox(height: context.tokens.spacing.xxxl),
       Row(
         children: [
           Text(
@@ -83,9 +91,9 @@ class _TodayContent extends StatelessWidget {
           TextButton(onPressed: () {}, child: const Text('Ver todos')),
         ],
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: context.tokens.spacing.md),
       const _ReviewCards(),
-      const SizedBox(height: 32),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _MethodNote(),
     ],
   );
@@ -101,8 +109,8 @@ class _Header extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if (showBrand) ...[
-        const AppBrandLogo(width: 178),
-        const SizedBox(height: 28),
+        AppBrandLogo(width: context.tokens.layout.brandWidth),
+        SizedBox(height: context.tokens.spacing.xxxl),
       ],
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +123,7 @@ class _Header extends StatelessWidget {
                   _greeting(date),
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: context.tokens.spacing.xs),
                 Text(
                   '${_formattedDate(date)} · Consolidação',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -128,11 +136,11 @@ class _Header extends StatelessWidget {
           IconButton.filledTonal(
             tooltip: 'Lembretes',
             onPressed: () {},
-            icon: Icon(AppIcons.notification, size: AppIcons.standard),
+            icon: Icon(AppIcons.notification, size: context.tokens.icons.lg),
           ),
         ],
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: context.tokens.spacing.md),
       Text(
         'Cada manhã conta.',
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -149,27 +157,27 @@ class _HorizonStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(16),
+    padding: EdgeInsets.all(context.tokens.spacing.lg),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Row(
       children: [
         Container(
-          width: 42,
-          height: 42,
+          width: context.tokens.sizes.iconContainerMd,
+          height: context.tokens.sizes.iconContainerMd,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: context.tokens.borders.md,
           ),
           child: Icon(
             AppIcons.horizons,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +186,7 @@ class _HorizonStrip extends StatelessWidget {
                 'Horizonte principal',
                 style: Theme.of(context).textTheme.labelMedium,
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: context.tokens.spacing.xxxs),
               Text(
                 'Analista · 82 dias para a prova',
                 style: Theme.of(context).textTheme.titleMedium,
@@ -186,9 +194,9 @@ class _HorizonStrip extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: context.tokens.spacing.lg),
         SizedBox(
-          width: 120,
+          width: context.tokens.sizes.compactField,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -196,8 +204,11 @@ class _HorizonStrip extends StatelessWidget {
                 '34% do Edital',
                 style: Theme.of(context).textTheme.labelMedium,
               ),
-              const SizedBox(height: 7),
-              const LinearProgressIndicator(value: .34, minHeight: 6),
+              SizedBox(height: context.tokens.spacing.sm),
+              LinearProgressIndicator(
+                value: .34,
+                minHeight: context.tokens.sizes.progressIndicatorThin,
+              ),
             ],
           ),
         ),
@@ -212,15 +223,15 @@ class _DailyPlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(width: 6, color: Theme.of(context).colorScheme.primary),
+            Container(width: context.tokens.sizes.accentBar, color: Theme.of(context).colorScheme.primary),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(context.tokens.spacing.xxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -238,47 +249,49 @@ class _DailyPlanCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: context.tokens.spacing.xxs),
                     Text(
                       'Comece pela disciplina principal. Um turno de cada vez.',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: context.tokens.spacing.xl),
                     const _PlanRow(
                       icon: AppIcons.bookText,
                       duration: '50 min',
                       title: 'Direito Constitucional',
-                      subtitle:
-                          'Leitura corrida · Controle de constitucionalidade',
+                      subtitle: 'Leitura corrida · Controle de constitucionalidade',
                       current: true,
                     ),
                     const _NotebookDivider(),
-                    _PlanRow(
+                    const _PlanRow(
                       icon: AppIcons.fromMemory,
                       duration: '10 min',
                       title: 'De cabeça',
                       subtitle: 'Cinco linhas com o material fechado',
                     ),
                     const _NotebookDivider(),
-                    _PlanRow(
+                    const _PlanRow(
                       icon: AppIcons.questions,
                       duration: '30 min',
                       title: 'Questões',
                       subtitle: '20 a 30 questões do tópico',
                     ),
                     const _NotebookDivider(),
-                    _PlanRow(
+                    const _PlanRow(
                       icon: AppIcons.errorNotebook,
                       duration: '10 min',
                       title: 'Caderno de Erros',
                       subtitle: 'Registre o motivo de cada erro',
                     ),
-                    const SizedBox(height: 22),
+                    SizedBox(height: context.tokens.spacing.xxl),
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
                         onPressed: () {},
-                        icon: Icon(AppIcons.play, size: AppIcons.compact),
+                        icon: Icon(
+                          AppIcons.play,
+                          size: context.tokens.icons.md,
+                        ),
                         label: const Text('Começar próximo turno'),
                       ),
                     ),
@@ -310,25 +323,25 @@ class _PlanRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
+    padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.sm),
     child: Row(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: context.tokens.sizes.iconContainerSm,
+          height: context.tokens.sizes.iconContainerSm,
           decoration: BoxDecoration(
             color: current
                 ? Theme.of(context).colorScheme.primaryContainer
                 : Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: context.tokens.borders.md,
           ),
           child: Icon(
             icon,
-            size: 21,
+            size: context.tokens.icons.md,
             color: current ? Theme.of(context).colorScheme.primary : null,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +351,7 @@ class _PlanRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: context.tokens.spacing.sm),
         Text(duration, style: Theme.of(context).textTheme.labelMedium),
       ],
     ),
@@ -350,9 +363,9 @@ class _NotebookDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(left: 52),
+    padding: EdgeInsets.only(left: context.tokens.spacing.huge),
     child: Divider(
-      height: 1,
+      height: context.tokens.sizes.hairline,
       color: Theme.of(context).colorScheme.outlineVariant,
     ),
   );
@@ -364,7 +377,7 @@ class _SunnyDaysCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(22),
+      padding: EdgeInsets.all(context.tokens.spacing.xxl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -374,19 +387,19 @@ class _SunnyDaysCard extends StatelessWidget {
                 AppIcons.sunnyDays,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: context.tokens.spacing.sm),
               Text(
                 'Dias de sol',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.xs),
           Text(
             'Seu ritmo nesta semana',
             style: Theme.of(context).textTheme.bodySmall,
           ),
-          const SizedBox(height: 22),
+          SizedBox(height: context.tokens.spacing.xxl),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -399,21 +412,21 @@ class _SunnyDaysCard extends StatelessWidget {
               _DayMark(day: 'D', state: _DayState.rest),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: context.tokens.spacing.xl),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(context.tokens.spacing.lg),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: context.tokens.borders.md,
             ),
             child: Row(
               children: [
                 Icon(
                   AppIcons.rest,
-                  size: 22,
+                  size: context.tokens.icons.md,
                   color: Theme.of(context).colorScheme.secondary,
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: context.tokens.spacing.md),
                 Expanded(
                   child: Text(
                     'Domingo é descanso. Ele já faz parte do método.',
@@ -423,14 +436,17 @@ class _SunnyDaysCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: context.tokens.spacing.xl),
           Text(
             'Fundação concluída',
             style: Theme.of(context).textTheme.labelMedium,
           ),
-          const SizedBox(height: 7),
-          const LinearProgressIndicator(value: .62, minHeight: 6),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.sm),
+          LinearProgressIndicator(
+            value: .62,
+            minHeight: context.tokens.sizes.progressIndicatorThin,
+          ),
+          SizedBox(height: context.tokens.spacing.xs),
           Text('Semana 8 de 13', style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
@@ -454,25 +470,29 @@ class _DayMark extends StatelessWidget {
     return Column(
       children: [
         Text(day, style: Theme.of(context).textTheme.labelSmall),
-        const SizedBox(height: 7),
+        SizedBox(height: context.tokens.spacing.sm),
         Container(
-          width: 26,
-          height: 26,
+          width: context.tokens.sizes.dayMarker,
+          height: context.tokens.sizes.dayMarker,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isDone
                 ? primary
                 : isRest
                 ? Theme.of(context).colorScheme.secondaryContainer
-                : Colors.transparent,
+                : context.tokens.colors.transparent,
             border: Border.all(
               color: isToday ? primary : Theme.of(context).colorScheme.outline,
             ),
           ),
           child: isDone
-              ? Icon(AppIcons.check, size: 15, color: AppColors.tinta)
+              ? Icon(
+                  AppIcons.check,
+                  size: context.tokens.icons.sm,
+                  color: context.tokens.colors.onPrimary,
+                )
               : isRest
-              ? Icon(AppIcons.rest, size: 14)
+              ? Icon(AppIcons.rest, size: context.tokens.icons.sm)
               : null,
         ),
       ],
@@ -486,12 +506,12 @@ class _ReviewCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final width = constraints.maxWidth >= 820
-          ? (constraints.maxWidth - 32) / 3
+      final width = constraints.maxWidth >= context.tokens.layout.detail
+          ? (constraints.maxWidth - context.tokens.spacing.xxxl) / 3
           : constraints.maxWidth;
       return Wrap(
-        spacing: 16,
-        runSpacing: 12,
+        spacing: context.tokens.spacing.lg,
+        runSpacing: context.tokens.spacing.md,
         children: [
           _ReviewCard(
             width: width,
@@ -500,7 +520,7 @@ class _ReviewCards extends StatelessWidget {
             duration: '3 min',
             title: 'Princípios fundamentais',
             detail: 'Memorize + Atenção',
-            color: AppColors.sol,
+            color: context.tokens.colors.primary,
           ),
           _ReviewCard(
             width: width,
@@ -509,7 +529,7 @@ class _ReviewCards extends StatelessWidget {
             duration: '10 min',
             title: 'Poder constituinte',
             detail: 'Caixas + De cabeça',
-            color: AppColors.jurisprudenciaTinta,
+            color: context.tokens.colors.info,
           ),
           _ReviewCard(
             width: width,
@@ -518,7 +538,7 @@ class _ReviewCards extends StatelessWidget {
             duration: '20 min',
             title: 'Direitos fundamentais',
             detail: '20 questões',
-            color: AppColors.salviaTexto,
+            color: context.tokens.colors.success,
           ),
         ],
       );
@@ -549,20 +569,20 @@ class _ReviewCard extends StatelessWidget {
     width: width,
     child: Card(
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(context.tokens.spacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.tokens.spacing.sm,
+                    vertical: context.tokens.spacing.xxs,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: .13),
-                    borderRadius: BorderRadius.circular(6),
+                    color: color.withValues(alpha: context.tokens.opacity.tint),
+                    borderRadius: context.tokens.borders.sm,
                   ),
                   child: Text(
                     'Revisão de $interval',
@@ -575,18 +595,18 @@ class _ReviewCard extends StatelessWidget {
                 Text(duration, style: Theme.of(context).textTheme.labelMedium),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: context.tokens.spacing.lg),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 3),
+            SizedBox(height: context.tokens.spacing.xxs),
             Text(detail, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 14),
+            SizedBox(height: context.tokens.spacing.lg),
             Row(
               children: [
-                Icon(AppIcons.reviews, size: 18, color: color),
-                const SizedBox(width: 6),
+                Icon(AppIcons.reviews, size: context.tokens.icons.md, color: color),
+                SizedBox(width: context.tokens.spacing.xs),
                 Text(when, style: Theme.of(context).textTheme.labelMedium),
                 const Spacer(),
-                const Icon(AppIcons.arrowRight, size: 18),
+                Icon(AppIcons.arrowRight, size: context.tokens.icons.md),
               ],
             ),
           ],
@@ -601,19 +621,19 @@ class _MethodNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(
-        context,
-      ).colorScheme.surfaceContainerHighest.withValues(alpha: .55),
-      borderRadius: BorderRadius.circular(12),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(
+        alpha: context.tokens.opacity.muted,
+      ),
+      borderRadius: context.tokens.borders.lg,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(AppIcons.fromMemory, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Text(
             'Recuperação ativa antes de tudo: feche o material e tente dizer antes de conferir.',
@@ -634,42 +654,42 @@ class _SundayView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (!desktop) const AppBrandLogo(width: 178),
+      if (!desktop) AppBrandLogo(width: context.tokens.layout.brandWidth),
       SizedBox(height: desktop ? 72 : 48),
       Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
+          constraints: BoxConstraints(maxWidth: context.tokens.layout.dialogMaxWidth),
           child: Card(
             child: Padding(
-              padding: const EdgeInsets.all(40),
+              padding: EdgeInsets.all(context.tokens.spacing.page),
               child: Column(
                 children: [
                   Container(
-                    width: 72,
-                    height: 72,
+                    width: context.tokens.sizes.largeVisual,
+                    height: context.tokens.sizes.largeVisual,
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.secondaryContainer,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       AppIcons.rest,
-                      size: 34,
+                      size: context.tokens.icons.hero,
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: context.tokens.spacing.xxl),
                   Text(
                     'Domingo protegido',
                     style: Theme.of(context).textTheme.headlineLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: context.tokens.spacing.md),
                   Text(
                     'Hoje a manhã é sua. O descanso já está no plano.',
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: context.tokens.spacing.xl),
                   Text(
                     _formattedDate(date),
                     style: Theme.of(context).textTheme.labelMedium,

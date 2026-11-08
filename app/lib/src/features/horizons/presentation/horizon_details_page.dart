@@ -24,8 +24,7 @@ class HorizonDetailsPage extends StatefulWidget {
 }
 
 class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
-  late final HorizonViewData? _horizon =
-      widget.horizonOverride ?? demoHorizonById(widget.horizonId);
+  late final HorizonViewData? _horizon = widget.horizonOverride ?? demoHorizonById(widget.horizonId);
   late final List<HorizonDisciplineProgress> _disciplines = List.of(
     _horizon?.disciplines ?? const [],
   );
@@ -33,17 +32,17 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
   bool _sortAscending = false;
 
   List<HorizonDisciplineProgress> get _visibleDisciplines {
-    final result = List<HorizonDisciplineProgress>.of(_disciplines);
-    result.sort(
-      (left, right) => switch (_sort) {
-        _DisciplineSort.name => right.name.compareTo(left.name),
-        _DisciplineSort.weight => right.weight.compareTo(left.weight),
-        _DisciplineSort.performance => right.performance.compareTo(
-          left.performance,
-        ),
-        _DisciplineSort.progress => right.progress.compareTo(left.progress),
-      },
-    );
+    final result = List<HorizonDisciplineProgress>.of(_disciplines)
+      ..sort(
+        (left, right) => switch (_sort) {
+          _DisciplineSort.name => right.name.compareTo(left.name),
+          _DisciplineSort.weight => right.weight.compareTo(left.weight),
+          _DisciplineSort.performance => right.performance.compareTo(
+            left.performance,
+          ),
+          _DisciplineSort.progress => right.progress.compareTo(left.progress),
+        },
+      );
     if (_sortAscending) return result.reversed.toList();
     return result;
   }
@@ -56,20 +55,20 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
       builder: (context, desktop) => SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
-            desktop ? 40 : 20,
-            20,
-            desktop ? 40 : 20,
-            48,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.xl,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.huge,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1220),
+              constraints: BoxConstraints(maxWidth: context.tokens.sizes.horizonPage),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!desktop) ...[
-                    const AppBrandLogo(width: 178),
-                    const SizedBox(height: 24),
+                    AppBrandLogo(width: context.tokens.layout.brandWidth),
+                    SizedBox(height: context.tokens.spacing.xxl),
                   ],
                   AppBreadcrumbs(
                     items: [
@@ -82,7 +81,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(height: context.tokens.spacing.xl),
                   if (horizon == null)
                     const _NotFound()
                   else ...[
@@ -90,16 +89,16 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
                       horizon: horizon,
                       disciplineCount: _disciplines.length,
                     ),
-                    const SizedBox(height: 18),
+                    SizedBox(height: context.tokens.spacing.xl),
                     Align(
                       alignment: Alignment.centerRight,
                       child: FilledButton.icon(
                         onPressed: _addDiscipline,
-                        icon: const Icon(AppIcons.add, size: 18),
+                        icon: Icon(AppIcons.add, size: context.tokens.icons.md),
                         label: const Text('Nova Disciplina'),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: context.tokens.spacing.lg),
                     _VerticalizedEdital(
                       disciplines: _visibleDisciplines,
                       sort: _sort,
@@ -185,8 +184,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
 enum _DisciplineSort { name, weight, progress, performance }
 
 typedef _DisciplineAction = void Function(HorizonDisciplineProgress);
-typedef _WeightChange =
-    void Function(HorizonDisciplineProgress discipline, int weight);
+typedef _WeightChange = void Function(HorizonDisciplineProgress discipline, int weight);
 
 class _HorizonSummary extends StatelessWidget {
   const _HorizonSummary({required this.horizon, required this.disciplineCount});
@@ -195,28 +193,28 @@ class _HorizonSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: _cardDecoration(context),
     child: LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 820;
+        final compact = constraints.maxWidth < context.tokens.layout.detail;
         final identity = Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 62,
-              height: 62,
+              width: context.tokens.sizes.iconContainerLg,
+              height: context.tokens.sizes.iconContainerLg,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: context.tokens.borders.lg,
               ),
               child: Icon(
                 AppIcons.horizonsActive,
                 color: Theme.of(context).colorScheme.primary,
-                size: 28,
+                size: context.tokens.icons.xl,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: context.tokens.spacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,20 +228,20 @@ class _HorizonSummary extends StatelessWidget {
                         ),
                       ),
                       if (horizon.isPrimary) ...[
-                        const SizedBox(width: 10),
+                        SizedBox(width: context.tokens.spacing.md),
                         const _StatusBadge(),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.tokens.spacing.xxs),
                   Text(horizon.role),
-                  const SizedBox(height: 12),
+                  SizedBox(height: context.tokens.spacing.md),
                   Wrap(
-                    spacing: 18,
-                    runSpacing: 8,
+                    spacing: context.tokens.spacing.xl,
+                    runSpacing: context.tokens.spacing.sm,
                     children: [
                       _InlineInfo(
-                        icon: Icons.event_outlined,
+                        icon: AppIcons.event,
                         text: horizon.examDate,
                       ),
                       _InlineInfo(
@@ -251,7 +249,7 @@ class _HorizonSummary extends StatelessWidget {
                         text: '$disciplineCount disciplinas',
                       ),
                       _InlineInfo(
-                        icon: Icons.account_balance_outlined,
+                        icon: AppIcons.institution,
                         text: horizon.board,
                       ),
                     ],
@@ -290,13 +288,17 @@ class _HorizonSummary extends StatelessWidget {
         if (compact) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [identity, const SizedBox(height: 22), metrics],
+            children: [
+              identity,
+              SizedBox(height: context.tokens.spacing.xxl),
+              metrics,
+            ],
           );
         }
         return Row(
           children: [
             Expanded(flex: 6, child: identity),
-            const SizedBox(width: 28),
+            SizedBox(width: context.tokens.spacing.xxxl),
             Expanded(flex: 5, child: metrics),
           ],
         );
@@ -328,7 +330,7 @@ class _VerticalizedEdital extends StatelessWidget {
     if (disciplines.isEmpty) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(48),
+        padding: EdgeInsets.all(context.tokens.spacing.huge),
         decoration: _cardDecoration(context),
         child: const Center(child: Text('Nenhuma Disciplina encontrada.')),
       );
@@ -339,7 +341,7 @@ class _VerticalizedEdital extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
-          width: 950,
+          width: context.tokens.sizes.detailsTable,
           child: Column(
             children: [
               _TableHeader(
@@ -375,7 +377,7 @@ class _TableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     color: Theme.of(context).colorScheme.surfaceContainerHighest,
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xl, vertical: context.tokens.spacing.lg),
     child: Row(
       children: [
         Expanded(
@@ -414,7 +416,10 @@ class _TableHeader extends StatelessWidget {
             onTap: () => onSort(_DisciplineSort.performance),
           ),
         ),
-        const SizedBox(width: 56, child: _HeaderLabel('Ações')),
+        SizedBox(
+          width: context.tokens.layout.tableActionsColumn,
+          child: const _HeaderLabel('Ações'),
+        ),
       ],
     ),
   );
@@ -434,11 +439,11 @@ class _DisciplineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
+    color: context.tokens.colors.transparent,
     child: InkWell(
       onTap: () => onOpen(discipline),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xl, vertical: context.tokens.spacing.lg),
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
@@ -453,19 +458,19 @@ class _DisciplineRow extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 38,
-                    height: 38,
+                    width: context.tokens.sizes.rowIcon,
+                    height: context.tokens.sizes.rowIcon,
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(9),
+                      borderRadius: context.tokens.borders.md,
                     ),
                     child: Icon(
                       AppIcons.bookText,
-                      size: 19,
+                      size: context.tokens.icons.md,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: context.tokens.spacing.lg),
                   Expanded(
                     child: Text(
                       discipline.name,
@@ -478,7 +483,7 @@ class _DisciplineRow extends StatelessWidget {
             Expanded(
               flex: 15,
               child: SizedBox(
-                width: 72,
+                width: context.tokens.sizes.largeVisual,
                 child: TextFormField(
                   key: ValueKey(
                     'weight-${discipline.name}-${discipline.weight}',
@@ -487,11 +492,11 @@ class _DisciplineRow extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 9,
+                      horizontal: context.tokens.spacing.md,
+                      vertical: context.tokens.spacing.md,
                     ),
                   ),
                   onFieldSubmitted: (value) {
@@ -506,13 +511,13 @@ class _DisciplineRow extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 105,
+                    width: context.tokens.sizes.weightColumn,
                     child: LinearProgressIndicator(
                       value: discipline.progress,
-                      minHeight: 6,
+                      minHeight: context.tokens.sizes.progressIndicatorThin,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: context.tokens.spacing.md),
                   Text(
                     '${(discipline.progress * 100).round()}%',
                     style: Theme.of(context).textTheme.titleSmall,
@@ -528,11 +533,11 @@ class _DisciplineRow extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 56,
+              width: context.tokens.layout.tableActionsColumn,
               child: IconButton(
                 tooltip: 'Remover Disciplina',
                 onPressed: () => onRemove(discipline),
-                icon: const Icon(Icons.delete_outline, size: 20),
+                icon: Icon(AppIcons.delete, size: context.tokens.icons.md),
               ),
             ),
           ],
@@ -554,15 +559,18 @@ class _SummaryMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 14),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.lg),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: Theme.of(context).textTheme.labelSmall),
-        const SizedBox(height: 7),
+        SizedBox(height: context.tokens.spacing.sm),
         if (progress != null) ...[
-          LinearProgressIndicator(value: progress, minHeight: 6),
-          const SizedBox(height: 6),
+          LinearProgressIndicator(
+            value: progress,
+            minHeight: context.tokens.sizes.progressIndicatorThin,
+          ),
+          SizedBox(height: context.tokens.spacing.xs),
         ],
         Text(value, style: Theme.of(context).textTheme.titleLarge),
       ],
@@ -574,8 +582,8 @@ class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider();
   @override
   Widget build(BuildContext context) => Container(
-    width: 1,
-    height: 58,
+    width: context.tokens.sizes.hairline,
+    height: context.tokens.sizes.rowDividerHeight,
     color: Theme.of(context).colorScheme.outlineVariant,
   );
 }
@@ -590,10 +598,10 @@ class _InlineInfo extends StatelessWidget {
     children: [
       Icon(
         icon,
-        size: 17,
+        size: context.tokens.icons.md,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
-      const SizedBox(width: 6),
+      SizedBox(width: context.tokens.spacing.xs),
       Text(text, style: Theme.of(context).textTheme.bodySmall),
     ],
   );
@@ -603,10 +611,10 @@ class _StatusBadge extends StatelessWidget {
   const _StatusBadge();
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.xxs),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.secondaryContainer,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: context.tokens.borders.full,
     ),
     child: Text('Principal', style: Theme.of(context).textTheme.labelSmall),
   );
@@ -616,8 +624,7 @@ class _HeaderLabel extends StatelessWidget {
   const _HeaderLabel(this.label);
   final String label;
   @override
-  Widget build(BuildContext context) =>
-      Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
+  Widget build(BuildContext context) => Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
 }
 
 class _SortableHeader extends StatelessWidget {
@@ -638,8 +645,11 @@ class _SortableHeader extends StatelessWidget {
       children: [
         Flexible(child: _HeaderLabel(label)),
         if (selected) ...[
-          const SizedBox(width: 4),
-          Icon(ascending ? Icons.arrow_upward : Icons.arrow_downward, size: 14),
+          SizedBox(width: context.tokens.spacing.xxs),
+          Icon(
+            ascending ? AppIcons.sortAscending : AppIcons.sortDescending,
+            size: context.tokens.icons.sm,
+          ),
         ],
       ],
     ),
@@ -685,9 +695,9 @@ class _AddDisciplineDialogState extends State<_AddDisciplineDialog> {
 class _NotFound extends StatelessWidget {
   const _NotFound();
   @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(vertical: 64),
-    child: Center(child: Text('Horizonte não encontrado')),
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.giant),
+    child: const Center(child: Text('Horizonte não encontrado')),
   );
 }
 
@@ -703,5 +713,5 @@ double _averagePerformance(HorizonViewData horizon) {
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
   color: Theme.of(context).colorScheme.surface,
   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-  borderRadius: BorderRadius.circular(12),
+  borderRadius: context.tokens.borders.lg,
 );

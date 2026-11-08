@@ -29,20 +29,22 @@ class _HorizonsPageState extends State<HorizonsPage> {
       return SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
-            desktop ? 40 : 20,
-            20,
-            desktop ? 40 : 20,
-            48,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.xl,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.huge,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1120),
+              constraints: BoxConstraints(
+                maxWidth: context.tokens.layout.contentMaxWidth,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!desktop) ...[
-                    const AppBrandLogo(width: 178),
-                    const SizedBox(height: 28),
+                    AppBrandLogo(width: context.tokens.layout.brandWidth),
+                    SizedBox(height: context.tokens.spacing.xxxl),
                   ],
                   _TimelineContent(horizons: _horizons, callbacks: callbacks),
                 ],
@@ -61,20 +63,21 @@ class _HorizonsPageState extends State<HorizonsPage> {
     );
     if (result == null || !mounted) return;
     setState(() {
-      _horizons.add(
-        HorizonViewData(
-          id: 'novo-horizonte-${DateTime.now().millisecondsSinceEpoch}',
-          institution: result.institution,
-          shortName: result.institution,
-          role: result.role,
-          board: result.board,
-          examDate: 'A definir',
-          days: 999,
-          progress: 0,
-          disciplines: const [],
-        ),
-      );
-      _horizons.sort((a, b) => a.days.compareTo(b.days));
+      _horizons
+        ..add(
+          HorizonViewData(
+            id: 'novo-horizonte-${DateTime.now().millisecondsSinceEpoch}',
+            institution: result.institution,
+            shortName: result.institution,
+            role: result.role,
+            board: result.board,
+            examDate: 'A definir',
+            days: 999,
+            progress: 0,
+            disciplines: const [],
+          ),
+        )
+        ..sort((a, b) => a.days.compareTo(b.days));
     });
   }
 
@@ -156,7 +159,7 @@ class _TimelineContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final compact = constraints.maxWidth < 600;
+      final compact = constraints.maxWidth < context.tokens.layout.compact;
       final railWidth = compact ? 64.0 : 112.0;
       final gap = compact ? 12.0 : 18.0;
 
@@ -167,7 +170,7 @@ class _TimelineContent extends StatelessWidget {
             subtitle: 'Seus concursos-alvo em ordem de prova.',
             onAdd: callbacks.add,
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: context.tokens.spacing.xxxl),
           if (horizons.isEmpty)
             _Empty(onAdd: callbacks.add)
           else ...[
@@ -229,15 +232,16 @@ class _TimelineItem extends StatelessWidget {
         SizedBox(
           width: railWidth,
           child: Padding(
-            padding: EdgeInsets.only(top: 38, right: compact ? 8 : 18),
+            padding: EdgeInsets.only(
+              top: context.tokens.spacing.page,
+              right: compact ? context.tokens.spacing.sm : context.tokens.spacing.xl,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   '${horizon.days}',
-                  style: compact
-                      ? Theme.of(context).textTheme.titleLarge
-                      : Theme.of(context).textTheme.headlineMedium,
+                  style: compact ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.headlineMedium,
                 ),
                 Text('dias', style: Theme.of(context).textTheme.bodySmall),
               ],
@@ -245,7 +249,7 @@ class _TimelineItem extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: 14,
+          width: context.tokens.spacing.lg,
           child: Column(
             children: [
               Expanded(child: _Line()),
@@ -257,20 +261,20 @@ class _TimelineItem extends StatelessWidget {
         SizedBox(width: gap),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18),
+            padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.xl),
             child: Material(
               color: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 side: BorderSide(
                   color: Theme.of(context).colorScheme.outlineVariant,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: context.tokens.borders.lg,
               ),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: () => callbacks.details(horizon),
                 child: Padding(
-                  padding: EdgeInsets.all(compact ? 16 : 20),
+                  padding: EdgeInsets.all(compact ? context.tokens.spacing.lg : context.tokens.spacing.xl),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -286,17 +290,15 @@ class _TimelineItem extends StatelessWidget {
                                     'Horizonte principal',
                                     quiet: true,
                                   ),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: context.tokens.spacing.md),
                                 ],
                                 Text(
-                                  compact
-                                      ? horizon.shortName
-                                      : horizon.institution,
+                                  compact ? horizon.shortName : horizon.institution,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.headlineSmall,
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: context.tokens.spacing.xxs),
                                 Text(horizon.role),
                               ],
                             ),
@@ -304,21 +306,21 @@ class _TimelineItem extends StatelessWidget {
                           _Menu(horizon: horizon, callbacks: callbacks),
                         ],
                       ),
-                      const SizedBox(height: 18),
+                      SizedBox(height: context.tokens.spacing.xl),
                       Wrap(
-                        spacing: 32,
-                        runSpacing: 10,
+                        spacing: context.tokens.spacing.xxxl,
+                        runSpacing: context.tokens.spacing.md,
                         children: [
                           _LabelValue('Prova', horizon.examDate),
                           _LabelValue('Banca', horizon.board),
                         ],
                       ),
-                      const SizedBox(height: 18),
+                      SizedBox(height: context.tokens.spacing.xl),
                       _Progress(horizon: horizon),
-                      const SizedBox(height: 10),
+                      SizedBox(height: context.tokens.spacing.md),
                       TextButton.icon(
                         onPressed: () => callbacks.edital(horizon),
-                        icon: const Icon(AppIcons.bookText, size: 18),
+                        icon: Icon(AppIcons.bookText, size: context.tokens.icons.md),
                         label: const Text('Abrir Edital'),
                       ),
                     ],
@@ -337,7 +339,7 @@ class _Line extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Container(
-      width: 2,
+      width: context.tokens.sizes.progressLine,
       color: Theme.of(context).colorScheme.outlineVariant,
     ),
   );
@@ -346,8 +348,8 @@ class _Line extends StatelessWidget {
 class _Dot extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
-    width: 14,
-    height: 14,
+    width: context.tokens.sizes.dotLg,
+    height: context.tokens.sizes.dotLg,
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.primary,
       shape: BoxShape.circle,
@@ -367,7 +369,7 @@ class _Header extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Horizontes', style: Theme.of(context).textTheme.headlineLarge),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.xs),
           Text(
             subtitle,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -378,20 +380,24 @@ class _Header extends StatelessWidget {
       );
       final button = FilledButton.icon(
         onPressed: onAdd,
-        icon: const Icon(AppIcons.add, size: 20),
+        icon: Icon(AppIcons.add, size: context.tokens.icons.md),
         label: const Text('Novo Horizonte'),
       );
-      if (constraints.maxWidth < 620) {
+      if (constraints.maxWidth < context.tokens.layout.toolbar) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [heading, const SizedBox(height: 20), button],
+          children: [
+            heading,
+            SizedBox(height: context.tokens.spacing.xl),
+            button,
+          ],
         );
       }
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(child: heading),
-          const SizedBox(width: 24),
+          SizedBox(width: context.tokens.spacing.xxl),
           button,
         ],
       );
@@ -417,15 +423,18 @@ class _Progress extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: context.tokens.spacing.md),
           Text(
             '${(horizon.progress * 100).round()}%',
             style: Theme.of(context).textTheme.labelMedium,
           ),
         ],
       ),
-      const SizedBox(height: 7),
-      LinearProgressIndicator(value: horizon.progress, minHeight: 7),
+      SizedBox(height: context.tokens.spacing.sm),
+      LinearProgressIndicator(
+        value: horizon.progress,
+        minHeight: context.tokens.sizes.progressIndicatorRegular,
+      ),
     ],
   );
 }
@@ -440,7 +449,7 @@ class _LabelValue extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label, style: Theme.of(context).textTheme.labelSmall),
-      const SizedBox(height: 3),
+      SizedBox(height: context.tokens.spacing.xxs),
       Text(value),
     ],
   );
@@ -453,12 +462,12 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.xxs),
     decoration: BoxDecoration(
       color: quiet
           ? Theme.of(context).colorScheme.surfaceContainerHighest
           : Theme.of(context).colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: context.tokens.borders.sm,
     ),
     child: Text(label, style: Theme.of(context).textTheme.labelSmall),
   );
@@ -494,22 +503,22 @@ class _Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 80),
+      padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.jumbo),
       child: Column(
         children: [
           Icon(
             AppIcons.horizons,
-            size: 42,
+            size: context.tokens.icons.hero,
             color: Theme.of(context).colorScheme.primary,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: context.tokens.spacing.lg),
           Text(
             'Nenhum Horizonte ativo',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.tokens.spacing.sm),
           const Text('Adicione um concurso-alvo para começar.'),
-          const SizedBox(height: 20),
+          SizedBox(height: context.tokens.spacing.xl),
           FilledButton(onPressed: onAdd, child: const Text('Novo Horizonte')),
         ],
       ),
@@ -525,14 +534,14 @@ class _EditalDialog extends StatelessWidget {
   Widget build(BuildContext context) => AlertDialog(
     title: const Text('Edital'),
     content: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
+      constraints: BoxConstraints(maxWidth: context.tokens.layout.dialogMaxWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(horizon.shortName),
           Text(horizon.role, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 24),
+          SizedBox(height: context.tokens.spacing.xxl),
           for (final discipline in horizon.disciplines) ...[
             Row(
               children: [
@@ -540,9 +549,12 @@ class _EditalDialog extends StatelessWidget {
                 Text('${(discipline.progress * 100).round()}%'),
               ],
             ),
-            const SizedBox(height: 6),
-            LinearProgressIndicator(value: discipline.progress, minHeight: 6),
-            const SizedBox(height: 16),
+            SizedBox(height: context.tokens.spacing.xs),
+            LinearProgressIndicator(
+              value: discipline.progress,
+              minHeight: context.tokens.sizes.progressIndicatorThin,
+            ),
+            SizedBox(height: context.tokens.spacing.lg),
           ],
         ],
       ),
@@ -579,7 +591,7 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
   Widget build(BuildContext context) => AlertDialog(
     title: const Text('Novo Horizonte'),
     content: SizedBox(
-      width: 460,
+      width: context.tokens.sizes.noteMaxWidth,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -589,12 +601,12 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
               labelText: 'Órgão ou instituição',
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: context.tokens.spacing.lg),
           TextField(
             controller: role,
             decoration: const InputDecoration(labelText: 'Cargo'),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: context.tokens.spacing.lg),
           TextField(
             controller: board,
             decoration: const InputDecoration(labelText: 'Banca'),
@@ -617,9 +629,7 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
             _NewHorizon(
               institution: institution.text.trim(),
               role: role.text.trim(),
-              board: board.text.trim().isEmpty
-                  ? 'A definir'
-                  : board.text.trim(),
+              board: board.text.trim().isEmpty ? 'A definir' : board.text.trim(),
             ),
           );
         },

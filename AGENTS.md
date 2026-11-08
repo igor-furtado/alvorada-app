@@ -11,3 +11,7 @@ São utilizados os cinco labels canônicos de triagem. Consulte `docs/agents/tri
 ### Domain docs
 
 O projeto usa documentação de domínio single-context. Consulte `docs/agents/domain.md`.
+
+### Flutter UI
+
+Ao criar ou alterar widgets Flutter, siga `app/docs/agents/design-system.md`.

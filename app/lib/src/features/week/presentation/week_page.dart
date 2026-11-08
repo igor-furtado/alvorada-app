@@ -198,15 +198,17 @@ class WeekPage extends StatelessWidget {
         slivers: [
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
-              desktop ? 40 : 20,
-              20,
-              desktop ? 40 : 20,
-              48,
+              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+              context.tokens.spacing.xl,
+              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+              context.tokens.spacing.huge,
             ),
             sliver: SliverToBoxAdapter(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1120),
+                  constraints: BoxConstraints(
+                    maxWidth: context.tokens.layout.contentMaxWidth,
+                  ),
                   child: _WeekContent(days: _days, desktop: desktop),
                 ),
               ),
@@ -229,27 +231,27 @@ class _WeekContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if (!desktop) ...[
-        const AppBrandLogo(width: 178),
-        const SizedBox(height: 28),
+        AppBrandLogo(width: context.tokens.layout.brandWidth),
+        SizedBox(height: context.tokens.spacing.xxxl),
       ],
       const _WeekHeader(),
-      const SizedBox(height: 28),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _WeekSummary(),
-      const SizedBox(height: 28),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _DaysHeader(),
-      const SizedBox(height: 14),
+      SizedBox(height: context.tokens.spacing.lg),
       LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth >= 1040
+          final columns = constraints.maxWidth >= context.tokens.layout.threeColumn
               ? 3
-              : constraints.maxWidth >= 680
+              : constraints.maxWidth >= context.tokens.layout.twoColumn
               ? 2
               : 1;
           final gaps = 16.0 * (columns - 1);
           final width = (constraints.maxWidth - gaps) / columns;
           return Wrap(
-            spacing: 16,
-            runSpacing: 16,
+            spacing: context.tokens.spacing.lg,
+            runSpacing: context.tokens.spacing.lg,
             children: [
               for (final day in days)
                 SizedBox(
@@ -263,9 +265,9 @@ class _WeekContent extends StatelessWidget {
           );
         },
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.tokens.spacing.lg),
       const _SundayCard(),
-      const SizedBox(height: 24),
+      SizedBox(height: context.tokens.spacing.xxl),
       const _ReplanningNote(),
     ],
   );
@@ -277,12 +279,12 @@ class _WeekHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final compact = constraints.maxWidth < 680;
+      final compact = constraints.maxWidth < context.tokens.layout.twoColumn;
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Esta semana', style: Theme.of(context).textTheme.headlineLarge),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.xs),
           Text(
             '2 a 8 de novembro · Consolidação',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -297,20 +299,20 @@ class _WeekHeader extends StatelessWidget {
           IconButton.outlined(
             tooltip: 'Semana anterior',
             onPressed: () => _showPreviewMessage(context),
-            icon: const Icon(Icons.chevron_left),
+            icon: const Icon(AppIcons.chevronLeft),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: context.tokens.spacing.sm),
           IconButton.outlined(
             tooltip: 'Próxima semana',
             onPressed: () => _showPreviewMessage(context),
-            icon: const Icon(Icons.chevron_right),
+            icon: const Icon(AppIcons.chevronRight),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: context.tokens.spacing.md),
           Expanded(
             flex: compact ? 1 : 0,
             child: FilledButton.icon(
               onPressed: () => _showAdjustmentDialog(context),
-              icon: const Icon(AppIcons.settings, size: AppIcons.compact),
+              icon: Icon(AppIcons.settings, size: context.tokens.icons.md),
               label: const Text('Ajustar semana'),
             ),
           ),
@@ -320,7 +322,11 @@ class _WeekHeader extends StatelessWidget {
       if (compact) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [title, const SizedBox(height: 20), controls],
+          children: [
+            title,
+            SizedBox(height: context.tokens.spacing.xl),
+            controls,
+          ],
         );
       }
 
@@ -340,11 +346,11 @@ class _WeekSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
       children: [
@@ -358,7 +364,7 @@ class _WeekSummary extends StatelessWidget {
                     '8 de 14 horas realizadas',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.tokens.spacing.xxs),
                   Text(
                     'A semana segue no ritmo planejado.',
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -369,13 +375,16 @@ class _WeekSummary extends StatelessWidget {
             Text('57%', style: Theme.of(context).textTheme.labelLarge),
           ],
         ),
-        const SizedBox(height: 12),
-        const LinearProgressIndicator(value: 8 / 14, minHeight: 7),
-        const SizedBox(height: 20),
-        const Wrap(
-          spacing: 28,
-          runSpacing: 16,
-          children: [
+        SizedBox(height: context.tokens.spacing.md),
+        LinearProgressIndicator(
+          value: 8 / 14,
+          minHeight: context.tokens.sizes.progressIndicatorRegular,
+        ),
+        SizedBox(height: context.tokens.spacing.xl),
+        Wrap(
+          spacing: context.tokens.spacing.xxxl,
+          runSpacing: context.tokens.spacing.lg,
+          children: const [
             _SummaryItem(
               icon: AppIcons.horizons,
               label: 'Horizonte principal',
@@ -416,18 +425,18 @@ class _SummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: 220,
+    width: context.tokens.sizes.weekSummary,
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(width: 10),
+        Icon(icon, size: context.tokens.icons.md, color: Theme.of(context).colorScheme.primary),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: Theme.of(context).textTheme.labelSmall),
-              const SizedBox(height: 3),
+              SizedBox(height: context.tokens.spacing.xxs),
               Text(value, style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
@@ -445,11 +454,11 @@ class _Legend extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       _LegendDot(color: Theme.of(context).colorScheme.secondary),
-      const SizedBox(width: 5),
+      SizedBox(width: context.tokens.spacing.xs),
       Text('feito', style: Theme.of(context).textTheme.labelSmall),
-      const SizedBox(width: 12),
+      SizedBox(width: context.tokens.spacing.md),
       _LegendDot(color: Theme.of(context).colorScheme.primary),
-      const SizedBox(width: 5),
+      SizedBox(width: context.tokens.spacing.xs),
       Text('hoje', style: Theme.of(context).textTheme.labelSmall),
     ],
   );
@@ -465,10 +474,14 @@ class _DaysHeader extends StatelessWidget {
         'Dias da semana',
         style: Theme.of(context).textTheme.headlineSmall,
       );
-      if (constraints.maxWidth < 520) {
+      if (constraints.maxWidth < context.tokens.layout.narrow) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [title, const SizedBox(height: 10), const _Legend()],
+          children: [
+            title,
+            SizedBox(height: context.tokens.spacing.md),
+            const _Legend(),
+          ],
         );
       }
       return Row(children: [title, const Spacer(), const _Legend()]);
@@ -483,8 +496,8 @@ class _LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 8,
-    height: 8,
+    width: context.tokens.sizes.dotSm,
+    height: context.tokens.sizes.dotSm,
     decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
 }
@@ -508,13 +521,13 @@ class _StudyDayCard extends StatelessWidget {
 
     return Container(
       constraints: BoxConstraints(minHeight: keepMinimumHeight ? 350 : 0),
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(context.tokens.spacing.xl),
       decoration: BoxDecoration(
         color: scheme.surface,
         border: Border.all(
           color: current ? scheme.primary : scheme.outlineVariant,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.tokens.borders.lg,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,14 +535,14 @@ class _StudyDayCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 10,
-                height: 10,
+                width: context.tokens.sizes.dotMd,
+                height: context.tokens.sizes.dotMd,
                 decoration: BoxDecoration(
                   color: accent,
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: context.tokens.spacing.sm),
               Expanded(
                 child: Text(
                   day.weekday,
@@ -542,26 +555,26 @@ class _StudyDayCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 3),
+          SizedBox(height: context.tokens.spacing.xxs),
           Padding(
-            padding: const EdgeInsets.only(left: 18),
+            padding: EdgeInsets.only(left: context.tokens.spacing.xl),
             child: Text(day.date, style: Theme.of(context).textTheme.bodySmall),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: context.tokens.spacing.lg),
           Divider(color: scheme.outlineVariant),
-          const SizedBox(height: 4),
+          SizedBox(height: context.tokens.spacing.xxs),
           for (var index = 0; index < day.entries.length; index++) ...[
             _TurnRow(turn: day.entries[index], done: done),
             if (index < day.entries.length - 1)
-              Divider(height: 16, color: scheme.outlineVariant),
+              Divider(height: context.tokens.spacing.lg, color: scheme.outlineVariant),
           ],
           if (current) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: context.tokens.spacing.lg),
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: () => context.go('/'),
-                icon: const Icon(AppIcons.today, size: 18),
+                icon: Icon(AppIcons.today, size: context.tokens.icons.md),
                 label: const Text('Ver Hoje'),
               ),
             ),
@@ -584,23 +597,21 @@ class _TurnRow extends StatelessWidget {
     children: [
       Icon(
         done ? AppIcons.check : turn.icon,
-        size: 18,
-        color: done
-            ? Theme.of(context).colorScheme.secondary
-            : Theme.of(context).colorScheme.onSurfaceVariant,
+        size: context.tokens.icons.md,
+        color: done ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
-      const SizedBox(width: 9),
+      SizedBox(width: context.tokens.spacing.md),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(turn.title, style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 2),
+            SizedBox(height: context.tokens.spacing.xxxs),
             Text(turn.detail, style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       ),
-      const SizedBox(width: 8),
+      SizedBox(width: context.tokens.spacing.sm),
       Text(turn.duration, style: Theme.of(context).textTheme.labelSmall),
     ],
   );
@@ -611,19 +622,21 @@ class _SundayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.secondaryContainer,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Row(
       children: [
         Container(
-          width: 48,
-          height: 48,
+          width: context.tokens.sizes.sundayIcon,
+          height: context.tokens.sizes.sundayIcon,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: .55),
+            color: Theme.of(context).colorScheme.surface.withValues(
+              alpha: context.tokens.opacity.muted,
+            ),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -631,7 +644,7 @@ class _SundayCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: context.tokens.spacing.lg),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +653,7 @@ class _SundayCard extends StatelessWidget {
                 'Domingo protegido · 8 nov.',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: context.tokens.spacing.xxs),
               Text(
                 'Nenhum Turno, nenhum lembrete. O descanso já faz parte do Plano.',
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -658,11 +671,11 @@ class _ReplanningNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,7 +684,7 @@ class _ReplanningNote extends StatelessWidget {
           AppIcons.observation,
           color: Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Text(
             'Se a semana mudar, o Plano preserva as Revisões e reduz o escopo antes de ocupar o domingo.',
@@ -690,7 +703,7 @@ class _AdjustmentDialog extends StatelessWidget {
   Widget build(BuildContext context) => AlertDialog(
     title: const Text('Ajustar esta semana'),
     content: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 460),
+      constraints: BoxConstraints(maxWidth: context.tokens.sizes.noteMaxWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -698,7 +711,7 @@ class _AdjustmentDialog extends StatelessWidget {
           const Text(
             'Conte o dia ruim também. O Plano pode mudar sem transformar domingo em dívida.',
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: context.tokens.spacing.xl),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(AppIcons.calendar),

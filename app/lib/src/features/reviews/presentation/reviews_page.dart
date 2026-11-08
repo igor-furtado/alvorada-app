@@ -47,15 +47,17 @@ class ReviewsPage extends StatelessWidget {
         slivers: [
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
-              desktop ? 40 : 20,
-              20,
-              desktop ? 40 : 20,
-              48,
+              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+              context.tokens.spacing.xl,
+              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+              context.tokens.spacing.huge,
             ),
             sliver: SliverToBoxAdapter(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1120),
+                  constraints: BoxConstraints(
+                    maxWidth: context.tokens.layout.contentMaxWidth,
+                  ),
                   child: _ReviewsContent(reviews: _reviews, desktop: desktop),
                 ),
               ),
@@ -78,18 +80,18 @@ class _ReviewsContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if (!desktop) ...[
-        const AppBrandLogo(width: 178),
-        const SizedBox(height: 28),
+        AppBrandLogo(width: context.tokens.layout.brandWidth),
+        SizedBox(height: context.tokens.spacing.xxxl),
       ],
       const _Header(),
-      const SizedBox(height: 28),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _Overview(),
-      const SizedBox(height: 24),
+      SizedBox(height: context.tokens.spacing.xxl),
       const _Filters(),
-      const SizedBox(height: 20),
+      SizedBox(height: context.tokens.spacing.xl),
       LayoutBuilder(
         builder: (context, constraints) {
-          final twoColumns = constraints.maxWidth >= 860;
+          final twoColumns = constraints.maxWidth >= context.tokens.layout.contentSplit;
           final queue = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -97,36 +99,42 @@ class _ReviewsContent extends StatelessWidget {
                 'Revisões para hoje',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: context.tokens.spacing.xs),
               Text(
                 'Faça na ordem. Cada intervalo pede uma atividade diferente.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: context.tokens.spacing.lg),
               for (var index = 0; index < reviews.length; index++) ...[
                 _ReviewCard(review: reviews[index]),
-                if (index < reviews.length - 1) const SizedBox(height: 14),
+                if (index < reviews.length - 1) SizedBox(height: context.tokens.spacing.lg),
               ],
             ],
           );
           const guide = _MethodGuide();
 
           if (!twoColumns) {
-            return Column(children: [queue, const SizedBox(height: 24), guide]);
+            return Column(
+              children: [
+                queue,
+                SizedBox(height: context.tokens.spacing.xxl),
+                guide,
+              ],
+            );
           }
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(flex: 7, child: queue),
-              const SizedBox(width: 20),
+              SizedBox(width: context.tokens.spacing.xl),
               const Expanded(flex: 4, child: guide),
             ],
           );
         },
       ),
-      const SizedBox(height: 28),
+      SizedBox(height: context.tokens.spacing.xxxl),
       const _UpcomingReviews(),
     ],
   );
@@ -138,12 +146,12 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final compact = constraints.maxWidth < 620;
+      final compact = constraints.maxWidth < context.tokens.layout.toolbar;
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Revisões', style: Theme.of(context).textTheme.headlineLarge),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.xs),
           Text(
             'Revise no momento certo, do jeito certo.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -154,14 +162,18 @@ class _Header extends StatelessWidget {
       );
       final button = OutlinedButton.icon(
         onPressed: () => _showMethodDialog(context),
-        icon: const Icon(AppIcons.observation, size: AppIcons.compact),
+        icon: Icon(AppIcons.observation, size: context.tokens.icons.md),
         label: const Text('Como funciona'),
       );
 
       if (compact) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [title, const SizedBox(height: 18), button],
+          children: [
+            title,
+            SizedBox(height: context.tokens.spacing.xl),
+            button,
+          ],
         );
       }
       return Row(
@@ -180,16 +192,16 @@ class _Overview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
-    child: const Wrap(
-      spacing: 32,
-      runSpacing: 16,
-      children: [
+    child: Wrap(
+      spacing: context.tokens.spacing.xxxl,
+      runSpacing: context.tokens.spacing.lg,
+      children: const [
         _OverviewItem(
           icon: AppIcons.reviews,
           value: '3',
@@ -223,19 +235,19 @@ class _OverviewItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: 240,
+    width: context.tokens.sizes.overviewPanel,
     child: Row(
       children: [
         Container(
-          width: 42,
-          height: 42,
+          width: context.tokens.layout.topicSelectionIndent,
+          height: context.tokens.sizes.iconContainerMd,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: context.tokens.borders.md,
           ),
           child: Icon(icon, color: Theme.of(context).colorScheme.primary),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,27 +275,26 @@ class _Filters extends StatelessWidget {
           onSelected: null,
           label: Text('Todas'),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
           label: const Text('1 dia'),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
           label: const Text('7 dias'),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
-          selected: false,
           onSelected: (_) => _showFilterMessage(context),
           label: const Text('30 dias'),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
-          avatar: const Icon(AppIcons.horizons, size: 16),
+          avatar: Icon(AppIcons.horizons, size: context.tokens.icons.sm),
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
           label: const Text('Todos os Horizontes'),
@@ -311,32 +322,38 @@ class _ReviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         border: Border.all(color: scheme.outlineVariant),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.tokens.borders.lg,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 6, height: 260, color: accent),
+          Container(
+            width: context.tokens.sizes.accentBar,
+            height: context.tokens.sizes.reviewAccentHeight,
+            color: accent,
+          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(context.tokens.spacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
+                    spacing: context.tokens.spacing.md,
+                    runSpacing: context.tokens.spacing.sm,
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 9,
-                          vertical: 5,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.tokens.spacing.md,
+                          vertical: context.tokens.spacing.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: accent.withValues(alpha: .14),
-                          borderRadius: BorderRadius.circular(6),
+                          color: accent.withValues(
+                            alpha: context.tokens.opacity.tintStrong,
+                          ),
+                          borderRadius: context.tokens.borders.sm,
                         ),
                         child: Text(
                           'Revisão de ${review.interval}',
@@ -351,35 +368,35 @@ class _ReviewCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: context.tokens.spacing.lg),
                   Text(
                     review.title,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.tokens.spacing.xxs),
                   Text(
                     '${review.discipline} · ${review.horizon}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: context.tokens.spacing.lg),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(context.tokens.spacing.md),
                     decoration: BoxDecoration(
                       color: scheme.surfaceContainerHighest.withValues(
-                        alpha: .5,
+                        alpha: context.tokens.opacity.half,
                       ),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: context.tokens.borders.md,
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
                           _instructionIcon(review.type),
-                          size: 20,
+                          size: context.tokens.icons.md,
                           color: accent,
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: context.tokens.spacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +405,7 @@ class _ReviewCard extends StatelessWidget {
                                 review.instruction,
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
-                              const SizedBox(height: 3),
+                              SizedBox(height: context.tokens.spacing.xxs),
                               Text(
                                 review.detail,
                                 style: Theme.of(context).textTheme.bodySmall,
@@ -399,12 +416,12 @@ class _ReviewCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: context.tokens.spacing.lg),
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton.icon(
                       onPressed: () => _showReviewDialog(context, review),
-                      icon: const Icon(AppIcons.play, size: 18),
+                      icon: Icon(AppIcons.play, size: context.tokens.icons.md),
                       label: const Text('Começar revisão'),
                     ),
                   ),
@@ -423,31 +440,31 @@ class _MethodGuide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           AppIcons.reviews,
-          size: AppIcons.prominent,
+          size: context.tokens.icons.xl,
           color: Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.tokens.spacing.lg),
         Text(
           'Uma Revisão, uma função',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.tokens.spacing.sm),
         Text(
           'O intervalo muda e a atividade também. Não transforme Revisão em releitura completa.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: context.tokens.spacing.xl),
         const _GuideStep(
           interval: '1 dia',
           duration: '2 a 3 min',
@@ -464,22 +481,22 @@ class _MethodGuide extends StatelessWidget {
           action: '20 questões do Tópico',
           last: true,
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.tokens.spacing.lg),
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(context.tokens.spacing.md),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: context.tokens.borders.md,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
                 AppIcons.rest,
-                size: 19,
+                size: context.tokens.icons.md,
                 color: Theme.of(context).colorScheme.secondary,
               ),
-              const SizedBox(width: 9),
+              SizedBox(width: context.tokens.spacing.md),
               Expanded(
                 child: Text(
                   'No domingo, nenhuma Revisão é cobrada ou enviada por lembrete.',
@@ -515,8 +532,8 @@ class _GuideStep extends StatelessWidget {
         Column(
           children: [
             Container(
-              width: 30,
-              height: 30,
+              width: context.tokens.sizes.stepIndicator,
+              height: context.tokens.sizes.stepIndicator,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
@@ -530,17 +547,17 @@ class _GuideStep extends StatelessWidget {
             if (!last)
               Expanded(
                 child: Container(
-                  width: 1,
-                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  width: context.tokens.sizes.hairline,
+                  margin: EdgeInsets.symmetric(vertical: context.tokens.spacing.xxs),
                   color: Theme.of(context).colorScheme.outlineVariant,
                 ),
               ),
           ],
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 18),
+            padding: EdgeInsets.only(bottom: context.tokens.spacing.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -557,7 +574,7 @@ class _GuideStep extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 3),
+                SizedBox(height: context.tokens.spacing.xxs),
                 Text(action, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
@@ -573,11 +590,11 @@ class _UpcomingReviews extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,19 +603,19 @@ class _UpcomingReviews extends StatelessWidget {
           'Próximas Revisões',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.tokens.spacing.lg),
         const _UpcomingRow(
           date: 'Sáb., 7 nov.',
           count: '2 Revisões',
           duration: '23 min',
         ),
-        const Divider(height: 24),
+        Divider(height: context.tokens.spacing.xxl),
         const _UpcomingRow(
           date: 'Seg., 9 nov.',
           count: '4 Revisões',
           duration: '36 min',
         ),
-        const Divider(height: 24),
+        Divider(height: context.tokens.spacing.xxl),
         const _UpcomingRow(
           date: 'Ter., 10 nov.',
           count: '1 Revisão',
@@ -625,17 +642,17 @@ class _UpcomingRow extends StatelessWidget {
     children: [
       Icon(
         AppIcons.calendar,
-        size: 20,
+        size: context.tokens.icons.md,
         color: Theme.of(context).colorScheme.primary,
       ),
-      const SizedBox(width: 10),
+      SizedBox(width: context.tokens.spacing.md),
       Expanded(
         child: Text(date, style: Theme.of(context).textTheme.titleSmall),
       ),
       Text(count, style: Theme.of(context).textTheme.bodyMedium),
-      const SizedBox(width: 16),
+      SizedBox(width: context.tokens.spacing.lg),
       SizedBox(
-        width: 48,
+        width: context.tokens.spacing.huge,
         child: Text(
           duration,
           style: Theme.of(context).textTheme.labelSmall,
@@ -655,23 +672,23 @@ class _ReviewDialog extends StatelessWidget {
   Widget build(BuildContext context) => AlertDialog(
     title: Text('Revisão de ${review.interval}'),
     content: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 450),
+      constraints: BoxConstraints(maxWidth: context.tokens.sizes.guideMaxWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(review.title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
+          SizedBox(height: context.tokens.spacing.xs),
           Text(review.instruction),
-          const SizedBox(height: 16),
+          SizedBox(height: context.tokens.spacing.lg),
           Row(
             children: [
-              const Icon(AppIcons.mockExam, size: 18),
-              const SizedBox(width: 8),
+              Icon(AppIcons.mockExam, size: context.tokens.icons.md),
+              SizedBox(width: context.tokens.spacing.sm),
               Text('${review.duration} previstos'),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.tokens.spacing.md),
           Text(review.detail, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
@@ -689,11 +706,10 @@ class _ReviewDialog extends StatelessWidget {
   );
 }
 
-Future<void> _showReviewDialog(BuildContext context, _ReviewPreview review) =>
-    showDialog<void>(
-      context: context,
-      builder: (context) => _ReviewDialog(review: review),
-    );
+Future<void> _showReviewDialog(BuildContext context, _ReviewPreview review) => showDialog<void>(
+  context: context,
+  builder: (context) => _ReviewDialog(review: review),
+);
 
 Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
   context: context,

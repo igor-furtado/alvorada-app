@@ -32,11 +32,9 @@ class DisciplineDetailsPage extends StatefulWidget {
 }
 
 class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
-  late final HorizonViewData? _horizon =
-      widget.arguments?.horizon ?? demoHorizonById(widget.horizonId);
+  late final HorizonViewData? _horizon = widget.arguments?.horizon ?? demoHorizonById(widget.horizonId);
   late final HorizonDisciplineProgress? _discipline =
-      widget.arguments?.discipline ??
-      _findDiscipline(_horizon, widget.disciplineName);
+      widget.arguments?.discipline ?? _findDiscipline(_horizon, widget.disciplineName);
   late final TextEditingController _nameController = TextEditingController(
     text: _discipline?.name ?? '',
   );
@@ -47,15 +45,11 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
     _discipline?.name ?? widget.disciplineName,
   );
 
-  int get _totalUnits =>
-      _topics.fold(0, (total, topic) => total + 1 + topic.subtopics.length);
+  int get _totalUnits => _topics.fold(0, (total, topic) => total + 1 + topic.subtopics.length);
 
   int get _completedUnits => _topics.fold(
     0,
-    (total, topic) =>
-        total +
-        (topic.completed ? 1 : 0) +
-        topic.subtopics.where((item) => item.completed).length,
+    (total, topic) => total + (topic.completed ? 1 : 0) + topic.subtopics.where((item) => item.completed).length,
   );
 
   @override
@@ -74,20 +68,20 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
       builder: (context, desktop) => SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
-            desktop ? 40 : 20,
-            20,
-            desktop ? 40 : 20,
-            48,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.xl,
+            desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
+            context.tokens.spacing.huge,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1180),
+              constraints: BoxConstraints(maxWidth: context.tokens.sizes.disciplinePage),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!desktop) ...[
-                    const AppBrandLogo(width: 178),
-                    const SizedBox(height: 24),
+                    AppBrandLogo(width: context.tokens.layout.brandWidth),
+                    SizedBox(height: context.tokens.spacing.xxl),
                   ],
                   AppBreadcrumbs(
                     items: [
@@ -97,18 +91,14 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
                       ),
                       AppBreadcrumbItem(
                         label: horizon?.shortName ?? 'Horizonte',
-                        route: horizon == null
-                            ? null
-                            : '/horizontes/${Uri.encodeComponent(horizon.id)}',
+                        route: horizon == null ? null : '/horizontes/${Uri.encodeComponent(horizon.id)}',
                       ),
                       AppBreadcrumbItem(
-                        label: _nameController.text.isEmpty
-                            ? 'Disciplina'
-                            : _nameController.text,
+                        label: _nameController.text.isEmpty ? 'Disciplina' : _nameController.text,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(height: context.tokens.spacing.xl),
                   if (horizon == null || discipline == null)
                     const _NotFound()
                   else ...[
@@ -119,7 +109,7 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
                       weightController: _weightController,
                       onNameChanged: (_) => setState(() {}),
                     ),
-                    const SizedBox(height: 22),
+                    SizedBox(height: context.tokens.spacing.xxl),
                     _VerticalizedTopics(
                       topics: _topics,
                       completed: _completedUnits,
@@ -155,27 +145,27 @@ class _EditableDisciplineHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity,
-    padding: const EdgeInsets.all(22),
+    padding: EdgeInsets.all(context.tokens.spacing.xxl),
     decoration: _cardDecoration(context),
     child: LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 760;
+        final compact = constraints.maxWidth < context.tokens.layout.medium;
         final identity = Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: context.tokens.sizes.identityIcon,
+              height: context.tokens.sizes.identityIcon,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: context.tokens.borders.lg,
               ),
               child: Icon(
                 AppIcons.bookText,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: context.tokens.spacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,12 +175,15 @@ class _EditableDisciplineHeader extends StatelessWidget {
                     controller: nameController,
                     onChanged: onNameChanged,
                     style: Theme.of(context).textTheme.headlineSmall,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Nome da Disciplina',
-                      suffixIcon: Icon(Icons.edit_outlined, size: 18),
+                      suffixIcon: Icon(
+                        AppIcons.edit,
+                        size: context.tokens.icons.md,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: context.tokens.spacing.sm),
                   Text(
                     '${horizon.shortName} · ${horizon.role}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -206,25 +199,28 @@ class _EditableDisciplineHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 120,
+              width: context.tokens.sizes.compactField,
               child: TextField(
                 key: const ValueKey('discipline-weight'),
                 controller: weightController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 textAlign: TextAlign.center,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Peso no Edital',
-                  suffixIcon: Icon(Icons.edit_outlined, size: 17),
+                  suffixIcon: Icon(
+                    AppIcons.edit,
+                    size: context.tokens.icons.md,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: context.tokens.spacing.xxl),
             _Metric(
               label: 'Avanço no Edital',
               value: '${(discipline.progress * 100).round()}%',
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: context.tokens.spacing.xxl),
             _Metric(
               label: 'Desempenho',
               value: '${(discipline.performance * 100).round()}%',
@@ -234,13 +230,17 @@ class _EditableDisciplineHeader extends StatelessWidget {
         if (compact) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [identity, const SizedBox(height: 20), metrics],
+            children: [
+              identity,
+              SizedBox(height: context.tokens.spacing.xl),
+              metrics,
+            ],
           );
         }
         return Row(
           children: [
             Expanded(flex: 6, child: identity),
-            const SizedBox(width: 28),
+            SizedBox(width: context.tokens.spacing.xxxl),
             metrics,
           ],
         );
@@ -259,7 +259,7 @@ class _Metric extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label, style: Theme.of(context).textTheme.labelSmall),
-      const SizedBox(height: 8),
+      SizedBox(height: context.tokens.spacing.sm),
       Text(value, style: Theme.of(context).textTheme.titleLarge),
     ],
   );
@@ -287,9 +287,9 @@ class _VerticalizedTopics extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
-          width: 1080,
+          width: context.tokens.sizes.disciplineTable,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.tokens.spacing.xl),
             child: Column(
               children: [
                 Row(
@@ -304,22 +304,22 @@ class _VerticalizedTopics extends StatelessWidget {
                       '$completed de $total concluídos',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    const SizedBox(width: 18),
+                    SizedBox(width: context.tokens.spacing.xl),
                     SizedBox(
-                      width: 110,
+                      width: context.tokens.sizes.progressColumn,
                       child: LinearProgressIndicator(
                         value: progress,
-                        minHeight: 7,
+                        minHeight: context.tokens.sizes.progressIndicatorRegular,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: context.tokens.spacing.md),
                     Text(
                       '${(progress * 100).round()}%',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: context.tokens.spacing.xl),
                 const _TopicsHeader(),
                 for (var index = 0; index < topics.length; index++) ...[
                   _TopicRow(
@@ -328,11 +328,7 @@ class _VerticalizedTopics extends StatelessWidget {
                     onChanged: onChanged,
                   ),
                   if (topics[index].expanded)
-                    for (
-                      var subIndex = 0;
-                      subIndex < topics[index].subtopics.length;
-                      subIndex++
-                    )
+                    for (var subIndex = 0; subIndex < topics[index].subtopics.length; subIndex++)
                       _SubtopicRow(
                         subtopic: topics[index].subtopics[subIndex],
                         position: '${index + 1}.${subIndex + 1}',
@@ -353,10 +349,10 @@ class _TopicsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.md, vertical: context.tokens.spacing.lg),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: context.tokens.borders.md,
     ),
     child: const Row(
       children: [
@@ -385,15 +381,15 @@ class _TopicRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
       color: topic.completed
-          ? Theme.of(
-              context,
-            ).colorScheme.secondaryContainer.withValues(alpha: .42)
-          : Colors.transparent,
+          ? Theme.of(context).colorScheme.secondaryContainer.withValues(
+              alpha: context.tokens.opacity.selection,
+            )
+          : context.tokens.colors.transparent,
       border: Border(
         bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
     ),
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.md),
     child: Row(
       children: [
         Expanded(
@@ -401,22 +397,18 @@ class _TopicRow extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                width: 34,
+                width: context.tokens.sizes.topicCheckbox,
                 child: topic.subtopics.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: topic.expanded
-                            ? 'Recolher Subtópicos'
-                            : 'Mostrar Subtópicos',
+                        tooltip: topic.expanded ? 'Recolher Subtópicos' : 'Mostrar Subtópicos',
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
                           topic.expanded = !topic.expanded;
                           onChanged();
                         },
                         icon: Icon(
-                          topic.expanded
-                              ? Icons.keyboard_arrow_down
-                              : Icons.keyboard_arrow_right,
+                          topic.expanded ? AppIcons.expandMore : AppIcons.expandNext,
                         ),
                       ),
               ),
@@ -428,7 +420,7 @@ class _TopicRow extends StatelessWidget {
                 },
               ),
               SizedBox(
-                width: 42,
+                width: context.tokens.layout.topicSelectionIndent,
                 child: Text(
                   '$position',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -440,8 +432,8 @@ class _TopicRow extends StatelessWidget {
                 child: topic.isRequired
                     ? Row(
                         children: [
-                          const Icon(AppIcons.lockedTopic, size: 17),
-                          const SizedBox(width: 8),
+                          Icon(AppIcons.lockedTopic, size: context.tokens.icons.md),
+                          SizedBox(width: context.tokens.spacing.sm),
                           Text(
                             topic.title,
                             style: Theme.of(context).textTheme.titleSmall,
@@ -452,13 +444,13 @@ class _TopicRow extends StatelessWidget {
                         key: ValueKey('topic-$position'),
                         initialValue: topic.title,
                         onChanged: (value) => topic.title = value,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
-                          focusedBorder: UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 8,
+                            horizontal: context.tokens.spacing.xs,
+                            vertical: context.tokens.spacing.sm,
                           ),
                         ),
                       ),
@@ -490,22 +482,22 @@ class _SubtopicRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
       color: subtopic.completed
-          ? Theme.of(
-              context,
-            ).colorScheme.secondaryContainer.withValues(alpha: .28)
-          : Colors.transparent,
+          ? Theme.of(context).colorScheme.secondaryContainer.withValues(
+              alpha: context.tokens.opacity.selectionFaint,
+            )
+          : context.tokens.colors.transparent,
       border: Border(
         bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
     ),
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.sm),
     child: Row(
       children: [
         Expanded(
           flex: 58,
           child: Row(
             children: [
-              const SizedBox(width: 42),
+              SizedBox(width: context.tokens.layout.topicSelectionIndent),
               Checkbox(
                 value: subtopic.completed,
                 onChanged: (value) {
@@ -514,7 +506,7 @@ class _SubtopicRow extends StatelessWidget {
                 },
               ),
               SizedBox(
-                width: 62,
+                width: context.tokens.sizes.iconContainerLg,
                 child: Text(
                   position,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -527,13 +519,13 @@ class _SubtopicRow extends StatelessWidget {
                   key: ValueKey('subtopic-$position'),
                   initialValue: subtopic.title,
                   onChanged: (value) => subtopic.title = value,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
-                    focusedBorder: UnderlineInputBorder(),
+                    focusedBorder: const UnderlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 8,
+                      horizontal: context.tokens.spacing.xs,
+                      vertical: context.tokens.spacing.sm,
                     ),
                   ),
                 ),
@@ -555,8 +547,7 @@ class _HeaderLabel extends StatelessWidget {
   final String label;
 
   @override
-  Widget build(BuildContext context) =>
-      Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
+  Widget build(BuildContext context) => Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
 }
 
 class _EmptyCell extends StatelessWidget {
@@ -696,14 +687,14 @@ class _NotFound extends StatelessWidget {
   const _NotFound();
 
   @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(vertical: 64),
-    child: Center(child: Text('Disciplina não encontrada')),
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.giant),
+    child: const Center(child: Text('Disciplina não encontrada')),
   );
 }
 
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
   color: Theme.of(context).colorScheme.surface,
   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-  borderRadius: BorderRadius.circular(12),
+  borderRadius: context.tokens.borders.lg,
 );

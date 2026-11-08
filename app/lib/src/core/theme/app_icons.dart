@@ -6,14 +6,57 @@ import 'package:flutter/widgets.dart';
 /// direto por [IconData] evita a incompatibilidade temporária do pacote com
 /// versões do Flutter em que `IconData` passou a ser uma classe final.
 abstract final class AppIcons {
-  static const double compact = 20;
-  static const double standard = 24;
-  static const double prominent = 28;
-
   static const String _regular = 'AlvoradaPhosphor';
   static const String _fill = 'PhosphorFill';
   static const String? _package = null;
   static const String _fillPackage = 'phosphor_flutter';
+
+  static const chevronLeft = IconData(
+    0xe138,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const chevronRight = IconData(
+    0xe13a,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const edit = IconData(
+    0xe3b4,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const expandMore = IconData(
+    0xe136,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const expandNext = chevronRight;
+  static const event = IconData(
+    0xe10a,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const institution = IconData(
+    0xe0b4,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const delete = IconData(
+    0xe4a6,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const sortAscending = IconData(
+    0xe08e,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const sortDescending = IconData(
+    0xe03e,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
 
   static const today = IconData(
     0xe5b6,
