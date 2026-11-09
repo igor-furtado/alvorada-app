@@ -6,6 +6,7 @@ import 'core/brand/app_brand.dart';
 import 'core/presentation/app_shell.dart';
 import 'core/theme/app_shad_theme.dart';
 import 'core/theme/app_theme.dart';
+import 'features/contests/presentation/content_catalog_page.dart';
 import 'features/contests/presentation/contest_details_page.dart';
 import 'features/contests/presentation/contest_view_data.dart';
 import 'features/contests/presentation/contests_page.dart';
@@ -53,6 +54,14 @@ final _router = GoRouter(
                   ],
                 ),
               ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/disciplinas',
+              builder: (context, state) => const ContentCatalogPage(),
             ),
           ],
         ),

@@ -34,7 +34,7 @@ Quando a prova estiver em até 30 dias, oferecer a Rota de 30 dias em vez de com
 - A ação principal de Hoje inicia o próximo Turno; não conclui o dia inteiro de uma vez.
 - No domingo, a experiência diária é substituída pelo descanso, sem estudo, notificações de tarefa, pendências ou contadores de produtividade.
 - O replanejamento semanal redistribui carga para dias disponíveis ou reduz escopo; nunca ocupa o domingo automaticamente.
-- Hoje, Semana, Concursos, Revisões e Caderno de Erros formam as cinco áreas principais e preservam histórico e estado transitório.
+- Hoje, Semana, Concursos, Disciplinas, Revisões e Caderno de Erros formam as seis áreas principais e preservam histórico e estado transitório.
 
 ## Ciclo do Tópico
 

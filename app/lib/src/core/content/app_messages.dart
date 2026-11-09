@@ -2,6 +2,7 @@ abstract final class AppMessages {
   static const navigationToday = 'Hoje';
   static const navigationWeek = 'Semana';
   static const navigationContests = 'Concursos';
+  static const navigationDisciplines = 'Disciplinas';
   static const navigationReviews = 'Revisões';
   static const navigationErrors = 'Caderno';
   static const navigationSection = 'Navegação';
@@ -30,6 +31,7 @@ abstract final class AppMessages {
   static const close = 'Fechar';
   static const understand = 'Entendi';
   static const add = 'Adicionar';
+  static const name = 'Nome';
   static const notNow = 'Agora não';
   static const start = 'Começar';
   static const seeToday = 'Ver Hoje';
@@ -105,6 +107,23 @@ abstract final class AppMessages {
   static const noDiscipline = 'Nenhuma Disciplina encontrada.';
   static const contestNotFound = 'Concurso não encontrado';
   static const disciplineNotFound = 'Disciplina não encontrada';
+  static const contentCatalog = 'Disciplinas e Tópicos';
+  static const contentCatalogSubtitle = 'Organize o catálogo compartilhado entre os Editais.';
+  static const searchContent = 'Buscar Disciplina, Tópico ou Subtópico';
+  static const addDiscipline = 'Adicionar Disciplina';
+  static const addTopic = 'Adicionar Tópico';
+  static const addSubtopic = 'Adicionar Subtópico';
+  static const rename = 'Renomear';
+  static const editDiscipline = 'Editar Disciplina';
+  static const editTopic = 'Editar Tópico';
+  static const editSubtopic = 'Editar Subtópico';
+  static const saveChanges = 'Salvar alterações';
+  static const deleteDisciplineQuestion = 'Excluir Disciplina?';
+  static const deleteTopicQuestion = 'Excluir Tópico?';
+  static const deleteSubtopicQuestion = 'Excluir Subtópico?';
+  static const noContentFound = 'Nenhum conteúdo encontrado. Ajuste a busca ou adicione uma Disciplina.';
+  static const mandatoryTopic = 'Tópico obrigatório';
+  static const sharedContent = 'Conteúdo compartilhado';
 
   static const thisWeek = 'Esta semana';
   static const todayPlanTitle = 'Plano de hoje';
@@ -132,6 +151,15 @@ abstract final class AppMessages {
   static String expectedDuration(String duration) => '$duration previstos';
 
   static String disciplineRemoved(String name) => '$name foi removida deste Edital.';
+
+  static String disciplineDeletedImpact(String name) =>
+      '$name, seus Tópicos e Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
+
+  static String topicDeletedImpact(String name) =>
+      '$name e seus Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
+
+  static String subtopicDeletedImpact(String name) =>
+      '$name será excluído do catálogo compartilhado. Esta ação não pode ser desfeita.';
 
   static String contestArchived(String name) => '$name foi arquivado.';
 

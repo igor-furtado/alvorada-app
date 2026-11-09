@@ -56,6 +56,11 @@ const _destinations = [
     icon: AppIcons.contests,
     selectedIcon: AppIcons.contestsActive,
   ),
+  _AppDestination(
+    label: AppMessages.navigationDisciplines,
+    icon: AppIcons.bookText,
+    selectedIcon: AppIcons.bookText,
+  ),
   _AppDestination(label: AppMessages.navigationReviews, icon: AppIcons.reviews, selectedIcon: AppIcons.reviewsActive),
   _AppDestination(
     label: AppMessages.navigationErrors,

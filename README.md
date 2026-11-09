@@ -28,7 +28,8 @@ O repositório reúne:
 
 - **Hoje:** Plano de hoje, Turnos, Revisões e Ritmo da semana, com uma experiência própria para o domingo protegido.
 - **Esta semana:** visão semanal do Plano e dos blocos previstos para cada dia.
-- **Concursos:** concursos-alvo, progresso do Edital e navegação por Disciplinas e Tópicos.
+- **Concursos:** concursos-alvo e progresso de cada Edital.
+- **Disciplinas:** catálogo compartilhado de Disciplinas, Tópicos e Subtópicos.
 - **Revisões:** atividades programadas para 1, 7 e 30 dias, com filtros por intervalo e Concurso.
 - **Caderno de Erros:** diagnóstico, Regra certa, Por que eu caí e ciclo de Revisão do Caderno.
 
