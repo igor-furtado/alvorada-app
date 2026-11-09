@@ -1,32 +1,36 @@
-# Alvorada
+# Prumo
 
-O Alvorada organiza a preparação para concursos em torno de recuperação ativa, revisões programadas e descanso protegido. Seu vocabulário existe para tornar o método claro sem transformar constância em cobrança.
+O Prumo organiza a preparação para concursos em torno de recuperação ativa, revisões programadas e descanso protegido. Seu vocabulário existe para tornar o método claro sem transformar constância em cobrança.
 
 ## Direção
 
-**Horizonte**:
-O concurso-alvo que dá direção ao estudo, reunindo cargo, instituição organizadora, data de prova, dados de inscrição e um Edital. Uma pessoa pode manter mais de um Horizonte e escolhe um deles como principal.
+**Concurso**:
+O concurso-alvo que dá direção ao estudo, reunindo cargo, instituição organizadora, data de prova, dados de inscrição e um Edital. Uma pessoa pode manter mais de um Concurso e escolhe um deles como principal.
 _Evitar_: Concurso cadastrado, projeto, meta
 
-**Horizonte principal**:
-O Horizonte que recebe prioridade quando as horas disponíveis não comportam todo o escopo. A proximidade da prova desempata Horizontes com a mesma prioridade.
+**Concurso prioritário**:
+O Concurso que recebe prioridade quando as horas disponíveis não comportam todo o escopo. A proximidade da prova desempata Concursos com a mesma prioridade.
 _Evitar_: Concurso favorito, concurso mais importante
 
 **Edital**:
-O recorte do edital oficial de um Horizonte, organizado em disciplinas e tópicos. No Alvorada, Edital significa somente a parte estudável; datas e dados de inscrição pertencem ao Horizonte.
+O recorte do edital oficial de um Concurso, organizado em disciplinas e tópicos. No Prumo, Edital significa somente a parte estudável; datas e dados de inscrição pertencem ao Concurso.
 _Evitar_: Pauta, Mapa, conteúdo programático, grade, lista de matérias
 
 **Plano**:
 A estratégia de estudo até a prova, organizada em fases, prioridades, Revisões programadas e horas reais disponíveis.
 _Evitar_: Cronograma fixo, calendário
 
-**Esta semana**:
+**Semana**:
 A visão semanal executável do Plano, com Turnos, Revisões programadas e domingo protegido.
 _Evitar_: Folhinha, agenda semanal, calendário de cobrança
 
-**Alvorada do dia**:
+**Plano de hoje**:
 O conjunto realista de turnos previsto para hoje, incluindo estudo principal, recuperação, questões e Caderno de Erros.
 _Evitar_: Meta diária, tarefas obrigatórias, desafio
+
+**Plano de hoje concluído**:
+O estado do dia quando todos os Turnos previstos foram encerrados. A conclusão orienta a parar e deixa estudo adicional para um replanejamento explícito.
+_Evitar_: Meta batida, dia perfeito, sequência mantida
 
 ## Conteúdo
 
@@ -43,7 +47,7 @@ A unidade de estudo compartilhável entre Editais, com um único ciclo e um úni
 _Evitar_: Capítulo, assunto duplicado, unidade por edital
 
 **Revisão de Véspera**:
-O Tópico estrutural, obrigatório e sempre último de cada Disciplina. Seu conteúdo permanece no material de estudo; o Alvorada registra somente seu planejamento e sua realização.
+O Tópico estrutural, obrigatório e sempre último de cada Disciplina. Seu conteúdo permanece no material de estudo; o Prumo registra somente seu planejamento e sua realização.
 _Evitar_: Menu Véspera, lista de gatilhos no app, conteúdo de revisão no app
 
 **Subtópico**:
@@ -51,7 +55,7 @@ Um detalhamento de um tópico usado para organizar seu escopo.
 _Evitar_: Subitem, subtarefa
 
 **Peso combinado**:
-A prioridade de uma disciplina ou tópico calculada pela relevância em cada Edital e pela proximidade de seus Horizontes.
+A prioridade de uma disciplina ou tópico calculada pela relevância em cada Edital e pela proximidade de seus Concursos.
 _Evitar_: Dificuldade, importância absoluta
 
 **Caixa de destaque**:
@@ -110,7 +114,7 @@ _Evitar_: Quiz, jogo, desafio
 
 ## Ritmo e descanso
 
-**Dias de sol**:
+**Ritmo da semana**:
 Um retrato dos dias estudados na semana atual, sem sequência acumulada e sem penalidade por imprevistos. Domingo aparece como descanso e nunca interrompe esse retrato.
 _Evitar_: Streak, ofensiva, sequência obrigatória
 

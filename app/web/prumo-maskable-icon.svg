@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Ícone adaptável do aplicativo Prumo</title>
+  <rect width="128" height="128" fill="#173F3E"/>
+  <path d="M64 28v44" fill="none" stroke="#F4F1E8" stroke-width="7" stroke-linecap="round"/>
+  <path d="M46 38h36M50 51h28M54 64h20" fill="none" stroke="#E69A78" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 72 77 87H51Z" fill="#E69A78"/>
+  <path d="M42 95h44" fill="none" stroke="#F4F1E8" stroke-width="7" stroke-linecap="round"/>
+</svg>

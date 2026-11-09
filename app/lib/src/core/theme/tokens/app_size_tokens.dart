@@ -40,7 +40,7 @@ class AppSizeTokens {
     this.detailsTable = 950,
     this.disciplineTable = 1080,
     this.disciplinePage = 1180,
-    this.horizonPage = 1220,
+    this.contestPage = 1220,
   });
 
   final double hairline;
@@ -77,7 +77,7 @@ class AppSizeTokens {
   final double detailsTable;
   final double disciplineTable;
   final double disciplinePage;
-  final double horizonPage;
+  final double contestPage;
 
   AppSizeTokens lerp(AppSizeTokens other, double t) => AppSizeTokens(
     hairline: lerpDouble(hairline, other.hairline, t)!,
@@ -126,6 +126,6 @@ class AppSizeTokens {
     detailsTable: lerpDouble(detailsTable, other.detailsTable, t)!,
     disciplineTable: lerpDouble(disciplineTable, other.disciplineTable, t)!,
     disciplinePage: lerpDouble(disciplinePage, other.disciplinePage, t)!,
-    horizonPage: lerpDouble(horizonPage, other.horizonPage, t)!,
+    contestPage: lerpDouble(contestPage, other.contestPage, t)!,
   );
 }

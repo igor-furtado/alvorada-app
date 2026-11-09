@@ -1,9 +1,10 @@
 import 'package:estudos_app/src/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
-  Future<void> openHorizons(WidgetTester tester) async {
+  Future<void> openContests(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 1000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -11,14 +12,14 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Horizontes').first);
+    await tester.tap(find.text('Concursos').first);
     await tester.pumpAndSettle();
   }
 
-  testWidgets('prioriza as informações essenciais dos Horizontes', (
+  testWidgets('prioriza as informações essenciais dos Concursos', (
     tester,
   ) async {
-    await openHorizons(tester);
+    await openContests(tester);
 
     expect(find.text('Tribunal Regional Federal da 5ª Região'), findsOneWidget);
     expect(
@@ -31,7 +32,7 @@ void main() {
     expect(find.text('Avanço no Edital'), findsNWidgets(3));
     expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
 
-    expect(find.textContaining('Horizontes ativos'), findsNothing);
+    expect(find.textContaining('Concursos ativos'), findsNothing);
     expect(find.textContaining('Tópicos compartilhados'), findsNothing);
     expect(find.textContaining('Disponíveis por semana'), findsNothing);
     expect(find.textContaining('disciplinas ·'), findsNothing);
@@ -40,9 +41,9 @@ void main() {
   testWidgets('abre os fluxos de adicionar e consultar o Edital', (
     tester,
   ) async {
-    await openHorizons(tester);
+    await openContests(tester);
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Novo Horizonte'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Novo Concurso'));
     await tester.pumpAndSettle();
     expect(find.text('Órgão ou instituição *'), findsOneWidget);
     expect(find.text('Cargo *'), findsOneWidget);
@@ -59,7 +60,7 @@ void main() {
   testWidgets('abre os detalhes pelo card e volta pela rota superior', (
     tester,
   ) async {
-    await openHorizons(tester);
+    await openContests(tester);
 
     await tester.tap(find.text('Tribunal Regional Federal da 5ª Região').first);
     await tester.pumpAndSettle();
@@ -71,19 +72,19 @@ void main() {
     expect(find.textContaining('Ordenar:'), findsNothing);
     expect(find.byType(TextFormField), findsNWidgets(8));
     expect(find.byTooltip('Remover Disciplina'), findsNWidgets(8));
-    expect(find.widgetWithText(TextButton, 'Horizontes'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'Concursos'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Horizontes'));
+    await tester.tap(find.widgetWithText(TextButton, 'Concursos'));
     await tester.pumpAndSettle();
 
     expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
     expect(find.text('Informações da prova'), findsNothing);
   });
 
-  testWidgets('abre Tópicos da Disciplina e volta ao Horizonte pela rota', (
+  testWidgets('abre Tópicos da Disciplina e volta ao Concurso pela rota', (
     tester,
   ) async {
-    await openHorizons(tester);
+    await openContests(tester);
 
     await tester.tap(find.text('Tribunal Regional Federal da 5ª Região').first);
     await tester.pumpAndSettle();
@@ -123,15 +124,32 @@ void main() {
   });
 
   testWidgets('mantém a linha do tempo legível no celular', (tester) async {
-    await openHorizons(tester);
+    await openContests(tester);
 
     tester.view.physicalSize = const Size(390, 844);
     await tester.pumpAndSettle();
 
-    expect(find.text('Horizontes'), findsWidgets);
+    expect(find.text('Concursos'), findsWidgets);
     expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
     expect(find.text('TRF da 5ª Região'), findsOneWidget);
     expect(find.byTooltip('Próxima variante'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('redireciona a URL legada de Horizontes para Concursos', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const EstudosApp());
+    await tester.pumpAndSettle();
+    GoRouter.of(tester.element(find.byType(Scaffold).first)).go('/horizontes');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Concursos'), findsWidgets);
+    expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
   });
 }

@@ -11,7 +11,7 @@ Future<void> main() async {
   // O pacote ainda não compila seus IconData tipados no Flutter atual. A fonte
   // Light é carregada com um nome próprio para evitar que o otimizador remova
   // glifos referenciados pelo mapa compatível em AppIcons.
-  final phosphorFont = FontLoader('AlvoradaPhosphor')
+  final phosphorFont = FontLoader('AppPhosphor')
     ..addFont(
       rootBundle.load('packages/phosphor_flutter/lib/fonts/Phosphor-Light.ttf'),
     );

@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 112" role="img" aria-labelledby="title">
-  <title id="title">Alvorada.app monocromático papel</title>
-  <g transform="translate(8 8)" fill="#F6F0E4" stroke="#F6F0E4">
-    <path d="M24 58a24 24 0 0 1 48 0Z" stroke="none"/>
-    <path d="M12 58h72M18 68h60M48 20v10M27 29l7 7M69 29l-7 7" fill="none" stroke-width="4" stroke-linecap="round"/>
-  </g>
-  <text x="112" y="69" fill="#F6F0E4" font-family="Fraunces, Georgia, serif" font-size="48" font-weight="600">Alvorada</text>
-  <text x="318" y="69" fill="#F6F0E4" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
-</svg>

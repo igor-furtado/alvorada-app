@@ -52,9 +52,9 @@ const _destinations = [
   _AppDestination(label: AppMessages.navigationToday, icon: AppIcons.today, selectedIcon: AppIcons.todayActive),
   _AppDestination(label: AppMessages.navigationWeek, icon: AppIcons.calendar, selectedIcon: AppIcons.calendarActive),
   _AppDestination(
-    label: AppMessages.navigationHorizons,
-    icon: AppIcons.horizons,
-    selectedIcon: AppIcons.horizonsActive,
+    label: AppMessages.navigationContests,
+    icon: AppIcons.contests,
+    selectedIcon: AppIcons.contestsActive,
   ),
   _AppDestination(label: AppMessages.navigationReviews, icon: AppIcons.reviews, selectedIcon: AppIcons.reviewsActive),
   _AppDestination(

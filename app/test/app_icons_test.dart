@@ -20,7 +20,7 @@ void main() {
     ];
 
     for (final icon in icons) {
-      expect(icon.fontFamily, 'AlvoradaPhosphor');
+      expect(icon.fontFamily, 'AppPhosphor');
       expect(icon.fontPackage, isNull);
     }
   });

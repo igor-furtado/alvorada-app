@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 /// direto por [IconData] evita a incompatibilidade temporária do pacote com
 /// versões do Flutter em que `IconData` passou a ser uma classe final.
 abstract final class AppIcons {
-  static const String _regular = 'AlvoradaPhosphor';
+  static const String _regular = 'AppPhosphor';
   static const String _fill = 'PhosphorFill';
   static const String? _package = null;
   static const String _fillPackage = 'phosphor_flutter';
@@ -88,12 +88,12 @@ abstract final class AppIcons {
     fontFamily: _fill,
     fontPackage: _fillPackage,
   );
-  static const horizons = IconData(
+  static const contests = IconData(
     0xe47c,
     fontFamily: _regular,
     fontPackage: _package,
   );
-  static const horizonsActive = IconData(
+  static const contestsActive = IconData(
     0xe47c,
     fontFamily: _fill,
     fontPackage: _fillPackage,

@@ -5,7 +5,7 @@ WCAG 2.2 AA bloqueia a entrega. Referências: [design](https://docs.flutter.dev/
 ## Regras
 
 - Contraste: texto comum 4,5:1; texto grande, foco e componente 3:1. Teste claro e escuro com `AppAccessibility`.
-- Papéis cromáticos: `primary` marca/preenchimento; `actionForeground` texto/ícone; `border` separação; `controlOutline` controle; `focusRing` foco; `errorForeground` erro textual.
+- Papéis cromáticos: `primary` destaque/preenchimento; `actionForeground` texto/ícone; `border` separação; `controlOutline` controle; `focusRing` foco; `errorForeground` erro textual.
 - Semântica: preserve a semântica Material; nomeie ícone acionável; exclua ícone decorativo; una label/controle; anuncie erro, loading, snackbar e novo lote.
 - Teclado: Tab segue ordem visual; setas percorrem rádios; Esc fecha modal; fechar restaura foco. Região composta usa `FocusTraversalGroup`.
 - Foco: contorno `focusRing`, 2 dp, perceptível sem depender somente de cor.

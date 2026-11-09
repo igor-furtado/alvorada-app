@@ -1,5 +1,5 @@
-class HorizonViewData {
-  const HorizonViewData({
+class ContestViewData {
+  const ContestViewData({
     required this.id,
     required this.institution,
     required this.shortName,
@@ -20,12 +20,12 @@ class HorizonViewData {
   final String examDate;
   final int days;
   final double progress;
-  final List<HorizonDisciplineProgress> disciplines;
+  final List<ContestDisciplineProgress> disciplines;
   final bool isPrimary;
 }
 
-class HorizonDisciplineProgress {
-  const HorizonDisciplineProgress({
+class ContestDisciplineProgress {
+  const ContestDisciplineProgress({
     required this.name,
     required this.progress,
     this.performance = 0,
@@ -37,7 +37,7 @@ class HorizonDisciplineProgress {
   final double performance;
   final int weight;
 
-  HorizonDisciplineProgress copyWith({int? weight}) => HorizonDisciplineProgress(
+  ContestDisciplineProgress copyWith({int? weight}) => ContestDisciplineProgress(
     name: name,
     progress: progress,
     performance: performance,
@@ -45,8 +45,8 @@ class HorizonDisciplineProgress {
   );
 }
 
-const demoHorizons = [
-  HorizonViewData(
+const demoContests = [
+  ContestViewData(
     id: 'trf5-tecnico-administrativo',
     institution: 'Tribunal Regional Federal da 5ª Região',
     shortName: 'TRF da 5ª Região',
@@ -56,49 +56,49 @@ const demoHorizons = [
     days: 36,
     progress: .72,
     disciplines: [
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Língua Portuguesa',
         progress: .82,
         performance: .74,
         weight: 24,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Direito Constitucional',
         progress: .76,
         performance: .81,
         weight: 20,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Direito Administrativo',
         progress: .68,
         performance: .69,
         weight: 18,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Administração Pública',
         progress: .55,
         performance: .62,
         weight: 14,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Raciocínio Lógico',
         progress: .61,
         performance: .57,
         weight: 10,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Informática',
         progress: .47,
         performance: .66,
         weight: 7,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Ética no Serviço Público',
         progress: .91,
         performance: .86,
         weight: 4,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Legislação Institucional',
         progress: .38,
         performance: .51,
@@ -106,7 +106,7 @@ const demoHorizons = [
       ),
     ],
   ),
-  HorizonViewData(
+  ContestViewData(
     id: 'camara-analista-tecnica-legislativa',
     institution: 'Câmara dos Deputados',
     shortName: 'Câmara dos Deputados',
@@ -117,25 +117,25 @@ const demoHorizons = [
     progress: .48,
     isPrimary: true,
     disciplines: [
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Língua Portuguesa',
         progress: .64,
         performance: .72,
         weight: 28,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Direito Constitucional',
         progress: .53,
         performance: .68,
         weight: 26,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Processo Legislativo',
         progress: .41,
         performance: .54,
         weight: 25,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Ciência Política',
         progress: .29,
         performance: .47,
@@ -143,7 +143,7 @@ const demoHorizons = [
       ),
     ],
   ),
-  HorizonViewData(
+  ContestViewData(
     id: 'tce-pe-auditor-controle-externo',
     institution: 'Tribunal de Contas do Estado de Pernambuco',
     shortName: 'TCE-PE',
@@ -153,25 +153,25 @@ const demoHorizons = [
     days: 190,
     progress: .23,
     disciplines: [
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Auditoria Governamental',
         progress: .34,
         performance: .58,
         weight: 32,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Controle Externo',
         progress: .27,
         performance: .49,
         weight: 28,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Contabilidade Pública',
         progress: .19,
         performance: .44,
         weight: 24,
       ),
-      HorizonDisciplineProgress(
+      ContestDisciplineProgress(
         name: 'Administração Financeira',
         progress: .12,
         performance: .39,
@@ -181,9 +181,9 @@ const demoHorizons = [
   ),
 ];
 
-HorizonViewData? demoHorizonById(String id) {
-  for (final horizon in demoHorizons) {
-    if (horizon.id == id) return horizon;
+ContestViewData? demoContestById(String id) {
+  for (final contest in demoContests) {
+    if (contest.id == id) return contest;
   }
   return null;
 }

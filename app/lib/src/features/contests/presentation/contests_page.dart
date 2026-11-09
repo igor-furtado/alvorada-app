@@ -5,17 +5,17 @@ import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
-import 'horizon_view_data.dart';
+import 'contest_view_data.dart';
 
-class HorizonsPage extends StatefulWidget {
-  const HorizonsPage({super.key});
+class ContestsPage extends StatefulWidget {
+  const ContestsPage({super.key});
 
   @override
-  State<HorizonsPage> createState() => _HorizonsPageState();
+  State<ContestsPage> createState() => _ContestsPageState();
 }
 
-class _HorizonsPageState extends State<HorizonsPage> {
-  final _horizons = List<HorizonViewData>.of(demoHorizons);
+class _ContestsPageState extends State<ContestsPage> {
+  final _contests = List<ContestViewData>.of(demoContests);
 
   @override
   Widget build(BuildContext context) => AppPageTemplate(
@@ -34,23 +34,23 @@ class _HorizonsPageState extends State<HorizonsPage> {
             AppBrandLogo(width: context.tokens.layout.brandWidth),
             SizedBox(height: context.tokens.spacing.xxxl),
           ],
-          _TimelineContent(horizons: _horizons, callbacks: callbacks),
+          _TimelineContent(contests: _contests, callbacks: callbacks),
         ],
       );
     },
   );
 
   Future<void> _add() async {
-    final result = await showDialog<_NewHorizon>(
+    final result = await showDialog<_NewContest>(
       context: context,
-      builder: (_) => const _NewHorizonDialog(),
+      builder: (_) => const _NewContestDialog(),
     );
     if (result == null || !mounted) return;
     setState(() {
-      _horizons
+      _contests
         ..add(
-          HorizonViewData(
-            id: 'novo-horizonte-${DateTime.now().millisecondsSinceEpoch}',
+          ContestViewData(
+            id: 'novo-concurso-${DateTime.now().millisecondsSinceEpoch}',
             institution: result.institution,
             shortName: result.institution,
             role: result.role,
@@ -65,47 +65,47 @@ class _HorizonsPageState extends State<HorizonsPage> {
     });
   }
 
-  void _details(HorizonViewData horizon) => context.go(
-    '/horizontes/${Uri.encodeComponent(horizon.id)}',
-    extra: horizon,
+  void _details(ContestViewData contest) => context.go(
+    '/concursos/${Uri.encodeComponent(contest.id)}',
+    extra: contest,
   );
 
-  void _edital(HorizonViewData horizon) => showDialog<void>(
+  void _edital(ContestViewData contest) => showDialog<void>(
     context: context,
-    builder: (_) => _EditalDialog(horizon: horizon),
+    builder: (_) => _EditalDialog(contest: contest),
   );
 
-  void _archive(HorizonViewData horizon) {
-    final index = _horizons.indexOf(horizon);
-    setState(() => _horizons.remove(horizon));
+  void _archive(ContestViewData contest) {
+    final index = _contests.indexOf(contest);
+    setState(() => _contests.remove(contest));
     AppSnackbar.show(
       context,
-      message: AppMessages.horizonArchived(horizon.shortName),
+      message: AppMessages.contestArchived(contest.shortName),
       actionLabel: AppMessages.undo,
-      onAction: () => setState(() => _horizons.insert(index, horizon)),
+      onAction: () => setState(() => _contests.insert(index, contest)),
     );
   }
 
-  Future<void> _delete(HorizonViewData horizon) async {
+  Future<void> _delete(ContestViewData contest) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AppDialog(
-        title: AppMessages.deleteHorizonQuestion,
-        content: Text(AppMessages.deleteHorizonImpact(horizon.shortName)),
+        title: AppMessages.deleteContestQuestion,
+        content: Text(AppMessages.deleteContestImpact(contest.shortName)),
         secondaryLabel: AppMessages.cancel,
         onSecondary: () => Navigator.pop(dialogContext, false),
-        primaryLabel: AppMessages.deleteHorizon,
+        primaryLabel: AppMessages.deleteContest,
         onPrimary: () => Navigator.pop(dialogContext, true),
         destructive: true,
       ),
     );
     if (confirmed == true && mounted) {
-      setState(() => _horizons.remove(horizon));
+      setState(() => _contests.remove(contest));
     }
   }
 }
 
-typedef _HorizonAction = void Function(HorizonViewData);
+typedef _ContestAction = void Function(ContestViewData);
 
 class _Callbacks {
   const _Callbacks({
@@ -117,15 +117,15 @@ class _Callbacks {
   });
 
   final VoidCallback add;
-  final _HorizonAction details;
-  final _HorizonAction edital;
-  final _HorizonAction archive;
-  final _HorizonAction delete;
+  final _ContestAction details;
+  final _ContestAction edital;
+  final _ContestAction archive;
+  final _ContestAction delete;
 }
 
 class _TimelineContent extends StatelessWidget {
-  const _TimelineContent({required this.horizons, required this.callbacks});
-  final List<HorizonViewData> horizons;
+  const _TimelineContent({required this.contests, required this.callbacks});
+  final List<ContestViewData> contests;
   final _Callbacks callbacks;
 
   @override
@@ -145,7 +145,7 @@ class _TimelineContent extends StatelessWidget {
             onAdd: callbacks.add,
           ),
           SizedBox(height: context.tokens.spacing.xxxl),
-          if (horizons.isEmpty)
+          if (contests.isEmpty)
             _Empty(onAdd: callbacks.add)
           else ...[
             Row(
@@ -161,15 +161,15 @@ class _TimelineContent extends StatelessWidget {
                 SizedBox(width: gap),
                 Expanded(
                   child: Text(
-                    'A próxima prova é em ${horizons.first.days} dias',
+                    'A próxima prova é em ${contests.first.days} dias',
                   ),
                 ),
               ],
             ),
-            for (var i = 0; i < horizons.length; i++)
+            for (var i = 0; i < contests.length; i++)
               _TimelineItem(
-                horizon: horizons[i],
-                last: i == horizons.length - 1,
+                contest: contests[i],
+                last: i == contests.length - 1,
                 callbacks: callbacks,
                 railWidth: railWidth,
                 gap: gap,
@@ -184,14 +184,14 @@ class _TimelineContent extends StatelessWidget {
 
 class _TimelineItem extends StatelessWidget {
   const _TimelineItem({
-    required this.horizon,
+    required this.contest,
     required this.last,
     required this.callbacks,
     required this.railWidth,
     required this.gap,
     required this.compact,
   });
-  final HorizonViewData horizon;
+  final ContestViewData contest;
   final bool last;
   final _Callbacks callbacks;
   final double railWidth;
@@ -214,7 +214,7 @@ class _TimelineItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${horizon.days}',
+                  '${contest.days}',
                   style: compact ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.headlineMedium,
                 ),
                 Text(AppMessages.days, style: Theme.of(context).textTheme.bodySmall),
@@ -246,7 +246,7 @@ class _TimelineItem extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                onTap: () => callbacks.details(horizon),
+                onTap: () => callbacks.details(contest),
                 child: Padding(
                   padding: EdgeInsets.all(compact ? context.tokens.spacing.lg : context.tokens.spacing.xl),
                   child: Column(
@@ -259,25 +259,25 @@ class _TimelineItem extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (horizon.isPrimary) ...[
+                                if (contest.isPrimary) ...[
                                   const _Badge(
-                                    'Horizonte principal',
+                                    AppMessages.mainContest,
                                     quiet: true,
                                   ),
                                   SizedBox(height: context.tokens.spacing.md),
                                 ],
                                 Text(
-                                  compact ? horizon.shortName : horizon.institution,
+                                  compact ? contest.shortName : contest.institution,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.headlineSmall,
                                 ),
                                 SizedBox(height: context.tokens.spacing.xxs),
-                                Text(horizon.role),
+                                Text(contest.role),
                               ],
                             ),
                           ),
-                          _Menu(horizon: horizon, callbacks: callbacks),
+                          _Menu(contest: contest, callbacks: callbacks),
                         ],
                       ),
                       SizedBox(height: context.tokens.spacing.xl),
@@ -285,15 +285,15 @@ class _TimelineItem extends StatelessWidget {
                         spacing: context.tokens.spacing.xxxl,
                         runSpacing: context.tokens.spacing.md,
                         children: [
-                          _LabelValue('Prova', horizon.examDate),
-                          _LabelValue('Banca', horizon.board),
+                          _LabelValue('Prova', contest.examDate),
+                          _LabelValue('Banca', contest.board),
                         ],
                       ),
                       SizedBox(height: context.tokens.spacing.xl),
-                      _Progress(horizon: horizon),
+                      _Progress(contest: contest),
                       SizedBox(height: context.tokens.spacing.md),
                       TextButton.icon(
-                        onPressed: () => callbacks.edital(horizon),
+                        onPressed: () => callbacks.edital(contest),
                         icon: Icon(AppIcons.bookText, size: context.tokens.icons.md),
                         label: const Text(AppMessages.openNotice),
                       ),
@@ -342,7 +342,7 @@ class _Header extends StatelessWidget {
       final heading = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppMessages.navigationHorizons, style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.navigationContests, style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             subtitle,
@@ -355,7 +355,7 @@ class _Header extends StatelessWidget {
       final button = FilledButton.icon(
         onPressed: onAdd,
         icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-        label: const Text(AppMessages.newHorizon),
+        label: const Text(AppMessages.newContest),
       );
       if (constraints.maxWidth < context.tokens.layout.toolbar) {
         return Column(
@@ -380,8 +380,8 @@ class _Header extends StatelessWidget {
 }
 
 class _Progress extends StatelessWidget {
-  const _Progress({required this.horizon});
-  final HorizonViewData horizon;
+  const _Progress({required this.contest});
+  final ContestViewData contest;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -399,14 +399,14 @@ class _Progress extends StatelessWidget {
           ),
           SizedBox(width: context.tokens.spacing.md),
           Text(
-            '${(horizon.progress * 100).round()}%',
+            '${(contest.progress * 100).round()}%',
             style: Theme.of(context).textTheme.labelMedium,
           ),
         ],
       ),
       SizedBox(height: context.tokens.spacing.sm),
       LinearProgressIndicator(
-        value: horizon.progress,
+        value: contest.progress,
         minHeight: context.tokens.sizes.progressIndicatorRegular,
       ),
     ],
@@ -450,17 +450,17 @@ class _Badge extends StatelessWidget {
 enum _MenuAction { details, archive, delete }
 
 class _Menu extends StatelessWidget {
-  const _Menu({required this.horizon, required this.callbacks});
-  final HorizonViewData horizon;
+  const _Menu({required this.contest, required this.callbacks});
+  final ContestViewData contest;
   final _Callbacks callbacks;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<_MenuAction>(
     tooltip: AppMessages.moreActions,
     onSelected: (action) => switch (action) {
-      _MenuAction.details => callbacks.details(horizon),
-      _MenuAction.archive => callbacks.archive(horizon),
-      _MenuAction.delete => callbacks.delete(horizon),
+      _MenuAction.details => callbacks.details(contest),
+      _MenuAction.archive => callbacks.archive(contest),
+      _MenuAction.delete => callbacks.delete(contest),
     },
     itemBuilder: (_) => const [
       PopupMenuItem(value: _MenuAction.details, child: Text(AppMessages.seeDetails)),
@@ -481,19 +481,19 @@ class _Empty extends StatelessWidget {
       child: Column(
         children: [
           Icon(
-            AppIcons.horizons,
+            AppIcons.contests,
             size: context.tokens.icons.hero,
             color: context.tokens.colors.actionForeground,
           ),
           SizedBox(height: context.tokens.spacing.lg),
           Text(
-            'Nenhum Horizonte ativo',
+            AppMessages.noActiveContests,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           SizedBox(height: context.tokens.spacing.sm),
-          const Text(AppMessages.emptyHorizons),
+          const Text(AppMessages.emptyContests),
           SizedBox(height: context.tokens.spacing.xl),
-          FilledButton(onPressed: onAdd, child: const Text(AppMessages.newHorizon)),
+          FilledButton(onPressed: onAdd, child: const Text(AppMessages.newContest)),
         ],
       ),
     ),
@@ -501,8 +501,8 @@ class _Empty extends StatelessWidget {
 }
 
 class _EditalDialog extends StatelessWidget {
-  const _EditalDialog({required this.horizon});
-  final HorizonViewData horizon;
+  const _EditalDialog({required this.contest});
+  final ContestViewData contest;
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -513,10 +513,10 @@ class _EditalDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(horizon.shortName),
-          Text(horizon.role, style: Theme.of(context).textTheme.bodySmall),
+          Text(contest.shortName),
+          Text(contest.role, style: Theme.of(context).textTheme.bodySmall),
           SizedBox(height: context.tokens.spacing.xxl),
-          for (final discipline in horizon.disciplines) ...[
+          for (final discipline in contest.disciplines) ...[
             Row(
               children: [
                 Expanded(child: Text(discipline.name)),
@@ -542,13 +542,13 @@ class _EditalDialog extends StatelessWidget {
   );
 }
 
-class _NewHorizonDialog extends StatefulWidget {
-  const _NewHorizonDialog();
+class _NewContestDialog extends StatefulWidget {
+  const _NewContestDialog();
   @override
-  State<_NewHorizonDialog> createState() => _NewHorizonDialogState();
+  State<_NewContestDialog> createState() => _NewContestDialogState();
 }
 
-class _NewHorizonDialogState extends State<_NewHorizonDialog> {
+class _NewContestDialogState extends State<_NewContestDialog> {
   final _formKey = GlobalKey<FormState>();
   final institution = TextEditingController();
   final role = TextEditingController();
@@ -576,14 +576,14 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
 
   @override
   Widget build(BuildContext context) => AppDialog(
-    title: AppMessages.newHorizon,
+    title: AppMessages.newContest,
     maxWidth: context.tokens.sizes.noteMaxWidth,
     content: AppValidatedForm(
       formKey: _formKey,
       firstInvalidFocusNode: _firstInvalidFocus,
       onSubmit: () async => Navigator.pop(
         context,
-        _NewHorizon(
+        _NewContest(
           institution: institution.text.trim(),
           role: role.text.trim(),
           board: board.text.trim().isEmpty ? AppMessages.toBeDefined : board.text.trim(),
@@ -620,7 +620,7 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
                 variant: AppButtonVariant.text,
                 onPressed: submitting ? null : () => Navigator.pop(context),
               ),
-              AppButton(label: AppMessages.createHorizon, loading: submitting, onPressed: submit),
+              AppButton(label: AppMessages.createContest, loading: submitting, onPressed: submit),
             ],
           ),
         ],
@@ -629,8 +629,8 @@ class _NewHorizonDialogState extends State<_NewHorizonDialog> {
   );
 }
 
-class _NewHorizon {
-  const _NewHorizon({
+class _NewContest {
+  const _NewContest({
     required this.institution,
     required this.role,
     required this.board,

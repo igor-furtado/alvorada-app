@@ -26,28 +26,28 @@ void main() {
 
     tester.view.physicalSize = const Size(1024, 900);
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(ListTile, 'Horizontes'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, 'Concursos'), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
   });
 
   testWidgets('preserva o estado de uma branch ao trocar de área', (tester) async {
     await setWindow(tester, const Size(1440, 1000));
-    await tester.tap(find.widgetWithText(ListTile, 'Horizontes'));
+    await tester.tap(find.widgetWithText(ListTile, 'Concursos'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Novo Horizonte'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Novo Concurso'));
     await tester.pumpAndSettle();
 
     final fields = find.byType(TextFormField);
     await tester.enterText(fields.at(0), 'Instituto Aurora');
     await tester.enterText(fields.at(1), 'Analista');
     await tester.enterText(fields.at(2), 'Banca Exemplo');
-    await tester.tap(find.text('Criar Horizonte'));
+    await tester.tap(find.text('Criar Concurso'));
     await tester.pumpAndSettle();
     expect(find.text('Instituto Aurora'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(ListTile, 'Revisões'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Horizontes'));
+    await tester.tap(find.widgetWithText(ListTile, 'Concursos'));
     await tester.pumpAndSettle();
 
     expect(find.text('Instituto Aurora'), findsOneWidget);

@@ -1,7 +1,7 @@
 abstract final class AppMessages {
   static const navigationToday = 'Hoje';
   static const navigationWeek = 'Semana';
-  static const navigationHorizons = 'Horizontes';
+  static const navigationContests = 'Concursos';
   static const navigationReviews = 'Revisões';
   static const navigationErrors = 'Caderno';
   static const navigationPath = 'Rota de navegação';
@@ -34,6 +34,7 @@ abstract final class AppMessages {
   static const seeToday = 'Ver Hoje';
   static const seeAll = 'Ver todos';
   static const reminders = 'Lembretes';
+  static const reviewsForToday = 'Revisões para hoje';
   static const howItWorks = 'Como funciona';
   static const undo = 'Desfazer';
   static const filtersNotConnected = 'Os filtros serão conectados aos dados depois.';
@@ -45,7 +46,7 @@ abstract final class AppMessages {
   static const oneDay = '1 dia';
   static const sevenDays = '7 dias';
   static const thirtyDays = '30 dias';
-  static const allHorizons = 'Todos os Horizontes';
+  static const allContests = 'Todos os Concursos';
   static const startReview = 'Começar revisão';
   static const howReviewsWork = 'Como funcionam as Revisões';
 
@@ -73,21 +74,24 @@ abstract final class AppMessages {
   static const howErrorNotebookWorks = 'Como funciona o Caderno de Erros';
   static const startNotebookReview = 'Começar Revisão';
 
-  static const newHorizon = 'Novo Horizonte';
+  static const newContest = 'Novo Concurso';
+  static const contest = 'Concurso';
+  static const mainContest = 'Concurso principal';
+  static const noActiveContests = 'Nenhum Concurso ativo';
   static const institution = 'Órgão ou instituição';
   static const role = 'Cargo';
   static const board = 'Banca';
-  static const createHorizon = 'Criar Horizonte';
+  static const createContest = 'Criar Concurso';
   static const toBeDefined = 'A definir';
-  static const deleteHorizon = 'Excluir Horizonte';
-  static const deleteHorizonQuestion = 'Excluir Horizonte?';
+  static const deleteContest = 'Excluir Concurso';
+  static const deleteContestQuestion = 'Excluir Concurso?';
   static const days = 'dias';
   static const openNotice = 'Abrir Edital';
   static const moreActions = 'Mais ações';
   static const seeDetails = 'Ver detalhes';
   static const archive = 'Arquivar';
   static const delete = 'Excluir';
-  static const emptyHorizons = 'Adicione um Horizonte para começar.';
+  static const emptyContests = 'Adicione um Concurso para começar.';
   static const notice = 'Edital';
   static const newDiscipline = 'Nova Disciplina';
   static const removeDiscipline = 'Remover Disciplina';
@@ -95,10 +99,16 @@ abstract final class AppMessages {
   static const disciplineName = 'Nome da Disciplina';
   static const disciplineWeight = 'Peso no Edital';
   static const noDiscipline = 'Nenhuma Disciplina encontrada.';
-  static const horizonNotFound = 'Horizonte não encontrado';
+  static const contestNotFound = 'Concurso não encontrado';
   static const disciplineNotFound = 'Disciplina não encontrada';
 
   static const thisWeek = 'Esta semana';
+  static const todayPlanTitle = 'Plano de hoje';
+  static const sunnyDays = 'Ritmo da semana';
+  static const weeklyRhythm = 'Seu ritmo nesta semana';
+  static const protectedSunday = 'Domingo protegido';
+  static const protectedSundayDescription = 'Domingo é descanso. Ele já faz parte do método.';
+  static const protectedSundayToday = 'Hoje é descanso. Ele já está no plano.';
   static const previousWeek = 'Semana anterior';
   static const nextWeek = 'Próxima semana';
   static const adjustWeek = 'Ajustar semana';
@@ -119,8 +129,8 @@ abstract final class AppMessages {
 
   static String disciplineRemoved(String name) => '$name foi removida deste Edital.';
 
-  static String horizonArchived(String name) => '$name foi arquivado.';
+  static String contestArchived(String name) => '$name foi arquivado.';
 
-  static String deleteHorizonImpact(String name) =>
+  static String deleteContestImpact(String name) =>
       '$name e seu Edital serão removidos. Esta ação não pode ser desfeita.';
 }

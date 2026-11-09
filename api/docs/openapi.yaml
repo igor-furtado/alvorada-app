@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: Alvorada API
+  title: Prumo API
   version: 1.0.0
   description: API para organização de disciplinas, tópicos e subtópicos de estudo.
   contact:
-    name: Alvorada.app
+    name: Prumo.app
 servers:
   - url: /
     description: Mesmo endereço que serve a documentação

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/brand/app_brand.dart';
 import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
@@ -31,7 +32,7 @@ class _TodayContent extends StatelessWidget {
     children: [
       _Header(date: date, showBrand: !desktop),
       SizedBox(height: context.tokens.spacing.xxxl),
-      const _HorizonStrip(),
+      const _ContestStrip(),
       SizedBox(height: context.tokens.spacing.xxl),
       LayoutBuilder(
         builder: (context, constraints) {
@@ -58,13 +59,16 @@ class _TodayContent extends StatelessWidget {
         },
       ),
       SizedBox(height: context.tokens.spacing.xxxl),
-      Row(
+      Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: context.tokens.spacing.md,
+        runSpacing: context.tokens.spacing.xs,
         children: [
           Text(
-            'Revisões para hoje',
+            AppMessages.reviewsForToday,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const Spacer(),
           TextButton(onPressed: () {}, child: const Text(AppMessages.seeAll)),
         ],
       ),
@@ -119,7 +123,7 @@ class _Header extends StatelessWidget {
       ),
       SizedBox(height: context.tokens.spacing.md),
       Text(
-        'Cada manhã conta.',
+        AppBrand.tagline,
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
           fontStyle: FontStyle.italic,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -129,8 +133,8 @@ class _Header extends StatelessWidget {
   );
 }
 
-class _HorizonStrip extends StatelessWidget {
-  const _HorizonStrip();
+class _ContestStrip extends StatelessWidget {
+  const _ContestStrip();
 
   @override
   Widget build(BuildContext context) => Container(
@@ -150,7 +154,7 @@ class _HorizonStrip extends StatelessWidget {
             borderRadius: context.tokens.borders.md,
           ),
           child: Icon(
-            AppIcons.horizons,
+            AppIcons.contests,
             color: context.tokens.colors.actionForeground,
           ),
         ),
@@ -160,7 +164,7 @@ class _HorizonStrip extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Horizonte principal',
+                AppMessages.mainContest,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               SizedBox(height: context.tokens.spacing.xxxs),
@@ -216,7 +220,7 @@ class _DailyPlanCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Sua alvorada',
+                            AppMessages.todayPlanTitle,
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ),
@@ -365,15 +369,17 @@ class _SunnyDaysCard extends StatelessWidget {
                 color: context.tokens.colors.actionForeground,
               ),
               SizedBox(width: context.tokens.spacing.sm),
-              Text(
-                'Dias de sol',
-                style: Theme.of(context).textTheme.titleLarge,
+              Flexible(
+                child: Text(
+                  AppMessages.sunnyDays,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
             ],
           ),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
-            'Seu ritmo nesta semana',
+            AppMessages.weeklyRhythm,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           SizedBox(height: context.tokens.spacing.xxl),
@@ -406,7 +412,7 @@ class _SunnyDaysCard extends StatelessWidget {
                 SizedBox(width: context.tokens.spacing.md),
                 Expanded(
                   child: Text(
-                    'Domingo é descanso. Ele já faz parte do método.',
+                    AppMessages.protectedSundayDescription,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -550,7 +556,11 @@ class _ReviewCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: context.tokens.spacing.sm,
+              runSpacing: context.tokens.spacing.xs,
               children: [
                 Container(
                   padding: EdgeInsets.symmetric(
@@ -568,7 +578,6 @@ class _ReviewCard extends StatelessWidget {
                     ).textTheme.labelMedium?.copyWith(color: color),
                   ),
                 ),
-                const Spacer(),
                 Text(duration, style: Theme.of(context).textTheme.labelMedium),
               ],
             ),
@@ -658,13 +667,13 @@ class _SundayView extends StatelessWidget {
                   ),
                   SizedBox(height: context.tokens.spacing.xxl),
                   Text(
-                    'Domingo protegido',
+                    AppMessages.protectedSunday,
                     style: Theme.of(context).textTheme.headlineLarge,
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: context.tokens.spacing.md),
                   Text(
-                    'Hoje a manhã é sua. O descanso já está no plano.',
+                    AppMessages.protectedSundayToday,
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),

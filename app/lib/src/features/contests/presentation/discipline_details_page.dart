@@ -5,27 +5,27 @@ import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
-import 'horizon_view_data.dart';
+import 'contest_view_data.dart';
 
 class DisciplineDetailsArguments {
   const DisciplineDetailsArguments({
-    required this.horizon,
+    required this.contest,
     required this.discipline,
   });
 
-  final HorizonViewData horizon;
-  final HorizonDisciplineProgress discipline;
+  final ContestViewData contest;
+  final ContestDisciplineProgress discipline;
 }
 
 class DisciplineDetailsPage extends StatefulWidget {
   const DisciplineDetailsPage({
-    required this.horizonId,
+    required this.contestId,
     required this.disciplineName,
     this.arguments,
     super.key,
   });
 
-  final String horizonId;
+  final String contestId;
   final String disciplineName;
   final DisciplineDetailsArguments? arguments;
 
@@ -34,9 +34,9 @@ class DisciplineDetailsPage extends StatefulWidget {
 }
 
 class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
-  late final HorizonViewData? _horizon = widget.arguments?.horizon ?? demoHorizonById(widget.horizonId);
-  late final HorizonDisciplineProgress? _discipline =
-      widget.arguments?.discipline ?? _findDiscipline(_horizon, widget.disciplineName);
+  late final ContestViewData? _contest = widget.arguments?.contest ?? demoContestById(widget.contestId);
+  late final ContestDisciplineProgress? _discipline =
+      widget.arguments?.discipline ?? _findDiscipline(_contest, widget.disciplineName);
   late final TextEditingController _nameController = TextEditingController(
     text: _discipline?.name ?? '',
   );
@@ -63,7 +63,7 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final horizon = _horizon;
+    final contest = _contest;
     final discipline = _discipline;
     return AppPageTemplate(
       maxWidth: context.tokens.sizes.disciplinePage,
@@ -77,12 +77,12 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
-                label: AppMessages.navigationHorizons,
-                route: '/horizontes',
+                label: AppMessages.navigationContests,
+                route: '/concursos',
               ),
               AppBreadcrumbItem(
-                label: horizon?.shortName ?? 'Horizonte',
-                route: horizon == null ? null : '/horizontes/${Uri.encodeComponent(horizon.id)}',
+                label: contest?.shortName ?? AppMessages.contest,
+                route: contest == null ? null : '/concursos/${Uri.encodeComponent(contest.id)}',
               ),
               AppBreadcrumbItem(
                 label: _nameController.text.isEmpty ? 'Disciplina' : _nameController.text,
@@ -90,11 +90,11 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
             ],
           ),
           SizedBox(height: context.tokens.spacing.xl),
-          if (horizon == null || discipline == null)
+          if (contest == null || discipline == null)
             const _NotFound()
           else ...[
             _EditableDisciplineHeader(
-              horizon: horizon,
+              contest: contest,
               discipline: discipline,
               nameController: _nameController,
               weightController: _weightController,
@@ -116,15 +116,15 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
 
 class _EditableDisciplineHeader extends StatelessWidget {
   const _EditableDisciplineHeader({
-    required this.horizon,
+    required this.contest,
     required this.discipline,
     required this.nameController,
     required this.weightController,
     required this.onNameChanged,
   });
 
-  final HorizonViewData horizon;
-  final HorizonDisciplineProgress discipline;
+  final ContestViewData contest;
+  final ContestDisciplineProgress discipline;
   final TextEditingController nameController;
   final TextEditingController weightController;
   final ValueChanged<String> onNameChanged;
@@ -172,7 +172,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
                   ),
                   SizedBox(height: context.tokens.spacing.sm),
                   Text(
-                    '${horizon.shortName} · ${horizon.role}',
+                    '${contest.shortName} · ${contest.role}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -573,12 +573,12 @@ class _SubtopicState {
   bool completed = false;
 }
 
-HorizonDisciplineProgress? _findDiscipline(
-  HorizonViewData? horizon,
+ContestDisciplineProgress? _findDiscipline(
+  ContestViewData? contest,
   String name,
 ) {
-  if (horizon == null) return null;
-  for (final discipline in horizon.disciplines) {
+  if (contest == null) return null;
+  for (final discipline in contest.disciplines) {
     if (discipline.name == name) return discipline;
   }
   return null;

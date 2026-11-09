@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
-  <title id="title">Ícone do aplicativo Alvorada</title>
-  <rect width="1024" height="1024" rx="224" fill="#F6F0E4"/>
-  <path d="M292 600a220 220 0 0 1 440 0Z" fill="#E8742A"/>
-  <path d="M190 600h644M244 696h536" fill="none" stroke="#1E1B18" stroke-width="44" stroke-linecap="round"/>
-  <path d="M512 190v104M320 284l74 74M704 284l-74 74" fill="none" stroke="#E8742A" stroke-width="44" stroke-linecap="round"/>
-</svg>

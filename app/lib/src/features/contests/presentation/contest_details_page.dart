@@ -6,35 +6,35 @@ import '../../../core/content/app_messages.dart';
 import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
+import 'contest_view_data.dart';
 import 'discipline_details_page.dart';
-import 'horizon_view_data.dart';
 
 // PROTÓTIPO DESCARTÁVEL — proposta orientada pela referência visual: resumo
-// do Horizonte no topo e Edital verticalizado em uma tabela única e contínua.
-class HorizonDetailsPage extends StatefulWidget {
-  const HorizonDetailsPage({
-    required this.horizonId,
-    this.horizonOverride,
+// do Concurso no topo e Edital verticalizado em uma tabela única e contínua.
+class ContestDetailsPage extends StatefulWidget {
+  const ContestDetailsPage({
+    required this.contestId,
+    this.contestOverride,
     super.key,
   });
 
-  final String horizonId;
-  final HorizonViewData? horizonOverride;
+  final String contestId;
+  final ContestViewData? contestOverride;
 
   @override
-  State<HorizonDetailsPage> createState() => _HorizonDetailsPageState();
+  State<ContestDetailsPage> createState() => _ContestDetailsPageState();
 }
 
-class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
-  late final HorizonViewData? _horizon = widget.horizonOverride ?? demoHorizonById(widget.horizonId);
-  late final List<HorizonDisciplineProgress> _disciplines = List.of(
-    _horizon?.disciplines ?? const [],
+class _ContestDetailsPageState extends State<ContestDetailsPage> {
+  late final ContestViewData? _contest = widget.contestOverride ?? demoContestById(widget.contestId);
+  late final List<ContestDisciplineProgress> _disciplines = List.of(
+    _contest?.disciplines ?? const [],
   );
   _DisciplineSort _sort = _DisciplineSort.weight;
   bool _sortAscending = false;
 
-  List<HorizonDisciplineProgress> get _visibleDisciplines {
-    final result = List<HorizonDisciplineProgress>.of(_disciplines)
+  List<ContestDisciplineProgress> get _visibleDisciplines {
+    final result = List<ContestDisciplineProgress>.of(_disciplines)
       ..sort(
         (left, right) => switch (_sort) {
           _DisciplineSort.name => right.name.compareTo(left.name),
@@ -51,9 +51,9 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final horizon = _horizon;
+    final contest = _contest;
     return AppPageTemplate(
-      maxWidth: context.tokens.sizes.horizonPage,
+      maxWidth: context.tokens.sizes.contestPage,
       builder: (context, desktop) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -64,20 +64,20 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
-                label: AppMessages.navigationHorizons,
-                route: '/horizontes',
+                label: AppMessages.navigationContests,
+                route: '/concursos',
               ),
               AppBreadcrumbItem(
-                label: horizon?.shortName ?? 'Não encontrado',
+                label: contest?.shortName ?? 'Não encontrado',
               ),
             ],
           ),
           SizedBox(height: context.tokens.spacing.xl),
-          if (horizon == null)
+          if (contest == null)
             const _NotFound()
           else ...[
-            _HorizonSummary(
-              horizon: horizon,
+            _ContestSummary(
+              contest: contest,
               disciplineCount: _disciplines.length,
             ),
             SizedBox(height: context.tokens.spacing.xl),
@@ -98,9 +98,9 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
               onChangeWeight: _changeWeight,
               onRemove: _remove,
               onOpen: (discipline) => context.go(
-                '/horizontes/${Uri.encodeComponent(horizon.id)}/disciplinas/${Uri.encodeComponent(discipline.name)}',
+                '/concursos/${Uri.encodeComponent(contest.id)}/disciplinas/${Uri.encodeComponent(discipline.name)}',
                 extra: DisciplineDetailsArguments(
-                  horizon: horizon,
+                  contest: contest,
                   discipline: discipline,
                 ),
               ),
@@ -119,7 +119,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
     if (name == null || name.trim().isEmpty || !mounted) return;
     setState(() {
       _disciplines.add(
-        HorizonDisciplineProgress(
+        ContestDisciplineProgress(
           name: name.trim(),
           progress: 0,
           performance: 0,
@@ -129,7 +129,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
     });
   }
 
-  void _changeWeight(HorizonDisciplineProgress discipline, int weight) {
+  void _changeWeight(ContestDisciplineProgress discipline, int weight) {
     final index = _disciplines.indexOf(discipline);
     if (index < 0) return;
     setState(() => _disciplines[index] = discipline.copyWith(weight: weight));
@@ -146,7 +146,7 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
     });
   }
 
-  void _remove(HorizonDisciplineProgress discipline) {
+  void _remove(ContestDisciplineProgress discipline) {
     final index = _disciplines.indexOf(discipline);
     setState(() => _disciplines.remove(discipline));
     ScaffoldMessenger.of(context)
@@ -170,12 +170,12 @@ class _HorizonDetailsPageState extends State<HorizonDetailsPage> {
 
 enum _DisciplineSort { name, weight, progress, performance }
 
-typedef _DisciplineAction = void Function(HorizonDisciplineProgress);
-typedef _WeightChange = void Function(HorizonDisciplineProgress discipline, int weight);
+typedef _DisciplineAction = void Function(ContestDisciplineProgress);
+typedef _WeightChange = void Function(ContestDisciplineProgress discipline, int weight);
 
-class _HorizonSummary extends StatelessWidget {
-  const _HorizonSummary({required this.horizon, required this.disciplineCount});
-  final HorizonViewData horizon;
+class _ContestSummary extends StatelessWidget {
+  const _ContestSummary({required this.contest, required this.disciplineCount});
+  final ContestViewData contest;
   final int disciplineCount;
 
   @override
@@ -196,7 +196,7 @@ class _HorizonSummary extends StatelessWidget {
                 borderRadius: context.tokens.borders.lg,
               ),
               child: Icon(
-                AppIcons.horizonsActive,
+                AppIcons.contestsActive,
                 color: context.tokens.colors.actionForeground,
                 size: context.tokens.icons.xl,
               ),
@@ -210,18 +210,18 @@ class _HorizonSummary extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          horizon.institution,
+                          contest.institution,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      if (horizon.isPrimary) ...[
+                      if (contest.isPrimary) ...[
                         SizedBox(width: context.tokens.spacing.md),
                         const _StatusBadge(),
                       ],
                     ],
                   ),
                   SizedBox(height: context.tokens.spacing.xxs),
-                  Text(horizon.role),
+                  Text(contest.role),
                   SizedBox(height: context.tokens.spacing.md),
                   Wrap(
                     spacing: context.tokens.spacing.xl,
@@ -229,7 +229,7 @@ class _HorizonSummary extends StatelessWidget {
                     children: [
                       _InlineInfo(
                         icon: AppIcons.event,
-                        text: horizon.examDate,
+                        text: contest.examDate,
                       ),
                       _InlineInfo(
                         icon: AppIcons.bookText,
@@ -237,7 +237,7 @@ class _HorizonSummary extends StatelessWidget {
                       ),
                       _InlineInfo(
                         icon: AppIcons.institution,
-                        text: horizon.board,
+                        text: contest.board,
                       ),
                     ],
                   ),
@@ -251,22 +251,22 @@ class _HorizonSummary extends StatelessWidget {
             Expanded(
               child: _SummaryMetric(
                 label: 'Avanço no Edital',
-                value: '${(horizon.progress * 100).round()}%',
-                progress: horizon.progress,
+                value: '${(contest.progress * 100).round()}%',
+                progress: contest.progress,
               ),
             ),
             const _VerticalDivider(),
             Expanded(
               child: _SummaryMetric(
                 label: 'Desempenho',
-                value: '${_averagePerformance(horizon).round()}%',
+                value: '${_averagePerformance(contest).round()}%',
               ),
             ),
             const _VerticalDivider(),
             Expanded(
               child: _SummaryMetric(
                 label: 'Prova em',
-                value: '${horizon.days} dias',
+                value: '${contest.days} dias',
               ),
             ),
           ],
@@ -304,7 +304,7 @@ class _VerticalizedEdital extends StatelessWidget {
     required this.onRemove,
     required this.onOpen,
   });
-  final List<HorizonDisciplineProgress> disciplines;
+  final List<ContestDisciplineProgress> disciplines;
   final _DisciplineSort sort;
   final bool sortAscending;
   final ValueChanged<_DisciplineSort> onSort;
@@ -419,7 +419,7 @@ class _DisciplineRow extends StatelessWidget {
     required this.onRemove,
     required this.onOpen,
   });
-  final HorizonDisciplineProgress discipline;
+  final ContestDisciplineProgress discipline;
   final _WeightChange onChangeWeight;
   final _DisciplineAction onRemove;
   final _DisciplineAction onOpen;
@@ -684,17 +684,17 @@ class _NotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.giant),
-    child: const Center(child: Text(AppMessages.horizonNotFound)),
+    child: const Center(child: Text(AppMessages.contestNotFound)),
   );
 }
 
-double _averagePerformance(HorizonViewData horizon) {
-  if (horizon.disciplines.isEmpty) return 0;
-  final total = horizon.disciplines.fold<double>(
+double _averagePerformance(ContestViewData contest) {
+  if (contest.disciplines.isEmpty) return 0;
+  final total = contest.disciplines.fold<double>(
     0,
     (sum, item) => sum + item.performance,
   );
-  return total / horizon.disciplines.length * 100;
+  return total / contest.disciplines.length * 100;
 }
 
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(

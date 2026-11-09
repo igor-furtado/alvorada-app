@@ -10,7 +10,7 @@
 
 ## Exemplos de decisão
 
-- Certo: “Excluir Horizonte? O Horizonte e seu Edital serão removidos.”
+- Certo: “Excluir registro? Os dados associados também serão removidos.”
 - Errado: “Tem certeza?”.
 - Certo: falha da próxima página mantém os itens e mostra “Tentar novamente” no rodapé.
 - Errado: falha limpa a lista ou abre dialog.

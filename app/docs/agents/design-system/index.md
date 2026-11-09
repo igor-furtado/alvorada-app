@@ -17,10 +17,10 @@ API: parâmetros nomeados, construtor `const`, variantes/estados explícitos e c
 Leia somente a referência correspondente à mudança:
 
 - Formulário, lista, estado, feedback, ação destrutiva ou navegação: [interaction.md](interaction.md)
-- Texto visível ou termo do produto: [writing.md](writing.md)
+- Texto visível: [writing.md](writing.md)
 - Layout adaptativo ou navegação por largura: [responsive.md](responsive.md)
 - Cor, semântica, foco, teclado, toque, texto ampliado ou movimento: [accessibility.md](accessibility.md)
 
-Plataforma: Web responsiva, orientação livre e idioma pt-BR. A voz é orientadora serena: amigável, respeitosa e direta. As cinco áreas do `StatefulShellRoute` preservam histórico e estado transitório.
+Plataforma: Web responsiva, orientação livre e idioma pt-BR.
 
 Conclua em `app/`: `dart format lib test`, `flutter analyze` e `flutter test` passam.
