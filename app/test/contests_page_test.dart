@@ -1,7 +1,6 @@
 import 'package:estudos_app/src/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 
 void main() {
   Future<void> openContests(WidgetTester tester) async {
@@ -134,22 +133,5 @@ void main() {
     expect(find.text('TRF da 5ª Região'), findsOneWidget);
     expect(find.byTooltip('Próxima variante'), findsNothing);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('redireciona a URL legada de Horizontes para Concursos', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1440, 1000);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(const EstudosApp());
-    await tester.pumpAndSettle();
-    GoRouter.of(tester.element(find.byType(Scaffold).first)).go('/horizontes');
-    await tester.pumpAndSettle();
-
-    expect(find.text('Concursos'), findsWidgets);
-    expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
   });
 }

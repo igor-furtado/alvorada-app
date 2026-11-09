@@ -4,7 +4,6 @@ Use esta documentação ao alterar comportamento, priorização, método, descan
 
 - Para regras e invariantes do produto, leia [rules.md](rules.md).
 - Para conceitos e termos canônicos do domínio, leia `CONTEXT.md` e siga `docs/agents/domain.md`.
-- Para o estado de uma migração que afete o produto, leia `docs/brand/prumo-rebrand-plan.md`.
 
 ## Hierarquia
 

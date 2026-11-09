@@ -64,22 +64,6 @@ final _router = GoRouter(
         ),
       ],
     ),
-    GoRoute(path: '/horizontes', redirect: (context, state) => '/concursos'),
-    GoRoute(
-      path: '/horizontes/:contestId',
-      redirect: (context, state) {
-        final contestId = Uri.encodeComponent(state.pathParameters['contestId']!);
-        return '/concursos/$contestId';
-      },
-    ),
-    GoRoute(
-      path: '/horizontes/:contestId/disciplinas/:disciplineName',
-      redirect: (context, state) {
-        final contestId = Uri.encodeComponent(state.pathParameters['contestId']!);
-        final disciplineName = Uri.encodeComponent(state.pathParameters['disciplineName']!);
-        return '/concursos/$contestId/disciplinas/$disciplineName';
-      },
-    ),
   ],
 );
 
