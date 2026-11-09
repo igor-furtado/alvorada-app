@@ -4,6 +4,7 @@ abstract final class AppMessages {
   static const navigationContests = 'Concursos';
   static const navigationReviews = 'Revisões';
   static const navigationErrors = 'Caderno';
+  static const navigationSection = 'Navegação';
   static const navigationPath = 'Rota de navegação';
 
   static const loading = 'Carregando';

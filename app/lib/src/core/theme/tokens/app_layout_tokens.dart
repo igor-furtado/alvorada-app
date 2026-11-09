@@ -13,7 +13,7 @@ class AppLayoutTokens {
     this.wide = AppDimensionPrimitives.breakpointWide,
     this.contentMaxWidth = AppDimensionPrimitives.contentMaxWidth,
     this.dialogMaxWidth = 600,
-    this.sideNavigationWidth = 232,
+    this.sideNavigationWidth = 256,
     this.brandWidth = 178,
     this.controlHeight = AppDimensionPrimitives.size48,
     this.topicSelectionIndent = 42,

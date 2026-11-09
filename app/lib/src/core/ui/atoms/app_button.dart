@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../content/app_messages.dart';
 import '../../theme/app_theme.dart';
@@ -41,12 +42,6 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.text => tokens.colors.actionForeground,
       AppButtonVariant.destructive => scheme.onError,
     };
-    final background = switch (variant) {
-      AppButtonVariant.primary => tokens.colors.primary,
-      AppButtonVariant.secondary => scheme.secondaryContainer,
-      AppButtonVariant.destructive => scheme.error,
-      AppButtonVariant.outline || AppButtonVariant.text => tokens.colors.transparent,
-    };
     final horizontalPadding = switch (size) {
       AppButtonSize.sm => tokens.spacing.md,
       AppButtonSize.md => tokens.spacing.xl,
@@ -57,67 +52,76 @@ class AppButton extends StatelessWidget {
       AppButtonSize.md => tokens.spacing.md,
       AppButtonSize.lg => tokens.spacing.lg,
     };
-    final style = ButtonStyle(
-      minimumSize: WidgetStatePropertyAll(Size.square(tokens.layout.controlHeight)),
-      padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding)),
-      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: tokens.borders.md)),
-      textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelLarge),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled)
-            ? scheme.onSurface.withValues(alpha: tokens.opacity.disabled)
-            : foreground,
-      ),
-      backgroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled)
-            ? scheme.onSurface.withValues(alpha: tokens.opacity.tint)
-            : background,
-      ),
-      overlayColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.pressed)) return foreground.withValues(alpha: tokens.opacity.tintStrong);
-        if (states.contains(WidgetState.hovered) || states.contains(WidgetState.focused)) {
-          return foreground.withValues(alpha: tokens.opacity.tint);
-        }
-        return tokens.colors.transparent;
-      }),
-      side: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.focused)) {
-          return BorderSide(color: tokens.colors.focusRing, width: tokens.borders.widthStrong);
-        }
-        if (variant != AppButtonVariant.outline) return BorderSide.none;
-        return BorderSide(
-          color: scheme.outline,
-          width: tokens.borders.widthHairline,
-        );
-      }),
-    );
-    final content = Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (loading)
-          SizedBox.square(
+    final callback = enabled ? onPressed : null;
+    final leading = loading
+        ? SizedBox.square(
             dimension: tokens.icons.sm,
             child: CircularProgressIndicator(
               color: foreground,
               strokeWidth: tokens.borders.widthStrong,
             ),
           )
-        else if (icon != null)
-          Icon(icon, size: tokens.icons.sm),
-        if (loading || icon != null) SizedBox(width: tokens.spacing.sm),
-        Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
-      ],
+        : icon == null
+        ? null
+        : Icon(icon, size: tokens.icons.sm);
+    final padding = EdgeInsets.symmetric(
+      horizontal: horizontalPadding,
+      vertical: verticalPadding,
     );
-    final callback = enabled ? onPressed : null;
-    final button = switch (variant) {
-      AppButtonVariant.outline => OutlinedButton(
-        onPressed: callback,
-        autofocus: autofocus,
-        style: style,
-        child: content,
+    final child = Flexible(
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
       ),
-      AppButtonVariant.text => TextButton(onPressed: callback, autofocus: autofocus, style: style, child: content),
-      _ => FilledButton(onPressed: callback, autofocus: autofocus, style: style, child: content),
+    );
+    final button = switch (variant) {
+      AppButtonVariant.primary => ShadButton(
+        onPressed: callback,
+        enabled: enabled,
+        autofocus: autofocus,
+        height: tokens.layout.controlHeight,
+        padding: padding,
+        leading: leading,
+        child: child,
+      ),
+      AppButtonVariant.secondary => ShadButton.secondary(
+        onPressed: callback,
+        enabled: enabled,
+        autofocus: autofocus,
+        height: tokens.layout.controlHeight,
+        padding: padding,
+        leading: leading,
+        child: child,
+      ),
+      AppButtonVariant.outline => ShadButton.outline(
+        onPressed: callback,
+        enabled: enabled,
+        autofocus: autofocus,
+        height: tokens.layout.controlHeight,
+        padding: padding,
+        leading: leading,
+        child: child,
+      ),
+      AppButtonVariant.text => ShadButton.ghost(
+        onPressed: callback,
+        enabled: enabled,
+        autofocus: autofocus,
+        height: tokens.layout.controlHeight,
+        padding: padding,
+        leading: leading,
+        child: child,
+      ),
+      AppButtonVariant.destructive => ShadButton.destructive(
+        onPressed: callback,
+        enabled: enabled,
+        autofocus: autofocus,
+        height: tokens.layout.controlHeight,
+        padding: padding,
+        leading: leading,
+        child: child,
+      ),
     };
     if (loading) {
       return Semantics(

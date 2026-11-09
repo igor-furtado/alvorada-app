@@ -74,31 +74,66 @@ class _SideNavigation extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: context.tokens.layout.sideNavigationWidth,
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
+      color: context.tokens.colors.surface,
       border: Border(
         right: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
     ),
     child: SafeArea(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.tokens.spacing.xl,
-          context.tokens.spacing.xxl,
-          context.tokens.spacing.xl,
-          context.tokens.spacing.xl,
-        ),
-        child: Column(
-          children: [
-            AppBrandLogo(width: context.tokens.sizes.navigationBrand),
-            SizedBox(height: context.tokens.spacing.xxxl),
-            for (var index = 0; index < _destinations.length; index++)
-              _SideItem(
-                destination: _destinations[index],
-                selected: selectedIndex == index,
-                onTap: () => onSelected(index),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.tokens.spacing.lg,
+              vertical: context.tokens.spacing.lg,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: AppBrandLogo(width: context.tokens.layout.brandWidth),
+            ),
+          ),
+          const Divider(),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(context.tokens.spacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.tokens.spacing.md,
+                      context.tokens.spacing.sm,
+                      context.tokens.spacing.md,
+                      context.tokens.spacing.sm,
+                    ),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        AppMessages.navigationSection,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        for (var index = 0; index < _destinations.length; index++)
+                          _SideItem(
+                            destination: _destinations[index],
+                            selected: selectedIndex == index,
+                            onTap: () => onSelected(index),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     ),
   );
@@ -117,18 +152,27 @@ class _SideItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: context.tokens.spacing.xxs),
+    padding: EdgeInsets.only(bottom: context.tokens.spacing.xxxs),
     child: Material(
       color: context.tokens.colors.transparent,
       child: ListTile(
         selected: selected,
-        selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
-        shape: RoundedRectangleBorder(borderRadius: context.tokens.borders.md),
+        selectedTileColor: context.tokens.colors.surfaceSubtle,
+        hoverColor: context.tokens.colors.surfaceSubtle,
+        contentPadding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.md),
+        minLeadingWidth: context.tokens.icons.md,
+        horizontalTitleGap: context.tokens.spacing.md,
         leading: Icon(
           selected ? destination.selectedIcon : destination.icon,
           size: context.tokens.icons.md,
+          color: selected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
         ),
-        title: Text(destination.label, style: Theme.of(context).textTheme.labelLarge),
+        title: Text(
+          destination.label,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+          ),
+        ),
         onTap: onTap,
       ),
     ),
@@ -142,18 +186,43 @@ class _MediumNavigation extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => NavigationRail(
-    selectedIndex: selectedIndex,
-    onDestinationSelected: onSelected,
-    labelType: NavigationRailLabelType.all,
-    destinations: [
-      for (final destination in _destinations)
-        NavigationRailDestination(
-          icon: Icon(destination.icon),
-          selectedIcon: Icon(destination.selectedIcon),
-          label: Text(destination.label),
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: context.tokens.colors.surface,
+      border: Border(
+        right: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+    ),
+    child: NavigationRail(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: onSelected,
+      minWidth: context.tokens.spacing.giant + context.tokens.spacing.sm,
+      groupAlignment: -1,
+      labelType: NavigationRailLabelType.none,
+      leading: Padding(
+        padding: EdgeInsets.only(bottom: context.tokens.spacing.lg),
+        child: SvgPicture.asset(
+          AppBrand.appIcon,
+          width: context.tokens.spacing.xxxl,
+          height: context.tokens.spacing.xxxl,
+          semanticsLabel: AppBrand.productName,
         ),
-    ],
+      ),
+      destinations: [
+        for (final destination in _destinations)
+          NavigationRailDestination(
+            icon: Tooltip(
+              message: destination.label,
+              child: Icon(destination.icon),
+            ),
+            selectedIcon: Tooltip(
+              message: destination.label,
+              child: Icon(destination.selectedIcon),
+            ),
+            label: Text(destination.label),
+          ),
+      ],
+    ),
   );
 }
 
@@ -164,17 +233,31 @@ class _CompactNavigation extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => NavigationBar(
-    selectedIndex: selectedIndex,
-    onDestinationSelected: onSelected,
-    destinations: [
-      for (final destination in _destinations)
-        NavigationDestination(
-          icon: Icon(destination.icon),
-          selectedIcon: Icon(destination.selectedIcon),
-          label: destination.label,
-        ),
-    ],
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+    ),
+    child: NavigationBar(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: onSelected,
+      destinations: [
+        for (var index = 0; index < _destinations.length; index++)
+          NavigationDestination(
+            icon: Icon(_destinations[index].icon),
+            selectedIcon: Container(
+              padding: EdgeInsets.all(context.tokens.spacing.sm),
+              decoration: BoxDecoration(
+                color: context.tokens.colors.surfaceSubtle,
+                borderRadius: context.tokens.borders.sm,
+              ),
+              child: Icon(_destinations[index].selectedIcon),
+            ),
+            label: _destinations[index].label,
+          ),
+      ],
+    ),
   );
 }
 

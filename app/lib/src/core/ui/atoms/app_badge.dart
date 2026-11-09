@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -23,9 +24,11 @@ class AppBadge extends StatelessWidget {
     };
     return Semantics(
       label: label,
-      child: Container(
+      child: ShadBadge.outline(
+        backgroundColor: background,
+        foregroundColor: foreground,
+        shape: RoundedRectangleBorder(borderRadius: context.tokens.borders.sm),
         padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.xxs),
-        decoration: BoxDecoration(color: background, borderRadius: context.tokens.borders.full),
         child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: foreground)),
       ),
     );

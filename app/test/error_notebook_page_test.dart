@@ -1,6 +1,7 @@
 import 'package:estudos_app/src/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   testWidgets('abre Caderno de Erros pela navegação principal', (tester) async {
@@ -39,7 +40,7 @@ void main() {
     tester.view.physicalSize = const Size(390, 844);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Registrar erro'));
+    await tester.tap(find.widgetWithText(ShadButton, 'Registrar erro'));
     await tester.pumpAndSettle();
 
     final dialog = find.byType(Dialog);
@@ -63,7 +64,7 @@ void main() {
       findsOneWidget,
     );
 
-    final submit = find.widgetWithText(FilledButton, 'Salvar e programar Revisões');
+    final submit = find.widgetWithText(ShadButton, 'Salvar e programar Revisões');
     await tester.ensureVisible(submit);
     await tester.tap(submit);
     await tester.pumpAndSettle();

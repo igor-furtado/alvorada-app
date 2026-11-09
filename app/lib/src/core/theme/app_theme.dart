@@ -48,7 +48,7 @@ abstract final class AppTheme {
       inversePrimary: colors.primary,
     );
 
-    final radius = tokens.borders.md;
+    final radius = tokens.borders.sm;
     final inputBorder = OutlineInputBorder(
       borderRadius: radius,
       borderSide: BorderSide(color: colors.controlOutline),
@@ -63,7 +63,11 @@ abstract final class AppTheme {
       textTheme: textTheme,
       dividerColor: colors.border,
       focusColor: colors.focusRing.withValues(alpha: tokens.opacity.tintStrong),
-      splashFactory: InkSparkle.splashFactory,
+      hoverColor: colors.surfaceSubtle,
+      highlightColor: colors.primaryContainer.withValues(
+        alpha: tokens.opacity.tintStrong,
+      ),
+      splashFactory: NoSplash.splashFactory,
       appBarTheme: AppBarTheme(
         backgroundColor: colors.canvas,
         foregroundColor: colors.onSurface,
@@ -72,13 +76,13 @@ abstract final class AppTheme {
         titleTextStyle: textTheme.titleLarge,
       ),
       cardTheme: CardThemeData(
-        color: colors.surface,
+        color: colors.surfaceElevated,
         elevation: 0,
         margin: EdgeInsets.zero,
         shadowColor: tokens.elevations.low.first.color,
         surfaceTintColor: colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: tokens.borders.lg,
+          borderRadius: radius,
           side: BorderSide(color: colors.border),
         ),
       ),
@@ -89,10 +93,10 @@ abstract final class AppTheme {
           foregroundColor: colors.onPrimary,
           textStyle: textTheme.labelLarge,
           shape: RoundedRectangleBorder(borderRadius: radius),
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.spacing.xl,
-            vertical: tokens.spacing.md,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
+          elevation: 0,
+          disabledBackgroundColor: colors.surfaceSubtle,
+          disabledForegroundColor: colors.onSurfaceMuted,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -102,16 +106,24 @@ abstract final class AppTheme {
           side: BorderSide(color: colors.border),
           textStyle: textTheme.labelLarge,
           shape: RoundedRectangleBorder(borderRadius: radius),
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.spacing.xl,
-            vertical: tokens.spacing.md,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
+          backgroundColor: colors.surfaceElevated,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.actionForeground,
           textStyle: textTheme.labelLarge,
+          shape: RoundedRectangleBorder(borderRadius: radius),
+          minimumSize: Size.square(tokens.layout.controlHeight),
+          padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          minimumSize: Size.square(tokens.layout.controlHeight),
+          foregroundColor: colors.onSurface,
+          backgroundColor: colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: radius),
         ),
       ),
@@ -148,7 +160,7 @@ abstract final class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: colors.surface,
+        backgroundColor: colors.surfaceElevated,
         selectedColor: colors.primaryContainer,
         side: BorderSide(color: colors.border),
         shape: RoundedRectangleBorder(borderRadius: tokens.borders.sm),
@@ -157,27 +169,76 @@ abstract final class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: colors.surfaceElevated,
         surfaceTintColor: colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: tokens.borders.lg),
+        shape: RoundedRectangleBorder(
+          borderRadius: tokens.borders.md,
+          side: BorderSide(color: colors.border),
+        ),
         titleTextStyle: textTheme.headlineSmall,
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colors.surface,
-        selectedItemColor: colors.primary,
-        unselectedItemColor: colors.onSurfaceMuted,
-        selectedLabelStyle: textTheme.labelSmall,
-        unselectedLabelStyle: textTheme.labelSmall,
-        type: BottomNavigationBarType.fixed,
+        indicatorColor: colors.transparent,
         elevation: 0,
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected) ? colors.actionForeground : colors.onSurfaceMuted,
+            size: tokens.icons.md,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => textTheme.labelSmall?.copyWith(
+            color: states.contains(WidgetState.selected) ? colors.onSurface : colors.onSurfaceMuted,
+          ),
+        ),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: colors.surface,
-        selectedIconTheme: IconThemeData(color: colors.primary),
+        selectedIconTheme: IconThemeData(color: colors.onSurface),
         unselectedIconTheme: IconThemeData(color: colors.onSurfaceMuted),
         selectedLabelTextStyle: textTheme.labelMedium?.copyWith(
           color: colors.onSurface,
         ),
         unselectedLabelTextStyle: textTheme.labelMedium,
-        indicatorColor: colors.primaryContainer,
+        indicatorColor: colors.surfaceSubtle,
+        indicatorShape: RoundedRectangleBorder(borderRadius: radius),
+        elevation: 0,
+      ),
+      listTileTheme: ListTileThemeData(
+        dense: true,
+        minTileHeight: tokens.layout.controlHeight,
+        iconColor: colors.onSurfaceMuted,
+        textColor: colors.onSurfaceMuted,
+        selectedColor: colors.onSurface,
+        selectedTileColor: colors.surfaceSubtle,
+        shape: RoundedRectangleBorder(borderRadius: radius),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        shape: RoundedRectangleBorder(borderRadius: tokens.borders.xs),
+        side: BorderSide(color: colors.controlOutline),
+        fillColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected) ? colors.primary : colors.transparent,
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected) ? colors.primary : colors.surfaceSubtle,
+        ),
+        thumbColor: WidgetStatePropertyAll(colors.surfaceElevated),
+        trackOutlineColor: WidgetStatePropertyAll(colors.border),
+      ),
+      dividerTheme: DividerThemeData(
+        color: colors.border,
+        thickness: tokens.borders.widthHairline,
+        space: tokens.spacing.hairline,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: colors.onSurface,
+          borderRadius: tokens.borders.sm,
+        ),
+        textStyle: textTheme.labelMedium?.copyWith(color: colors.canvas),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colors.primary,

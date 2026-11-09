@@ -12,9 +12,9 @@ class AppBorderTokens {
     this.widthStrong = AppDimensionPrimitives.size2,
     this.radiusXs = AppDimensionPrimitives.size4,
     this.radiusSm = AppDimensionPrimitives.size6,
-    this.radiusMd = AppDimensionPrimitives.size8,
-    this.radiusLg = AppDimensionPrimitives.size12,
-    this.radiusXl = AppDimensionPrimitives.size16,
+    this.radiusMd = AppDimensionPrimitives.size6,
+    this.radiusLg = AppDimensionPrimitives.size8,
+    this.radiusXl = AppDimensionPrimitives.size12,
     this.radiusFull = AppDimensionPrimitives.full,
   });
 

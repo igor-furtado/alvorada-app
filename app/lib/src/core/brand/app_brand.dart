@@ -5,4 +5,5 @@ abstract final class AppBrand {
   static const applicationTitle = '$productName — $tagline';
   static const logoLight = 'assets/brand/prumo-horizontal.svg';
   static const logoDark = 'assets/brand/prumo-monochrome-mineral.svg';
+  static const appIcon = 'assets/brand/prumo-app-icon.svg';
 }

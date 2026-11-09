@@ -1,8 +1,10 @@
 import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/src/core/theme/app_shad_theme.dart';
 import 'package:estudos_app/src/core/theme/app_theme.dart';
 import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   Future<void> setWindow(WidgetTester tester, Size size) async {
@@ -26,8 +28,14 @@ void main() {
 
     tester.view.physicalSize = const Size(1024, 900);
     await tester.pumpAndSettle();
+    expect(find.text('Navegação'), findsOneWidget);
     expect(find.widgetWithText(ListTile, 'Concursos'), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
+
+    final todayItem = tester.widget<ListTile>(
+      find.widgetWithText(ListTile, 'Hoje'),
+    );
+    expect(todayItem.selected, isTrue);
   });
 
   testWidgets('preserva o estado de uma branch ao trocar de área', (tester) async {
@@ -56,10 +64,13 @@ void main() {
   testWidgets('componentes básicos atendem rótulo e alvo de toque', (tester) async {
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light,
-        home: Scaffold(
-          body: AppButton(label: 'Salvar alterações', onPressed: () {}),
+      ShadApp.custom(
+        theme: AppShadTheme.light,
+        appBuilder: (context) => MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: AppButton(label: 'Salvar alterações', onPressed: () {}),
+          ),
         ),
       ),
     );

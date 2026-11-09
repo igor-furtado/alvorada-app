@@ -137,64 +137,87 @@ class _ContestStrip extends StatelessWidget {
   const _ContestStrip();
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.all(context.tokens.spacing.lg),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: context.tokens.borders.lg,
-    ),
-    child: Row(
-      children: [
-        Container(
-          width: context.tokens.sizes.iconContainerMd,
-          height: context.tokens.sizes.iconContainerMd,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: context.tokens.borders.md,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final compact = constraints.maxWidth < context.tokens.layout.narrow;
+      final identity = Row(
+        children: [
+          Container(
+            width: context.tokens.sizes.iconContainerMd,
+            height: context.tokens.sizes.iconContainerMd,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: context.tokens.borders.md,
+            ),
+            child: Icon(
+              AppIcons.contests,
+              color: context.tokens.colors.actionForeground,
+            ),
           ),
-          child: Icon(
-            AppIcons.contests,
-            color: context.tokens.colors.actionForeground,
+          SizedBox(width: context.tokens.spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppMessages.mainContest,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                SizedBox(height: context.tokens.spacing.xxxs),
+                Text(
+                  'Analista · 82 dias para a prova',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
           ),
+        ],
+      );
+      final progress = Column(
+        crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        children: [
+          Text(
+            '34% do Edital',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+          SizedBox(height: context.tokens.spacing.sm),
+          LinearProgressIndicator(
+            value: .34,
+            minHeight: context.tokens.sizes.progressIndicatorThin,
+          ),
+        ],
+      );
+
+      return Container(
+        padding: EdgeInsets.all(context.tokens.spacing.lg),
+        decoration: BoxDecoration(
+          color: context.tokens.colors.surfaceElevated,
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+          borderRadius: context.tokens.borders.lg,
         ),
-        SizedBox(width: context.tokens.spacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppMessages.mainContest,
-                style: Theme.of(context).textTheme.labelMedium,
+        child: compact
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  identity,
+                  SizedBox(height: context.tokens.spacing.lg),
+                  progress,
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: identity),
+                  SizedBox(width: context.tokens.spacing.lg),
+                  SizedBox(
+                    width: context.tokens.sizes.compactField,
+                    child: progress,
+                  ),
+                ],
               ),
-              SizedBox(height: context.tokens.spacing.xxxs),
-              Text(
-                'Analista · 82 dias para a prova',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: context.tokens.spacing.lg),
-        SizedBox(
-          width: context.tokens.sizes.compactField,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '34% do Edital',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-              SizedBox(height: context.tokens.spacing.sm),
-              LinearProgressIndicator(
-                value: .34,
-                minHeight: context.tokens.sizes.progressIndicatorThin,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
+      );
+    },
   );
 }
 

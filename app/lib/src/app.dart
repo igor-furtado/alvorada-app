@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'core/brand/app_brand.dart';
 import 'core/presentation/app_shell.dart';
+import 'core/theme/app_shad_theme.dart';
 import 'core/theme/app_theme.dart';
 import 'features/contests/presentation/contest_details_page.dart';
 import 'features/contests/presentation/contest_view_data.dart';
@@ -85,13 +87,18 @@ class EstudosApp extends StatelessWidget {
   const EstudosApp({super.key});
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-    title: AppBrand.applicationTitle,
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.light,
-    darkTheme: AppTheme.dark,
+  Widget build(BuildContext context) => ShadApp.custom(
+    theme: AppShadTheme.light,
+    darkTheme: AppShadTheme.dark,
     themeMode: ThemeMode.system,
-    restorationScopeId: 'application',
-    routerConfig: _router,
+    appBuilder: (context) => MaterialApp.router(
+      title: AppBrand.applicationTitle,
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
+      restorationScopeId: 'application',
+      routerConfig: _router,
+    ),
   );
 }
