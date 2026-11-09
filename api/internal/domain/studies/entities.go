@@ -1,5 +1,11 @@
 package studies
 
+import "errors"
+
+const MandatoryReviewTopicName = "Revisão de Véspera"
+
+var ErrMandatoryTopic = errors.New("o Tópico Revisão de Véspera é obrigatório e não pode ser alterado ou excluído")
+
 type Difficulty int
 
 const (
@@ -16,21 +22,22 @@ func (d Difficulty) Valid() bool {
 
 type Subject struct {
 	ID         string     `json:"id"`
-	Name       string     `json:"name"`
-	Difficulty Difficulty `json:"difficulty"`
-	Color      string     `json:"color"`
-	Topics     []Topic    `json:"topics"`
+	Name       string     `json:"nome"`
+	Difficulty Difficulty `json:"dificuldade"`
+	Color      string     `json:"cor"`
+	Topics     []Topic    `json:"topicos"`
 }
 
 type Topic struct {
 	ID        string     `json:"id"`
-	Name      string     `json:"name"`
-	Subtopics []Subtopic `json:"subtopics"`
+	Name      string     `json:"nome"`
+	Mandatory bool       `json:"obrigatorio"`
+	Subtopics []Subtopic `json:"subtopicos"`
 }
 
 type Subtopic struct {
 	ID   string `json:"id"`
-	Name string `json:"name"`
+	Name string `json:"nome"`
 }
 
 type CreateSubjectInput struct {

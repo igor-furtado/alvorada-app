@@ -34,6 +34,14 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+	if err := mysqlrepo.EnsurePortugueseSchema(rootCtx, db); err != nil {
+		logger.Error("database schema migration failed", "error", err)
+		os.Exit(1)
+	}
+	if err := mysqlrepo.EnsureDisciplineInvariants(rootCtx, db); err != nil {
+		logger.Error("discipline data migration failed", "error", err)
+		os.Exit(1)
+	}
 
 	repository := mysqlrepo.NewStudyRepository(db)
 	service := application.NewService(repository)

@@ -68,19 +68,19 @@ func (h *Handler) catalog(w http.ResponseWriter, r *http.Request) {
 }
 
 type subjectRequest struct {
-	Name       string `json:"name"`
-	Difficulty int    `json:"difficulty"`
-	Color      string `json:"color"`
+	Name       string `json:"nome"`
+	Difficulty int    `json:"dificuldade"`
+	Color      string `json:"cor"`
 }
 
 type updateSubjectRequest struct {
-	Name       *string `json:"name"`
-	Difficulty *int    `json:"difficulty"`
-	Color      *string `json:"color"`
+	Name       *string `json:"nome"`
+	Difficulty *int    `json:"dificuldade"`
+	Color      *string `json:"cor"`
 }
 
 type nameRequest struct {
-	Name string `json:"name"`
+	Name string `json:"nome"`
 }
 
 func (h *Handler) createSubject(w http.ResponseWriter, r *http.Request) {
@@ -182,7 +182,7 @@ func (h *Handler) runUpdateName(w http.ResponseWriter, r *http.Request, operatio
 
 func (h *Handler) runDelete(w http.ResponseWriter, r *http.Request, operation func() error) {
 	if err := operation(); err != nil {
-		h.internalError(w, r, err)
+		h.serviceError(w, r, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -190,7 +190,8 @@ func (h *Handler) runDelete(w http.ResponseWriter, r *http.Request, operation fu
 
 func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error) {
 	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrNameTooLong) ||
-		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) {
+		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
+		errors.Is(err, domain.ErrMandatoryTopic) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -221,5 +222,5 @@ func writeJSON(w http.ResponseWriter, status int, body any) {
 }
 
 func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, map[string]string{"error": message})
+	writeJSON(w, status, map[string]string{"erro": message})
 }

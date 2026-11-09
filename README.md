@@ -22,7 +22,7 @@ O repositório reúne:
 - uma especificação **OpenAPI 3.1** servida pela própria API.
 
 > [!IMPORTANT]
-> As telas Flutter são protótipos navegáveis com dados demonstrativos. A API está funcional, mas ainda não alimenta a interface. Essa separação permite validar os fluxos centrais antes de implementar a integração e a persistência do restante do domínio.
+> As telas Flutter ainda são protótipos navegáveis com dados demonstrativos. A funcionalidade de Disciplinas já está integrada de ponta a ponta à API e ao banco; as demais funcionalidades ainda não possuem integração e persistência.
 
 ## Experiência atual
 
@@ -70,6 +70,12 @@ flutter pub get
 flutter run -d chrome
 ```
 
+Por padrão, a camada de dados de Disciplinas acessa `http://localhost:8080`. Para usar outro endereço:
+
+```bash
+flutter run -d chrome --dart-define=API_BASE_URL=https://api.exemplo.com
+```
+
 O Flutter informa o endereço da interface no terminal. Os demais serviços ficam disponíveis em:
 
 | Serviço | Endereço |
@@ -103,6 +109,8 @@ O Docker Compose lê as seguintes variáveis do arquivo `.env` na raiz:
 
 Ao executar a API sem Docker, também estão disponíveis `PORT` (padrão `8080`), `DB_HOST` (padrão `127.0.0.1`) e `DB_PORT` (padrão `3306`).
 
+O esquema MySQL usa o vocabulário do domínio em português: `disciplinas`, `topicos` e `subtopicos`, com colunas como `nome`, `dificuldade`, `cor`, `posicao`, `criado_em` e `atualizado_em`. Ao iniciar, a API migra de forma idempotente bancos locais que ainda usam os nomes legados em inglês.
+
 ## Arquitetura
 
 ```text
@@ -127,7 +135,7 @@ Ao executar a API sem Docker, também estão disponíveis `PORT` (padrão `8080`
 └── docker-compose.yml           ambiente local da API e do MySQL
 ```
 
-A interface organiza cada funcionalidade por área e mantém componentes compartilhados em `core`. Como os dados ainda são demonstrativos, as features contêm apenas a camada de apresentação. A API separa domínio, aplicação, infraestrutura e entrega HTTP.
+A interface organiza cada funcionalidade por área e mantém componentes compartilhados em `core`. A funcionalidade Flutter de Disciplinas separa `domain`, `data` e `presentation` conforme o [guia oficial de arquitetura do Flutter](https://docs.flutter.dev/app-architecture/guide), com Bloc para estado e comandos da interface. As classes usam o conceito de negócio em português e preservam qualificadores técnicos em inglês, como `DisciplinaApiModel`, `DisciplinasRepository` e `DisciplinasBloc`. A API separa domínio, aplicação, infraestrutura e entrega HTTP.
 
 Para entender os conceitos do produto — como Concurso, Edital, Turno, Fixado e Revisão programada — consulte [`CONTEXT.md`](CONTEXT.md). As decisões duradouras ficam em [`docs/adr/`](docs/adr/), as regras do produto em [`app/docs/agents/product/`](app/docs/agents/product/) e a identidade em [`app/docs/agents/brand/`](app/docs/agents/brand/).
 
@@ -138,6 +146,8 @@ A API aceita e retorna JSON. O catálogo completo é obtido com:
 ```bash
 curl http://localhost:8080/api/v1/subjects
 ```
+
+Os campos serializados seguem o vocabulário em português: `nome`, `dificuldade`, `cor`, `topicos`, `obrigatorio`, `subtopicos` e `erro`.
 
 Principais rotas:
 

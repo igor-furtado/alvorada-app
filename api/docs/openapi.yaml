@@ -10,7 +10,7 @@ servers:
     description: Mesmo endereço que serve a documentação
 security: []
 tags:
-  - name: Health
+  - name: Saúde
     description: Disponibilidade do serviço
   - name: Disciplinas
     description: Organização das disciplinas
@@ -21,22 +21,22 @@ tags:
 paths:
   /health:
     get:
-      tags: [Health]
+      tags: [Saúde]
       summary: Verifica a disponibilidade da API
-      operationId: getHealth
+      operationId: obterSaude
       responses:
         '200':
           description: API disponível
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Health'
+                $ref: '#/components/schemas/Saude'
   /api/v1/subjects:
     get:
       tags: [Disciplinas]
       summary: Lista o catálogo completo de estudos
       description: Retorna disciplinas com seus tópicos e subtópicos aninhados.
-      operationId: listSubjects
+      operationId: listarDisciplinas
       responses:
         '200':
           description: Catálogo atual
@@ -45,73 +45,74 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Subject'
+                  $ref: '#/components/schemas/Disciplina'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
     post:
       tags: [Disciplinas]
       summary: Cria uma disciplina
-      operationId: createSubject
+      description: Cria a Disciplina com o Tópico obrigatório Revisão de Véspera na última posição.
+      operationId: criarDisciplina
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSubject'
+              $ref: '#/components/schemas/CriarDisciplina'
       responses:
         '201':
           description: Disciplina criada
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatedResource'
+                $ref: '#/components/schemas/RecursoCriado'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects/{id}:
     parameters:
-      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/IdRecurso'
     patch:
       tags: [Disciplinas]
       summary: Atualiza uma disciplina
-      operationId: updateSubject
+      operationId: atualizarDisciplina
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateSubject'
+              $ref: '#/components/schemas/AtualizarDisciplina'
       responses:
         '204':
           description: Disciplina atualizada
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
     delete:
       tags: [Disciplinas]
       summary: Exclui uma disciplina
       description: Os tópicos e subtópicos relacionados também são excluídos.
-      operationId: deleteSubject
+      operationId: excluirDisciplina
       responses:
         '204':
           description: Disciplina excluída
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects/{id}/topics:
     parameters:
-      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/IdRecurso'
     post:
       tags: [Tópicos]
       summary: Adiciona um tópico a uma disciplina
-      operationId: createTopic
+      operationId: criarTopico
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NameInput'
+              $ref: '#/components/schemas/EntradaNome'
       responses:
         '201':
           description: Tópico criado
@@ -120,52 +121,54 @@ paths:
               schema:
                 type: object
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/topics/{id}:
     parameters:
-      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/IdRecurso'
     patch:
       tags: [Tópicos]
       summary: Renomeia um tópico
-      operationId: updateTopic
+      operationId: atualizarTopico
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NameInput'
+              $ref: '#/components/schemas/EntradaNome'
       responses:
         '204':
           description: Tópico atualizado
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
     delete:
       tags: [Tópicos]
       summary: Exclui um tópico
       description: Seus subtópicos também são excluídos.
-      operationId: deleteTopic
+      operationId: excluirTopico
       responses:
         '204':
           description: Tópico excluído
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/topics/{id}/subtopics:
     parameters:
-      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/IdRecurso'
     post:
       tags: [Subtópicos]
       summary: Adiciona um subtópico a um tópico
-      operationId: createSubtopic
+      operationId: criarSubtopico
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NameInput'
+              $ref: '#/components/schemas/EntradaNome'
       responses:
         '201':
           description: Subtópico criado
@@ -174,41 +177,41 @@ paths:
               schema:
                 type: object
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subtopics/{id}:
     parameters:
-      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/IdRecurso'
     patch:
       tags: [Subtópicos]
       summary: Renomeia um subtópico
-      operationId: updateSubtopic
+      operationId: atualizarSubtopico
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NameInput'
+              $ref: '#/components/schemas/EntradaNome'
       responses:
         '204':
           description: Subtópico atualizado
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ErroValidacao'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
     delete:
       tags: [Subtópicos]
       summary: Exclui um subtópico
-      operationId: deleteSubtopic
+      operationId: excluirSubtopico
       responses:
         '204':
           description: Subtópico excluído
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/ErroInterno'
 components:
   parameters:
-    ResourceId:
+    IdRecurso:
       name: id
       in: path
       required: true
@@ -217,120 +220,123 @@ components:
         type: string
         format: uuid
   responses:
-    ValidationError:
+    ErroValidacao:
       description: Dados inválidos
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-    InternalError:
+            $ref: '#/components/schemas/Erro'
+    ErroInterno:
       description: Erro interno
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/Erro'
   schemas:
-    Health:
+    Saude:
       type: object
       required: [status]
       properties:
         status:
           type: string
           const: ok
-    CreatedResource:
+    RecursoCriado:
       type: object
       required: [id]
       properties:
         id:
           type: string
           format: uuid
-    CreateSubject:
+    CriarDisciplina:
       type: object
-      required: [name]
+      required: [nome]
       properties:
-        name:
+        nome:
           type: string
           minLength: 1
           maxLength: 120
           examples: [Direito Constitucional]
-        difficulty:
-          $ref: '#/components/schemas/Difficulty'
-        color:
-          $ref: '#/components/schemas/Color'
-    UpdateSubject:
+        dificuldade:
+          $ref: '#/components/schemas/Dificuldade'
+        cor:
+          $ref: '#/components/schemas/Cor'
+    AtualizarDisciplina:
       type: object
       minProperties: 1
       properties:
-        name:
+        nome:
           type: string
           minLength: 1
           maxLength: 120
-        difficulty:
-          $ref: '#/components/schemas/Difficulty'
-        color:
-          $ref: '#/components/schemas/Color'
-    NameInput:
+        dificuldade:
+          $ref: '#/components/schemas/Dificuldade'
+        cor:
+          $ref: '#/components/schemas/Cor'
+    EntradaNome:
       type: object
-      required: [name]
+      required: [nome]
       properties:
-        name:
+        nome:
           type: string
           minLength: 1
           maxLength: 120
           examples: [Controle de constitucionalidade]
-    Difficulty:
+    Dificuldade:
       type: integer
       minimum: 1
       maximum: 5
       default: 3
       description: 1 representa muito fácil e 5 representa muito difícil.
-    Color:
+    Cor:
       type: string
       pattern: '^#[0-9A-Fa-f]{6}$'
       default: '#E8742A'
       examples: ['#3178C6']
-    Subject:
+    Disciplina:
       type: object
-      required: [id, name, difficulty, color, topics]
+      required: [id, nome, dificuldade, cor, topicos]
       properties:
         id:
           type: string
           format: uuid
-        name:
+        nome:
           type: string
-        difficulty:
-          $ref: '#/components/schemas/Difficulty'
-        color:
-          $ref: '#/components/schemas/Color'
-        topics:
+        dificuldade:
+          $ref: '#/components/schemas/Dificuldade'
+        cor:
+          $ref: '#/components/schemas/Cor'
+        topicos:
           type: array
           items:
-            $ref: '#/components/schemas/Topic'
-    Topic:
+            $ref: '#/components/schemas/Topico'
+    Topico:
       type: object
-      required: [id, name, subtopics]
+      required: [id, nome, obrigatorio, subtopicos]
       properties:
         id:
           type: string
           format: uuid
-        name:
+        nome:
           type: string
-        subtopics:
+        obrigatorio:
+          type: boolean
+          description: Indica o Tópico estrutural Revisão de Véspera, que não pode ser alterado nem excluído.
+        subtopicos:
           type: array
           items:
-            $ref: '#/components/schemas/Subtopic'
-    Subtopic:
+            $ref: '#/components/schemas/Subtopico'
+    Subtopico:
       type: object
-      required: [id, name]
+      required: [id, nome]
       properties:
         id:
           type: string
           format: uuid
-        name:
+        nome:
           type: string
-    Error:
+    Erro:
       type: object
-      required: [error]
+      required: [erro]
       properties:
-        error:
+        erro:
           type: string

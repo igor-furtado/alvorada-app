@@ -83,10 +83,10 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
             SizedBox(height: context.tokens.spacing.xl),
             Align(
               alignment: Alignment.centerRight,
-              child: FilledButton.icon(
+              child: AppButton(
+                label: AppMessages.newDiscipline,
+                icon: AppIcons.add,
                 onPressed: _addDiscipline,
-                icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-                label: const Text(AppMessages.newDiscipline),
               ),
             ),
             SizedBox(height: context.tokens.spacing.lg),
@@ -149,22 +149,17 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
   void _remove(ContestDisciplineProgress discipline) {
     final index = _disciplines.indexOf(discipline);
     setState(() => _disciplines.remove(discipline));
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(AppMessages.disciplineRemoved(discipline.name)),
-          action: SnackBarAction(
-            label: AppMessages.undo,
-            onPressed: () => setState(
-              () => _disciplines.insert(
-                index.clamp(0, _disciplines.length),
-                discipline,
-              ),
-            ),
-          ),
+    AppSnackbar.show(
+      context,
+      message: AppMessages.disciplineRemoved(discipline.name),
+      actionLabel: AppMessages.undo,
+      onAction: () => setState(
+        () => _disciplines.insert(
+          index.clamp(0, _disciplines.length),
+          discipline,
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -471,7 +466,7 @@ class _DisciplineRow extends StatelessWidget {
               flex: 15,
               child: SizedBox(
                 width: context.tokens.sizes.largeVisual,
-                child: TextFormField(
+                child: AppTextInput(
                   key: ValueKey(
                     'weight-${discipline.name}-${discipline.weight}',
                   ),
@@ -479,14 +474,8 @@ class _DisciplineRow extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: context.tokens.spacing.md,
-                      vertical: context.tokens.spacing.md,
-                    ),
-                  ),
-                  onFieldSubmitted: (value) {
+                  semanticLabel: AppMessages.disciplineWeight,
+                  onSubmitted: (value) {
                     final weight = int.tryParse(value);
                     if (weight != null) onChangeWeight(discipline, weight);
                   },
@@ -521,10 +510,10 @@ class _DisciplineRow extends StatelessWidget {
             ),
             SizedBox(
               width: context.tokens.layout.tableActionsColumn,
-              child: IconButton(
-                tooltip: AppMessages.removeDiscipline,
+              child: AppAccessibleIconButton(
+                label: AppMessages.removeDiscipline,
                 onPressed: () => onRemove(discipline),
-                icon: Icon(AppIcons.delete, size: context.tokens.icons.md),
+                icon: AppIcons.delete,
               ),
             ),
           ],
@@ -658,24 +647,18 @@ class _AddDisciplineDialogState extends State<_AddDisciplineDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text(AppMessages.newDiscipline),
-    content: TextField(
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.newDiscipline,
+    content: AppFormField(
+      label: AppMessages.disciplineName,
       controller: controller,
       autofocus: true,
-      decoration: const InputDecoration(labelText: AppMessages.disciplineName),
       onSubmitted: (value) => Navigator.pop(context, value),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(AppMessages.cancel),
-      ),
-      FilledButton(
-        onPressed: () => Navigator.pop(context, controller.text),
-        child: const Text(AppMessages.add),
-      ),
-    ],
+    secondaryLabel: AppMessages.cancel,
+    onSecondary: () => Navigator.pop(context),
+    primaryLabel: AppMessages.add,
+    onPrimary: () => Navigator.pop(context, controller.text),
   );
 }
 

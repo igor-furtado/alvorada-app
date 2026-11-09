@@ -124,6 +124,19 @@ abstract final class AppMessages {
   static const noContentFound = 'Nenhum conteúdo encontrado. Ajuste a busca ou adicione uma Disciplina.';
   static const mandatoryTopic = 'Tópico obrigatório';
   static const sharedContent = 'Conteúdo compartilhado';
+  static const loadingDisciplines = 'Carregando Disciplinas';
+  static const disciplinesUpdated = 'Disciplinas atualizadas.';
+  static const disciplineCreated = 'Disciplina adicionada.';
+  static const disciplineUpdated = 'Disciplina atualizada.';
+  static const disciplineDeleted = 'Disciplina excluída.';
+  static const topicCreated = 'Tópico adicionado.';
+  static const topicUpdated = 'Tópico atualizado.';
+  static const topicDeleted = 'Tópico excluído.';
+  static const subtopicCreated = 'Subtópico adicionado.';
+  static const subtopicUpdated = 'Subtópico atualizado.';
+  static const subtopicDeleted = 'Subtópico excluído.';
+  static const contentUpdateFailed = 'Não foi possível atualizar. Os dados exibidos foram preservados.';
+  static const contentOperationFailed = 'Não foi possível salvar a alteração. Tente novamente.';
 
   static const thisWeek = 'Esta semana';
   static const todayPlanTitle = 'Plano de hoje';

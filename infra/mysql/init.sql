@@ -4,38 +4,54 @@ CREATE DATABASE IF NOT EXISTS estudos
 
 USE estudos;
 
-CREATE TABLE IF NOT EXISTS subjects (
+CREATE TABLE IF NOT EXISTS disciplinas (
   id CHAR(36) PRIMARY KEY,
-  name VARCHAR(120) NOT NULL,
-  difficulty TINYINT UNSIGNED NOT NULL DEFAULT 3,
-  color CHAR(7) NOT NULL DEFAULT '#E8742A',
-  position INT UNSIGNED NOT NULL DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT chk_subject_difficulty CHECK (difficulty BETWEEN 1 AND 5),
-  INDEX idx_subject_position (position, created_at)
+  nome VARCHAR(120) NOT NULL,
+  dificuldade TINYINT UNSIGNED NOT NULL DEFAULT 3,
+  cor CHAR(7) NOT NULL DEFAULT '#E8742A',
+  posicao INT UNSIGNED NOT NULL DEFAULT 0,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT chk_disciplina_dificuldade CHECK (dificuldade BETWEEN 1 AND 5),
+  INDEX idx_disciplina_posicao (posicao, criado_em)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS topics (
+CREATE TABLE IF NOT EXISTS topicos (
   id CHAR(36) PRIMARY KEY,
-  subject_id CHAR(36) NOT NULL,
-  name VARCHAR(120) NOT NULL,
-  position INT UNSIGNED NOT NULL DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_topic_subject FOREIGN KEY (subject_id)
-    REFERENCES subjects(id) ON DELETE CASCADE,
-  INDEX idx_topic_subject_position (subject_id, position, created_at)
+  disciplina_id CHAR(36) NOT NULL,
+  nome VARCHAR(120) NOT NULL,
+  posicao INT UNSIGNED NOT NULL DEFAULT 0,
+  obrigatorio TINYINT GENERATED ALWAYS AS (
+    IF(BINARY nome = BINARY 'Revisão de Véspera', 1, NULL)
+  ) STORED,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_topico_disciplina FOREIGN KEY (disciplina_id)
+    REFERENCES disciplinas(id) ON DELETE CASCADE,
+  INDEX idx_topico_disciplina_posicao (disciplina_id, posicao, criado_em),
+  UNIQUE INDEX idx_topicos_revisao_vespera_unica (disciplina_id, obrigatorio)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS subtopics (
+CREATE TABLE IF NOT EXISTS subtopicos (
   id CHAR(36) PRIMARY KEY,
-  topic_id CHAR(36) NOT NULL,
-  name VARCHAR(120) NOT NULL,
-  position INT UNSIGNED NOT NULL DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_subtopic_topic FOREIGN KEY (topic_id)
-    REFERENCES topics(id) ON DELETE CASCADE,
-  INDEX idx_subtopic_topic_position (topic_id, position, created_at)
+  topico_id CHAR(36) NOT NULL,
+  nome VARCHAR(120) NOT NULL,
+  posicao INT UNSIGNED NOT NULL DEFAULT 0,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_subtopico_topico FOREIGN KEY (topico_id)
+    REFERENCES topicos(id) ON DELETE CASCADE,
+  INDEX idx_subtopico_topico_posicao (topico_id, posicao, criado_em)
 ) ENGINE=InnoDB;
+
+-- Mantém bancos locais criados antes da invariável de produto coerentes ao
+-- reaplicar este esquema manualmente.
+INSERT INTO topicos (id, disciplina_id, nome)
+SELECT UUID(), disciplinas.id, 'Revisão de Véspera'
+FROM disciplinas
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM topicos
+  WHERE topicos.disciplina_id = disciplinas.id
+    AND BINARY topicos.nome = BINARY 'Revisão de Véspera'
+);

@@ -34,6 +34,14 @@ func TestCreateTopicRejectsBlankName(t *testing.T) {
 	}
 }
 
+func TestCreateTopicRejectsReservedMandatoryTopicName(t *testing.T) {
+	service := NewService(&fakeRepository{})
+	err := service.CreateTopic(context.Background(), "subject-id", domain.MandatoryReviewTopicName)
+	if !errors.Is(err, domain.ErrMandatoryTopic) {
+		t.Fatalf("CreateTopic() error = %v, want %v", err, domain.ErrMandatoryTopic)
+	}
+}
+
 func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 	service := NewService(&fakeRepository{})
 	_, err := service.CreateSubject(context.Background(), domain.CreateSubjectInput{

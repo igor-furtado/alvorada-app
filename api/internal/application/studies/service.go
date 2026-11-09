@@ -70,6 +70,9 @@ func (s *Service) CreateTopic(ctx context.Context, subjectID, name string) error
 	if err != nil {
 		return err
 	}
+	if value == domain.MandatoryReviewTopicName {
+		return domain.ErrMandatoryTopic
+	}
 	return s.repository.CreateTopic(ctx, subjectID, value)
 }
 
@@ -77,6 +80,9 @@ func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {
 	value, err := validateName(name)
 	if err != nil {
 		return err
+	}
+	if value == domain.MandatoryReviewTopicName {
+		return domain.ErrMandatoryTopic
 	}
 	return s.repository.UpdateTopic(ctx, id, value)
 }

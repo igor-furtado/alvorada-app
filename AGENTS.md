@@ -23,3 +23,11 @@ Ao alterar comportamento, método, priorização, descanso, métricas, navegaç�
 ### Flutter UI
 
 Ao alterar widget, fluxo, texto, navegação, responsividade ou acessibilidade Flutter, siga a convenção shadcn/ui em `app/docs/agents/design-system/index.md`.
+
+### Flutter domain e data
+
+Ao criar ou alterar models, inputs, use cases, repositories, services, serialização ou integração HTTP Flutter, siga `app/docs/agents/architecture/index.md`.
+
+### Banco de dados
+
+Ao criar ou alterar tabelas, colunas, índices, chaves, migrações ou SQL de persistência, siga `infra/docs/agents/database.md`.

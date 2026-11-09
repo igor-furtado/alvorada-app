@@ -13,6 +13,7 @@ class AppFormField extends StatelessWidget {
     this.helperText,
     this.errorText,
     this.enabled = true,
+    this.autofocus = false,
     this.required = false,
     this.obscureText = false,
     this.keyboardType,
@@ -35,6 +36,7 @@ class AppFormField extends StatelessWidget {
   final String? helperText;
   final String? errorText;
   final bool enabled;
+  final bool autofocus;
   final bool required;
   final bool obscureText;
   final TextInputType? keyboardType;
@@ -62,6 +64,7 @@ class AppFormField extends StatelessWidget {
           placeholder: placeholder,
           errorText: errorText,
           enabled: enabled,
+          autofocus: autofocus,
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,

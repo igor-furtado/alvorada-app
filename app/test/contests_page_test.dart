@@ -65,12 +65,15 @@ void main() {
     await tester.tap(find.text('Tribunal Regional Federal da 5ª Região').first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Nova Disciplina'), findsOneWidget);
+    expect(
+      find.widgetWithText(AppButton, 'Nova Disciplina'),
+      findsOneWidget,
+    );
     expect(find.text('Língua Portuguesa'), findsOneWidget);
     expect(find.text('PESO NO EDITAL'), findsOneWidget);
     expect(find.textContaining('Buscar disciplina'), findsNothing);
     expect(find.textContaining('Ordenar:'), findsNothing);
-    expect(find.byType(TextFormField), findsNWidgets(8));
+    expect(find.byType(AppTextInput), findsNWidgets(8));
     expect(find.byTooltip('Remover Disciplina'), findsNWidgets(8));
     expect(find.widgetWithText(TextButton, 'Concursos'), findsOneWidget);
 
@@ -119,7 +122,10 @@ void main() {
     await tester.tap(find.widgetWithText(TextButton, 'TRF da 5ª Região'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Nova Disciplina'), findsOneWidget);
+    expect(
+      find.widgetWithText(AppButton, 'Nova Disciplina'),
+      findsOneWidget,
+    );
     expect(find.text('EDITAL VERTICALIZADO'), findsNothing);
   });
 
