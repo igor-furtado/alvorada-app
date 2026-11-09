@@ -1,4 +1,5 @@
 import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -42,7 +43,7 @@ void main() {
   ) async {
     await openContests(tester);
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Novo Concurso'));
+    await tester.tap(find.widgetWithText(AppButton, 'Novo Concurso'));
     await tester.pumpAndSettle();
     expect(find.text('Órgão ou instituição *'), findsOneWidget);
     expect(find.text('Cargo *'), findsOneWidget);
@@ -50,7 +51,7 @@ void main() {
 
     await tester.tap(find.text('Cancelar'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(TextButton, 'Abrir Edital').first);
+    await tester.tap(find.widgetWithText(AppButton, 'Abrir Edital').first);
     await tester.pumpAndSettle();
     expect(find.text('Edital'), findsOneWidget);
     expect(find.text('Língua Portuguesa'), findsOneWidget);

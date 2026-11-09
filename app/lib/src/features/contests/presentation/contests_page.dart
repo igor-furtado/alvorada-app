@@ -141,7 +141,7 @@ class _TimelineContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _Header(
-            subtitle: 'Seus concursos-alvo em ordem de prova.',
+            subtitle: AppMessages.contestsSubtitle,
             onAdd: callbacks.add,
           ),
           SizedBox(height: context.tokens.spacing.xxxl),
@@ -153,23 +153,24 @@ class _TimelineContent extends StatelessWidget {
                 SizedBox(
                   width: railWidth,
                   child: Text(
-                    'HOJE',
+                    AppMessages.today.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ),
-                _Dot(),
+                const _Dot(),
                 SizedBox(width: gap),
                 Expanded(
                   child: Text(
-                    'A próxima prova é em ${contests.first.days} dias',
+                    AppMessages.nextExamIn(contests.first.days),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ],
             ),
-            for (var i = 0; i < contests.length; i++)
+            for (var index = 0; index < contests.length; index++)
               _TimelineItem(
-                contest: contests[i],
-                last: i == contests.length - 1,
+                contest: contests[index],
+                last: index == contests.length - 1,
                 callbacks: callbacks,
                 railWidth: railWidth,
                 gap: gap,
@@ -217,7 +218,10 @@ class _TimelineItem extends StatelessWidget {
                   '${contest.days}',
                   style: compact ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.headlineMedium,
                 ),
-                Text(AppMessages.days, style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  AppMessages.days,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
           ),
@@ -226,80 +230,71 @@ class _TimelineItem extends StatelessWidget {
           width: context.tokens.spacing.lg,
           child: Column(
             children: [
-              Expanded(child: _Line()),
-              _Dot(),
-              Expanded(child: last ? const SizedBox() : _Line()),
+              const Expanded(child: _Line()),
+              const _Dot(),
+              Expanded(child: last ? const SizedBox() : const _Line()),
             ],
           ),
         ),
         SizedBox(width: gap),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.xl),
-            child: Material(
-              color: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-                borderRadius: context.tokens.borders.lg,
+            padding: EdgeInsets.symmetric(
+              vertical: context.tokens.spacing.xl,
+            ),
+            child: AppCard(
+              onTap: () => callbacks.details(contest),
+              padding: EdgeInsets.all(
+                compact ? context.tokens.spacing.lg : context.tokens.spacing.xl,
               ),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () => callbacks.details(contest),
-                child: Padding(
-                  padding: EdgeInsets.all(compact ? context.tokens.spacing.lg : context.tokens.spacing.xl),
-                  child: Column(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (contest.isPrimary) ...[
-                                  const _Badge(
-                                    AppMessages.mainContest,
-                                    quiet: true,
-                                  ),
-                                  SizedBox(height: context.tokens.spacing.md),
-                                ],
-                                Text(
-                                  compact ? contest.shortName : contest.institution,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineSmall,
-                                ),
-                                SizedBox(height: context.tokens.spacing.xxs),
-                                Text(contest.role),
-                              ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (contest.isPrimary) ...[
+                              const AppBadge(
+                                label: AppMessages.mainContest,
+                              ),
+                              SizedBox(height: context.tokens.spacing.md),
+                            ],
+                            Text(
+                              compact ? contest.shortName : contest.institution,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                          ),
-                          _Menu(contest: contest, callbacks: callbacks),
-                        ],
+                            SizedBox(height: context.tokens.spacing.xxs),
+                            Text(contest.role),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: context.tokens.spacing.xl),
-                      Wrap(
-                        spacing: context.tokens.spacing.xxxl,
-                        runSpacing: context.tokens.spacing.md,
-                        children: [
-                          _LabelValue('Prova', contest.examDate),
-                          _LabelValue('Banca', contest.board),
-                        ],
-                      ),
-                      SizedBox(height: context.tokens.spacing.xl),
-                      _Progress(contest: contest),
-                      SizedBox(height: context.tokens.spacing.md),
-                      TextButton.icon(
-                        onPressed: () => callbacks.edital(contest),
-                        icon: Icon(AppIcons.bookText, size: context.tokens.icons.md),
-                        label: const Text(AppMessages.openNotice),
-                      ),
+                      _Menu(contest: contest, callbacks: callbacks),
                     ],
                   ),
-                ),
+                  SizedBox(height: context.tokens.spacing.xl),
+                  Wrap(
+                    spacing: context.tokens.spacing.xxxl,
+                    runSpacing: context.tokens.spacing.md,
+                    children: [
+                      _LabelValue(AppMessages.exam, contest.examDate),
+                      _LabelValue(AppMessages.board, contest.board),
+                    ],
+                  ),
+                  SizedBox(height: context.tokens.spacing.xl),
+                  _Progress(contest: contest),
+                  SizedBox(height: context.tokens.spacing.md),
+                  AppButton(
+                    label: AppMessages.openNotice,
+                    icon: AppIcons.bookText,
+                    variant: AppButtonVariant.text,
+                    size: AppButtonSize.sm,
+                    onPressed: () => callbacks.edital(contest),
+                  ),
+                ],
               ),
             ),
           ),
@@ -310,6 +305,8 @@ class _TimelineItem extends StatelessWidget {
 }
 
 class _Line extends StatelessWidget {
+  const _Line();
+
   @override
   Widget build(BuildContext context) => Center(
     child: Container(
@@ -320,6 +317,8 @@ class _Line extends StatelessWidget {
 }
 
 class _Dot extends StatelessWidget {
+  const _Dot();
+
   @override
   Widget build(BuildContext context) => Container(
     width: context.tokens.sizes.dotLg,
@@ -327,6 +326,10 @@ class _Dot extends StatelessWidget {
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.primary,
       shape: BoxShape.circle,
+      border: Border.all(
+        color: Theme.of(context).colorScheme.surface,
+        width: context.tokens.borders.widthStrong,
+      ),
     ),
   );
 }
@@ -352,10 +355,10 @@ class _Header extends StatelessWidget {
           ),
         ],
       );
-      final button = FilledButton.icon(
+      final action = AppButton(
+        label: AppMessages.newContest,
+        icon: AppIcons.add,
         onPressed: onAdd,
-        icon: Icon(AppIcons.add, size: context.tokens.icons.md),
-        label: const Text(AppMessages.newContest),
       );
       if (constraints.maxWidth < context.tokens.layout.toolbar) {
         return Column(
@@ -363,7 +366,7 @@ class _Header extends StatelessWidget {
           children: [
             heading,
             SizedBox(height: context.tokens.spacing.xl),
-            button,
+            action,
           ],
         );
       }
@@ -372,7 +375,7 @@ class _Header extends StatelessWidget {
         children: [
           Expanded(child: heading),
           SizedBox(width: context.tokens.spacing.xxl),
-          button,
+          action,
         ],
       );
     },
@@ -391,7 +394,7 @@ class _Progress extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              'Avanço no Edital',
+              AppMessages.noticeProgress,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelMedium,
@@ -429,24 +432,6 @@ class _LabelValue extends StatelessWidget {
   );
 }
 
-class _Badge extends StatelessWidget {
-  const _Badge(this.label, {this.quiet = false});
-  final String label;
-  final bool quiet;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.xxs),
-    decoration: BoxDecoration(
-      color: quiet
-          ? Theme.of(context).colorScheme.surfaceContainerHighest
-          : Theme.of(context).colorScheme.primaryContainer,
-      borderRadius: context.tokens.borders.sm,
-    ),
-    child: Text(label, style: Theme.of(context).textTheme.labelSmall),
-  );
-}
-
 enum _MenuAction { details, archive, delete }
 
 class _Menu extends StatelessWidget {
@@ -455,17 +440,30 @@ class _Menu extends StatelessWidget {
   final _Callbacks callbacks;
 
   @override
-  Widget build(BuildContext context) => PopupMenuButton<_MenuAction>(
-    tooltip: AppMessages.moreActions,
+  Widget build(BuildContext context) => AppMenuButton<_MenuAction>(
+    icon: AppIcons.expandMore,
+    label: AppMessages.moreActions,
     onSelected: (action) => switch (action) {
       _MenuAction.details => callbacks.details(contest),
       _MenuAction.archive => callbacks.archive(contest),
       _MenuAction.delete => callbacks.delete(contest),
     },
-    itemBuilder: (_) => const [
-      PopupMenuItem(value: _MenuAction.details, child: Text(AppMessages.seeDetails)),
-      PopupMenuItem(value: _MenuAction.archive, child: Text(AppMessages.archive)),
-      PopupMenuItem(value: _MenuAction.delete, child: Text(AppMessages.delete)),
+    items: const [
+      AppMenuItem(
+        value: _MenuAction.details,
+        label: AppMessages.seeDetails,
+        icon: AppIcons.arrowRight,
+      ),
+      AppMenuItem(
+        value: _MenuAction.archive,
+        label: AppMessages.archive,
+      ),
+      AppMenuItem(
+        value: _MenuAction.delete,
+        label: AppMessages.delete,
+        icon: AppIcons.delete,
+        destructive: true,
+      ),
     ],
   );
 }
@@ -493,7 +491,11 @@ class _Empty extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.sm),
           const Text(AppMessages.emptyContests),
           SizedBox(height: context.tokens.spacing.xl),
-          FilledButton(onPressed: onAdd, child: const Text(AppMessages.newContest)),
+          AppButton(
+            label: AppMessages.newContest,
+            icon: AppIcons.add,
+            onPressed: onAdd,
+          ),
         ],
       ),
     ),
@@ -505,8 +507,8 @@ class _EditalDialog extends StatelessWidget {
   final ContestViewData contest;
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text(AppMessages.notice),
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.notice,
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.layout.dialogMaxWidth),
       child: Column(
@@ -533,12 +535,8 @@ class _EditalDialog extends StatelessWidget {
         ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(AppMessages.close),
-      ),
-    ],
+    primaryLabel: AppMessages.close,
+    onPrimary: () => Navigator.pop(context),
   );
 }
 

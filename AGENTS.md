@@ -22,4 +22,4 @@ Ao alterar comportamento, método, priorização, descanso, métricas, navegaç�
 
 ### Flutter UI
 
-Ao alterar widget, fluxo, texto, navegação, responsividade ou acessibilidade Flutter, siga `app/docs/agents/design-system/index.md`.
+Ao alterar widget, fluxo, texto, navegação, responsividade ou acessibilidade Flutter, siga a convenção shadcn/ui em `app/docs/agents/design-system/index.md`.

@@ -73,6 +73,24 @@ void main() {
     expect(find.text('Disciplina'), findsOneWidget);
     expect(find.text('Nome da disciplina'), findsOneWidget);
     expect(find.text('Use o nome do edital.'), findsOneWidget);
+    expect(find.byType(ShadInput), findsOneWidget);
+  });
+
+  testWidgets('seletores usam a gramática shadcn', (tester) async {
+    await tester.pumpWidget(
+      subject(
+        const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppCheckbox(value: false, semanticLabel: 'Selecionar tópico'),
+            AppSwitch(value: true, semanticLabel: 'Ativar lembrete'),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byType(ShadCheckbox), findsOneWidget);
+    expect(find.byType(ShadSwitch), findsOneWidget);
   });
 
   testWidgets('AppInfiniteListView apresenta itens e encerra a paginação', (tester) async {

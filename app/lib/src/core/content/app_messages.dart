@@ -78,6 +78,9 @@ abstract final class AppMessages {
   static const newContest = 'Novo Concurso';
   static const contest = 'Concurso';
   static const mainContest = 'Concurso principal';
+  static const contestsSubtitle = 'Seus concursos-alvo em ordem de prova.';
+  static const noticeProgress = 'Avanço no Edital';
+  static const exam = 'Prova';
   static const noActiveContests = 'Nenhum Concurso ativo';
   static const institution = 'Órgão ou instituição';
   static const role = 'Cargo';
@@ -131,6 +134,8 @@ abstract final class AppMessages {
   static String disciplineRemoved(String name) => '$name foi removida deste Edital.';
 
   static String contestArchived(String name) => '$name foi arquivado.';
+
+  static String nextExamIn(int days) => 'A próxima prova é em $days dias';
 
   static String deleteContestImpact(String name) =>
       '$name e seu Edital serão removidos. Esta ação não pode ser desfeita.';

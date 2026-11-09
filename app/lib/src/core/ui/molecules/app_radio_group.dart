@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 import '../atoms/app_radio.dart';
@@ -26,28 +27,20 @@ class AppRadioGroup<T> extends StatelessWidget {
   final Axis direction;
 
   @override
-  Widget build(BuildContext context) => RadioGroup<T>(
-    groupValue: value,
-    onChanged: onChanged ?? (_) {},
-    child: Flex(
-      direction: direction,
-      children: [
-        for (final option in options)
-          InkWell(
-            borderRadius: context.tokens.borders.md,
-            onTap: onChanged == null ? null : () => onChanged!(option.value),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: context.tokens.layout.controlHeight),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppRadio<T>(value: option.value, semanticLabel: option.label, enabled: onChanged != null),
-                  Flexible(child: Text(option.label)),
-                ],
-              ),
-            ),
-          ),
-      ],
-    ),
+  Widget build(BuildContext context) => ShadRadioGroup<T>(
+    initialValue: value,
+    onChanged: onChanged,
+    enabled: onChanged != null,
+    axis: direction,
+    spacing: context.tokens.spacing.xs,
+    items: [
+      for (final option in options)
+        AppRadio<T>(
+          value: option.value,
+          semanticLabel: option.label,
+          enabled: onChanged != null,
+          label: Text(option.label),
+        ),
+    ],
   );
 }

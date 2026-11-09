@@ -39,6 +39,8 @@ O sistema aprovado usa continuidade editorial na tipografia e o eixo vertical co
 
 A identidade combina a precisão de uma ferramenta de produtividade com a calma de um ambiente de leitura. Deve parecer firme sem rigidez e sofisticada sem elitismo.
 
+A interface aplica essa identidade sobre a gramática de componentes shadcn/ui. shadcn define estrutura, estados, densidade, bordas e elevação; a marca define cor, tipografia, ícones e voz. A convenção de implementação vive em `app/docs/agents/design-system/shadcn.md`.
+
 ### Cor
 
 | Papel | Claro | Escuro |

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -21,23 +22,15 @@ class AppAccessibleIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Tooltip(
     message: label,
-    child: IconButton(
-      tooltip: label,
+    child: ShadButton.ghost(
       onPressed: onPressed,
-      isSelected: selected,
+      enabled: onPressed != null,
       autofocus: autofocus,
-      constraints: BoxConstraints.tightFor(
-        width: context.tokens.layout.controlHeight,
-        height: context.tokens.layout.controlHeight,
-      ),
-      style: ButtonStyle(
-        side: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.focused)
-              ? BorderSide(color: context.tokens.colors.focusRing, width: context.tokens.borders.widthStrong)
-              : BorderSide.none,
-        ),
-      ),
-      icon: Icon(icon, size: context.tokens.icons.md),
+      width: context.tokens.layout.controlHeight,
+      height: context.tokens.layout.controlHeight,
+      padding: EdgeInsets.zero,
+      backgroundColor: selected ? context.tokens.colors.surfaceSubtle : null,
+      child: Icon(icon, size: context.tokens.icons.md),
     ),
   );
 }

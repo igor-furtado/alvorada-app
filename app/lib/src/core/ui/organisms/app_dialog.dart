@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 import '../atoms/app_button.dart';
@@ -67,13 +68,14 @@ class AppDialog extends StatelessWidget {
         ),
       );
     }
-    return AlertDialog(
+    return ShadDialog(
       title: Text(title),
-      content: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth ?? context.tokens.layout.dialogMaxWidth),
-        child: content,
+      constraints: BoxConstraints(
+        maxWidth: maxWidth ?? context.tokens.layout.dialogMaxWidth,
       ),
+      scrollable: true,
       actions: actions,
+      child: content,
     );
   }
 }

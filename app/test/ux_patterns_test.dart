@@ -42,10 +42,10 @@ void main() {
     await setWindow(tester, const Size(1440, 1000));
     await tester.tap(find.widgetWithText(ListTile, 'Concursos'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Novo Concurso'));
+    await tester.tap(find.widgetWithText(AppButton, 'Novo Concurso'));
     await tester.pumpAndSettle();
 
-    final fields = find.byType(TextFormField);
+    final fields = find.byType(ShadInput);
     await tester.enterText(fields.at(0), 'Instituto Aurora');
     await tester.enterText(fields.at(1), 'Analista');
     await tester.enterText(fields.at(2), 'Banca Exemplo');
