@@ -1,7 +1,7 @@
 import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   testWidgets('abre Revisões pela navegação principal', (tester) async {
@@ -12,7 +12,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Revisões').first);
+    await tester.tap(find.byKey(const ValueKey('shell-destination-4')));
     await tester.pumpAndSettle();
 
     expect(find.text('Revisões para hoje'), findsWidgets);
@@ -36,7 +36,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Revisões').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ShadButton, 'Como funciona'));
+    await tester.tap(find.widgetWithText(AppButton, 'Como funciona'));
     await tester.pumpAndSettle();
 
     expect(find.text('Como funcionam as Revisões'), findsOneWidget);

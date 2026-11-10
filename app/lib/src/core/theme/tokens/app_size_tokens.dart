@@ -9,6 +9,7 @@ class AppSizeTokens {
     this.hairline = 1,
     this.progressLine = 2,
     this.accentBar = 6,
+    this.dialogBackdropBlur = 4,
     this.progressIndicatorThin = 6,
     this.progressIndicatorRegular = 8,
     this.dotSm = 8,
@@ -16,6 +17,9 @@ class AppSizeTokens {
     this.dotLg = 14,
     this.dayMarker = 26,
     this.stepIndicator = 30,
+    this.avatarSm = 24,
+    this.avatarMd = 32,
+    this.avatarLg = 40,
     this.topicCheckbox = 34,
     this.rowIcon = 38,
     this.iconContainerSm = 40,
@@ -39,13 +43,14 @@ class AppSizeTokens {
     this.dialogWide = 560,
     this.detailsTable = 950,
     this.disciplineTable = 1080,
-    this.disciplinePage = 1180,
+    this.disciplinePage = 1216,
     this.contestPage = 1220,
   });
 
   final double hairline;
   final double progressLine;
   final double accentBar;
+  final double dialogBackdropBlur;
   final double progressIndicatorThin;
   final double progressIndicatorRegular;
   final double dotSm;
@@ -53,6 +58,9 @@ class AppSizeTokens {
   final double dotLg;
   final double dayMarker;
   final double stepIndicator;
+  final double avatarSm;
+  final double avatarMd;
+  final double avatarLg;
   final double topicCheckbox;
   final double rowIcon;
   final double iconContainerSm;
@@ -83,6 +91,11 @@ class AppSizeTokens {
     hairline: lerpDouble(hairline, other.hairline, t)!,
     progressLine: lerpDouble(progressLine, other.progressLine, t)!,
     accentBar: lerpDouble(accentBar, other.accentBar, t)!,
+    dialogBackdropBlur: lerpDouble(
+      dialogBackdropBlur,
+      other.dialogBackdropBlur,
+      t,
+    )!,
     progressIndicatorThin: lerpDouble(
       progressIndicatorThin,
       other.progressIndicatorThin,
@@ -98,6 +111,9 @@ class AppSizeTokens {
     dotLg: lerpDouble(dotLg, other.dotLg, t)!,
     dayMarker: lerpDouble(dayMarker, other.dayMarker, t)!,
     stepIndicator: lerpDouble(stepIndicator, other.stepIndicator, t)!,
+    avatarSm: lerpDouble(avatarSm, other.avatarSm, t)!,
+    avatarMd: lerpDouble(avatarMd, other.avatarMd, t)!,
+    avatarLg: lerpDouble(avatarLg, other.avatarLg, t)!,
     topicCheckbox: lerpDouble(topicCheckbox, other.topicCheckbox, t)!,
     rowIcon: lerpDouble(rowIcon, other.rowIcon, t)!,
     iconContainerSm: lerpDouble(iconContainerSm, other.iconContainerSm, t)!,

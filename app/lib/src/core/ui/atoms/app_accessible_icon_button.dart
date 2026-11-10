@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -20,17 +19,27 @@ class AppAccessibleIconButton extends StatelessWidget {
   final bool autofocus;
 
   @override
-  Widget build(BuildContext context) => Tooltip(
-    message: label,
-    child: ShadButton.ghost(
-      onPressed: onPressed,
-      enabled: onPressed != null,
-      autofocus: autofocus,
-      width: context.tokens.layout.controlHeight,
-      height: context.tokens.layout.controlHeight,
-      padding: EdgeInsets.zero,
-      backgroundColor: selected ? context.tokens.colors.surfaceSubtle : null,
-      child: Icon(icon, size: context.tokens.icons.md),
+  Widget build(BuildContext context) => Semantics(
+    label: label,
+    button: true,
+    enabled: onPressed != null,
+    onTap: onPressed,
+    excludeSemantics: true,
+    child: Tooltip(
+      message: label,
+      child: IconButton(
+        onPressed: onPressed,
+        autofocus: autofocus,
+        padding: EdgeInsets.zero,
+        style: IconButton.styleFrom(
+          fixedSize: Size.square(context.tokens.layout.controlHeight),
+          backgroundColor: selected ? context.tokens.colors.surfaceSubtle : context.tokens.colors.transparent,
+          foregroundColor: selected ? context.tokens.colors.onSurface : context.tokens.colors.onSurfaceMuted,
+          disabledForegroundColor: context.tokens.colors.onSurfaceMuted,
+          shape: RoundedRectangleBorder(borderRadius: context.tokens.borders.sm),
+        ),
+        icon: Icon(icon, size: context.tokens.icons.md),
+      ),
     ),
   );
 }

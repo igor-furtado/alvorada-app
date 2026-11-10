@@ -12,7 +12,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Concursos').first);
+    await tester.tap(find.byKey(const ValueKey('shell-destination-2')));
     await tester.pumpAndSettle();
   }
 
@@ -73,11 +73,14 @@ void main() {
     expect(find.text('PESO NO EDITAL'), findsOneWidget);
     expect(find.textContaining('Buscar disciplina'), findsNothing);
     expect(find.textContaining('Ordenar:'), findsNothing);
-    expect(find.byType(AppTextInput), findsNWidgets(8));
+    expect(find.byType(AppTextInput), findsNWidgets(9));
     expect(find.byTooltip('Remover Disciplina'), findsNWidgets(8));
-    expect(find.widgetWithText(TextButton, 'Concursos'), findsOneWidget);
+    expect(
+      find.ancestor(of: find.text('Concursos'), matching: find.byType(InkWell)),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.widgetWithText(TextButton, 'Concursos'));
+    await tester.tap(find.text('Concursos'));
     await tester.pumpAndSettle();
 
     expect(find.text('A próxima prova é em 36 dias'), findsOneWidget);
@@ -117,9 +120,12 @@ void main() {
     expect(find.text('Português Geral'), findsWidgets);
     expect(find.text('Interpretação textual'), findsOneWidget);
     expect(find.text('1 de 19 concluídos'), findsOneWidget);
-    expect(find.widgetWithText(TextButton, 'TRF da 5ª Região'), findsOneWidget);
+    expect(
+      find.ancestor(of: find.text('TRF da 5ª Região'), matching: find.byType(InkWell)),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.widgetWithText(TextButton, 'TRF da 5ª Região'));
+    await tester.tap(find.text('TRF da 5ª Região'));
     await tester.pumpAndSettle();
 
     expect(

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 112" role="img" aria-labelledby="title">
   <title id="title">Prumo.app monocromático escuro</title>
-  <g fill="#173F3E" stroke="#173F3E">
+  <g fill="#18181B" stroke="#18181B">
     <path d="M56 16v54" fill="none" stroke-width="6" stroke-linecap="round"/>
     <path d="M37 28h38M42 44h28M47 60h18" fill="none" stroke-width="5" stroke-linecap="round"/>
     <path d="M56 70 70 86H42Z" stroke="none"/>
     <path d="M32 92h48" fill="none" stroke-width="6" stroke-linecap="round"/>
   </g>
-  <text x="112" y="70" fill="#173F3E" font-family="Fraunces, Georgia, serif" font-size="52" font-weight="600">Prumo</text>
-  <text x="259" y="70" fill="#173F3E" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
+  <text x="112" y="70" fill="#18181B" font-family="Geist, Arial, sans-serif" font-size="52" font-weight="600">Prumo</text>
+  <text x="267" y="70" fill="#18181B" font-family="Geist, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
 </svg>

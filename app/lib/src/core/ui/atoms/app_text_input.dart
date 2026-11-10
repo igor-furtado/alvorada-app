@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+
+import '../../theme/app_theme.dart';
 
 class AppTextInput extends StatelessWidget {
   const AppTextInput({
@@ -55,7 +56,7 @@ class AppTextInput extends StatelessWidget {
     label: semanticLabel,
     textField: true,
     enabled: enabled,
-    child: ShadInputFormField(
+    child: TextFormField(
       controller: controller,
       initialValue: initialValue,
       focusNode: focusNode,
@@ -69,13 +70,16 @@ class AppTextInput extends StatelessWidget {
       validator: validator,
       autovalidateMode: autovalidateMode,
       onChanged: onChanged,
-      onSubmitted: onSubmitted,
+      onFieldSubmitted: onSubmitted,
       minLines: minLines,
       maxLines: obscureText ? 1 : maxLines,
-      placeholder: placeholder == null ? null : Text(placeholder!),
+      style: context.tokens.typography.bodySmall.copyWith(color: context.tokens.colors.onSurface),
       forceErrorText: errorText,
-      leading: prefixIcon,
-      trailing: suffixIcon,
+      decoration: InputDecoration(
+        hintText: placeholder,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+      ),
     ),
   );
 }

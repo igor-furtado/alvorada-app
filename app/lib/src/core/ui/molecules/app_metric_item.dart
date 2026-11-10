@@ -35,8 +35,8 @@ class AppMetricItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(data.value, style: Theme.of(context).textTheme.titleMedium),
-              Text(data.label, style: Theme.of(context).textTheme.bodySmall),
+              Text(data.value, style: context.tokens.typography.titleMedium),
+              Text(data.label, style: context.tokens.typography.bodySmall),
             ],
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +12,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Semana').first);
+    await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
 
     expect(find.text('2 a 8 de novembro · Consolidação'), findsOneWidget);
@@ -36,7 +37,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Semana').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Ajustar semana'));
+    await tester.tap(find.widgetWithText(AppButton, 'Ajustar semana'));
     await tester.pumpAndSettle();
 
     expect(find.text('Ajustar esta semana'), findsOneWidget);

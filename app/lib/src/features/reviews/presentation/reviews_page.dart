@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 
@@ -57,10 +56,6 @@ class _ReviewsContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (!desktop) ...[
-        AppBrandLogo(width: context.tokens.layout.brandWidth),
-        SizedBox(height: context.tokens.spacing.xxxl),
-      ],
       const _Header(),
       SizedBox(height: context.tokens.spacing.xxxl),
       const AppMetricOverview(
@@ -81,13 +76,13 @@ class _ReviewsContent extends StatelessWidget {
             children: [
               Text(
                 'Revisões para hoje',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: context.tokens.typography.headlineSmall,
               ),
               SizedBox(height: context.tokens.spacing.xs),
               Text(
                 'Faça na ordem. Cada intervalo pede uma atividade diferente.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                style: context.tokens.typography.bodyMedium.copyWith(
+                  color: context.tokens.colors.onSurfaceMuted,
                 ),
               ),
               SizedBox(height: context.tokens.spacing.lg),
@@ -134,12 +129,12 @@ class _Header extends StatelessWidget {
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppMessages.reviews, style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.reviews, style: context.tokens.typography.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             'Revise no momento certo, do jeito certo.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.tokens.typography.bodyLarge.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
             ),
           ),
         ],
@@ -221,18 +216,18 @@ class _ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final colors = context.tokens.colors;
     final accent = switch (review.type) {
-      _ReviewType.oneDay => scheme.primary,
-      _ReviewType.sevenDays => scheme.tertiary,
-      _ReviewType.thirtyDays => scheme.secondary,
+      _ReviewType.oneDay => colors.primary,
+      _ReviewType.sevenDays => colors.info,
+      _ReviewType.thirtyDays => colors.success,
     };
     final labelColor = review.type == _ReviewType.oneDay ? context.tokens.colors.actionForeground : accent;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border.all(color: scheme.outlineVariant),
+        color: colors.surface,
+        border: Border.all(color: colors.border),
         borderRadius: context.tokens.borders.lg,
       ),
       child: Row(
@@ -268,33 +263,33 @@ class _ReviewCard extends StatelessWidget {
                         ),
                         child: Text(
                           'Revisão de ${review.interval}',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelMedium?.copyWith(color: labelColor),
+                          style: context.tokens.typography.labelMedium.copyWith(
+                            color: labelColor,
+                          ),
                         ),
                       ),
                       Text(
                         review.duration,
-                        style: Theme.of(context).textTheme.labelMedium,
+                        style: context.tokens.typography.labelMedium,
                       ),
                     ],
                   ),
                   SizedBox(height: context.tokens.spacing.lg),
                   Text(
                     review.title,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: context.tokens.typography.titleLarge,
                   ),
                   SizedBox(height: context.tokens.spacing.xxs),
                   Text(
                     '${review.discipline} · ${review.contest}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: context.tokens.typography.bodySmall,
                   ),
                   SizedBox(height: context.tokens.spacing.lg),
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(context.tokens.spacing.md),
                     decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest.withValues(
+                      color: colors.surfaceSubtle.withValues(
                         alpha: context.tokens.opacity.half,
                       ),
                       borderRadius: context.tokens.borders.md,
@@ -314,12 +309,12 @@ class _ReviewCard extends StatelessWidget {
                             children: [
                               Text(
                                 review.instruction,
-                                style: Theme.of(context).textTheme.titleSmall,
+                                style: context.tokens.typography.titleSmall,
                               ),
                               SizedBox(height: context.tokens.spacing.xxs),
                               Text(
                                 review.detail,
-                                style: Theme.of(context).textTheme.bodySmall,
+                                style: context.tokens.typography.bodySmall,
                               ),
                             ],
                           ),
@@ -330,10 +325,10 @@ class _ReviewCard extends StatelessWidget {
                   SizedBox(height: context.tokens.spacing.lg),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: FilledButton.icon(
+                    child: AppButton(
                       onPressed: () => _showReviewDialog(context, review),
-                      icon: Icon(AppIcons.play, size: context.tokens.icons.md),
-                      label: const Text(AppMessages.startReview),
+                      icon: AppIcons.play,
+                      label: AppMessages.startReview,
                     ),
                   ),
                 ],
@@ -353,8 +348,8 @@ class _MethodGuide extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
@@ -368,12 +363,12 @@ class _MethodGuide extends StatelessWidget {
         SizedBox(height: context.tokens.spacing.lg),
         Text(
           'Uma Revisão, uma função',
-          style: Theme.of(context).textTheme.headlineSmall,
+          style: context.tokens.typography.headlineSmall,
         ),
         SizedBox(height: context.tokens.spacing.sm),
         Text(
           'O intervalo muda e a atividade também. Não transforme Revisão em releitura completa.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: context.tokens.typography.bodyMedium,
         ),
         SizedBox(height: context.tokens.spacing.xl),
         const _GuideStep(
@@ -396,7 +391,7 @@ class _MethodGuide extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(context.tokens.spacing.md),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryContainer,
+            color: context.tokens.colors.successContainer,
             borderRadius: context.tokens.borders.md,
           ),
           child: Row(
@@ -405,13 +400,13 @@ class _MethodGuide extends StatelessWidget {
               Icon(
                 AppIcons.rest,
                 size: context.tokens.icons.md,
-                color: Theme.of(context).colorScheme.secondary,
+                color: context.tokens.colors.success,
               ),
               SizedBox(width: context.tokens.spacing.md),
               Expanded(
                 child: Text(
                   'No domingo, nenhuma Revisão é cobrada ou enviada por lembrete.',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.tokens.typography.bodySmall,
                 ),
               ),
             ],
@@ -447,12 +442,12 @@ class _GuideStep extends StatelessWidget {
               height: context.tokens.sizes.stepIndicator,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: context.tokens.colors.primaryContainer,
                 shape: BoxShape.circle,
               ),
               child: Text(
                 interval.split(' ').first,
-                style: Theme.of(context).textTheme.labelMedium,
+                style: context.tokens.typography.labelMedium,
               ),
             ),
             if (!last)
@@ -460,7 +455,7 @@ class _GuideStep extends StatelessWidget {
                 child: Container(
                   width: context.tokens.sizes.hairline,
                   margin: EdgeInsets.symmetric(vertical: context.tokens.spacing.xxs),
-                  color: Theme.of(context).colorScheme.outlineVariant,
+                  color: context.tokens.colors.border,
                 ),
               ),
           ],
@@ -476,17 +471,17 @@ class _GuideStep extends StatelessWidget {
                   children: [
                     Text(
                       interval,
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: context.tokens.typography.titleSmall,
                     ),
                     const Spacer(),
                     Text(
                       duration,
-                      style: Theme.of(context).textTheme.labelSmall,
+                      style: context.tokens.typography.labelSmall,
                     ),
                   ],
                 ),
                 SizedBox(height: context.tokens.spacing.xxs),
-                Text(action, style: Theme.of(context).textTheme.bodySmall),
+                Text(action, style: context.tokens.typography.bodySmall),
               ],
             ),
           ),
@@ -503,8 +498,8 @@ class _UpcomingReviews extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
@@ -512,7 +507,7 @@ class _UpcomingReviews extends StatelessWidget {
       children: [
         Text(
           'Próximas Revisões',
-          style: Theme.of(context).textTheme.headlineSmall,
+          style: context.tokens.typography.headlineSmall,
         ),
         SizedBox(height: context.tokens.spacing.lg),
         const _UpcomingRow(
@@ -520,13 +515,17 @@ class _UpcomingReviews extends StatelessWidget {
           count: '2 Revisões',
           duration: '23 min',
         ),
-        Divider(height: context.tokens.spacing.xxl),
+        AppDivider(
+          margin: EdgeInsets.symmetric(vertical: context.tokens.spacing.md),
+        ),
         const _UpcomingRow(
           date: 'Seg., 9 nov.',
           count: '4 Revisões',
           duration: '36 min',
         ),
-        Divider(height: context.tokens.spacing.xxl),
+        AppDivider(
+          margin: EdgeInsets.symmetric(vertical: context.tokens.spacing.md),
+        ),
         const _UpcomingRow(
           date: 'Ter., 10 nov.',
           count: '1 Revisão',
@@ -558,15 +557,15 @@ class _UpcomingRow extends StatelessWidget {
       ),
       SizedBox(width: context.tokens.spacing.md),
       Expanded(
-        child: Text(date, style: Theme.of(context).textTheme.titleSmall),
+        child: Text(date, style: context.tokens.typography.titleSmall),
       ),
-      Text(count, style: Theme.of(context).textTheme.bodyMedium),
+      Text(count, style: context.tokens.typography.bodyMedium),
       SizedBox(width: context.tokens.spacing.lg),
       SizedBox(
         width: context.tokens.spacing.huge,
         child: Text(
           duration,
-          style: Theme.of(context).textTheme.labelSmall,
+          style: context.tokens.typography.labelSmall,
           textAlign: TextAlign.end,
         ),
       ),
@@ -580,15 +579,15 @@ class _ReviewDialog extends StatelessWidget {
   final _ReviewPreview review;
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(AppMessages.reviewOf(review.interval)),
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.reviewOf(review.interval),
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.sizes.guideMaxWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(review.title, style: Theme.of(context).textTheme.titleMedium),
+          Text(review.title, style: context.tokens.typography.titleMedium),
           SizedBox(height: context.tokens.spacing.xs),
           Text(review.instruction),
           SizedBox(height: context.tokens.spacing.lg),
@@ -600,20 +599,14 @@ class _ReviewDialog extends StatelessWidget {
             ],
           ),
           SizedBox(height: context.tokens.spacing.md),
-          Text(review.detail, style: Theme.of(context).textTheme.bodySmall),
+          Text(review.detail, style: context.tokens.typography.bodySmall),
         ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.notNow),
-      ),
-      FilledButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.start),
-      ),
-    ],
+    secondaryLabel: AppMessages.notNow,
+    onSecondary: () => Navigator.of(context).pop(),
+    primaryLabel: AppMessages.start,
+    onPrimary: () => Navigator.of(context).pop(),
   );
 }
 
@@ -624,17 +617,13 @@ Future<void> _showReviewDialog(BuildContext context, _ReviewPreview review) => s
 
 Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
   context: context,
-  builder: (context) => AlertDialog(
-    title: const Text(AppMessages.howReviewsWork),
+  builder: (context) => AppDialog(
+    title: AppMessages.howReviewsWork,
     content: const Text(
       'Cada Tópico volta em 1, 7 e 30 dias. A atividade muda em cada intervalo para recuperar antes de reler.',
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.understand),
-      ),
-    ],
+    primaryLabel: AppMessages.understand,
+    onPrimary: () => Navigator.of(context).pop(),
   ),
 );
 

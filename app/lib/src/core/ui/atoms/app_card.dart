@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -19,22 +18,23 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? EdgeInsets.all(context.tokens.spacing.xl);
-    final content = onTap == null
-        ? child
-        : Material(
-            color: context.tokens.colors.transparent,
-            child: InkWell(
+    final effectivePadding = padding ?? EdgeInsets.all(context.tokens.spacing.lg);
+    final content = Padding(padding: effectivePadding, child: child);
+    final card = Material(
+      color: backgroundColor ?? context.tokens.colors.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: context.tokens.borders.xl,
+        side: BorderSide(color: context.tokens.colors.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: onTap == null
+          ? content
+          : InkWell(
               onTap: onTap,
               excludeFromSemantics: true,
-              child: Padding(padding: effectivePadding, child: child),
+              hoverColor: context.tokens.colors.surfaceSubtle,
+              child: content,
             ),
-          );
-    final card = ShadCard(
-      width: double.infinity,
-      padding: onTap == null ? effectivePadding : EdgeInsets.zero,
-      backgroundColor: backgroundColor,
-      child: content,
     );
     return Semantics(
       container: true,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_theme.dart';
+
 enum AppLabelStyle { body, caption, control }
 
 class AppLabel extends StatelessWidget {
@@ -21,16 +23,16 @@ class AppLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = switch (style) {
-      AppLabelStyle.body => Theme.of(context).textTheme.bodyMedium,
-      AppLabelStyle.caption => Theme.of(context).textTheme.bodySmall,
-      AppLabelStyle.control => Theme.of(context).textTheme.labelLarge,
+      AppLabelStyle.body => context.tokens.typography.bodyMedium,
+      AppLabelStyle.caption => context.tokens.typography.bodySmall,
+      AppLabelStyle.control => context.tokens.typography.labelLarge,
     };
     return Text(
       text,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
       textAlign: textAlign,
-      style: textStyle?.copyWith(color: color),
+      style: textStyle.copyWith(color: color),
     );
   }
 }

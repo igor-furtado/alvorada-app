@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 import 'contest_view_data.dart';
@@ -30,10 +29,6 @@ class _ContestsPageState extends State<ContestsPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!desktop) ...[
-            AppBrandLogo(width: context.tokens.layout.brandWidth),
-            SizedBox(height: context.tokens.spacing.xxxl),
-          ],
           _TimelineContent(contests: _contests, callbacks: callbacks),
         ],
       );
@@ -154,7 +149,7 @@ class _TimelineContent extends StatelessWidget {
                   width: railWidth,
                   child: Text(
                     AppMessages.today.toUpperCase(),
-                    style: Theme.of(context).textTheme.labelSmall,
+                    style: context.tokens.typography.labelSmall,
                   ),
                 ),
                 const _Dot(),
@@ -162,7 +157,7 @@ class _TimelineContent extends StatelessWidget {
                 Expanded(
                   child: Text(
                     AppMessages.nextExamIn(contests.first.days),
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: context.tokens.typography.bodySmall,
                   ),
                 ),
               ],
@@ -216,11 +211,11 @@ class _TimelineItem extends StatelessWidget {
               children: [
                 Text(
                   '${contest.days}',
-                  style: compact ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.headlineMedium,
+                  style: compact ? context.tokens.typography.titleLarge : context.tokens.typography.headlineMedium,
                 ),
                 Text(
                   AppMessages.days,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.tokens.typography.bodySmall,
                 ),
               ],
             ),
@@ -265,7 +260,7 @@ class _TimelineItem extends StatelessWidget {
                             ],
                             Text(
                               compact ? contest.shortName : contest.institution,
-                              style: Theme.of(context).textTheme.headlineSmall,
+                              style: context.tokens.typography.headlineSmall,
                             ),
                             SizedBox(height: context.tokens.spacing.xxs),
                             Text(contest.role),
@@ -311,7 +306,7 @@ class _Line extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: Container(
       width: context.tokens.sizes.progressLine,
-      color: Theme.of(context).colorScheme.outlineVariant,
+      color: context.tokens.colors.border,
     ),
   );
 }
@@ -324,10 +319,10 @@ class _Dot extends StatelessWidget {
     width: context.tokens.sizes.dotLg,
     height: context.tokens.sizes.dotLg,
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.primary,
+      color: context.tokens.colors.primary,
       shape: BoxShape.circle,
       border: Border.all(
-        color: Theme.of(context).colorScheme.surface,
+        color: context.tokens.colors.surface,
         width: context.tokens.borders.widthStrong,
       ),
     ),
@@ -345,12 +340,12 @@ class _Header extends StatelessWidget {
       final heading = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppMessages.navigationContests, style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.navigationContests, style: context.tokens.typography.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.tokens.typography.bodyLarge.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
             ),
           ),
         ],
@@ -397,13 +392,13 @@ class _Progress extends StatelessWidget {
               AppMessages.noticeProgress,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelMedium,
+              style: context.tokens.typography.labelMedium,
             ),
           ),
           SizedBox(width: context.tokens.spacing.md),
           Text(
             '${(contest.progress * 100).round()}%',
-            style: Theme.of(context).textTheme.labelMedium,
+            style: context.tokens.typography.labelMedium,
           ),
         ],
       ),
@@ -425,7 +420,7 @@ class _LabelValue extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: Theme.of(context).textTheme.labelSmall),
+      Text(label, style: context.tokens.typography.labelSmall),
       SizedBox(height: context.tokens.spacing.xxs),
       Text(value),
     ],
@@ -486,7 +481,7 @@ class _Empty extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.lg),
           Text(
             AppMessages.noActiveContests,
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: context.tokens.typography.headlineSmall,
           ),
           SizedBox(height: context.tokens.spacing.sm),
           const Text(AppMessages.emptyContests),
@@ -516,7 +511,7 @@ class _EditalDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(contest.shortName),
-          Text(contest.role, style: Theme.of(context).textTheme.bodySmall),
+          Text(contest.role, style: context.tokens.typography.bodySmall),
           SizedBox(height: context.tokens.spacing.xxl),
           for (final discipline in contest.disciplines) ...[
             Row(
@@ -573,21 +568,21 @@ class _NewContestDialogState extends State<_NewContestDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AppDialog(
-    title: AppMessages.newContest,
-    maxWidth: context.tokens.sizes.noteMaxWidth,
-    content: AppValidatedForm(
-      formKey: _formKey,
-      firstInvalidFocusNode: _firstInvalidFocus,
-      onSubmit: () async => Navigator.pop(
-        context,
-        _NewContest(
-          institution: institution.text.trim(),
-          role: role.text.trim(),
-          board: board.text.trim().isEmpty ? AppMessages.toBeDefined : board.text.trim(),
-        ),
+  Widget build(BuildContext context) => AppValidatedForm(
+    formKey: _formKey,
+    firstInvalidFocusNode: _firstInvalidFocus,
+    onSubmit: () async => Navigator.pop(
+      context,
+      _NewContest(
+        institution: institution.text.trim(),
+        role: role.text.trim(),
+        board: board.text.trim().isEmpty ? AppMessages.toBeDefined : board.text.trim(),
       ),
-      builder: (context, submitting, submit) => Column(
+    ),
+    builder: (context, submitting, submit) => AppDialog(
+      title: AppMessages.newContest,
+      maxWidth: context.tokens.sizes.noteMaxWidth,
+      content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           AppFormField(
@@ -607,22 +602,20 @@ class _NewContestDialogState extends State<_NewContestDialog> {
           ),
           SizedBox(height: context.tokens.spacing.lg),
           AppFormField(label: AppMessages.board, controller: board),
-          SizedBox(height: context.tokens.spacing.xl),
-          Wrap(
-            spacing: context.tokens.spacing.sm,
-            runSpacing: context.tokens.spacing.sm,
-            alignment: WrapAlignment.end,
-            children: [
-              AppButton(
-                label: AppMessages.cancel,
-                variant: AppButtonVariant.text,
-                onPressed: submitting ? null : () => Navigator.pop(context),
-              ),
-              AppButton(label: AppMessages.createContest, loading: submitting, onPressed: submit),
-            ],
-          ),
         ],
       ),
+      actions: [
+        AppButton(
+          label: AppMessages.cancel,
+          variant: AppButtonVariant.outline,
+          onPressed: submitting ? null : () => Navigator.pop(context),
+        ),
+        AppButton(
+          label: AppMessages.createContest,
+          loading: submitting,
+          onPressed: submit,
+        ),
+      ],
     ),
   );
 }

@@ -1,116 +1,131 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'tokens/primitives/app_typography_primitives.dart';
-
 abstract final class AppTypography {
+  static const displayFamily = 'Geist';
+  static const bodyFamily = 'Geist';
+  static const labelFamily = 'Geist';
+
+  static const trackingTightest = -1.0;
+  static const trackingTighter = -0.7;
+  static const trackingTight = -0.4;
+  static const trackingSlight = -0.2;
+  static const trackingSubtle = -0.1;
+  static const trackingNormal = 0.0;
+  static const trackingRelaxed = 0.1;
+  static const trackingWide = 0.2;
+  static const trackingWider = 0.3;
+  static const trackingWidest = 0.4;
+
+  static const leadingCompact = 1.2;
+
   static TextTheme textTheme(Color primary, Color secondary) => TextTheme(
     displayLarge: GoogleFonts.getFont(
-      AppTypographyPrimitives.displayFamily,
-      fontSize: AppTypographyPrimitives.size48,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingDisplayLarge,
-      letterSpacing: AppTypographyPrimitives.trackingTightest,
+      displayFamily,
+      fontSize: 48,
+      fontWeight: FontWeight.w600,
+      height: 1.08,
+      letterSpacing: trackingTightest,
       color: primary,
     ),
     displayMedium: GoogleFonts.getFont(
-      AppTypographyPrimitives.displayFamily,
-      fontSize: AppTypographyPrimitives.size40,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingDisplayMedium,
-      letterSpacing: AppTypographyPrimitives.trackingTighter,
+      displayFamily,
+      fontSize: 36,
+      fontWeight: FontWeight.w600,
+      height: 1.1,
+      letterSpacing: trackingTighter,
       color: primary,
     ),
     headlineLarge: GoogleFonts.getFont(
-      AppTypographyPrimitives.displayFamily,
-      fontSize: AppTypographyPrimitives.size32,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingHeadlineLarge,
-      letterSpacing: AppTypographyPrimitives.trackingTight,
+      displayFamily,
+      fontSize: 30,
+      fontWeight: FontWeight.w600,
+      height: 1.15,
+      letterSpacing: trackingTight,
       color: primary,
     ),
     headlineMedium: GoogleFonts.getFont(
-      AppTypographyPrimitives.displayFamily,
-      fontSize: AppTypographyPrimitives.size26,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingHeadlineMedium,
-      letterSpacing: AppTypographyPrimitives.trackingSlight,
+      displayFamily,
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      height: 1.18,
+      letterSpacing: trackingSlight,
       color: primary,
     ),
     headlineSmall: GoogleFonts.getFont(
-      AppTypographyPrimitives.displayFamily,
-      fontSize: AppTypographyPrimitives.size22,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingCompact,
+      displayFamily,
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      height: 1.2,
       color: primary,
     ),
     titleLarge: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size20,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingTitleLarge,
-      letterSpacing: AppTypographyPrimitives.trackingSubtle,
+      labelFamily,
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      height: 1.25,
+      letterSpacing: trackingSubtle,
       color: primary,
     ),
     titleMedium: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size16,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingTitleMedium,
+      labelFamily,
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
       color: primary,
     ),
     titleSmall: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size14,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingTitleSmall,
-      letterSpacing: AppTypographyPrimitives.trackingRelaxed,
+      labelFamily,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      height: 1.35,
+      letterSpacing: trackingRelaxed,
       color: primary,
     ),
     bodyLarge: GoogleFonts.getFont(
-      AppTypographyPrimitives.bodyFamily,
-      fontSize: AppTypographyPrimitives.size18,
-      fontWeight: AppTypographyPrimitives.regular,
-      height: AppTypographyPrimitives.leadingBodyLarge,
+      bodyFamily,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      height: 1.55,
       color: primary,
     ),
     bodyMedium: GoogleFonts.getFont(
-      AppTypographyPrimitives.bodyFamily,
-      fontSize: AppTypographyPrimitives.size16,
-      fontWeight: AppTypographyPrimitives.regular,
-      height: AppTypographyPrimitives.leadingBodyMedium,
+      bodyFamily,
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      height: 1.5,
       color: primary,
     ),
     bodySmall: GoogleFonts.getFont(
-      AppTypographyPrimitives.bodyFamily,
-      fontSize: AppTypographyPrimitives.size14,
-      fontWeight: AppTypographyPrimitives.regular,
-      height: AppTypographyPrimitives.leadingBodySmall,
-      letterSpacing: AppTypographyPrimitives.trackingRelaxed,
+      bodyFamily,
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      height: 1.45,
+      letterSpacing: trackingRelaxed,
       color: secondary,
     ),
     labelLarge: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size14,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingCompact,
-      letterSpacing: AppTypographyPrimitives.trackingWide,
+      labelFamily,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      height: 1.2,
+      letterSpacing: trackingWide,
       color: primary,
     ),
     labelMedium: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size12,
-      fontWeight: AppTypographyPrimitives.semibold,
-      height: AppTypographyPrimitives.leadingCompact,
-      letterSpacing: AppTypographyPrimitives.trackingWider,
+      labelFamily,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      height: 1.2,
+      letterSpacing: trackingWider,
       color: secondary,
     ),
     labelSmall: GoogleFonts.getFont(
-      AppTypographyPrimitives.labelFamily,
-      fontSize: AppTypographyPrimitives.size11,
-      fontWeight: AppTypographyPrimitives.medium,
-      height: AppTypographyPrimitives.leadingTitleLarge,
-      letterSpacing: AppTypographyPrimitives.trackingWidest,
+      labelFamily,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      height: 1.25,
+      letterSpacing: trackingWidest,
       color: secondary,
     ),
   );

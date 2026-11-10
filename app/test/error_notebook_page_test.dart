@@ -1,7 +1,7 @@
 import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   testWidgets('abre Caderno de Erros pela navegação principal', (tester) async {
@@ -12,7 +12,7 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Caderno'));
+    await tester.tap(find.byKey(const ValueKey('shell-destination-5')));
     await tester.pumpAndSettle();
 
     expect(find.text('Em revisão'), findsOneWidget);
@@ -35,12 +35,12 @@ void main() {
 
     await tester.pumpWidget(const EstudosApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Caderno'));
+    await tester.tap(find.byKey(const ValueKey('shell-destination-5')));
     await tester.pumpAndSettle();
     tester.view.physicalSize = const Size(390, 844);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(ShadButton, 'Registrar erro'));
+    await tester.tap(find.widgetWithText(AppButton, 'Registrar erro'));
     await tester.pumpAndSettle();
 
     final dialog = find.byType(Dialog);
@@ -64,7 +64,10 @@ void main() {
       findsOneWidget,
     );
 
-    final submit = find.widgetWithText(ShadButton, 'Salvar e programar Revisões');
+    final submit = find.widgetWithText(
+      AppButton,
+      'Salvar e programar Revisões',
+    );
     await tester.ensureVisible(submit);
     await tester.tap(submit);
     await tester.pumpAndSettle();

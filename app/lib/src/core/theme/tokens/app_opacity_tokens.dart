@@ -15,6 +15,7 @@ class AppOpacityTokens {
     this.hint = .78,
     this.tint = .13,
     this.tintStrong = .14,
+    this.dialogBarrier = .10,
   });
 
   final double disabled;
@@ -27,6 +28,7 @@ class AppOpacityTokens {
   final double hint;
   final double tint;
   final double tintStrong;
+  final double dialogBarrier;
 
   AppOpacityTokens lerp(AppOpacityTokens other, double t) => AppOpacityTokens(
     disabled: lerpDouble(disabled, other.disabled, t)!,
@@ -39,5 +41,6 @@ class AppOpacityTokens {
     hint: lerpDouble(hint, other.hint, t)!,
     tint: lerpDouble(tint, other.tint, t)!,
     tintStrong: lerpDouble(tintStrong, other.tintStrong, t)!,
+    dialogBarrier: lerpDouble(dialogBarrier, other.dialogBarrier, t)!,
   );
 }

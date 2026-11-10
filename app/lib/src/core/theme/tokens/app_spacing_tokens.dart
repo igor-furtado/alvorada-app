@@ -21,7 +21,7 @@ class AppSpacingTokens {
     this.huge = AppDimensionPrimitives.size48,
     this.giant = AppDimensionPrimitives.size64,
     this.jumbo = 80,
-    this.page = AppDimensionPrimitives.size40,
+    this.page = AppDimensionPrimitives.size32,
   });
 
   final double none;

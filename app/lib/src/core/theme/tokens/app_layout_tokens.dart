@@ -12,10 +12,18 @@ class AppLayoutTokens {
     this.expanded = AppDimensionPrimitives.breakpointExpanded,
     this.wide = AppDimensionPrimitives.breakpointWide,
     this.contentMaxWidth = AppDimensionPrimitives.contentMaxWidth,
-    this.dialogMaxWidth = 600,
-    this.sideNavigationWidth = 256,
-    this.brandWidth = 178,
-    this.controlHeight = AppDimensionPrimitives.size48,
+    this.dialogMaxWidth = 384,
+    this.alertDialogSmallMaxWidth = 320,
+    this.iconRailWidth = 68,
+    this.commandBarHeight = 64,
+    this.commandSearchWidth = 544,
+    this.catalogMasterWidth = 304,
+    this.catalogWorkspaceHeight = 608,
+    this.brandWidth = 144,
+    this.controlHeight = AppDimensionPrimitives.size32,
+    this.buttonHeightSm = AppDimensionPrimitives.size28,
+    this.buttonHeightMd = AppDimensionPrimitives.size32,
+    this.buttonHeightLg = 36,
     this.topicSelectionIndent = 42,
     this.tableActionsColumn = 56,
     this.narrow = 520,
@@ -40,9 +48,17 @@ class AppLayoutTokens {
   final double wide;
   final double contentMaxWidth;
   final double dialogMaxWidth;
-  final double sideNavigationWidth;
+  final double alertDialogSmallMaxWidth;
+  final double iconRailWidth;
+  final double commandBarHeight;
+  final double commandSearchWidth;
+  final double catalogMasterWidth;
+  final double catalogWorkspaceHeight;
   final double brandWidth;
   final double controlHeight;
+  final double buttonHeightSm;
+  final double buttonHeightMd;
+  final double buttonHeightLg;
   final double topicSelectionIndent;
   final double tableActionsColumn;
   final double narrow;
@@ -67,13 +83,21 @@ class AppLayoutTokens {
     wide: lerpDouble(wide, other.wide, t)!,
     contentMaxWidth: lerpDouble(contentMaxWidth, other.contentMaxWidth, t)!,
     dialogMaxWidth: lerpDouble(dialogMaxWidth, other.dialogMaxWidth, t)!,
-    sideNavigationWidth: lerpDouble(
-      sideNavigationWidth,
-      other.sideNavigationWidth,
+    alertDialogSmallMaxWidth: lerpDouble(
+      alertDialogSmallMaxWidth,
+      other.alertDialogSmallMaxWidth,
       t,
     )!,
+    iconRailWidth: lerpDouble(iconRailWidth, other.iconRailWidth, t)!,
+    commandBarHeight: lerpDouble(commandBarHeight, other.commandBarHeight, t)!,
+    commandSearchWidth: lerpDouble(commandSearchWidth, other.commandSearchWidth, t)!,
+    catalogMasterWidth: lerpDouble(catalogMasterWidth, other.catalogMasterWidth, t)!,
+    catalogWorkspaceHeight: lerpDouble(catalogWorkspaceHeight, other.catalogWorkspaceHeight, t)!,
     brandWidth: lerpDouble(brandWidth, other.brandWidth, t)!,
     controlHeight: lerpDouble(controlHeight, other.controlHeight, t)!,
+    buttonHeightSm: lerpDouble(buttonHeightSm, other.buttonHeightSm, t)!,
+    buttonHeightMd: lerpDouble(buttonHeightMd, other.buttonHeightMd, t)!,
+    buttonHeightLg: lerpDouble(buttonHeightLg, other.buttonHeightLg, t)!,
     topicSelectionIndent: lerpDouble(
       topicSelectionIndent,
       other.topicSelectionIndent,

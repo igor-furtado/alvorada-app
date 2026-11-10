@@ -15,6 +15,7 @@ class AppBorderTokens {
     this.radiusMd = AppDimensionPrimitives.size6,
     this.radiusLg = AppDimensionPrimitives.size8,
     this.radiusXl = AppDimensionPrimitives.size12,
+    this.radius2xl = AppDimensionPrimitives.size16,
     this.radiusFull = AppDimensionPrimitives.full,
   });
 
@@ -26,6 +27,7 @@ class AppBorderTokens {
   final double radiusMd;
   final double radiusLg;
   final double radiusXl;
+  final double radius2xl;
   final double radiusFull;
 
   BorderRadius get xs => BorderRadius.circular(radiusXs);
@@ -33,6 +35,7 @@ class AppBorderTokens {
   BorderRadius get md => BorderRadius.circular(radiusMd);
   BorderRadius get lg => BorderRadius.circular(radiusLg);
   BorderRadius get xl => BorderRadius.circular(radiusXl);
+  BorderRadius get xxl => BorderRadius.circular(radius2xl);
   BorderRadius get full => BorderRadius.circular(radiusFull);
 
   AppBorderTokens lerp(AppBorderTokens other, double t) => AppBorderTokens(
@@ -44,6 +47,7 @@ class AppBorderTokens {
     radiusMd: lerpDouble(radiusMd, other.radiusMd, t)!,
     radiusLg: lerpDouble(radiusLg, other.radiusLg, t)!,
     radiusXl: lerpDouble(radiusXl, other.radiusXl, t)!,
+    radius2xl: lerpDouble(radius2xl, other.radius2xl, t)!,
     radiusFull: lerpDouble(radiusFull, other.radiusFull, t)!,
   );
 }

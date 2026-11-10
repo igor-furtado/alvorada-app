@@ -15,13 +15,14 @@ class AppPageTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     final desktop = context.windowClass.isExpanded;
     return SafeArea(
+      top: false,
       child: CustomScrollView(
         key: PageStorageKey<String>(ModalRoute.of(context)?.settings.name ?? 'app-page'),
         slivers: [
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
-              context.tokens.spacing.xl,
+              desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
               desktop ? context.tokens.spacing.page : context.tokens.spacing.xl,
               context.tokens.spacing.huge,
             ),

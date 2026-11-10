@@ -7,6 +7,13 @@ abstract final class AppMessages {
   static const navigationErrors = 'Caderno';
   static const navigationSection = 'Navegação';
   static const navigationPath = 'Rota de navegação';
+  static const navigationSearch = 'Ir para uma área…';
+  static const administration = 'Administração';
+  static const administrationSubtitle = 'Organize ferramentas internas e recursos de manutenção do produto.';
+  static const componentCatalog = 'Catálogo de componentes';
+  static const componentCatalogSubtitle = 'Consulte os componentes, variantes e estados disponíveis no design system.';
+  static const useLightTheme = 'Usar tema claro';
+  static const useDarkTheme = 'Usar tema escuro';
 
   static const loading = 'Carregando';
   static const search = 'Buscar';
@@ -100,6 +107,9 @@ abstract final class AppMessages {
   static const emptyContests = 'Adicione um Concurso para começar.';
   static const notice = 'Edital';
   static const newDiscipline = 'Nova Disciplina';
+  static const newDisciplineDescription = 'Adicione uma Disciplina para organizar seus Tópicos.';
+  static const disciplineNameExample = 'Ex.: Língua Portuguesa';
+  static const disciplineNameHelp = 'Use o nome adotado no Edital.';
   static const removeDiscipline = 'Remover Disciplina';
   static const main = 'Principal';
   static const disciplineName = 'Nome da Disciplina';
@@ -107,8 +117,8 @@ abstract final class AppMessages {
   static const noDiscipline = 'Nenhuma Disciplina encontrada.';
   static const contestNotFound = 'Concurso não encontrado';
   static const disciplineNotFound = 'Disciplina não encontrada';
-  static const contentCatalog = 'Disciplinas e Tópicos';
-  static const contentCatalogSubtitle = 'Organize o catálogo compartilhado entre os Editais.';
+  static const contentCatalog = 'Disciplinas';
+  static const contentCatalogSubtitle = 'Organize Tópicos e Subtópicos sem perder o contexto do catálogo.';
   static const searchContent = 'Buscar Disciplina, Tópico ou Subtópico';
   static const addDiscipline = 'Adicionar Disciplina';
   static const addTopic = 'Adicionar Tópico';
@@ -123,7 +133,10 @@ abstract final class AppMessages {
   static const deleteSubtopicQuestion = 'Excluir Subtópico?';
   static const noContentFound = 'Nenhum conteúdo encontrado. Ajuste a busca ou adicione uma Disciplina.';
   static const mandatoryTopic = 'Tópico obrigatório';
-  static const sharedContent = 'Conteúdo compartilhado';
+  static const protected = 'Protegido';
+  static const topics = 'Tópicos';
+  static const subtopics = 'Subtópicos';
+  static const noSubtopics = 'Nenhum Subtópico cadastrado.';
   static const loadingDisciplines = 'Carregando Disciplinas';
   static const disciplinesUpdated = 'Disciplinas atualizadas.';
   static const disciplineCreated = 'Disciplina adicionada.';
@@ -136,6 +149,7 @@ abstract final class AppMessages {
   static const subtopicUpdated = 'Subtópico atualizado.';
   static const subtopicDeleted = 'Subtópico excluído.';
   static const contentUpdateFailed = 'Não foi possível atualizar. Os dados exibidos foram preservados.';
+  static const contentSavedSyncPending = 'Alteração salva. Atualize para ver os dados mais recentes.';
   static const contentOperationFailed = 'Não foi possível salvar a alteração. Tente novamente.';
 
   static const thisWeek = 'Esta semana';
@@ -159,6 +173,19 @@ abstract final class AppMessages {
 
   static String loadedItems(int count) => '$count resultados carregados.';
 
+  static String catalogSummary(
+    int disciplineCount,
+    int topicCount,
+    int subtopicCount,
+  ) =>
+      '${_count(disciplineCount, 'Disciplina', 'Disciplinas')}  ·  '
+      '${_count(topicCount, 'Tópico', 'Tópicos')}  ·  '
+      '${_count(subtopicCount, 'Subtópico', 'Subtópicos')}';
+
+  static String disciplineResults(int count) => _count(count, 'Disciplina', 'Disciplinas');
+
+  static String topicCount(int count) => _count(count, 'Tópico', 'Tópicos');
+
   static String reviewOf(String interval) => 'Revisão de $interval';
 
   static String expectedDuration(String duration) => '$duration previstos';
@@ -180,4 +207,6 @@ abstract final class AppMessages {
 
   static String deleteContestImpact(String name) =>
       '$name e seu Edital serão removidos. Esta ação não pode ser desfeita.';
+
+  static String _count(int count, String singular, String plural) => '$count ${count == 1 ? singular : plural}';
 }

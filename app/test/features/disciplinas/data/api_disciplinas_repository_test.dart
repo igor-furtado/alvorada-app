@@ -3,6 +3,7 @@ import 'package:estudos_app/src/features/disciplinas/data/repositories/api_disci
 import 'package:estudos_app/src/features/disciplinas/data/services/disciplinas_api_service.dart';
 import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
 import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina_input.dart';
+import 'package:estudos_app/src/features/disciplinas/domain/repositories/disciplinas_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -31,6 +32,23 @@ void main() {
     expect(api.getCalls, 2);
   });
 
+  test('distingue mutação confirmada de falha ao sincronizar o catálogo', () async {
+    final api = _FakeApi();
+    final repository = ApiDisciplinasRepository(api);
+    await repository.getDisciplinas();
+    api.failGet = true;
+
+    await expectLater(
+      repository.createTopico(
+        disciplineId: 'discipline-1',
+        name: 'Pontuação',
+      ),
+      throwsA(isA<DisciplinasSynchronizationException>()),
+    );
+
+    expect(api.createdTopico, 'Pontuação');
+  });
+
   test('retorna a Disciplina criada depois de sincronizar com a API', () async {
     final api = _FakeApi();
     final repository = ApiDisciplinasRepository(api);
@@ -46,10 +64,12 @@ class _FakeApi implements DisciplinasApi {
   int getCalls = 0;
   String? createdTopico;
   Map<String, Object?>? createdDisciplina;
+  bool failGet = false;
 
   @override
   Future<List<DisciplinaApiModel>> getDisciplinas() async {
     getCalls++;
+    if (failGet) throw StateError('Falha simulada ao atualizar catálogo.');
     return [_discipline];
   }
 

@@ -172,7 +172,7 @@ class _AppInfiniteListViewState<T> extends State<AppInfiniteListView<T>> {
           child: Text(
             AppMessages.noMoreResults,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: context.tokens.typography.bodySmall,
           ),
         );
       },

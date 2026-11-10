@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 112" role="img" aria-labelledby="title">
   <title id="title">Prumo.app</title>
   <g transform="translate(8 8)">
-    <path d="M48 8v54" fill="none" stroke="#173F3E" stroke-width="6" stroke-linecap="round"/>
-    <path d="M29 20h38M34 36h28M39 52h18" fill="none" stroke="#B85C3B" stroke-width="5" stroke-linecap="round"/>
-    <path d="M48 62 62 78H34Z" fill="#B85C3B"/>
-    <path d="M24 84h48" fill="none" stroke="#173F3E" stroke-width="6" stroke-linecap="round"/>
+    <path d="M48 8v54" fill="none" stroke="#18181B" stroke-width="6" stroke-linecap="round"/>
+    <path d="M29 20h38M34 36h28M39 52h18" fill="none" stroke="#18181B" stroke-width="5" stroke-linecap="round"/>
+    <path d="M48 62 62 78H34Z" fill="#18181B"/>
+    <path d="M24 84h48" fill="none" stroke="#18181B" stroke-width="6" stroke-linecap="round"/>
   </g>
-  <text x="112" y="70" fill="#173F3E" font-family="Fraunces, Georgia, serif" font-size="52" font-weight="600">Prumo</text>
-  <text x="259" y="70" fill="#9F4D32" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
+  <text x="112" y="70" fill="#18181B" font-family="Geist, Arial, sans-serif" font-size="52" font-weight="600">Prumo</text>
+  <text x="267" y="70" fill="#71717A" font-family="Geist, Arial, sans-serif" font-size="25" font-weight="600">.app</text>
 </svg>

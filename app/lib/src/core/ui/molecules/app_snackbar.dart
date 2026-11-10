@@ -14,12 +14,11 @@ abstract final class AppSnackbar {
     String? actionLabel,
     VoidCallback? onAction,
   }) {
-    final scheme = Theme.of(context).colorScheme;
     final colors = context.tokens.colors;
     final (background, foreground, icon) = switch (variant) {
-      AppSnackbarVariant.neutral => (scheme.inverseSurface, scheme.onInverseSurface, AppIcons.observation),
+      AppSnackbarVariant.neutral => (colors.onSurface, colors.canvas, AppIcons.observation),
       AppSnackbarVariant.success => (colors.success, colors.onSuccess, AppIcons.check),
-      AppSnackbarVariant.error => (scheme.error, scheme.onError, AppIcons.attention),
+      AppSnackbarVariant.error => (colors.error, colors.onError, AppIcons.attention),
       AppSnackbarVariant.info => (colors.info, colors.onInfo, AppIcons.observation),
     };
     AppAccessibility.announce(context, message);
@@ -33,7 +32,7 @@ abstract final class AppSnackbar {
               AppIcon(icon, size: AppIconSize.sm, color: foreground),
               SizedBox(width: context.tokens.spacing.md),
               Expanded(
-                child: Text(message, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: foreground)),
+                child: Text(message, style: context.tokens.typography.bodyMedium.copyWith(color: foreground)),
               ),
             ],
           ),

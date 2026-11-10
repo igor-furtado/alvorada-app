@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 
@@ -208,10 +207,6 @@ class _WeekContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (!desktop) ...[
-        AppBrandLogo(width: context.tokens.layout.brandWidth),
-        SizedBox(height: context.tokens.spacing.xxxl),
-      ],
       const _WeekHeader(),
       SizedBox(height: context.tokens.spacing.xxxl),
       const _WeekSummary(),
@@ -261,12 +256,12 @@ class _WeekHeader extends StatelessWidget {
       final title = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppMessages.thisWeek, style: Theme.of(context).textTheme.headlineLarge),
+          Text(AppMessages.thisWeek, style: context.tokens.typography.headlineLarge),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             '2 a 8 de novembro · Consolidação',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.tokens.typography.bodyLarge.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
             ),
           ),
         ],
@@ -274,24 +269,24 @@ class _WeekHeader extends StatelessWidget {
       final controls = Row(
         mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          IconButton.outlined(
-            tooltip: AppMessages.previousWeek,
+          AppAccessibleIconButton(
+            label: AppMessages.previousWeek,
             onPressed: () => _showPreviewMessage(context),
-            icon: const Icon(AppIcons.chevronLeft),
+            icon: AppIcons.chevronLeft,
           ),
           SizedBox(width: context.tokens.spacing.sm),
-          IconButton.outlined(
-            tooltip: AppMessages.nextWeek,
+          AppAccessibleIconButton(
+            label: AppMessages.nextWeek,
             onPressed: () => _showPreviewMessage(context),
-            icon: const Icon(AppIcons.chevronRight),
+            icon: AppIcons.chevronRight,
           ),
           SizedBox(width: context.tokens.spacing.md),
           Expanded(
             flex: compact ? 1 : 0,
-            child: FilledButton.icon(
+            child: AppButton(
               onPressed: () => _showAdjustmentDialog(context),
-              icon: Icon(AppIcons.settings, size: context.tokens.icons.md),
-              label: const Text(AppMessages.adjustWeek),
+              icon: AppIcons.settings,
+              label: AppMessages.adjustWeek,
             ),
           ),
         ],
@@ -326,8 +321,8 @@ class _WeekSummary extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
@@ -340,17 +335,17 @@ class _WeekSummary extends StatelessWidget {
                 children: [
                   Text(
                     '8 de 14 horas realizadas',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: context.tokens.typography.titleMedium,
                   ),
                   SizedBox(height: context.tokens.spacing.xxs),
                   Text(
                     'A semana segue no ritmo planejado.',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: context.tokens.typography.bodyMedium,
                   ),
                 ],
               ),
             ),
-            Text('57%', style: Theme.of(context).textTheme.labelLarge),
+            Text('57%', style: context.tokens.typography.labelLarge),
           ],
         ),
         SizedBox(height: context.tokens.spacing.md),
@@ -413,9 +408,9 @@ class _SummaryItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: Theme.of(context).textTheme.labelSmall),
+              Text(label, style: context.tokens.typography.labelSmall),
               SizedBox(height: context.tokens.spacing.xxs),
-              Text(value, style: Theme.of(context).textTheme.bodyMedium),
+              Text(value, style: context.tokens.typography.bodyMedium),
             ],
           ),
         ),
@@ -431,13 +426,13 @@ class _Legend extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      _LegendDot(color: Theme.of(context).colorScheme.secondary),
+      _LegendDot(color: context.tokens.colors.success),
       SizedBox(width: context.tokens.spacing.xs),
-      Text(AppMessages.done, style: Theme.of(context).textTheme.labelSmall),
+      Text(AppMessages.done, style: context.tokens.typography.labelSmall),
       SizedBox(width: context.tokens.spacing.md),
-      _LegendDot(color: Theme.of(context).colorScheme.primary),
+      _LegendDot(color: context.tokens.colors.primary),
       SizedBox(width: context.tokens.spacing.xs),
-      Text(AppMessages.today, style: Theme.of(context).textTheme.labelSmall),
+      Text(AppMessages.today, style: context.tokens.typography.labelSmall),
     ],
   );
 }
@@ -450,7 +445,7 @@ class _DaysHeader extends StatelessWidget {
     builder: (context, constraints) {
       final title = Text(
         'Dias da semana',
-        style: Theme.of(context).textTheme.headlineSmall,
+        style: context.tokens.typography.headlineSmall,
       );
       if (constraints.maxWidth < context.tokens.layout.narrow) {
         return Column(
@@ -488,22 +483,22 @@ class _StudyDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final colors = context.tokens.colors;
     final current = day.status == _DayStatus.today;
     final done = day.status == _DayStatus.done;
     final accent = current
-        ? scheme.primary
+        ? colors.primary
         : done
-        ? scheme.secondary
-        : scheme.outline;
+        ? colors.success
+        : colors.controlOutline;
 
     return Container(
       constraints: BoxConstraints(minHeight: keepMinimumHeight ? 350 : 0),
       padding: EdgeInsets.all(context.tokens.spacing.xl),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: colors.surface,
         border: Border.all(
-          color: current ? scheme.primary : scheme.outlineVariant,
+          color: current ? colors.primary : colors.border,
         ),
         borderRadius: context.tokens.borders.lg,
       ),
@@ -524,36 +519,40 @@ class _StudyDayCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   day.weekday,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: context.tokens.typography.titleMedium,
                 ),
               ),
               Text(
                 day.duration,
-                style: Theme.of(context).textTheme.labelMedium,
+                style: context.tokens.typography.labelMedium,
               ),
             ],
           ),
           SizedBox(height: context.tokens.spacing.xxs),
           Padding(
             padding: EdgeInsets.only(left: context.tokens.spacing.xl),
-            child: Text(day.date, style: Theme.of(context).textTheme.bodySmall),
+            child: Text(day.date, style: context.tokens.typography.bodySmall),
           ),
           SizedBox(height: context.tokens.spacing.lg),
-          Divider(color: scheme.outlineVariant),
+          const AppDivider(margin: EdgeInsets.zero),
           SizedBox(height: context.tokens.spacing.xxs),
           for (var index = 0; index < day.entries.length; index++) ...[
             _TurnRow(turn: day.entries[index], done: done),
             if (index < day.entries.length - 1)
-              Divider(height: context.tokens.spacing.lg, color: scheme.outlineVariant),
+              AppDivider(
+                margin: EdgeInsets.symmetric(
+                  vertical: context.tokens.spacing.sm,
+                ),
+              ),
           ],
           if (current) ...[
             SizedBox(height: context.tokens.spacing.lg),
             SizedBox(
               width: double.infinity,
-              child: FilledButton.icon(
+              child: AppButton(
                 onPressed: () => context.go('/'),
-                icon: Icon(AppIcons.today, size: context.tokens.icons.md),
-                label: const Text(AppMessages.seeToday),
+                icon: AppIcons.today,
+                label: AppMessages.seeToday,
               ),
             ),
           ],
@@ -576,21 +575,21 @@ class _TurnRow extends StatelessWidget {
       Icon(
         done ? AppIcons.check : turn.icon,
         size: context.tokens.icons.md,
-        color: done ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: done ? context.tokens.colors.success : context.tokens.colors.onSurfaceMuted,
       ),
       SizedBox(width: context.tokens.spacing.md),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(turn.title, style: Theme.of(context).textTheme.titleSmall),
+            Text(turn.title, style: context.tokens.typography.titleSmall),
             SizedBox(height: context.tokens.spacing.xxxs),
-            Text(turn.detail, style: Theme.of(context).textTheme.bodySmall),
+            Text(turn.detail, style: context.tokens.typography.bodySmall),
           ],
         ),
       ),
       SizedBox(width: context.tokens.spacing.sm),
-      Text(turn.duration, style: Theme.of(context).textTheme.labelSmall),
+      Text(turn.duration, style: context.tokens.typography.labelSmall),
     ],
   );
 }
@@ -602,8 +601,8 @@ class _SundayCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.successContainer,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Row(
@@ -612,14 +611,14 @@ class _SundayCard extends StatelessWidget {
           width: context.tokens.sizes.sundayIcon,
           height: context.tokens.sizes.sundayIcon,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(
+            color: context.tokens.colors.surface.withValues(
               alpha: context.tokens.opacity.muted,
             ),
             shape: BoxShape.circle,
           ),
           child: Icon(
             AppIcons.rest,
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.tokens.colors.success,
           ),
         ),
         SizedBox(width: context.tokens.spacing.lg),
@@ -629,12 +628,12 @@ class _SundayCard extends StatelessWidget {
             children: [
               Text(
                 'Domingo protegido · 8 nov.',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: context.tokens.typography.titleMedium,
               ),
               SizedBox(height: context.tokens.spacing.xxs),
               Text(
                 'Nenhum Turno, nenhum lembrete. O descanso já faz parte do Plano.',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: context.tokens.typography.bodyMedium,
               ),
             ],
           ),
@@ -651,8 +650,8 @@ class _ReplanningNote extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Row(
@@ -666,7 +665,7 @@ class _ReplanningNote extends StatelessWidget {
         Expanded(
           child: Text(
             'Se a semana mudar, o Plano preserva as Revisões e reduz o escopo antes de ocupar o domingo.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: context.tokens.typography.bodyMedium,
           ),
         ),
       ],
@@ -678,8 +677,8 @@ class _AdjustmentDialog extends StatelessWidget {
   const _AdjustmentDialog();
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text(AppMessages.adjustThisWeek),
+  Widget build(BuildContext context) => AppDialog(
+    title: AppMessages.adjustThisWeek,
     content: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: context.tokens.sizes.noteMaxWidth),
       child: Column(
@@ -690,29 +689,23 @@ class _AdjustmentDialog extends StatelessWidget {
             'Conte o dia ruim também. O Plano pode mudar sem transformar domingo em dívida.',
           ),
           SizedBox(height: context.tokens.spacing.xl),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(AppIcons.calendar),
-            title: const Text(AppMessages.lessTime),
-            subtitle: const Text(AppMessages.lessTimeHint),
+          AppListItem(
+            leadingIcon: AppIcons.calendar,
+            title: AppMessages.lessTime,
+            subtitle: AppMessages.lessTimeHint,
             onTap: () => Navigator.of(context).pop(),
           ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(AppIcons.questions),
-            title: const Text(AppMessages.extraTime),
-            subtitle: const Text(AppMessages.extraTimeHint),
+          AppListItem(
+            leadingIcon: AppIcons.questions,
+            title: AppMessages.extraTime,
+            subtitle: AppMessages.extraTimeHint,
             onTap: () => Navigator.of(context).pop(),
           ),
         ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.close),
-      ),
-    ],
+    primaryLabel: AppMessages.close,
+    onPrimary: () => Navigator.of(context).pop(),
   );
 }
 

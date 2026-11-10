@@ -15,13 +15,16 @@ void main() {
       AppIcons.delete,
       AppIcons.sortAscending,
       AppIcons.sortDescending,
+      AppIcons.arrowsDownUp,
       AppIcons.search,
       AppIcons.close,
+      AppIcons.moon,
+      AppIcons.sun,
     ];
 
     for (final icon in icons) {
-      expect(icon.fontFamily, 'AppPhosphor');
-      expect(icon.fontPackage, isNull);
+      expect(icon.fontFamily, 'PhosphorLight');
+      expect(icon.fontPackage, 'phosphor_flutter');
     }
   });
 }

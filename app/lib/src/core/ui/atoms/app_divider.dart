@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../theme/app_theme.dart';
 
 class AppDivider extends StatelessWidget {
-  const AppDivider({this.vertical = false, super.key});
+  const AppDivider({this.vertical = false, this.margin, super.key});
 
   final bool vertical;
+  final EdgeInsetsGeometry? margin;
 
   @override
-  Widget build(BuildContext context) => vertical
-      ? ShadSeparator.vertical(
-          margin: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm),
-          thickness: context.tokens.borders.widthHairline,
-        )
-      : ShadSeparator.horizontal(
-          margin: EdgeInsets.symmetric(vertical: context.tokens.spacing.sm),
-          thickness: context.tokens.borders.widthHairline,
-        );
+  Widget build(BuildContext context) {
+    final separator = ColoredBox(
+      color: context.tokens.colors.border,
+      child: SizedBox(
+        width: vertical ? context.tokens.borders.widthHairline : double.infinity,
+        height: vertical ? double.infinity : context.tokens.borders.widthHairline,
+      ),
+    );
+    return Padding(
+      padding:
+          margin ??
+          (vertical
+              ? EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm)
+              : EdgeInsets.symmetric(vertical: context.tokens.spacing.sm)),
+      child: separator,
+    );
+  }
 }

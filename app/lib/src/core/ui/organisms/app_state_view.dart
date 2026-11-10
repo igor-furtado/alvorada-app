@@ -47,15 +47,34 @@ class AppStateView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(defaults.$1, size: context.tokens.icons.xl, color: context.tokens.colors.actionForeground),
-                SizedBox(height: context.tokens.spacing.lg),
-                Text(resolvedTitle, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+                Container(
+                  width: context.tokens.layout.controlHeight,
+                  height: context.tokens.layout.controlHeight,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: context.tokens.colors.surfaceSubtle,
+                    borderRadius: context.tokens.borders.lg,
+                  ),
+                  child: Icon(
+                    defaults.$1,
+                    size: context.tokens.icons.sm,
+                    color: context.tokens.colors.actionForeground,
+                  ),
+                ),
+                SizedBox(height: context.tokens.spacing.md),
+                Text(resolvedTitle, textAlign: TextAlign.center, style: context.tokens.typography.labelLarge),
                 if (resolvedMessage.isNotEmpty) ...[
                   SizedBox(height: context.tokens.spacing.sm),
-                  Text(resolvedMessage, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    resolvedMessage,
+                    textAlign: TextAlign.center,
+                    style: context.tokens.typography.bodySmall.copyWith(
+                      color: context.tokens.colors.onSurfaceMuted,
+                    ),
+                  ),
                 ],
                 if (actionLabel != null) ...[
-                  SizedBox(height: context.tokens.spacing.xl),
+                  SizedBox(height: context.tokens.spacing.lg),
                   AppButton(label: actionLabel!, onPressed: onAction),
                 ],
               ],

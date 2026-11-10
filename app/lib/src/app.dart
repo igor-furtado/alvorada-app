@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'core/brand/app_brand.dart';
 import 'core/presentation/app_shell.dart';
-import 'core/theme/app_shad_theme.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/app_theme_mode.dart';
+import 'features/administration/presentation/administration_page.dart';
 import 'features/contests/presentation/contest_details_page.dart';
 import 'features/contests/presentation/contest_view_data.dart';
 import 'features/contests/presentation/contests_page.dart';
 import 'features/contests/presentation/discipline_details_page.dart';
+import 'features/design_system/presentation/component_catalog_page.dart';
 import 'features/disciplinas/data/repositories/api_disciplinas_repository.dart';
 import 'features/disciplinas/data/services/disciplinas_api_service.dart';
 import 'features/disciplinas/domain/repositories/disciplinas_repository.dart';
 import 'features/disciplinas/presentation/bloc/disciplinas_bloc.dart';
 import 'features/disciplinas/presentation/bloc/disciplinas_event.dart';
-import 'features/disciplinas/presentation/disciplinas_page.dart';
+import 'features/disciplinas/presentation/pages/disciplinas_page.dart';
 import 'features/errors/presentation/error_notebook_page.dart';
 import 'features/reviews/presentation/reviews_page.dart';
 import 'features/today/presentation/today_page.dart';
@@ -83,6 +84,20 @@ final _router = GoRouter(
         StatefulShellBranch(
           routes: [GoRoute(path: '/caderno-de-erros', builder: (context, state) => const ErrorNotebookPage())],
         ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/administracao',
+              builder: (context, state) => const AdministrationPage(),
+              routes: [
+                GoRoute(
+                  path: 'componentes',
+                  builder: (context, state) => const ComponentCatalogPage(),
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     ),
   ],
@@ -100,10 +115,12 @@ class EstudosApp extends StatefulWidget {
 class _EstudosAppState extends State<EstudosApp> {
   http.Client? _client;
   late final DisciplinasRepository _disciplinasRepository;
+  late final AppThemeModeController _themeModeController;
 
   @override
   void initState() {
     super.initState();
+    _themeModeController = AppThemeModeController();
     final injectedRepository = widget.disciplinasRepository;
     if (injectedRepository != null) {
       _disciplinasRepository = injectedRepository;
@@ -116,24 +133,26 @@ class _EstudosAppState extends State<EstudosApp> {
   @override
   void dispose() {
     _client?.close();
+    _themeModeController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => RepositoryProvider<DisciplinasRepository>.value(
-    value: _disciplinasRepository,
-    child: ShadApp.custom(
-      theme: AppShadTheme.light,
-      darkTheme: AppShadTheme.dark,
-      themeMode: ThemeMode.system,
-      appBuilder: (context) => MaterialApp.router(
-        title: AppBrand.applicationTitle,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        restorationScopeId: 'application',
-        routerConfig: _router,
+  Widget build(BuildContext context) => AppThemeModeScope(
+    controller: _themeModeController,
+    child: RepositoryProvider<DisciplinasRepository>.value(
+      value: _disciplinasRepository,
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: _themeModeController,
+        builder: (context, themeMode, child) => MaterialApp.router(
+          title: AppBrand.applicationTitle,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
+          restorationScopeId: 'application',
+          routerConfig: _router,
+        ),
       ),
     ),
   );

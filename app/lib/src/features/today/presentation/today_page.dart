@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/brand/app_brand.dart';
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 
@@ -15,22 +14,20 @@ class TodayPage extends StatelessWidget {
     final isSunday = now.weekday == DateTime.sunday;
 
     return AppPageTemplate(
-      builder: (context, desktop) =>
-          isSunday ? _SundayView(date: now, desktop: desktop) : _TodayContent(date: now, desktop: desktop),
+      builder: (context, desktop) => isSunday ? _SundayView(date: now, desktop: desktop) : _TodayContent(date: now),
     );
   }
 }
 
 class _TodayContent extends StatelessWidget {
-  const _TodayContent({required this.date, required this.desktop});
+  const _TodayContent({required this.date});
   final DateTime date;
-  final bool desktop;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      _Header(date: date, showBrand: !desktop),
+      _Header(date: date),
       SizedBox(height: context.tokens.spacing.xxxl),
       const _ContestStrip(),
       SizedBox(height: context.tokens.spacing.xxl),
@@ -67,9 +64,13 @@ class _TodayContent extends StatelessWidget {
         children: [
           Text(
             AppMessages.reviewsForToday,
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: context.tokens.typography.headlineSmall,
           ),
-          TextButton(onPressed: () {}, child: const Text(AppMessages.seeAll)),
+          AppButton(
+            label: AppMessages.seeAll,
+            variant: AppButtonVariant.text,
+            onPressed: () {},
+          ),
         ],
       ),
       SizedBox(height: context.tokens.spacing.md),
@@ -81,18 +82,13 @@ class _TodayContent extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.date, required this.showBrand});
+  const _Header({required this.date});
   final DateTime date;
-  final bool showBrand;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (showBrand) ...[
-        AppBrandLogo(width: context.tokens.layout.brandWidth),
-        SizedBox(height: context.tokens.spacing.xxxl),
-      ],
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -102,31 +98,31 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   _greeting(date),
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: context.tokens.typography.headlineLarge,
                 ),
                 SizedBox(height: context.tokens.spacing.xs),
                 Text(
                   '${_formattedDate(date)} · Consolidação',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  style: context.tokens.typography.bodyMedium.copyWith(
+                    color: context.tokens.colors.onSurfaceMuted,
                   ),
                 ),
               ],
             ),
           ),
-          IconButton.filledTonal(
-            tooltip: AppMessages.reminders,
+          AppAccessibleIconButton(
+            label: AppMessages.reminders,
             onPressed: () {},
-            icon: Icon(AppIcons.notification, size: context.tokens.icons.lg),
+            icon: AppIcons.notification,
           ),
         ],
       ),
       SizedBox(height: context.tokens.spacing.md),
       Text(
         AppBrand.tagline,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+        style: context.tokens.typography.bodyLarge.copyWith(
           fontStyle: FontStyle.italic,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: context.tokens.colors.onSurfaceMuted,
         ),
       ),
     ],
@@ -146,7 +142,7 @@ class _ContestStrip extends StatelessWidget {
             width: context.tokens.sizes.iconContainerMd,
             height: context.tokens.sizes.iconContainerMd,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: context.tokens.colors.primaryContainer,
               borderRadius: context.tokens.borders.md,
             ),
             child: Icon(
@@ -161,12 +157,12 @@ class _ContestStrip extends StatelessWidget {
               children: [
                 Text(
                   AppMessages.mainContest,
-                  style: Theme.of(context).textTheme.labelMedium,
+                  style: context.tokens.typography.labelMedium,
                 ),
                 SizedBox(height: context.tokens.spacing.xxxs),
                 Text(
                   'Analista · 82 dias para a prova',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: context.tokens.typography.titleMedium,
                 ),
               ],
             ),
@@ -178,7 +174,7 @@ class _ContestStrip extends StatelessWidget {
         children: [
           Text(
             '34% do Edital',
-            style: Theme.of(context).textTheme.labelMedium,
+            style: context.tokens.typography.labelMedium,
           ),
           SizedBox(height: context.tokens.spacing.sm),
           LinearProgressIndicator(
@@ -191,9 +187,9 @@ class _ContestStrip extends StatelessWidget {
       return Container(
         padding: EdgeInsets.all(context.tokens.spacing.lg),
         decoration: BoxDecoration(
-          color: context.tokens.colors.surfaceElevated,
+          color: context.tokens.colors.card,
           border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant,
+            color: context.tokens.colors.border,
           ),
           borderRadius: context.tokens.borders.lg,
         ),
@@ -232,7 +228,7 @@ class _DailyPlanCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(width: context.tokens.sizes.accentBar, color: Theme.of(context).colorScheme.primary),
+            Container(width: context.tokens.sizes.accentBar, color: context.tokens.colors.primary),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(context.tokens.spacing.xxl),
@@ -244,19 +240,19 @@ class _DailyPlanCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             AppMessages.todayPlanTitle,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                            style: context.tokens.typography.headlineSmall,
                           ),
                         ),
                         Text(
                           '1h40',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: context.tokens.typography.titleMedium,
                         ),
                       ],
                     ),
                     SizedBox(height: context.tokens.spacing.xxs),
                     Text(
                       'Comece pela disciplina principal. Um turno de cada vez.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: context.tokens.typography.bodyMedium,
                     ),
                     SizedBox(height: context.tokens.spacing.xl),
                     const _PlanRow(
@@ -290,13 +286,10 @@ class _DailyPlanCard extends StatelessWidget {
                     SizedBox(height: context.tokens.spacing.xxl),
                     SizedBox(
                       width: double.infinity,
-                      child: FilledButton.icon(
+                      child: AppButton(
                         onPressed: () {},
-                        icon: Icon(
-                          AppIcons.play,
-                          size: context.tokens.icons.md,
-                        ),
-                        label: const Text(AppMessages.startNextTurn),
+                        icon: AppIcons.play,
+                        label: AppMessages.startNextTurn,
                       ),
                     ),
                   ],
@@ -334,9 +327,7 @@ class _PlanRow extends StatelessWidget {
           width: context.tokens.sizes.iconContainerSm,
           height: context.tokens.sizes.iconContainerSm,
           decoration: BoxDecoration(
-            color: current
-                ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: current ? context.tokens.colors.primaryContainer : context.tokens.colors.surfaceSubtle,
             borderRadius: context.tokens.borders.md,
           ),
           child: Icon(
@@ -350,13 +341,13 @@ class _PlanRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleSmall),
-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+              Text(title, style: context.tokens.typography.titleSmall),
+              Text(subtitle, style: context.tokens.typography.bodySmall),
             ],
           ),
         ),
         SizedBox(width: context.tokens.spacing.sm),
-        Text(duration, style: Theme.of(context).textTheme.labelMedium),
+        Text(duration, style: context.tokens.typography.labelMedium),
       ],
     ),
   );
@@ -368,10 +359,7 @@ class _NotebookDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.only(left: context.tokens.spacing.huge),
-    child: Divider(
-      height: context.tokens.sizes.hairline,
-      color: Theme.of(context).colorScheme.outlineVariant,
-    ),
+    child: const AppDivider(margin: EdgeInsets.zero),
   );
 }
 
@@ -395,7 +383,7 @@ class _SunnyDaysCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   AppMessages.sunnyDays,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: context.tokens.typography.titleLarge,
                 ),
               ),
             ],
@@ -403,7 +391,7 @@ class _SunnyDaysCard extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             AppMessages.weeklyRhythm,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: context.tokens.typography.bodySmall,
           ),
           SizedBox(height: context.tokens.spacing.xxl),
           const Row(
@@ -422,7 +410,7 @@ class _SunnyDaysCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(context.tokens.spacing.lg),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer,
+              color: context.tokens.colors.successContainer,
               borderRadius: context.tokens.borders.md,
             ),
             child: Row(
@@ -430,13 +418,13 @@ class _SunnyDaysCard extends StatelessWidget {
                 Icon(
                   AppIcons.rest,
                   size: context.tokens.icons.md,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: context.tokens.colors.success,
                 ),
                 SizedBox(width: context.tokens.spacing.md),
                 Expanded(
                   child: Text(
                     AppMessages.protectedSundayDescription,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: context.tokens.typography.bodySmall,
                   ),
                 ),
               ],
@@ -445,7 +433,7 @@ class _SunnyDaysCard extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.xl),
           Text(
             'Fundação concluída',
-            style: Theme.of(context).textTheme.labelMedium,
+            style: context.tokens.typography.labelMedium,
           ),
           SizedBox(height: context.tokens.spacing.sm),
           LinearProgressIndicator(
@@ -453,7 +441,7 @@ class _SunnyDaysCard extends StatelessWidget {
             minHeight: context.tokens.sizes.progressIndicatorThin,
           ),
           SizedBox(height: context.tokens.spacing.xs),
-          Text('Semana 8 de 13', style: Theme.of(context).textTheme.bodySmall),
+          Text('Semana 8 de 13', style: context.tokens.typography.bodySmall),
         ],
       ),
     ),
@@ -469,13 +457,13 @@ class _DayMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
+    final primary = context.tokens.colors.primary;
     final isDone = state == _DayState.done;
     final isToday = state == _DayState.today;
     final isRest = state == _DayState.rest;
     return Column(
       children: [
-        Text(day, style: Theme.of(context).textTheme.labelSmall),
+        Text(day, style: context.tokens.typography.labelSmall),
         SizedBox(height: context.tokens.spacing.sm),
         Container(
           width: context.tokens.sizes.dayMarker,
@@ -485,10 +473,10 @@ class _DayMark extends StatelessWidget {
             color: isDone
                 ? primary
                 : isRest
-                ? Theme.of(context).colorScheme.secondaryContainer
+                ? context.tokens.colors.successContainer
                 : context.tokens.colors.transparent,
             border: Border.all(
-              color: isToday ? primary : Theme.of(context).colorScheme.outline,
+              color: isToday ? primary : context.tokens.colors.controlOutline,
             ),
           ),
           child: isDone
@@ -596,24 +584,24 @@ class _ReviewCard extends StatelessWidget {
                   ),
                   child: Text(
                     'Revisão de $interval',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelMedium?.copyWith(color: color),
+                    style: context.tokens.typography.labelMedium.copyWith(
+                      color: color,
+                    ),
                   ),
                 ),
-                Text(duration, style: Theme.of(context).textTheme.labelMedium),
+                Text(duration, style: context.tokens.typography.labelMedium),
               ],
             ),
             SizedBox(height: context.tokens.spacing.lg),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            Text(title, style: context.tokens.typography.titleMedium),
             SizedBox(height: context.tokens.spacing.xxs),
-            Text(detail, style: Theme.of(context).textTheme.bodySmall),
+            Text(detail, style: context.tokens.typography.bodySmall),
             SizedBox(height: context.tokens.spacing.lg),
             Row(
               children: [
                 Icon(AppIcons.reviews, size: context.tokens.icons.md, color: color),
                 SizedBox(width: context.tokens.spacing.xs),
-                Text(when, style: Theme.of(context).textTheme.labelMedium),
+                Text(when, style: context.tokens.typography.labelMedium),
                 const Spacer(),
                 Icon(AppIcons.arrowRight, size: context.tokens.icons.md),
               ],
@@ -632,11 +620,11 @@ class _MethodNote extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(
+      color: context.tokens.colors.surfaceSubtle.withValues(
         alpha: context.tokens.opacity.muted,
       ),
       borderRadius: context.tokens.borders.lg,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      border: Border.all(color: context.tokens.colors.border),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -646,7 +634,7 @@ class _MethodNote extends StatelessWidget {
         Expanded(
           child: Text(
             'Recuperação ativa antes de tudo: feche o material e tente dizer antes de conferir.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: context.tokens.typography.bodyMedium,
           ),
         ),
       ],
@@ -663,7 +651,6 @@ class _SundayView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (!desktop) AppBrandLogo(width: context.tokens.layout.brandWidth),
       SizedBox(
         height: desktop ? context.tokens.layout.sundayContentOffset : context.tokens.spacing.huge,
       ),
@@ -679,31 +666,31 @@ class _SundayView extends StatelessWidget {
                     width: context.tokens.sizes.largeVisual,
                     height: context.tokens.sizes.largeVisual,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      color: context.tokens.colors.successContainer,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       AppIcons.rest,
                       size: context.tokens.icons.hero,
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: context.tokens.colors.success,
                     ),
                   ),
                   SizedBox(height: context.tokens.spacing.xxl),
                   Text(
                     AppMessages.protectedSunday,
-                    style: Theme.of(context).textTheme.headlineLarge,
+                    style: context.tokens.typography.headlineLarge,
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: context.tokens.spacing.md),
                   Text(
                     AppMessages.protectedSundayToday,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: context.tokens.typography.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: context.tokens.spacing.xl),
                   Text(
                     _formattedDate(date),
-                    style: Theme.of(context).textTheme.labelMedium,
+                    style: context.tokens.typography.labelMedium,
                   ),
                 ],
               ),

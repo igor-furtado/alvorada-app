@@ -14,6 +14,7 @@ enum DisciplinasFeedback {
   subtopicoAtualizado,
   subtopicoExcluido,
   atualizacaoFalhou,
+  sincronizacaoPendente,
   operacaoFalhou,
 }
 

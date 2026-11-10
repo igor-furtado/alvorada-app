@@ -12,17 +12,13 @@ São utilizados os cinco labels canônicos de triagem. Consulte `docs/agents/tri
 
 O projeto usa documentação de domínio single-context. Consulte `docs/agents/domain.md`.
 
-### Marca
-
-Ao alterar nome, posicionamento, assinatura, identidade, assets, metadados de marca ou materiais de loja, siga `app/docs/agents/brand/index.md`.
-
 ### Produto
 
 Ao alterar comportamento, método, priorização, descanso, métricas, navegação, vocabulário ou termos do produto, siga `app/docs/agents/product/index.md`.
 
-### Flutter UI
+### Widgets Flutter
 
-Ao alterar widget, fluxo, texto, navegação, responsividade ou acessibilidade Flutter, siga a convenção shadcn/ui em `app/docs/agents/design-system/index.md`.
+Widgets Flutter: ao criar, alterar ou revisar componente, tela, fluxo, texto visível, navegação, responsividade ou acessibilidade, siga `app/docs/agents/architecture/widgets.md`.
 
 ### Flutter domain e data
 

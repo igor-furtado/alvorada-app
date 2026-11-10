@@ -137,7 +137,7 @@ O esquema MySQL usa o vocabulário do domínio em português: `disciplinas`, `to
 
 A interface organiza cada funcionalidade por área e mantém componentes compartilhados em `core`. A funcionalidade Flutter de Disciplinas separa `domain`, `data` e `presentation` conforme o [guia oficial de arquitetura do Flutter](https://docs.flutter.dev/app-architecture/guide), com Bloc para estado e comandos da interface. As classes usam o conceito de negócio em português e preservam qualificadores técnicos em inglês, como `DisciplinaApiModel`, `DisciplinasRepository` e `DisciplinasBloc`. A API separa domínio, aplicação, infraestrutura e entrega HTTP.
 
-Para entender os conceitos do produto — como Concurso, Edital, Turno, Fixado e Revisão programada — consulte [`CONTEXT.md`](CONTEXT.md). As decisões duradouras ficam em [`docs/adr/`](docs/adr/), as regras do produto em [`app/docs/agents/product/`](app/docs/agents/product/) e a identidade em [`app/docs/agents/brand/`](app/docs/agents/brand/).
+Para entender os conceitos do produto — como Concurso, Edital, Turno, Fixado e Revisão programada — consulte [`CONTEXT.md`](CONTEXT.md). As decisões duradouras ficam em [`docs/adr/`](docs/adr/), as regras do produto em [`app/docs/agents/product/`](app/docs/agents/product/) e as convenções de widgets em [`app/docs/agents/architecture/widgets.md`](app/docs/agents/architecture/widgets.md).
 
 ## API
 
@@ -182,8 +182,7 @@ O conjunto Flutter cobre navegação responsiva, preservação de estado, contra
 
 ## Referências do projeto
 
-- [`app/docs/agents/design-system/index.md`](app/docs/agents/design-system/index.md): princípios e regras do design system;
-- [`app/docs/agents/brand/index.md`](app/docs/agents/brand/index.md): identidade e expressão da marca;
+- [`app/docs/agents/architecture/widgets.md`](app/docs/agents/architecture/widgets.md): processo e critérios para widgets Flutter;
 - [`app/docs/agents/product/index.md`](app/docs/agents/product/index.md): regras do produto;
 - [`CONTEXT.md`](CONTEXT.md): glossário canônico do domínio;
 - [`api/docs/openapi.yaml`](api/docs/openapi.yaml): contrato HTTP da API.

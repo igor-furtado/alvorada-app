@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 
@@ -70,10 +69,6 @@ class _ErrorNotebookPageState extends State<ErrorNotebookPage> {
     builder: (context, desktop) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (!desktop) ...[
-          AppBrandLogo(width: context.tokens.layout.brandWidth),
-          SizedBox(height: context.tokens.spacing.xxxl),
-        ],
         _Header(
           onAdd: () => _showRegisterDialog(context),
           onLearn: () => _showMethodDialog(context),
@@ -118,13 +113,13 @@ class _Header extends StatelessWidget {
         children: [
           Text(
             'Caderno de Erros',
-            style: Theme.of(context).textTheme.headlineLarge,
+            style: context.tokens.typography.headlineLarge,
           ),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             'Entenda por que errou. Volte apenas ao que precisa.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.tokens.typography.bodyLarge.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
             ),
           ),
         ],
@@ -236,12 +231,12 @@ class _ActiveNotebook extends StatelessWidget {
       final notebook = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppMessages.underReview, style: Theme.of(context).textTheme.headlineSmall),
+          Text(AppMessages.underReview, style: context.tokens.typography.headlineSmall),
           SizedBox(height: context.tokens.spacing.xs),
           Text(
             'O caderno ativo guarda somente o que ainda precisa voltar.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.tokens.typography.bodyMedium.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
             ),
           ),
           SizedBox(height: context.tokens.spacing.lg),
@@ -282,14 +277,14 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final accent = entry.priority ? scheme.error : _kindColor(entry.kind, context);
+    final colors = context.tokens.colors;
+    final accent = entry.priority ? colors.error : _kindColor(entry.kind, context);
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: colors.surface,
         borderRadius: context.tokens.borders.lg,
-        border: Border.all(color: scheme.outlineVariant),
+        border: Border.all(color: colors.border),
       ),
       child: Stack(
         children: [
@@ -323,12 +318,12 @@ class _ErrorCard extends StatelessWidget {
                 SizedBox(height: context.tokens.spacing.lg),
                 Text(
                   entry.topic,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: context.tokens.typography.titleLarge,
                 ),
                 SizedBox(height: context.tokens.spacing.xxs),
                 Text(
                   '${entry.discipline} · ${entry.question}',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.tokens.typography.bodySmall,
                 ),
                 SizedBox(height: context.tokens.spacing.lg),
                 _LinedField(
@@ -350,14 +345,15 @@ class _ErrorCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         entry.nextReview,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelLarge?.copyWith(color: accent),
+                        style: context.tokens.typography.labelLarge.copyWith(
+                          color: accent,
+                        ),
                       ),
                     ),
-                    TextButton(
+                    AppButton(
                       onPressed: () => _showReviewPreview(context, entry),
-                      child: const Text(AppMessages.openEntry),
+                      label: AppMessages.openEntry,
+                      variant: AppButtonVariant.text,
                     ),
                   ],
                 ),
@@ -385,7 +381,7 @@ class _Tag extends StatelessWidget {
     ),
     child: Text(
       label,
-      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: color),
+      style: context.tokens.typography.labelMedium.copyWith(color: color),
     ),
   );
 }
@@ -406,12 +402,12 @@ class _LinedField extends StatelessWidget {
     width: double.infinity,
     padding: EdgeInsets.all(context.tokens.spacing.md),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(
+      color: context.tokens.colors.surfaceSubtle.withValues(
         alpha: context.tokens.opacity.subtle,
       ),
       borderRadius: context.tokens.borders.md,
       border: Border(
-        bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        bottom: BorderSide(color: context.tokens.colors.border),
       ),
     ),
     child: Row(
@@ -420,16 +416,16 @@ class _LinedField extends StatelessWidget {
         Icon(
           icon,
           size: context.tokens.icons.md,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: context.tokens.colors.onSurfaceMuted,
         ),
         SizedBox(width: context.tokens.spacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: Theme.of(context).textTheme.labelMedium),
+              Text(label, style: context.tokens.typography.labelMedium),
               SizedBox(height: context.tokens.spacing.xxs),
-              Text(value, style: Theme.of(context).textTheme.bodyMedium),
+              Text(value, style: context.tokens.typography.bodyMedium),
             ],
           ),
         ),
@@ -445,8 +441,8 @@ class _DiagnosisGuide extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
@@ -460,28 +456,33 @@ class _DiagnosisGuide extends StatelessWidget {
         SizedBox(height: context.tokens.spacing.lg),
         Text(
           'Diagnóstico antes do remédio',
-          style: Theme.of(context).textTheme.headlineSmall,
+          style: context.tokens.typography.headlineSmall,
         ),
         SizedBox(height: context.tokens.spacing.sm),
         Text(
           'Classifique pela primeira resposta que fizer sentido. Cada causa pede um treino diferente.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: context.tokens.typography.bodyMedium,
         ),
         SizedBox(height: context.tokens.spacing.xl),
         for (final kind in _ErrorKind.values) ...[
           _DiagnosisRow(kind: kind),
-          if (kind != _ErrorKind.values.last) Divider(height: context.tokens.spacing.xl),
+          if (kind != _ErrorKind.values.last)
+            AppDivider(
+              margin: EdgeInsets.symmetric(
+                vertical: context.tokens.spacing.md,
+              ),
+            ),
         ],
         SizedBox(height: context.tokens.spacing.lg),
         Container(
           padding: EdgeInsets.all(context.tokens.spacing.md),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.errorContainer,
+            color: context.tokens.colors.errorContainer,
             borderRadius: context.tokens.borders.md,
           ),
           child: Text(
             'Evite “falta de atenção”. Nomeie a palavra, condição ou decisão que levou ao erro.',
-            style: Theme.of(context).textTheme.bodySmall,
+            style: context.tokens.typography.bodySmall,
           ),
         ),
       ],
@@ -512,9 +513,9 @@ class _DiagnosisRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(kind.label, style: Theme.of(context).textTheme.titleSmall),
+            Text(kind.label, style: context.tokens.typography.titleSmall),
             SizedBox(height: context.tokens.spacing.xxxs),
-            Text(kind.remedy, style: Theme.of(context).textTheme.bodySmall),
+            Text(kind.remedy, style: context.tokens.typography.bodySmall),
           ],
         ),
       ),
@@ -530,8 +531,8 @@ class _ArchivePreview extends StatelessWidget {
     width: double.infinity,
     padding: EdgeInsets.all(context.tokens.spacing.xxl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: Column(
@@ -539,20 +540,21 @@ class _ArchivePreview extends StatelessWidget {
       children: [
         Icon(
           AppIcons.check,
-          color: Theme.of(context).colorScheme.secondary,
+          color: context.tokens.colors.success,
           size: context.tokens.icons.xl,
         ),
         SizedBox(height: context.tokens.spacing.md),
-        Text(AppMessages.notebookArchive, style: Theme.of(context).textTheme.headlineSmall),
+        Text(AppMessages.notebookArchive, style: context.tokens.typography.headlineSmall),
         SizedBox(height: context.tokens.spacing.xs),
         Text(
           '18 registros já saíram do caderno ativo. Eles voltam apenas na semana da prova, com uma leitura de “Por que eu caí”.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: context.tokens.typography.bodyMedium,
         ),
         SizedBox(height: context.tokens.spacing.lg),
-        OutlinedButton(
+        AppButton(
           onPressed: () => _showDataMessage(context),
-          child: const Text(AppMessages.seeArchivedEntries),
+          label: AppMessages.seeArchivedEntries,
+          variant: AppButtonVariant.outline,
         ),
       ],
     ),
@@ -566,7 +568,7 @@ class _MonthlyReading extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(context.tokens.spacing.xl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.secondaryContainer,
+      color: context.tokens.colors.successContainer,
       borderRadius: context.tokens.borders.lg,
     ),
     child: LayoutBuilder(
@@ -576,19 +578,20 @@ class _MonthlyReading extends StatelessWidget {
           children: [
             Text(
               'Leitura mensal do seu padrão',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: context.tokens.typography.titleLarge,
             ),
             SizedBox(height: context.tokens.spacing.xs),
             Text(
               'Direito Administrativo concentra mais erros. Leitura é a causa predominante; o ajuste é no processo, não em reler toda a matéria.',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: context.tokens.typography.bodyMedium,
             ),
           ],
         );
-        final button = OutlinedButton.icon(
+        final button = AppButton(
           onPressed: () => _showDataMessage(context),
-          icon: Icon(AppIcons.statistics, size: context.tokens.icons.md),
-          label: const Text(AppMessages.seeMonthlyReport),
+          icon: AppIcons.statistics,
+          label: AppMessages.seeMonthlyReport,
+          variant: AppButtonVariant.outline,
         );
         if (constraints.maxWidth < context.tokens.layout.reading) {
           return Column(
@@ -620,8 +623,8 @@ class _EmptyFilter extends StatelessWidget {
     width: double.infinity,
     padding: EdgeInsets.all(context.tokens.spacing.xxl),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      color: context.tokens.colors.surface,
+      border: Border.all(color: context.tokens.colors.border),
       borderRadius: context.tokens.borders.lg,
     ),
     child: const Text(AppMessages.noEntryForDiagnosis),
@@ -659,22 +662,18 @@ class _RegisterErrorDialogState extends State<_RegisterErrorDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AppDialog(
-    title: AppMessages.registerError,
-    maxWidth: context.tokens.sizes.dialogWide,
-    content: AppValidatedForm(
-      formKey: _formKey,
-      firstInvalidFocusNode: _firstInvalidFocus,
-      onSubmit: () async => Navigator.of(context).pop(true),
-      builder: (context, submitting, submit) => Column(
+  Widget build(BuildContext context) => AppValidatedForm(
+    formKey: _formKey,
+    firstInvalidFocusNode: _firstInvalidFocus,
+    onSubmit: () async => Navigator.of(context).pop(true),
+    builder: (context, submitting, submit) => AppDialog(
+      title: AppMessages.registerError,
+      description: AppMessages.registerErrorIntro,
+      maxWidth: context.tokens.sizes.dialogWide,
+      content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppMessages.registerErrorIntro,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          SizedBox(height: context.tokens.spacing.xl),
           const AppFormField(label: AppMessages.date),
           SizedBox(height: context.tokens.spacing.md),
           const AppFormField(label: AppMessages.disciplineAndTopic),
@@ -683,7 +682,7 @@ class _RegisterErrorDialogState extends State<_RegisterErrorDialog> {
           SizedBox(height: context.tokens.spacing.lg),
           Text(
             AppMessages.errorType,
-            style: Theme.of(context).textTheme.labelLarge,
+            style: context.tokens.typography.labelLarge,
           ),
           SizedBox(height: context.tokens.spacing.sm),
           Wrap(
@@ -723,28 +722,22 @@ class _RegisterErrorDialogState extends State<_RegisterErrorDialog> {
           SizedBox(height: context.tokens.spacing.lg),
           Text(
             AppMessages.revisionsWillBeScheduled,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          SizedBox(height: context.tokens.spacing.xl),
-          Wrap(
-            spacing: context.tokens.spacing.sm,
-            runSpacing: context.tokens.spacing.sm,
-            alignment: WrapAlignment.end,
-            children: [
-              AppButton(
-                label: AppMessages.cancel,
-                variant: AppButtonVariant.text,
-                onPressed: submitting ? null : () => Navigator.of(context).pop(false),
-              ),
-              AppButton(
-                label: AppMessages.saveAndScheduleReviews,
-                loading: submitting,
-                onPressed: submit,
-              ),
-            ],
+            style: context.tokens.typography.bodySmall,
           ),
         ],
       ),
+      actions: [
+        AppButton(
+          label: AppMessages.cancel,
+          variant: AppButtonVariant.outline,
+          onPressed: submitting ? null : () => Navigator.of(context).pop(false),
+        ),
+        AppButton(
+          label: AppMessages.saveAndScheduleReviews,
+          loading: submitting,
+          onPressed: submit,
+        ),
+      ],
     ),
   );
 }
@@ -758,20 +751,16 @@ Future<void> _showRegisterDialog(BuildContext context) async {
 
 Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
   context: context,
-  builder: (context) => AlertDialog(
-    title: const Text(AppMessages.howErrorNotebookWorks),
+  builder: (context) => AppDialog(
+    title: AppMessages.howErrorNotebookWorks,
     content: SizedBox(
       width: context.tokens.sizes.dialogMedium,
       child: const Text(
         'Classifique a causa, escreva a regra correta com suas palavras e explique por que caiu. No dia seguinte, leia a regra; em 7 dias, recupere de memória; em 30 dias, refaça a questão. Só então um registro pode sair do caderno ativo.',
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.understand),
-      ),
-    ],
+    primaryLabel: AppMessages.understand,
+    onPrimary: () => Navigator.of(context).pop(),
   ),
 );
 
@@ -780,8 +769,8 @@ Future<void> _showReviewPreview(
   _ErrorEntry entry,
 ) => showDialog<void>(
   context: context,
-  builder: (context) => AlertDialog(
-    title: Text(entry.topic),
+  builder: (context) => AppDialog(
+    title: entry.topic,
     content: SizedBox(
       width: context.tokens.sizes.dialogNarrow,
       child: Column(
@@ -790,7 +779,7 @@ Future<void> _showReviewPreview(
         children: [
           Text(
             entry.reviewStage,
-            style: Theme.of(context).textTheme.labelLarge,
+            style: context.tokens.typography.labelLarge,
           ),
           SizedBox(height: context.tokens.spacing.sm),
           Text(_reviewInstruction(entry.reviewStage)),
@@ -798,22 +787,16 @@ Future<void> _showReviewPreview(
             SizedBox(height: context.tokens.spacing.lg),
             Text(
               'Como este erro se repetiu, o Tópico inteiro volta para consulta.',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: context.tokens.typography.bodySmall,
             ),
           ],
         ],
       ),
     ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.close),
-      ),
-      FilledButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppMessages.startNotebookReview),
-      ),
-    ],
+    secondaryLabel: AppMessages.close,
+    onSecondary: () => Navigator.of(context).pop(),
+    primaryLabel: AppMessages.startNotebookReview,
+    onPrimary: () => Navigator.of(context).pop(),
   ),
 );
 
@@ -834,7 +817,7 @@ String _reviewInstruction(String stage) => switch (stage) {
 Color _kindColor(_ErrorKind kind, BuildContext context) => switch (kind) {
   _ErrorKind.content => context.tokens.colors.errorForeground,
   _ErrorKind.reading => context.tokens.colors.actionForeground,
-  _ErrorKind.rush => Theme.of(context).colorScheme.tertiary,
+  _ErrorKind.rush => context.tokens.colors.info,
   _ErrorKind.trap => context.tokens.colors.info,
 };
 

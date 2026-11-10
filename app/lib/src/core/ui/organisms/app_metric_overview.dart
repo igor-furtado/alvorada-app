@@ -13,13 +13,12 @@ class AppMetricOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final colors = context.tokens.colors;
     final (background, foreground) = switch (tone) {
-      AppMetricTone.primary => (scheme.primaryContainer, colors.actionForeground),
+      AppMetricTone.primary => (colors.primaryContainer, colors.actionForeground),
       AppMetricTone.error => (
-        scheme.error.withValues(alpha: context.tokens.opacity.tintStrong),
-        scheme.onSurface,
+        colors.error.withValues(alpha: context.tokens.opacity.tintStrong),
+        colors.onSurface,
       ),
       AppMetricTone.success => (colors.successContainer, colors.success),
       AppMetricTone.info => (colors.infoContainer, colors.info),
@@ -27,8 +26,8 @@ class AppMetricOverview extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.tokens.spacing.xl),
       decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border.all(color: scheme.outlineVariant),
+        color: colors.surface,
+        border: Border.all(color: colors.border),
         borderRadius: context.tokens.borders.lg,
       ),
       child: Wrap(

@@ -18,21 +18,27 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
 
   @override
   Future<Disciplina> createDisciplina(CreateDisciplinaInput input) async {
+    late final String id;
     try {
-      final id = await _api.createDisciplina({
+      id = await _api.createDisciplina({
         'nome': input.name,
         'dificuldade': input.difficulty.apiValue,
         'cor': input.color,
       });
-      final disciplinas = await _refresh();
-      return disciplinas.firstWhere(
-        (discipline) => discipline.id == id,
-        orElse: () => throw const FormatException('A API criou a Disciplina, mas não a retornou no catálogo.'),
-      );
     } on DisciplinasRepositoryException {
       rethrow;
     } on Object catch (error) {
       throw DisciplinasRepositoryException('Não foi possível criar a Disciplina.', error);
+    }
+    final disciplinas = await _refreshAfterMutation();
+    try {
+      return disciplinas.firstWhere(
+        (discipline) => discipline.id == id,
+        orElse: () => throw const FormatException('A API criou a Disciplina, mas não a retornou no catálogo.'),
+      );
+    } on Object catch (error) {
+      _cache = null;
+      throw DisciplinasSynchronizationException(error);
     }
   }
 
@@ -93,11 +99,20 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
   Future<void> _mutate(Future<void> Function() operation, String message) async {
     try {
       await operation();
-      await _refresh();
     } on DisciplinasRepositoryException {
       rethrow;
     } on Object catch (error) {
       throw DisciplinasRepositoryException(message, error);
+    }
+    await _refreshAfterMutation();
+  }
+
+  Future<List<Disciplina>> _refreshAfterMutation() async {
+    try {
+      return await _refresh();
+    } on Object catch (error) {
+      _cache = null;
+      throw DisciplinasSynchronizationException(error);
     }
   }
 }

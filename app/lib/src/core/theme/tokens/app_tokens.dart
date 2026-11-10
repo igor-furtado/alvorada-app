@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 
 import 'app_border_tokens.dart';
 import 'app_color_tokens.dart';
-import 'app_elevation_tokens.dart';
 import 'app_icon_tokens.dart';
 import 'app_layout_tokens.dart';
 import 'app_motion_tokens.dart';
 import 'app_opacity_tokens.dart';
+import 'app_shadow_tokens.dart';
 import 'app_size_tokens.dart';
 import 'app_spacing_tokens.dart';
+import 'app_typography_tokens.dart';
 
 @immutable
 class AppTokens extends ThemeExtension<AppTokens> {
   const AppTokens({
     required this.colors,
-    required this.elevations,
+    required this.shadows,
+    required this.typography,
     this.spacing = const AppSpacingTokens(),
     this.borders = const AppBorderTokens(),
     this.motion = const AppMotionTokens(),
@@ -28,7 +30,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     const colors = AppColorTokens.light();
     return AppTokens(
       colors: colors,
-      elevations: AppElevationTokens.from(colors.shadow),
+      shadows: AppShadowTokens.from(colors.shadow),
+      typography: AppTypographyTokens.fromColors(colors.onSurface, colors.onSurfaceMuted),
     );
   }
 
@@ -36,14 +39,16 @@ class AppTokens extends ThemeExtension<AppTokens> {
     const colors = AppColorTokens.dark();
     return AppTokens(
       colors: colors,
-      elevations: AppElevationTokens.from(colors.shadow),
+      shadows: AppShadowTokens.from(colors.shadow),
+      typography: AppTypographyTokens.fromColors(colors.onSurface, colors.onSurfaceMuted),
     );
   }
 
   final AppColorTokens colors;
+  final AppTypographyTokens typography;
   final AppSpacingTokens spacing;
   final AppBorderTokens borders;
-  final AppElevationTokens elevations;
+  final AppShadowTokens shadows;
   final AppMotionTokens motion;
   final AppLayoutTokens layout;
   final AppIconTokens icons;
@@ -53,9 +58,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
   @override
   AppTokens copyWith({
     AppColorTokens? colors,
+    AppTypographyTokens? typography,
     AppSpacingTokens? spacing,
     AppBorderTokens? borders,
-    AppElevationTokens? elevations,
+    AppShadowTokens? shadows,
     AppMotionTokens? motion,
     AppLayoutTokens? layout,
     AppIconTokens? icons,
@@ -63,9 +69,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
     AppSizeTokens? sizes,
   }) => AppTokens(
     colors: colors ?? this.colors,
+    typography: typography ?? this.typography,
     spacing: spacing ?? this.spacing,
     borders: borders ?? this.borders,
-    elevations: elevations ?? this.elevations,
+    shadows: shadows ?? this.shadows,
     motion: motion ?? this.motion,
     layout: layout ?? this.layout,
     icons: icons ?? this.icons,
@@ -78,9 +85,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
     if (other == null) return this;
     return AppTokens(
       colors: colors.lerp(other.colors, t),
+      typography: typography.lerp(other.typography, t),
       spacing: spacing.lerp(other.spacing, t),
       borders: borders.lerp(other.borders, t),
-      elevations: elevations.lerp(other.elevations, t),
+      shadows: shadows.lerp(other.shadows, t),
       motion: motion.lerp(other.motion, t),
       layout: layout.lerp(other.layout, t),
       icons: icons.lerp(other.icons, t),

@@ -172,6 +172,13 @@ class DisciplinasBloc extends Bloc<DisciplinasEvent, DisciplinasState> {
           feedback: successFeedback,
         ),
       );
+    } on DisciplinasSynchronizationException {
+      emit(
+        state.copyWith(
+          isMutating: false,
+          feedback: DisciplinasFeedback.sincronizacaoPendente,
+        ),
+      );
     } on Object {
       emit(
         state.copyWith(

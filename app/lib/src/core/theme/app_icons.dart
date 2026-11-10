@@ -6,9 +6,10 @@ import 'package:flutter/widgets.dart';
 /// direto por [IconData] evita a incompatibilidade temporária do pacote com
 /// versões do Flutter em que `IconData` passou a ser uma classe final.
 abstract final class AppIcons {
-  static const String _regular = 'AppPhosphor';
+  static const String _regular = 'PhosphorLight';
+  static const String _regularStroke = 'PhosphorRegular';
   static const String _fill = 'PhosphorFill';
-  static const String? _package = null;
+  static const String _package = 'phosphor_flutter';
   static const String _fillPackage = 'phosphor_flutter';
 
   static const chevronLeft = IconData(
@@ -16,9 +17,19 @@ abstract final class AppIcons {
     fontFamily: _regular,
     fontPackage: _package,
   );
+  static const chevronLeftStrong = IconData(
+    0xe138,
+    fontFamily: _regularStroke,
+    fontPackage: _package,
+  );
   static const chevronRight = IconData(
     0xe13a,
     fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const chevronRightStrong = IconData(
+    0xe13a,
+    fontFamily: _regularStroke,
     fontPackage: _package,
   );
   static const edit = IconData(
@@ -29,6 +40,11 @@ abstract final class AppIcons {
   static const expandMore = IconData(
     0xe136,
     fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const expandMoreStrong = IconData(
+    0xe136,
+    fontFamily: _regularStroke,
     fontPackage: _package,
   );
   static const expandNext = chevronRight;
@@ -47,6 +63,16 @@ abstract final class AppIcons {
     fontFamily: _regular,
     fontPackage: _package,
   );
+  static const deleteStrong = IconData(
+    0xe4a6,
+    fontFamily: _regularStroke,
+    fontPackage: _package,
+  );
+  static const bluetooth = IconData(
+    0xe0da,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
   static const sortAscending = IconData(
     0xe08e,
     fontFamily: _regular,
@@ -57,6 +83,11 @@ abstract final class AppIcons {
     fontFamily: _regular,
     fontPackage: _package,
   );
+  static const arrowsDownUp = IconData(
+    0xe098,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
   static const search = IconData(
     0xe30c,
     fontFamily: _regular,
@@ -64,6 +95,41 @@ abstract final class AppIcons {
   );
   static const close = IconData(
     0xe4f6,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const clock = IconData(
+    0xe19a,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const refresh = IconData(
+    0xe036,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const fileText = IconData(
+    0xe23a,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const fileWarning = IconData(
+    0xe4e4,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const moon = IconData(
+    0xe330,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const more = IconData(
+    0xe1fe,
+    fontFamily: _regular,
+    fontPackage: _package,
+  );
+  static const sun = IconData(
+    0xe472,
     fontFamily: _regular,
     fontPackage: _package,
   );

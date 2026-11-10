@@ -32,3 +32,11 @@ class DisciplinasRepositoryException implements Exception {
   @override
   String toString() => message;
 }
+
+class DisciplinasSynchronizationException extends DisciplinasRepositoryException {
+  const DisciplinasSynchronizationException([Object? cause])
+    : super(
+        'A alteração foi salva, mas o catálogo não pôde ser atualizado.',
+        cause,
+      );
+}

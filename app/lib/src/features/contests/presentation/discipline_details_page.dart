@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 import 'contest_view_data.dart';
@@ -70,10 +69,6 @@ class _DisciplineDetailsPageState extends State<DisciplineDetailsPage> {
       builder: (context, desktop) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!desktop) ...[
-            AppBrandLogo(width: context.tokens.layout.brandWidth),
-            SizedBox(height: context.tokens.spacing.xxl),
-          ],
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
@@ -144,7 +139,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
               width: context.tokens.sizes.identityIcon,
               height: context.tokens.sizes.identityIcon,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: context.tokens.colors.primaryContainer,
                 borderRadius: context.tokens.borders.lg,
               ),
               child: Icon(
@@ -161,7 +156,7 @@ class _EditableDisciplineHeader extends StatelessWidget {
                     key: const ValueKey('discipline-name'),
                     controller: nameController,
                     onChanged: onNameChanged,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: context.tokens.typography.headlineSmall,
                     decoration: InputDecoration(
                       labelText: AppMessages.disciplineName,
                       suffixIcon: Icon(
@@ -173,8 +168,8 @@ class _EditableDisciplineHeader extends StatelessWidget {
                   SizedBox(height: context.tokens.spacing.sm),
                   Text(
                     '${contest.shortName} · ${contest.role}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    style: context.tokens.typography.bodyMedium.copyWith(
+                      color: context.tokens.colors.onSurfaceMuted,
                     ),
                   ),
                 ],
@@ -245,9 +240,9 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: Theme.of(context).textTheme.labelSmall),
+      Text(label, style: context.tokens.typography.labelSmall),
       SizedBox(height: context.tokens.spacing.sm),
-      Text(value, style: Theme.of(context).textTheme.titleLarge),
+      Text(value, style: context.tokens.typography.titleLarge),
     ],
   );
 }
@@ -284,12 +279,12 @@ class _VerticalizedTopics extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'EDITAL VERTICALIZADO',
-                        style: Theme.of(context).textTheme.labelLarge,
+                        style: context.tokens.typography.labelLarge,
                       ),
                     ),
                     Text(
                       '$completed de $total concluídos',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: context.tokens.typography.bodyLarge,
                     ),
                     SizedBox(width: context.tokens.spacing.xl),
                     SizedBox(
@@ -302,7 +297,7 @@ class _VerticalizedTopics extends StatelessWidget {
                     SizedBox(width: context.tokens.spacing.md),
                     Text(
                       '${(progress * 100).round()}%',
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: context.tokens.typography.titleMedium,
                     ),
                   ],
                 ),
@@ -338,7 +333,7 @@ class _TopicsHeader extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.md, vertical: context.tokens.spacing.lg),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: context.tokens.colors.surfaceSubtle,
       borderRadius: context.tokens.borders.md,
     ),
     child: const Row(
@@ -368,12 +363,12 @@ class _TopicRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
       color: topic.completed
-          ? Theme.of(context).colorScheme.secondaryContainer.withValues(
+          ? context.tokens.colors.successContainer.withValues(
               alpha: context.tokens.opacity.selection,
             )
           : context.tokens.colors.transparent,
       border: Border(
-        bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        bottom: BorderSide(color: context.tokens.colors.border),
       ),
     ),
     padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.md),
@@ -410,7 +405,7 @@ class _TopicRow extends StatelessWidget {
                 width: context.tokens.layout.topicSelectionIndent,
                 child: Text(
                   '$position',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: context.tokens.typography.titleSmall.copyWith(
                     color: context.tokens.colors.actionForeground,
                   ),
                 ),
@@ -423,7 +418,7 @@ class _TopicRow extends StatelessWidget {
                           SizedBox(width: context.tokens.spacing.sm),
                           Text(
                             topic.title,
-                            style: Theme.of(context).textTheme.titleSmall,
+                            style: context.tokens.typography.titleSmall,
                           ),
                         ],
                       )
@@ -469,12 +464,12 @@ class _SubtopicRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
       color: subtopic.completed
-          ? Theme.of(context).colorScheme.secondaryContainer.withValues(
+          ? context.tokens.colors.successContainer.withValues(
               alpha: context.tokens.opacity.selectionFaint,
             )
           : context.tokens.colors.transparent,
       border: Border(
-        bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        bottom: BorderSide(color: context.tokens.colors.border),
       ),
     ),
     padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.sm),
@@ -496,7 +491,7 @@ class _SubtopicRow extends StatelessWidget {
                 width: context.tokens.sizes.iconContainerLg,
                 child: Text(
                   position,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  style: context.tokens.typography.labelLarge.copyWith(
                     color: context.tokens.colors.actionForeground,
                   ),
                 ),
@@ -534,7 +529,7 @@ class _HeaderLabel extends StatelessWidget {
   final String label;
 
   @override
-  Widget build(BuildContext context) => Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
+  Widget build(BuildContext context) => Text(label.toUpperCase(), style: context.tokens.typography.labelSmall);
 }
 
 class _EmptyCell extends StatelessWidget {
@@ -544,8 +539,8 @@ class _EmptyCell extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: Text(
       '—',
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      style: context.tokens.typography.bodyMedium.copyWith(
+        color: context.tokens.colors.onSurfaceMuted,
       ),
     ),
   );
@@ -681,7 +676,7 @@ class _NotFound extends StatelessWidget {
 }
 
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
-  color: Theme.of(context).colorScheme.surface,
-  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+  color: context.tokens.colors.surface,
+  border: Border.all(color: context.tokens.colors.border),
   borderRadius: context.tokens.borders.lg,
 );

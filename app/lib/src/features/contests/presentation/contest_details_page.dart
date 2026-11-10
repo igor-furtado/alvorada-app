@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 import 'contest_view_data.dart';
@@ -57,10 +56,6 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
       builder: (context, desktop) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!desktop) ...[
-            AppBrandLogo(width: context.tokens.layout.brandWidth),
-            SizedBox(height: context.tokens.spacing.xxl),
-          ],
           AppBreadcrumbs(
             items: [
               const AppBreadcrumbItem(
@@ -187,7 +182,7 @@ class _ContestSummary extends StatelessWidget {
               width: context.tokens.sizes.iconContainerLg,
               height: context.tokens.sizes.iconContainerLg,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: context.tokens.colors.primaryContainer,
                 borderRadius: context.tokens.borders.lg,
               ),
               child: Icon(
@@ -206,7 +201,7 @@ class _ContestSummary extends StatelessWidget {
                       Flexible(
                         child: Text(
                           contest.institution,
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: context.tokens.typography.titleLarge,
                         ),
                       ),
                       if (contest.isPrimary) ...[
@@ -358,7 +353,7 @@ class _TableHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    color: context.tokens.colors.surfaceSubtle,
     padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xl, vertical: context.tokens.spacing.lg),
     child: Row(
       children: [
@@ -429,7 +424,7 @@ class _DisciplineRow extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
+              color: context.tokens.colors.border,
             ),
           ),
         ),
@@ -443,7 +438,7 @@ class _DisciplineRow extends StatelessWidget {
                     width: context.tokens.sizes.rowIcon,
                     height: context.tokens.sizes.rowIcon,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: context.tokens.colors.primaryContainer,
                       borderRadius: context.tokens.borders.md,
                     ),
                     child: Icon(
@@ -456,7 +451,7 @@ class _DisciplineRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       discipline.name,
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: context.tokens.typography.titleSmall,
                     ),
                   ),
                 ],
@@ -496,7 +491,7 @@ class _DisciplineRow extends StatelessWidget {
                   SizedBox(width: context.tokens.spacing.md),
                   Text(
                     '${(discipline.progress * 100).round()}%',
-                    style: Theme.of(context).textTheme.titleSmall,
+                    style: context.tokens.typography.titleSmall,
                   ),
                 ],
               ),
@@ -505,7 +500,7 @@ class _DisciplineRow extends StatelessWidget {
               flex: 18,
               child: Text(
                 '${(discipline.performance * 100).round()}%',
-                style: Theme.of(context).textTheme.titleSmall,
+                style: context.tokens.typography.titleSmall,
               ),
             ),
             SizedBox(
@@ -539,7 +534,7 @@ class _SummaryMetric extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
+        Text(label, style: context.tokens.typography.labelSmall),
         SizedBox(height: context.tokens.spacing.sm),
         if (progress != null) ...[
           LinearProgressIndicator(
@@ -548,7 +543,7 @@ class _SummaryMetric extends StatelessWidget {
           ),
           SizedBox(height: context.tokens.spacing.xs),
         ],
-        Text(value, style: Theme.of(context).textTheme.titleLarge),
+        Text(value, style: context.tokens.typography.titleLarge),
       ],
     ),
   );
@@ -560,7 +555,7 @@ class _VerticalDivider extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: context.tokens.sizes.hairline,
     height: context.tokens.sizes.rowDividerHeight,
-    color: Theme.of(context).colorScheme.outlineVariant,
+    color: context.tokens.colors.border,
   );
 }
 
@@ -575,10 +570,10 @@ class _InlineInfo extends StatelessWidget {
       Icon(
         icon,
         size: context.tokens.icons.md,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        color: context.tokens.colors.onSurfaceMuted,
       ),
       SizedBox(width: context.tokens.spacing.xs),
-      Text(text, style: Theme.of(context).textTheme.bodySmall),
+      Text(text, style: context.tokens.typography.bodySmall),
     ],
   );
 }
@@ -589,10 +584,10 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm, vertical: context.tokens.spacing.xxs),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.secondaryContainer,
+      color: context.tokens.colors.successContainer,
       borderRadius: context.tokens.borders.full,
     ),
-    child: Text(AppMessages.main, style: Theme.of(context).textTheme.labelSmall),
+    child: Text(AppMessages.main, style: context.tokens.typography.labelSmall),
   );
 }
 
@@ -600,7 +595,7 @@ class _HeaderLabel extends StatelessWidget {
   const _HeaderLabel(this.label);
   final String label;
   @override
-  Widget build(BuildContext context) => Text(label.toUpperCase(), style: Theme.of(context).textTheme.labelSmall);
+  Widget build(BuildContext context) => Text(label.toUpperCase(), style: context.tokens.typography.labelSmall);
 }
 
 class _SortableHeader extends StatelessWidget {
@@ -681,7 +676,7 @@ double _averagePerformance(ContestViewData contest) {
 }
 
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
-  color: Theme.of(context).colorScheme.surface,
-  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+  color: context.tokens.colors.surface,
+  border: Border.all(color: context.tokens.colors.border),
   borderRadius: context.tokens.borders.lg,
 );

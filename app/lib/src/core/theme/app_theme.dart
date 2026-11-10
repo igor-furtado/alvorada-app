@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'app_typography.dart';
 import 'tokens/tokens.dart';
 
 export 'app_icons.dart';
-export 'app_typography.dart';
 export 'tokens/tokens.dart';
 
 abstract final class AppTheme {
@@ -15,10 +13,7 @@ abstract final class AppTheme {
     final dark = brightness == Brightness.dark;
     final tokens = dark ? AppTokens.dark() : AppTokens.light();
     final colors = tokens.colors;
-    final textTheme = AppTypography.textTheme(
-      colors.onSurface,
-      colors.onSurfaceMuted,
-    );
+    final textTheme = tokens.typography.textTheme;
 
     final scheme = ColorScheme(
       brightness: brightness,
@@ -48,7 +43,7 @@ abstract final class AppTheme {
       inversePrimary: colors.primary,
     );
 
-    final radius = tokens.borders.sm;
+    final radius = tokens.borders.lg;
     final inputBorder = OutlineInputBorder(
       borderRadius: radius,
       borderSide: BorderSide(color: colors.controlOutline),
@@ -76,10 +71,10 @@ abstract final class AppTheme {
         titleTextStyle: textTheme.titleLarge,
       ),
       cardTheme: CardThemeData(
-        color: colors.surfaceElevated,
+        color: colors.card,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shadowColor: tokens.elevations.low.first.color,
+        shadowColor: colors.shadow,
         surfaceTintColor: colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
@@ -107,7 +102,7 @@ abstract final class AppTheme {
           textStyle: textTheme.labelLarge,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
-          backgroundColor: colors.surfaceElevated,
+          backgroundColor: colors.surface,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -128,12 +123,21 @@ abstract final class AppTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
         filled: true,
-        fillColor: colors.surfaceElevated,
-        labelStyle: textTheme.bodyMedium?.copyWith(
+        fillColor: colors.surface,
+        labelStyle: textTheme.bodySmall?.copyWith(
           color: colors.onSurfaceMuted,
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceMuted),
+        hintStyle: textTheme.bodySmall?.copyWith(color: colors.onSurfaceMuted),
+        prefixIconConstraints: BoxConstraints(
+          minWidth: tokens.layout.controlHeight,
+          minHeight: tokens.layout.controlHeight,
+        ),
+        suffixIconConstraints: BoxConstraints(
+          minWidth: tokens.layout.controlHeight,
+          minHeight: tokens.layout.controlHeight,
+        ),
         border: inputBorder,
         enabledBorder: inputBorder,
         focusedBorder: inputBorder.copyWith(
@@ -155,22 +159,26 @@ abstract final class AppTheme {
           ),
         ),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: tokens.spacing.lg,
-          vertical: tokens.spacing.md,
+          horizontal: tokens.spacing.md,
+          vertical: tokens.spacing.xxs,
         ),
+        constraints: BoxConstraints(minHeight: tokens.layout.controlHeight),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: colors.surfaceElevated,
+        backgroundColor: colors.surface,
         selectedColor: colors.primaryContainer,
         side: BorderSide(color: colors.border),
         shape: RoundedRectangleBorder(borderRadius: tokens.borders.sm),
         labelStyle: textTheme.labelMedium,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: colors.surfaceElevated,
+        backgroundColor: colors.popover,
+        barrierColor: colors.scrim.withValues(
+          alpha: tokens.opacity.dialogBarrier,
+        ),
         surfaceTintColor: colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: tokens.borders.md,
+          borderRadius: tokens.borders.xl,
           side: BorderSide(color: colors.border),
         ),
         titleTextStyle: textTheme.headlineSmall,
@@ -193,18 +201,6 @@ abstract final class AppTheme {
           ),
         ),
       ),
-      navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: colors.surface,
-        selectedIconTheme: IconThemeData(color: colors.onSurface),
-        unselectedIconTheme: IconThemeData(color: colors.onSurfaceMuted),
-        selectedLabelTextStyle: textTheme.labelMedium?.copyWith(
-          color: colors.onSurface,
-        ),
-        unselectedLabelTextStyle: textTheme.labelMedium,
-        indicatorColor: colors.surfaceSubtle,
-        indicatorShape: RoundedRectangleBorder(borderRadius: radius),
-        elevation: 0,
-      ),
       listTileTheme: ListTileThemeData(
         dense: true,
         minTileHeight: tokens.layout.controlHeight,
@@ -225,7 +221,7 @@ abstract final class AppTheme {
         trackColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected) ? colors.primary : colors.surfaceSubtle,
         ),
-        thumbColor: WidgetStatePropertyAll(colors.surfaceElevated),
+        thumbColor: WidgetStatePropertyAll(colors.surface),
         trackOutlineColor: WidgetStatePropertyAll(colors.border),
       ),
       dividerTheme: DividerThemeData(
