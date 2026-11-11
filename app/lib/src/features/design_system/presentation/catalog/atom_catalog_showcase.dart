@@ -188,7 +188,7 @@ class _AtomCatalogShowcaseState extends State<AtomCatalogShowcase> {
               children: [
                 AppSkeleton(width: context.tokens.sizes.overviewPanel, height: context.tokens.spacing.lg),
                 SizedBox(height: context.tokens.spacing.sm),
-                AppSkeleton(width: context.tokens.sizes.weekSummary, height: context.tokens.spacing.lg),
+                AppSkeleton(width: context.tokens.sizes.summaryPanel, height: context.tokens.spacing.lg),
               ],
             ),
           ],

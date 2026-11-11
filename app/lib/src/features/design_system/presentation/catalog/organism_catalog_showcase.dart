@@ -430,14 +430,14 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
         title: 'AppSidebar',
         description: 'Navegação lateral expansível, tematizável e composta por destinos.',
         child: SizedBox(
-          height: context.tokens.sizes.reviewAccentHeight,
+          height: context.tokens.sizes.listItemHeaderHeight,
           child: AppSidebar<String>(
             selectedValue: _sidebarValue,
             onSelected: (value) => setState(() => _sidebarValue = value),
             header: const AppLabel('Navegação', style: AppLabelStyle.control),
             items: const [
-              AppSidebarItem(value: 'inicio', label: 'Início', icon: AppIcons.today),
-              AppSidebarItem(value: 'agenda', label: 'Agenda', icon: AppIcons.calendar),
+              AppSidebarItem(value: 'concursos', label: 'Concursos', icon: AppIcons.concursos),
+              AppSidebarItem(value: 'disciplinas', label: 'Disciplinas', icon: AppIcons.bookText),
               AppSidebarItem(value: 'ajustes', label: 'Ajustes', icon: AppIcons.settings),
             ],
           ),

@@ -4,7 +4,7 @@
 
 # Prumo.app
 
-**Organização de estudos para concursos com recuperação ativa, revisões programadas e descanso protegido.**
+**Organização de Concursos, Editais e Disciplinas em um catálogo único.**
 
 [Visão geral](#visão-geral) • [Executar localmente](#executar-localmente) • [Arquitetura](#arquitetura) • [API](#api) • [Qualidade](#qualidade)
 
@@ -12,7 +12,7 @@
 
 ## Visão geral
 
-O Prumo transforma horas reais disponíveis em um Plano de estudo que prioriza o que mais pesa, agenda Revisões de 1, 7 e 30 dias e protege o domingo. O produto foi pensado para apoiar constância sem gamificação, rankings ou cobrança por sequências.
+O Prumo reúne Concursos e Disciplinas para manter os Editais organizados em um catálogo compartilhado de Tópicos e Subtópicos.
 
 O repositório reúne:
 
@@ -22,16 +22,12 @@ O repositório reúne:
 - uma especificação **OpenAPI 3.1** servida pela própria API.
 
 > [!IMPORTANT]
-> O cadastro de Concursos e o catálogo de Disciplinas estão integrados à API e ao banco. O vínculo entre Editais e Disciplinas ainda não possui persistência e, por isso, é exibido somente para leitura. As demais telas Flutter ainda usam dados demonstrativos.
+> O cadastro de Concursos e o catálogo de Disciplinas estão integrados à API e ao banco. O vínculo entre Editais e Disciplinas ainda não possui persistência e, por isso, é exibido somente para leitura.
 
 ## Experiência atual
 
-- **Hoje:** Plano de hoje, Turnos, Revisões e Ritmo da semana, com uma experiência própria para o domingo protegido.
-- **Esta semana:** visão semanal do Plano e dos blocos previstos para cada dia.
 - **Concursos:** concursos-alvo e progresso de cada Edital.
-- **Disciplinas:** catálogo compartilhado de Disciplinas, Tópicos e Subtópicos.
-- **Revisões:** atividades programadas para 1, 7 e 30 dias, com filtros por intervalo e Concurso.
-- **Caderno de Erros:** diagnóstico, Regra certa, Por que eu caí e ciclo de Revisão do Caderno.
+- **Disciplinas:** catálogo compartilhado de Disciplinas, Tópicos e Subtópicos, incluindo a Revisão de Véspera fixa de cada Disciplina.
 
 ## Executar localmente
 
@@ -137,7 +133,7 @@ O esquema MySQL usa o vocabulário do domínio em português: `concursos`, `disc
 
 A interface organiza cada funcionalidade por área e mantém componentes compartilhados em `core`. A funcionalidade Flutter de Disciplinas separa `domain`, `data` e `presentation` conforme o [guia oficial de arquitetura do Flutter](https://docs.flutter.dev/app-architecture/guide), com Bloc para estado e comandos da interface. As classes usam o conceito de negócio em português e preservam qualificadores técnicos em inglês, como `DisciplinaApiModel`, `DisciplinasRepository` e `DisciplinasBloc`. A API separa domínio, aplicação, infraestrutura e entrega HTTP.
 
-Para entender os conceitos do produto — como Concurso, Edital, Turno, Fixado e Revisão programada — consulte [`CONTEXT.md`](CONTEXT.md). As decisões duradouras ficam em [`docs/adr/`](docs/adr/), as regras do produto em [`app/docs/agents/product/`](app/docs/agents/product/) e as convenções de widgets em [`app/docs/agents/architecture/widgets.md`](app/docs/agents/architecture/widgets.md).
+Para entender os conceitos do produto — como Concurso, Edital, Disciplina e Revisão de Véspera — consulte [`CONTEXT.md`](CONTEXT.md). As decisões duradouras ficam em [`docs/adr/`](docs/adr/), as regras do produto em [`app/docs/agents/product/`](app/docs/agents/product/), a arquitetura de interface em [`presentation.md`](app/docs/agents/architecture/presentation.md) e os contratos visuais em [`design-system.md`](app/docs/agents/architecture/design-system.md).
 
 ## API
 
@@ -186,7 +182,8 @@ O conjunto Flutter cobre navegação responsiva, preservação de estado, contra
 
 ## Referências do projeto
 
-- [`app/docs/agents/architecture/widgets.md`](app/docs/agents/architecture/widgets.md): processo e critérios para widgets Flutter;
+- [`app/docs/agents/architecture/presentation.md`](app/docs/agents/architecture/presentation.md): arquitetura de páginas, fluxos e estado de interface;
+- [`app/docs/agents/architecture/design-system.md`](app/docs/agents/architecture/design-system.md): componentes, tokens e critérios visuais;
 - [`app/docs/agents/product/index.md`](app/docs/agents/product/index.md): regras do produto;
 - [`CONTEXT.md`](CONTEXT.md): glossário canônico do domínio;
 - [`api/docs/openapi.yaml`](api/docs/openapi.yaml): contrato HTTP da API.

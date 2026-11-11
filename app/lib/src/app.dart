@@ -21,23 +21,15 @@ import 'features/disciplinas/domain/repositories/disciplinas_repository.dart';
 import 'features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart';
 import 'features/disciplinas/presentation/disciplinas_page.dart';
-import 'features/errors/presentation/error_notebook_page.dart';
-import 'features/reviews/presentation/reviews_page.dart';
-import 'features/today/presentation/today_page.dart';
-import 'features/week/presentation/week_page.dart';
 
 final _router = GoRouter(
   restorationScopeId: 'router',
+  initialLocation: '/concursos',
   routes: [
+    GoRoute(path: '/', redirect: (context, state) => '/concursos'),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
       branches: [
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/', builder: (context, state) => const TodayPage())],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/semana', builder: (context, state) => const WeekPage())],
-        ),
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -66,12 +58,6 @@ final _router = GoRouter(
               ),
             ),
           ],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/revisoes', builder: (context, state) => const ReviewsPage())],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/caderno-de-erros', builder: (context, state) => const ErrorNotebookPage())],
         ),
         StatefulShellBranch(
           routes: [

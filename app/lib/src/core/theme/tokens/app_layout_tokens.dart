@@ -22,9 +22,6 @@ class AppLayoutTokens {
     this.catalogWorkspaceHeight = 608,
     this.brandWidth = 144,
     this.controlHeight = AppDimensionPrimitives.size32,
-    this.buttonHeightSm = AppDimensionPrimitives.size28,
-    this.buttonHeightMd = AppDimensionPrimitives.size32,
-    this.buttonHeightLg = 36,
     this.topicSelectionIndent = 42,
     this.tableActionsColumn = 56,
     this.narrow = 520,
@@ -57,10 +54,9 @@ class AppLayoutTokens {
   final double catalogMasterWidth;
   final double catalogWorkspaceHeight;
   final double brandWidth;
+
+  /// Altura padrão compartilhada por campos, botões e outros controles.
   final double controlHeight;
-  final double buttonHeightSm;
-  final double buttonHeightMd;
-  final double buttonHeightLg;
   final double topicSelectionIndent;
   final double tableActionsColumn;
   final double narrow;
@@ -98,9 +94,6 @@ class AppLayoutTokens {
     catalogWorkspaceHeight: lerpDouble(catalogWorkspaceHeight, other.catalogWorkspaceHeight, t)!,
     brandWidth: lerpDouble(brandWidth, other.brandWidth, t)!,
     controlHeight: lerpDouble(controlHeight, other.controlHeight, t)!,
-    buttonHeightSm: lerpDouble(buttonHeightSm, other.buttonHeightSm, t)!,
-    buttonHeightMd: lerpDouble(buttonHeightMd, other.buttonHeightMd, t)!,
-    buttonHeightLg: lerpDouble(buttonHeightLg, other.buttonHeightLg, t)!,
     topicSelectionIndent: lerpDouble(
       topicSelectionIndent,
       other.topicSelectionIndent,

@@ -25,7 +25,8 @@ class _AppShellState extends State<AppShell> {
   var _commandQuery = '';
   var _lastPrimaryIndex = 0;
 
-  static const _administrationBranchIndex = 6;
+  static const _disciplinasBranchIndex = 1;
+  static const _administrationBranchIndex = 2;
 
   @override
   void initState() {
@@ -70,7 +71,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _submitCommand(String value) {
-    if (widget.navigationShell.currentIndex == 3 && _shellController.value != null) return;
+    if (widget.navigationShell.currentIndex == _disciplinasBranchIndex && _shellController.value != null) return;
     final query = value.trim().toLowerCase();
     if (query.isEmpty) return;
     final index = _destinations.indexWhere(
@@ -83,7 +84,7 @@ class _AppShellState extends State<AppShell> {
 
   void _changeCommand(String value) {
     setState(() => _commandQuery = value);
-    if (widget.navigationShell.currentIndex == 3) {
+    if (widget.navigationShell.currentIndex == _disciplinasBranchIndex) {
       _shellController.value?.onChanged(value);
     }
   }
@@ -135,7 +136,9 @@ class _AppShellState extends State<AppShell> {
                         compact: windowClass.isCompact,
                         controller: _commandController,
                         query: _commandQuery,
-                        searchConfig: widget.navigationShell.currentIndex == 3 ? searchConfig : null,
+                        searchConfig: widget.navigationShell.currentIndex == _disciplinasBranchIndex
+                            ? searchConfig
+                            : null,
                         onChanged: _changeCommand,
                         onClear: _clearCommand,
                         onSubmitted: _submitCommand,
@@ -163,8 +166,6 @@ class _AppDestination {
 }
 
 const _destinations = [
-  _AppDestination(label: AppMessages.navigationToday, icon: AppIcons.today, selectedIcon: AppIcons.todayActive),
-  _AppDestination(label: AppMessages.navigationWeek, icon: AppIcons.calendar, selectedIcon: AppIcons.calendarActive),
   _AppDestination(
     label: AppMessages.navigationConcursos,
     icon: AppIcons.concursos,
@@ -174,12 +175,6 @@ const _destinations = [
     label: AppMessages.navigationDisciplines,
     icon: AppIcons.bookText,
     selectedIcon: AppIcons.bookText,
-  ),
-  _AppDestination(label: AppMessages.navigationReviews, icon: AppIcons.reviews, selectedIcon: AppIcons.reviewsActive),
-  _AppDestination(
-    label: AppMessages.navigationErrors,
-    icon: AppIcons.errorNotebook,
-    selectedIcon: AppIcons.errorNotebookActive,
   ),
 ];
 

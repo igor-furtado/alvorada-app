@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import '../../domain/use_cases/disciplinas_use_cases.dart';
 import '../disciplinas_list/disciplinas_list_state.dart';
@@ -66,14 +65,18 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
           (state) => state.status == DisciplinasFormStatus.success || state.status == DisciplinasFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDialog(
+      builder: (context, submitting, submit) => AppDrawer(
         title: widget.disciplina == null ? AppMessages.newDiscipline : AppMessages.editDiscipline,
         description: widget.disciplina == null ? AppMessages.newDisciplineDescription : null,
-        maxWidth: context.tokens.sizes.dialogMedium,
-        content: AppFormField(
+        dismissible: !submitting,
+        primaryLabel: widget.disciplina == null ? AppMessages.addDiscipline : AppMessages.saveChanges,
+        onPrimary: submit,
+        loading: submitting,
+        secondaryLabel: AppMessages.cancel,
+        onSecondary: submitting ? null : () => Navigator.pop(context),
+        child: AppFormField(
           label: AppMessages.disciplineName,
           placeholder: AppMessages.disciplineNameExample,
-          helperText: state.errorMessage ?? AppMessages.disciplineNameHelp,
           errorText: state.errorMessage,
           controller: _nameController,
           focusNode: _nameFocus,
@@ -83,18 +86,6 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
           onSubmitted: (_) => submit(),
           validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
         ),
-        actions: [
-          AppButton(
-            label: AppMessages.cancel,
-            variant: AppButtonVariant.outline,
-            onPressed: submitting ? null : () => Navigator.pop(context),
-          ),
-          AppButton(
-            label: widget.disciplina == null ? AppMessages.addDiscipline : AppMessages.saveChanges,
-            loading: submitting,
-            onPressed: submit,
-          ),
-        ],
       ),
     ),
   );

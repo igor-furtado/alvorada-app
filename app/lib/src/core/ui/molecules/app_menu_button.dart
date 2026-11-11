@@ -93,7 +93,6 @@ class AppMenuButton<T> extends StatelessWidget {
                   semanticLabel: label,
                   icon: icon,
                   variant: AppButtonVariant.outline,
-                  size: AppButtonSize.sm,
                   onPressed: enabled ? () {} : null,
                 ),
         ),

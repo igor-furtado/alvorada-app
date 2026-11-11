@@ -25,7 +25,6 @@ class TopicosListHeader extends StatelessWidget {
         label: AppMessages.addTopic,
         icon: AppIcons.add,
         variant: AppButtonVariant.outline,
-        size: AppButtonSize.sm,
         onPressed: canAdd ? onAdd : null,
       );
       if (constraints.maxWidth < context.tokens.layout.narrow) {

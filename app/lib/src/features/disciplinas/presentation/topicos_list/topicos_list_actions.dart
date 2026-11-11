@@ -10,8 +10,8 @@ import 'topicos_list_state.dart';
 
 abstract final class TopicosListActions {
   static Future<void> add(BuildContext context, String disciplineId) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => TopicosFormView(disciplineId: disciplineId),
     );
     if (saved == true && context.mounted) {
@@ -28,8 +28,8 @@ abstract final class TopicosListActions {
     String disciplineId,
     TopicoListItemData topico,
   ) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => TopicosFormView(
         disciplineId: disciplineId,
         topico: topico,

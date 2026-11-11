@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import '../../domain/use_cases/disciplinas_use_cases.dart';
 import '../subtopicos_list/subtopicos_list_state.dart';
@@ -72,10 +71,15 @@ class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
           (state) => state.status == SubtopicosFormStatus.success || state.status == SubtopicosFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDialog(
+      builder: (context, submitting, submit) => AppDrawer(
         title: widget.subtopico == null ? AppMessages.addSubtopic : AppMessages.editSubtopic,
-        maxWidth: context.tokens.sizes.dialogMedium,
-        content: AppFormField(
+        dismissible: !submitting,
+        primaryLabel: widget.subtopico == null ? AppMessages.addSubtopic : AppMessages.saveChanges,
+        onPrimary: submit,
+        loading: submitting,
+        secondaryLabel: AppMessages.cancel,
+        onSecondary: submitting ? null : () => Navigator.pop(context),
+        child: AppFormField(
           label: AppMessages.name,
           errorText: state.errorMessage,
           controller: _nameController,
@@ -86,18 +90,6 @@ class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
           onSubmitted: (_) => submit(),
           validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
         ),
-        actions: [
-          AppButton(
-            label: AppMessages.cancel,
-            variant: AppButtonVariant.outline,
-            onPressed: submitting ? null : () => Navigator.pop(context),
-          ),
-          AppButton(
-            label: widget.subtopico == null ? AppMessages.addSubtopic : AppMessages.saveChanges,
-            loading: submitting,
-            onPressed: submit,
-          ),
-        ],
       ),
     ),
   );

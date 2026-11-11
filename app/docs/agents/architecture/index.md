@@ -7,6 +7,8 @@ Use ao alterar `domain` ou `data`. Siga o [guia oficial do Flutter](https://docs
 - Entidades, invariantes, inputs, contratos de repository ou use cases: leia [domain.md](domain.md).
 - API models, serialização, services, repositories concretos, cache ou HTTP: leia [data.md](data.md).
 - Mudanças entre camadas: leia ambos antes de editar.
+- Páginas, fluxos, rotas, Bloc ou estado de interface: leia [presentation.md](presentation.md).
+- Componentes `App*`, tokens, tema ou acessibilidade: leia [design-system.md](design-system.md).
 
 ## Convenções comuns
 

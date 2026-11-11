@@ -73,7 +73,7 @@ class AppTextInput extends StatelessWidget {
       onFieldSubmitted: onSubmitted,
       minLines: minLines,
       maxLines: obscureText ? 1 : maxLines,
-      style: context.tokens.typography.bodySmall.copyWith(color: context.tokens.colors.onSurface),
+      style: context.tokens.typography.labelLarge,
       forceErrorText: errorText,
       decoration: InputDecoration(
         hintText: placeholder,

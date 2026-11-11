@@ -12,8 +12,8 @@ import 'concursos_list_state.dart';
 
 abstract final class ConcursosListActions {
   static Future<void> add(BuildContext context) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => const ConcursosFormView(),
     );
     if (saved == true && context.mounted) {

@@ -22,7 +22,6 @@ class ListItemCatalogDemo extends StatelessWidget {
                 variant: AppListItemVariant.outline,
                 trailing: AppButton(
                   label: 'Ação',
-                  size: AppButtonSize.sm,
                   variant: AppButtonVariant.outline,
                   onPressed: () {},
                 ),
@@ -97,7 +96,6 @@ class ListItemCatalogDemo extends StatelessWidget {
             variant: AppListItemVariant.outline,
             trailing: AppButton(
               label: 'Revisar',
-              size: AppButtonSize.sm,
               variant: AppButtonVariant.outline,
               onPressed: () {},
             ),
@@ -131,7 +129,6 @@ class ListItemCatalogDemo extends StatelessWidget {
                 variant: AppListItemVariant.outline,
                 trailing: AppButton(
                   label: 'Convidar',
-                  size: AppButtonSize.sm,
                   variant: AppButtonVariant.outline,
                   onPressed: () {},
                 ),

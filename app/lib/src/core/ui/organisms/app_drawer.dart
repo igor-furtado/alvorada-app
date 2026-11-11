@@ -65,72 +65,75 @@ class AppDrawer extends StatelessWidget {
       ...actions,
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final viewport = MediaQuery.sizeOf(context);
-        final width = constraints.hasBoundedWidth ? constraints.maxWidth : viewport.width;
-        final height = constraints.hasBoundedHeight ? constraints.maxHeight : viewport.height;
-        final panelWidth = horizontal
-            ? math.min(width * tokens.layout.drawerSideFraction, tokens.layout.dialogMaxWidth)
-            : width;
-        final panelHeight = horizontal ? height : null;
-        final maxPanelHeight = math.max(tokens.spacing.none, height - (tokens.spacing.huge * 2));
-        final panel = Semantics(
-          scopesRoute: true,
-          namesRoute: true,
-          explicitChildNodes: true,
-          label: title,
-          child: FocusTraversalGroup(
-            child: Container(
-              key: const ValueKey('app-drawer-surface'),
-              width: panelWidth,
-              height: panelHeight,
-              constraints: horizontal ? null : BoxConstraints(maxHeight: maxPanelHeight),
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: tokens.colors.popover,
-                border: Border.all(
-                  color: tokens.colors.border,
-                  width: tokens.borders.widthHairline,
+    return PopScope(
+      canPop: dismissible,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final viewport = MediaQuery.sizeOf(context);
+          final width = constraints.hasBoundedWidth ? constraints.maxWidth : viewport.width;
+          final height = constraints.hasBoundedHeight ? constraints.maxHeight : viewport.height;
+          final panelWidth = horizontal
+              ? math.min(width * tokens.layout.drawerSideFraction, tokens.layout.dialogMaxWidth)
+              : width;
+          final panelHeight = horizontal ? height : null;
+          final maxPanelHeight = math.max(tokens.spacing.none, height - (tokens.spacing.huge * 2));
+          final panel = Semantics(
+            scopesRoute: true,
+            namesRoute: true,
+            explicitChildNodes: true,
+            label: title,
+            child: FocusTraversalGroup(
+              child: Container(
+                key: const ValueKey('app-drawer-surface'),
+                width: panelWidth,
+                height: panelHeight,
+                constraints: horizontal ? null : BoxConstraints(maxHeight: maxPanelHeight),
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: tokens.colors.popover,
+                  border: Border.all(
+                    color: tokens.colors.border,
+                    width: tokens.borders.widthHairline,
+                  ),
+                  borderRadius: tokens.borders.xxxl,
+                  boxShadow: tokens.shadows.overlay,
                 ),
-                borderRadius: tokens.borders.xxxl,
-                boxShadow: tokens.shadows.overlay,
-              ),
-              child: Material(
-                color: tokens.colors.transparent,
-                child: _AppDrawerPanel(
-                  title: title,
-                  description: description,
-                  direction: resolvedDirection,
-                  showSwipeHandle: displayHandle,
-                  footerActions: footerActions,
-                  child: child,
+                child: Material(
+                  color: tokens.colors.transparent,
+                  child: _AppDrawerPanel(
+                    title: title,
+                    description: description,
+                    direction: resolvedDirection,
+                    showSwipeHandle: displayHandle,
+                    footerActions: footerActions,
+                    child: child,
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-        final dismissiblePanel = dismissible
-            ? Dismissible(
-                key: ValueKey('app-drawer-${resolvedDirection.name}-$title'),
-                direction: _dismissDirection(context, resolvedDirection),
-                resizeDuration: Duration.zero,
-                confirmDismiss: (_) async {
-                  await Navigator.maybePop(context);
-                  return false;
-                },
-                child: panel,
-              )
-            : panel;
+          );
+          final dismissiblePanel = dismissible
+              ? Dismissible(
+                  key: ValueKey('app-drawer-${resolvedDirection.name}-$title'),
+                  direction: _dismissDirection(context, resolvedDirection),
+                  resizeDuration: Duration.zero,
+                  confirmDismiss: (_) async {
+                    await Navigator.maybePop(context);
+                    return false;
+                  },
+                  child: panel,
+                )
+              : panel;
 
-        return SafeArea(
-          minimum: EdgeInsets.all(tokens.spacing.sm),
-          child: Align(
-            alignment: _alignment(resolvedDirection),
-            child: dismissiblePanel,
-          ),
-        );
-      },
+          return SafeArea(
+            minimum: EdgeInsets.all(tokens.spacing.sm),
+            child: Align(
+              alignment: _alignment(resolvedDirection),
+              child: dismissiblePanel,
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -330,17 +333,14 @@ Future<T?> showAppDrawer<T>(
   bool dismissible = true,
   bool useRootNavigator = true,
 }) {
-  final tokens = context.tokens;
   final resolvedDirection = direction ?? _responsiveDirection(context);
   final displayHandle = showSwipeHandle ?? context.windowClass.isCompact;
-  return showGeneralDialog<T>(
-    context: context,
+  return _showAppDrawerRoute<T>(
+    context,
+    direction: resolvedDirection,
+    dismissible: dismissible,
     useRootNavigator: useRootNavigator,
-    barrierDismissible: dismissible,
-    barrierLabel: AppMessages.close,
-    barrierColor: tokens.colors.scrim.withValues(alpha: tokens.opacity.drawerBarrier),
-    transitionDuration: context.motionDuration(tokens.motion.drawer),
-    pageBuilder: (context, animation, secondaryAnimation) => AppDrawer(
+    builder: (context) => AppDrawer(
       title: title,
       description: description,
       direction: resolvedDirection,
@@ -355,6 +355,38 @@ Future<T?> showAppDrawer<T>(
       dismissible: dismissible,
       child: child,
     ),
+  );
+}
+
+Future<T?> showAppDrawerBuilder<T>(
+  BuildContext context, {
+  required WidgetBuilder builder,
+  bool dismissible = true,
+  bool useRootNavigator = true,
+}) => _showAppDrawerRoute<T>(
+  context,
+  direction: _responsiveDirection(context),
+  dismissible: dismissible,
+  useRootNavigator: useRootNavigator,
+  builder: builder,
+);
+
+Future<T?> _showAppDrawerRoute<T>(
+  BuildContext context, {
+  required AppDrawerDirection direction,
+  required bool dismissible,
+  required bool useRootNavigator,
+  required WidgetBuilder builder,
+}) {
+  final tokens = context.tokens;
+  return showGeneralDialog<T>(
+    context: context,
+    useRootNavigator: useRootNavigator,
+    barrierDismissible: dismissible,
+    barrierLabel: AppMessages.close,
+    barrierColor: tokens.colors.scrim.withValues(alpha: tokens.opacity.drawerBarrier),
+    transitionDuration: context.motionDuration(tokens.motion.drawer),
+    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       final curvedAnimation = CurvedAnimation(
         parent: animation,
@@ -375,7 +407,7 @@ Future<T?> showAppDrawer<T>(
           ),
           SlideTransition(
             position: Tween<Offset>(
-              begin: _transitionOffset(resolvedDirection),
+              begin: _transitionOffset(direction),
               end: Offset.zero,
             ).animate(curvedAnimation),
             child: child,

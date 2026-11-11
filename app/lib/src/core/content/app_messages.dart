@@ -1,10 +1,6 @@
 abstract final class AppMessages {
-  static const navigationToday = 'Hoje';
-  static const navigationWeek = 'Semana';
   static const navigationConcursos = 'Concursos';
   static const navigationDisciplines = 'Disciplinas';
-  static const navigationReviews = 'Revisões';
-  static const navigationErrors = 'Caderno';
   static const navigationSection = 'Navegação';
   static const navigationPath = 'Rota de navegação';
   static const navigationSearch = 'Ir para uma área…';
@@ -41,48 +37,7 @@ abstract final class AppMessages {
   static const name = 'Nome';
   static const notNow = 'Agora não';
   static const start = 'Começar';
-  static const seeToday = 'Ver Hoje';
-  static const seeAll = 'Ver todos';
-  static const reminders = 'Lembretes';
-  static const reviewsForToday = 'Revisões para hoje';
-  static const howItWorks = 'Como funciona';
   static const undo = 'Desfazer';
-  static const filtersNotConnected = 'Os filtros serão conectados aos dados depois.';
-  static const areaNotConnected = 'Esta área será conectada aos dados depois.';
-  static const otherWeeksUnavailable = 'As outras semanas entram na próxima etapa.';
-
-  static const reviews = 'Revisões';
-  static const all = 'Todas';
-  static const oneDay = '1 dia';
-  static const sevenDays = '7 dias';
-  static const thirtyDays = '30 dias';
-  static const todosConcursos = 'Todos os Concursos';
-  static const startReview = 'Começar revisão';
-  static const howReviewsWork = 'Como funcionam as Revisões';
-
-  static const registerError = 'Registrar erro';
-  static const registerErrorIntro = 'Sete campos, cerca de noventa segundos. Escreva antes de voltar ao gabarito.';
-  static const date = 'Data';
-  static const disciplineAndTopic = 'Disciplina e Tópico';
-  static const boardAndYear = 'Banca e ano';
-  static const errorType = 'Tipo do erro';
-  static const correctRule = 'A regra certa, com minhas palavras';
-  static const correctRuleHint = 'Feche o gabarito antes de escrever.';
-  static const whyIFell = 'Por que eu caí';
-  static const whyIFellHint = 'Nomeie o mecanismo do erro, não o sentimento.';
-  static const revisionsWillBeScheduled = 'As Revisões de 1, 7 e 30 dias serão programadas ao salvar.';
-  static const saveAndScheduleReviews = 'Salvar e programar Revisões';
-  static const errorRegistered = 'Erro registrado e Revisões programadas.';
-  static const activeNotebook = 'Caderno ativo';
-  static const notebookArchive = 'Arquivo';
-  static const allErrorTypes = 'Todos os tipos';
-  static const underReview = 'Em revisão';
-  static const openEntry = 'Abrir registro';
-  static const seeArchivedEntries = 'Ver registros arquivados';
-  static const seeMonthlyReport = 'Ver relatório mensal';
-  static const noEntryForDiagnosis = 'Nenhum registro com esse diagnóstico.';
-  static const howErrorNotebookWorks = 'Como funciona o Caderno de Erros';
-  static const startNotebookReview = 'Começar Revisão';
 
   static const novoConcurso = 'Novo Concurso';
   static const concurso = 'Concurso';
@@ -123,9 +78,8 @@ abstract final class AppMessages {
   static const newDiscipline = 'Nova Disciplina';
   static const newDisciplineDescription = 'Adicione uma Disciplina para organizar seus Tópicos.';
   static const disciplineNameExample = 'Ex.: Língua Portuguesa';
-  static const disciplineNameHelp = 'Use o nome adotado no Edital.';
   static const main = 'Principal';
-  static const disciplineName = 'Nome da Disciplina';
+  static const disciplineName = 'Nome';
   static const disciplineWeight = 'Peso no Edital';
   static const noDiscipline = 'Nenhuma Disciplina vinculada a este Edital.';
   static const concursoNaoEncontrado = 'Concurso não encontrado';
@@ -168,24 +122,7 @@ abstract final class AppMessages {
   static const contentSavedSyncPending = 'Alteração salva. Atualize para ver os dados mais recentes.';
   static const contentOperationFailed = 'Não foi possível salvar a alteração. Tente novamente.';
 
-  static const thisWeek = 'Esta semana';
-  static const todayPlanTitle = 'Plano de hoje';
-  static const sunnyDays = 'Ritmo da semana';
-  static const weeklyRhythm = 'Seu ritmo nesta semana';
-  static const protectedSunday = 'Domingo protegido';
-  static const protectedSundayDescription = 'Domingo é descanso. Ele já faz parte do método.';
-  static const protectedSundayToday = 'Hoje é descanso. Ele já está no plano.';
-  static const previousWeek = 'Semana anterior';
-  static const nextWeek = 'Próxima semana';
-  static const adjustWeek = 'Ajustar semana';
-  static const adjustThisWeek = 'Ajustar esta semana';
-  static const done = 'feito';
   static const today = 'hoje';
-  static const lessTime = 'Tive menos tempo';
-  static const lessTimeHint = 'Reduzir o escopo e preservar as Revisões.';
-  static const extraTime = 'Tenho tempo extra';
-  static const extraTimeHint = 'Usar a sobra para questões.';
-  static const startNextTurn = 'Começar próximo turno';
 
   static String loadedItems(int count) => '$count resultados carregados.';
 
@@ -201,10 +138,6 @@ abstract final class AppMessages {
   static String disciplineResults(int count) => _count(count, 'Disciplina', 'Disciplinas');
 
   static String topicCount(int count) => _count(count, 'Tópico', 'Tópicos');
-
-  static String reviewOf(String interval) => 'Revisão de $interval';
-
-  static String expectedDuration(String duration) => '$duration previstos';
 
   static String disciplineDeletedImpact(String name) =>
       '$name, seus Tópicos e Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';

@@ -16,9 +16,13 @@ O projeto usa documentação de domínio single-context. Consulte `docs/agents/d
 
 Ao alterar comportamento, método, priorização, descanso, métricas, navegação, vocabulário ou termos do produto, siga `app/docs/agents/product/index.md`.
 
-### Widgets Flutter
+### Flutter presentation
 
-Widgets Flutter: ao criar, alterar ou revisar componente, tela, fluxo, texto visível, navegação, responsividade ou acessibilidade, siga `app/docs/agents/architecture/widgets.md`.
+Presentation: ao criar ou alterar página, fluxo, rota, Bloc, estado de interface, ação ou texto visível Flutter, siga `app/docs/agents/architecture/presentation.md`.
+
+### Design system Flutter
+
+Design system: ao criar ou alterar componente `App*`, token, tema, ícone, responsividade, interação visual ou acessibilidade Flutter, siga `app/docs/agents/architecture/design-system.md`.
 
 ### Flutter domain e data
 

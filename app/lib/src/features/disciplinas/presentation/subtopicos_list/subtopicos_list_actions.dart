@@ -10,8 +10,8 @@ import 'subtopicos_list_state.dart';
 
 abstract final class SubtopicosListActions {
   static Future<void> add(BuildContext context, String topicId) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => SubtopicosFormView(topicId: topicId),
     );
     if (saved == true && context.mounted) {
@@ -28,8 +28,8 @@ abstract final class SubtopicosListActions {
     String topicId,
     SubtopicoListItemData subtopico,
   ) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => SubtopicosFormView(
         topicId: topicId,
         subtopico: subtopico,

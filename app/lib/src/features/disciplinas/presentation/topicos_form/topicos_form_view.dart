@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import '../../domain/use_cases/disciplinas_use_cases.dart';
 import '../topicos_list/topicos_list_state.dart';
@@ -71,10 +70,15 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
           (state) => state.status == TopicosFormStatus.success || state.status == TopicosFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDialog(
+      builder: (context, submitting, submit) => AppDrawer(
         title: widget.topico == null ? AppMessages.addTopic : AppMessages.editTopic,
-        maxWidth: context.tokens.sizes.dialogMedium,
-        content: AppFormField(
+        dismissible: !submitting,
+        primaryLabel: widget.topico == null ? AppMessages.addTopic : AppMessages.saveChanges,
+        onPrimary: submit,
+        loading: submitting,
+        secondaryLabel: AppMessages.cancel,
+        onSecondary: submitting ? null : () => Navigator.pop(context),
+        child: AppFormField(
           label: AppMessages.name,
           errorText: state.errorMessage,
           controller: _nameController,
@@ -85,18 +89,6 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
           onSubmitted: (_) => submit(),
           validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
         ),
-        actions: [
-          AppButton(
-            label: AppMessages.cancel,
-            variant: AppButtonVariant.outline,
-            onPressed: submitting ? null : () => Navigator.pop(context),
-          ),
-          AppButton(
-            label: widget.topico == null ? AppMessages.addTopic : AppMessages.saveChanges,
-            loading: submitting,
-            onPressed: submit,
-          ),
-        ],
       ),
     ),
   );

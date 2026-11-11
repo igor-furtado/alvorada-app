@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import '../../domain/models/concurso_input.dart';
 import '../../domain/use_cases/concursos_use_cases.dart';
@@ -72,10 +71,15 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
           (state) => state.status == ConcursosFormStatus.success || state.status == ConcursosFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDialog(
+      builder: (context, submitting, submit) => AppDrawer(
         title: AppMessages.novoConcurso,
-        maxWidth: context.tokens.sizes.dialogNarrow,
-        content: AppFieldGroup(
+        dismissible: !submitting,
+        primaryLabel: AppMessages.criarConcurso,
+        onPrimary: submit,
+        loading: submitting,
+        secondaryLabel: AppMessages.cancel,
+        onSecondary: submitting ? null : () => Navigator.pop(context),
+        child: AppFieldGroup(
           children: [
             AppFormField(
               label: AppMessages.institution,
@@ -120,18 +124,6 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             ),
           ],
         ),
-        actions: [
-          AppButton(
-            label: AppMessages.cancel,
-            variant: AppButtonVariant.outline,
-            onPressed: submitting ? null : () => Navigator.pop(context),
-          ),
-          AppButton(
-            label: AppMessages.criarConcurso,
-            loading: submitting,
-            onPressed: submit,
-          ),
-        ],
       ),
     ),
   );

@@ -112,7 +112,7 @@ class _BreadcrumbEllipsis extends StatelessWidget {
           onTap: onPressed,
           borderRadius: context.tokens.borders.sm,
           child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: context.tokens.layout.buttonHeightSm),
+            constraints: BoxConstraints(minWidth: context.tokens.layout.controlHeight),
             child: icon,
           ),
         ),

@@ -111,7 +111,6 @@ class ConcursoListItem extends StatelessWidget {
           label: AppMessages.openNotice,
           icon: AppIcons.arrowRight,
           variant: AppButtonVariant.outline,
-          size: AppButtonSize.sm,
           onPressed: enabled ? onOpenEdital : null,
         ),
       ],

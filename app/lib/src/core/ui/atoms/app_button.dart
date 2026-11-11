@@ -6,14 +6,11 @@ import '../responsive/app_responsive.dart';
 
 enum AppButtonVariant { primary, secondary, outline, text, destructive }
 
-enum AppButtonSize { sm, md, lg }
-
 class AppButton extends StatefulWidget {
   const AppButton({
     required this.label,
     this.onPressed,
     this.variant = AppButtonVariant.primary,
-    this.size = AppButtonSize.md,
     this.icon,
     this.loading = false,
     this.semanticLabel,
@@ -24,7 +21,6 @@ class AppButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
-  final AppButtonSize size;
   final IconData? icon;
   final bool loading;
   final String? semanticLabel;
@@ -61,11 +57,6 @@ class _AppButtonState extends State<AppButton> {
     final tokens = context.tokens;
     final palette = _AppButtonPalette.resolve(context, widget.variant);
     final background = _pressed || _hovered ? palette.interactiveBackground : palette.background;
-    final height = switch (widget.size) {
-      AppButtonSize.sm => tokens.layout.buttonHeightSm,
-      AppButtonSize.md => tokens.layout.buttonHeightMd,
-      AppButtonSize.lg => tokens.layout.buttonHeightLg,
-    };
     final horizontalPadding = (tokens.spacing.sm + tokens.spacing.md) / 2;
     final leading = widget.loading
         ? SizedBox.square(
@@ -138,7 +129,7 @@ class _AppButtonState extends State<AppButton> {
             child: AnimatedContainer(
               duration: context.motionDuration(tokens.motion.fast),
               curve: tokens.motion.standard,
-              constraints: BoxConstraints(minHeight: height),
+              constraints: BoxConstraints(minHeight: tokens.layout.controlHeight),
               padding: EdgeInsets.symmetric(
                 horizontal: horizontalPadding,
                 vertical: tokens.spacing.xxs,

@@ -556,7 +556,6 @@ class _AppToastContent extends StatelessWidget {
                 label: actionLabel!,
                 onPressed: onAction,
                 variant: AppButtonVariant.outline,
-                size: AppButtonSize.sm,
               )
             : null;
 

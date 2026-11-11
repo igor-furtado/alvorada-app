@@ -103,7 +103,7 @@ class AppListItemHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: double.infinity,
-    height: height ?? context.tokens.sizes.reviewAccentHeight,
+    height: height ?? context.tokens.sizes.listItemHeaderHeight,
     child: ClipRRect(
       borderRadius: context.tokens.borders.md,
       child: child,

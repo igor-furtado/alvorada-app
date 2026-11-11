@@ -102,7 +102,7 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
       AppShellSearchConfig(
         placeholder: AppMessages.searchContent,
         query: disciplinas.query,
-        actionIcon: AppIcons.reviews,
+        actionIcon: AppIcons.refresh,
         actionLabel: AppMessages.update,
         onAction: canRefresh ? _refreshAll : null,
         onChanged: (value) {

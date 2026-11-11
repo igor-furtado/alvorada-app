@@ -10,8 +10,8 @@ import 'disciplinas_list_state.dart';
 
 abstract final class DisciplinasListActions {
   static Future<void> add(BuildContext context) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => const DisciplinasFormView(),
     );
     if (saved == true && context.mounted) {
@@ -27,8 +27,8 @@ abstract final class DisciplinasListActions {
     BuildContext context,
     DisciplinaListItemData disciplina,
   ) async {
-    final saved = await showDialog<bool>(
-      context: context,
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
       builder: (_) => DisciplinasFormView(disciplina: disciplina),
     );
     if (saved == true && context.mounted) {

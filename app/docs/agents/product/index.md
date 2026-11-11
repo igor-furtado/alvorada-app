@@ -9,7 +9,8 @@ Use esta documentação ao alterar comportamento, priorização, método, descan
 
 1. `CONTEXT.md` define o significado e o nome atual dos conceitos.
 2. [rules.md](rules.md) define comportamentos que a implementação deve preservar.
-3. O [guia de widgets](../architecture/widgets.md) define a apresentação e a interação genérica dos fluxos.
+3. O [guia de presentation](../architecture/presentation.md) define como os fluxos expõem essas regras na interface.
+4. O [design system](../architecture/design-system.md) define os componentes e contratos visuais compartilhados.
 
 Uma proposta terminológica só entra nestes documentos depois de aprovada e coordenada com modelos, rotas, APIs, testes e contratos afetados.
 

@@ -1,6 +1,7 @@
 import 'package:estudos_app/src/core/theme/app_theme.dart';
 import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -100,6 +101,27 @@ void main() {
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
     expect(find.text('Abrir drawer'), findsOneWidget);
   });
+
+  testWidgets('bloqueia fundo e Esc durante loading sem impedir conclusão programática', (tester) async {
+    await _pumpDismissibilityLauncher(tester, width: 390, height: 844);
+
+    await tester.tap(find.text('Abrir formulário'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Salvar'));
+    await tester.pump();
+
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+
+    await tester.tap(find.text('Concluir'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
+  });
 }
 
 Future<void> _pumpDrawerLauncher(
@@ -182,6 +204,60 @@ Future<void> _pumpNestedDrawerLauncher(
           ),
         ),
       ),
+    ),
+  );
+}
+
+Future<void> _pumpDismissibilityLauncher(
+  WidgetTester tester, {
+  required double width,
+  required double height,
+}) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = Size(width, height);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => Center(
+            child: AppButton(
+              label: 'Abrir formulário',
+              onPressed: () => showAppDrawerBuilder<void>(
+                context,
+                builder: (_) => const _DismissibilityDrawer(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _DismissibilityDrawer extends StatefulWidget {
+  const _DismissibilityDrawer();
+
+  @override
+  State<_DismissibilityDrawer> createState() => _DismissibilityDrawerState();
+}
+
+class _DismissibilityDrawerState extends State<_DismissibilityDrawer> {
+  var _loading = false;
+
+  @override
+  Widget build(BuildContext context) => AppDrawer(
+    title: 'Formulário',
+    dismissible: !_loading,
+    primaryLabel: 'Salvar',
+    onPrimary: () => setState(() => _loading = true),
+    loading: _loading,
+    child: AppButton(
+      label: 'Concluir',
+      onPressed: () => Navigator.pop(context),
     ),
   );
 }

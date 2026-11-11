@@ -37,7 +37,6 @@ class SubtopicosListHeader extends StatelessWidget {
           label: AppMessages.addSubtopic,
           icon: AppIcons.add,
           variant: AppButtonVariant.text,
-          size: AppButtonSize.sm,
           onPressed: canMutateSubtopics ? onAdd : null,
         ),
         AppMenuButton<_TopicoAction>(
