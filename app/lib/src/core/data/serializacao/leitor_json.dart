@@ -4,6 +4,12 @@ String readJsonString(Map<String, Object?> json, String key) {
   throw FormatException('O campo "$key" da API deve ser um texto.');
 }
 
+String? readJsonNullableString(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value == null || value is String) return value as String?;
+  throw FormatException('O campo "$key" da API deve ser um texto ou nulo.');
+}
+
 int readJsonInteger(Map<String, Object?> json, String key) {
   final value = json[key];
   if (value is int) return value;

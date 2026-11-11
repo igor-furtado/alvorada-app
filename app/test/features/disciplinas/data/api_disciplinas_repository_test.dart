@@ -58,6 +58,35 @@ void main() {
     expect(discipline.id, 'discipline-1');
     expect(api.createdDisciplina?['dificuldade'], DificuldadeDisciplina.medium.apiValue);
   });
+
+  test('traduz erro 4xx da API em violação de regra', () async {
+    final api = _FakeApi()
+      ..mutationError = const DisciplinasApiException(
+        statusCode: 409,
+        message: 'Já existe um Tópico com esse nome.',
+      );
+    final repository = ApiDisciplinasRepository(api);
+
+    await expectLater(
+      repository.createTopico(
+        disciplineId: 'discipline-1',
+        name: 'Pontuação',
+      ),
+      throwsA(
+        isA<DisciplinasRuleViolationException>()
+            .having(
+              (failure) => failure.code,
+              'código',
+              'disciplinas.api.409',
+            )
+            .having(
+              (failure) => failure.message,
+              'mensagem',
+              'Já existe um Tópico com esse nome.',
+            ),
+      ),
+    );
+  });
 }
 
 class _FakeApi implements DisciplinasApi {
@@ -65,6 +94,7 @@ class _FakeApi implements DisciplinasApi {
   String? createdTopico;
   Map<String, Object?>? createdDisciplina;
   bool failGet = false;
+  Exception? mutationError;
 
   @override
   Future<List<DisciplinaApiModel>> getDisciplinas() async {
@@ -80,7 +110,11 @@ class _FakeApi implements DisciplinasApi {
   }
 
   @override
-  Future<void> createTopico(String disciplineId, String name) async => createdTopico = name;
+  Future<void> createTopico(String disciplineId, String name) async {
+    final error = mutationError;
+    if (error != null) throw error;
+    createdTopico = name;
+  }
 
   @override
   Future<void> createSubtopico(String topicId, String name) async {}

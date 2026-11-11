@@ -1,7 +1,7 @@
 abstract final class AppMessages {
   static const navigationToday = 'Hoje';
   static const navigationWeek = 'Semana';
-  static const navigationContests = 'Concursos';
+  static const navigationConcursos = 'Concursos';
   static const navigationDisciplines = 'Disciplinas';
   static const navigationReviews = 'Revisões';
   static const navigationErrors = 'Caderno';
@@ -56,7 +56,7 @@ abstract final class AppMessages {
   static const oneDay = '1 dia';
   static const sevenDays = '7 dias';
   static const thirtyDays = '30 dias';
-  static const allContests = 'Todos os Concursos';
+  static const todosConcursos = 'Todos os Concursos';
   static const startReview = 'Começar revisão';
   static const howReviewsWork = 'Como funcionam as Revisões';
 
@@ -84,42 +84,57 @@ abstract final class AppMessages {
   static const howErrorNotebookWorks = 'Como funciona o Caderno de Erros';
   static const startNotebookReview = 'Começar Revisão';
 
-  static const newContest = 'Novo Concurso';
-  static const contest = 'Concurso';
-  static const mainContest = 'Concurso principal';
-  static const contestsSubtitle = 'Seus concursos-alvo em ordem de prova.';
+  static const novoConcurso = 'Novo Concurso';
+  static const concurso = 'Concurso';
+  static const concursoPrioritario = 'Concurso prioritário';
+  static const concursosSubtitle = 'Seus concursos-alvo em ordem de prova.';
   static const noticeProgress = 'Avanço no Edital';
   static const exam = 'Prova';
-  static const noActiveContests = 'Nenhum Concurso ativo';
+  static const nenhumConcursoAtivo = 'Nenhum Concurso ativo';
   static const institution = 'Órgão ou instituição';
   static const role = 'Cargo';
   static const board = 'Banca';
-  static const createContest = 'Criar Concurso';
+  static const examDate = 'Data da prova';
+  static const examDatePlaceholder = 'DD/MM/AAAA';
+  static const invalidExamDate = 'Informe uma data válida no formato DD/MM/AAAA.';
+  static const definirConcursoPrioritario = 'Definir como prioritário';
+  static const concursoPrioritarioField = 'Usar como Concurso prioritário';
+  static const concursoPrioritarioHelp = 'Ele receberá prioridade quando as horas não comportarem todo o escopo.';
+  static const criarConcurso = 'Criar Concurso';
   static const toBeDefined = 'A definir';
-  static const deleteContest = 'Excluir Concurso';
-  static const deleteContestQuestion = 'Excluir Concurso?';
+  static const excluirConcurso = 'Excluir Concurso';
+  static const excluirConcursoQuestion = 'Excluir Concurso?';
   static const days = 'dias';
   static const openNotice = 'Abrir Edital';
   static const moreActions = 'Mais ações';
   static const seeDetails = 'Ver detalhes';
   static const archive = 'Arquivar';
   static const delete = 'Excluir';
-  static const emptyContests = 'Adicione um Concurso para começar.';
+  static const concursosEmpty = 'Adicione um Concurso para começar.';
   static const notice = 'Edital';
+  static const carregandoConcursos = 'Carregando Concursos';
+  static const concursoCriado = 'Concurso criado.';
+  static const concursoPriorizado = 'Concurso prioritário atualizado.';
+  static const concursoRestaurado = 'Concurso restaurado.';
+  static const concursoExcluido = 'Concurso excluído.';
+  static const concursosAtualizados = 'Concursos atualizados.';
+  static const concursoOperacaoFalhou = 'Não foi possível concluir a alteração. Tente novamente.';
+  static const concursosSincronizacaoPendente = 'Alteração salva. Atualize para ver os Concursos mais recentes.';
   static const newDiscipline = 'Nova Disciplina';
   static const newDisciplineDescription = 'Adicione uma Disciplina para organizar seus Tópicos.';
   static const disciplineNameExample = 'Ex.: Língua Portuguesa';
   static const disciplineNameHelp = 'Use o nome adotado no Edital.';
-  static const removeDiscipline = 'Remover Disciplina';
   static const main = 'Principal';
   static const disciplineName = 'Nome da Disciplina';
   static const disciplineWeight = 'Peso no Edital';
-  static const noDiscipline = 'Nenhuma Disciplina encontrada.';
-  static const contestNotFound = 'Concurso não encontrado';
-  static const disciplineNotFound = 'Disciplina não encontrada';
+  static const noDiscipline = 'Nenhuma Disciplina vinculada a este Edital.';
+  static const concursoNaoEncontrado = 'Concurso não encontrado';
   static const contentCatalog = 'Disciplinas';
   static const contentCatalogSubtitle = 'Organize Tópicos e Subtópicos sem perder o contexto do catálogo.';
   static const searchContent = 'Buscar Disciplina, Tópico ou Subtópico';
+  static const orderDisciplines = 'Ordenar Disciplinas';
+  static const defaultDisciplineOrder = 'Ordem padrão';
+  static const alphabeticalDisciplineOrder = 'Ordem alfabética';
   static const addDiscipline = 'Adicionar Disciplina';
   static const addTopic = 'Adicionar Tópico';
   static const addSubtopic = 'Adicionar Subtópico';
@@ -191,8 +206,6 @@ abstract final class AppMessages {
 
   static String expectedDuration(String duration) => '$duration previstos';
 
-  static String disciplineRemoved(String name) => '$name foi removida deste Edital.';
-
   static String disciplineDeletedImpact(String name) =>
       '$name, seus Tópicos e Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
 
@@ -202,11 +215,11 @@ abstract final class AppMessages {
   static String subtopicDeletedImpact(String name) =>
       '$name será excluído do catálogo compartilhado. Esta ação não pode ser desfeita.';
 
-  static String contestArchived(String name) => '$name foi arquivado.';
+  static String concursoArquivado(String name) => '$name foi arquivado.';
 
   static String nextExamIn(int days) => 'A próxima prova é em $days dias';
 
-  static String deleteContestImpact(String name) =>
+  static String excluirConcursoImpacto(String name) =>
       '$name e seu Edital serão removidos. Esta ação não pode ser desfeita.';
 
   static String _count(int count, String singular, String plural) => '$count ${count == 1 ? singular : plural}';

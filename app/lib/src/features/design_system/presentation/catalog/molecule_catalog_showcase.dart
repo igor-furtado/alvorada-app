@@ -238,7 +238,7 @@ class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
           label: 'Mostrar toast',
           variant: AppButtonVariant.outline,
           onPressed: () {
-            final toast = AppToast.show(
+            AppToast.show(
               context,
               title: 'Criando evento',
               description: 'Domingo, 3 de dezembro, às 9h',

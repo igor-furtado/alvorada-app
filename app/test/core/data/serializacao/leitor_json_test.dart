@@ -13,11 +13,19 @@ void main() {
 
   test('lê valores tipados do JSON', () {
     expect(readJsonString(json, 'texto'), 'valor');
+    expect(readJsonNullableString(json, 'nulo'), isNull);
     expect(readJsonInteger(json, 'inteiro'), 3);
     expect(readJsonBoolean(json, 'booleano'), isTrue);
     expect(readJsonList(json, 'objetos'), [
       {'id': '1'},
     ]);
+  });
+
+  test('rejeita texto anulável com tipo inesperado', () {
+    expect(
+      () => readJsonNullableString(const {'campo': 1}, 'campo'),
+      throwsA(isA<FormatException>()),
+    );
   });
 
   test('informa o campo quando o tipo recebido é inválido', () {

@@ -9,7 +9,6 @@ export 'app_metric_overview.dart';
 export 'app_popover.dart';
 export 'app_resizable.dart';
 export 'app_scroll_area.dart';
-export 'app_sheet.dart';
 export 'app_sidebar.dart';
 export 'app_state_view.dart';
 export 'app_table.dart';

@@ -8,17 +8,19 @@ import 'core/presentation/app_shell.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_theme_mode.dart';
 import 'features/administration/presentation/administration_page.dart';
-import 'features/contests/presentation/contest_details_page.dart';
-import 'features/contests/presentation/contest_view_data.dart';
-import 'features/contests/presentation/contests_page.dart';
-import 'features/contests/presentation/discipline_details_page.dart';
+import 'features/concursos/data/repositories/api_concursos_repository.dart';
+import 'features/concursos/data/services/concursos_api_service.dart';
+import 'features/concursos/domain/repositories/concursos_repository.dart';
+import 'features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'features/concursos/presentation/concurso_details_page.dart';
+import 'features/concursos/presentation/concursos_page.dart';
 import 'features/design_system/presentation/component_catalog_page.dart';
 import 'features/disciplinas/data/repositories/api_disciplinas_repository.dart';
 import 'features/disciplinas/data/services/disciplinas_api_service.dart';
 import 'features/disciplinas/domain/repositories/disciplinas_repository.dart';
-import 'features/disciplinas/presentation/bloc/disciplinas_bloc.dart';
-import 'features/disciplinas/presentation/bloc/disciplinas_event.dart';
-import 'features/disciplinas/presentation/pages/disciplinas_page.dart';
+import 'features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart';
+import 'features/disciplinas/presentation/disciplinas_page.dart';
 import 'features/errors/presentation/error_notebook_page.dart';
 import 'features/reviews/presentation/reviews_page.dart';
 import 'features/today/presentation/today_page.dart';
@@ -40,26 +42,13 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: '/concursos',
-              builder: (context, state) => const ContestsPage(),
+              builder: (context, state) => const ConcursosPage(),
               routes: [
                 GoRoute(
-                  path: ':contestId',
-                  builder: (context, state) => ContestDetailsPage(
-                    contestId: state.pathParameters['contestId']!,
-                    contestOverride: state.extra is ContestViewData ? state.extra! as ContestViewData : null,
+                  path: ':concursoId',
+                  builder: (context, state) => ConcursoDetailsPage(
+                    concursoId: state.pathParameters['concursoId']!,
                   ),
-                  routes: [
-                    GoRoute(
-                      path: 'disciplinas/:disciplineName',
-                      builder: (context, state) => DisciplineDetailsPage(
-                        contestId: state.pathParameters['contestId']!,
-                        disciplineName: state.pathParameters['disciplineName']!,
-                        arguments: state.extra is DisciplineDetailsArguments
-                            ? state.extra! as DisciplineDetailsArguments
-                            : null,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -69,11 +58,11 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: '/disciplinas',
-              builder: (context, state) => BlocProvider(
-                create: (context) => DisciplinasBloc(
-                  repository: context.read<DisciplinasRepository>(),
-                )..add(const LoadDisciplinasRequested()),
-                child: const DisciplinasPage(),
+              builder: (context, state) => DisciplinasPage(
+                initialQuery: state.uri.queryParameters['busca'] ?? '',
+                initialOrder: state.uri.queryParameters['ordem'] == 'alfabetica'
+                    ? DisciplinasListOrder.alphabetical
+                    : DisciplinasListOrder.catalog,
               ),
             ),
           ],
@@ -104,9 +93,10 @@ final _router = GoRouter(
 );
 
 class EstudosApp extends StatefulWidget {
-  const EstudosApp({this.disciplinasRepository, super.key});
+  const EstudosApp({this.disciplinasRepository, this.concursosRepository, super.key});
 
   final DisciplinasRepository? disciplinasRepository;
+  final ConcursosRepository? concursosRepository;
 
   @override
   State<EstudosApp> createState() => _EstudosAppState();
@@ -115,19 +105,22 @@ class EstudosApp extends StatefulWidget {
 class _EstudosAppState extends State<EstudosApp> {
   http.Client? _client;
   late final DisciplinasRepository _disciplinasRepository;
+  late final DisciplinasUseCases _disciplinasUseCases;
+  late final ConcursosRepository _concursosRepository;
+  late final ConcursosUseCases _concursosUseCases;
   late final AppThemeModeController _themeModeController;
 
   @override
   void initState() {
     super.initState();
     _themeModeController = AppThemeModeController();
-    final injectedRepository = widget.disciplinasRepository;
-    if (injectedRepository != null) {
-      _disciplinasRepository = injectedRepository;
-    } else {
+    if (widget.disciplinasRepository == null || widget.concursosRepository == null) {
       _client = http.Client();
-      _disciplinasRepository = ApiDisciplinasRepository(DisciplinasApiService(_client!));
     }
+    _disciplinasRepository = widget.disciplinasRepository ?? ApiDisciplinasRepository(DisciplinasApiService(_client!));
+    _disciplinasUseCases = DisciplinasUseCases(_disciplinasRepository);
+    _concursosRepository = widget.concursosRepository ?? ApiConcursosRepository(ConcursosApiService(_client!));
+    _concursosUseCases = ConcursosUseCases(_concursosRepository);
   }
 
   @override
@@ -140,8 +133,11 @@ class _EstudosAppState extends State<EstudosApp> {
   @override
   Widget build(BuildContext context) => AppThemeModeScope(
     controller: _themeModeController,
-    child: RepositoryProvider<DisciplinasRepository>.value(
-      value: _disciplinasRepository,
+    child: MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<DisciplinasUseCases>.value(value: _disciplinasUseCases),
+        RepositoryProvider<ConcursosUseCases>.value(value: _concursosUseCases),
+      ],
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: _themeModeController,
         builder: (context, themeMode, child) => MaterialApp.router(

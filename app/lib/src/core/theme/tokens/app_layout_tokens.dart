@@ -13,6 +13,7 @@ class AppLayoutTokens {
     this.wide = AppDimensionPrimitives.breakpointWide,
     this.contentMaxWidth = AppDimensionPrimitives.contentMaxWidth,
     this.dialogMaxWidth = 384,
+    this.drawerSideFraction = .75,
     this.alertDialogSmallMaxWidth = 320,
     this.iconRailWidth = 68,
     this.commandBarHeight = 64,
@@ -48,6 +49,7 @@ class AppLayoutTokens {
   final double wide;
   final double contentMaxWidth;
   final double dialogMaxWidth;
+  final double drawerSideFraction;
   final double alertDialogSmallMaxWidth;
   final double iconRailWidth;
   final double commandBarHeight;
@@ -83,6 +85,7 @@ class AppLayoutTokens {
     wide: lerpDouble(wide, other.wide, t)!,
     contentMaxWidth: lerpDouble(contentMaxWidth, other.contentMaxWidth, t)!,
     dialogMaxWidth: lerpDouble(dialogMaxWidth, other.dialogMaxWidth, t)!,
+    drawerSideFraction: lerpDouble(drawerSideFraction, other.drawerSideFraction, t)!,
     alertDialogSmallMaxWidth: lerpDouble(
       alertDialogSmallMaxWidth,
       other.alertDialogSmallMaxWidth,

@@ -33,6 +33,7 @@ func TestDisciplineContractUsesPortugueseJSONFields(t *testing.T) {
 	}
 	handler := NewHandler(
 		application.NewService(repository),
+		nil,
 		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
 	).Router()
 	request := httptest.NewRequest(http.MethodGet, "/api/v1/subjects", nil)
@@ -55,6 +56,7 @@ func TestCreateDisciplineAcceptsPortugueseJSONFields(t *testing.T) {
 	repository := &serializationRepository{}
 	handler := NewHandler(
 		application.NewService(repository),
+		nil,
 		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
 	).Router()
 	request := httptest.NewRequest(
@@ -77,6 +79,7 @@ func TestCreateDisciplineAcceptsPortugueseJSONFields(t *testing.T) {
 func TestErrorResponseUsesPortugueseField(t *testing.T) {
 	handler := NewHandler(
 		application.NewService(&serializationRepository{}),
+		nil,
 		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
 	).Router()
 	request := httptest.NewRequest(http.MethodPost, "/api/v1/subjects", strings.NewReader(`{"name":"Português"}`))
@@ -96,6 +99,7 @@ func TestDeleteMandatoryTopicReturnsValidationError(t *testing.T) {
 	repository := &serializationRepository{deleteTopicError: domain.ErrMandatoryTopic}
 	handler := NewHandler(
 		application.NewService(repository),
+		nil,
 		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
 	).Router()
 	request := httptest.NewRequest(http.MethodDelete, "/api/v1/topics/topico-1", nil)

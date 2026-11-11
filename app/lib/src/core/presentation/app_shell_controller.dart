@@ -5,6 +5,7 @@ class AppShellSearchConfig {
   const AppShellSearchConfig({
     required this.placeholder,
     required this.onChanged,
+    this.query = '',
     this.actionIcon,
     this.actionLabel,
     this.onAction,
@@ -12,6 +13,7 @@ class AppShellSearchConfig {
 
   final String placeholder;
   final ValueChanged<String> onChanged;
+  final String query;
   final IconData? actionIcon;
   final String? actionLabel;
   final VoidCallback? onAction;

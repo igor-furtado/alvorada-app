@@ -29,7 +29,7 @@ class _TodayContent extends StatelessWidget {
     children: [
       _Header(date: date),
       SizedBox(height: context.tokens.spacing.xxxl),
-      const _ContestStrip(),
+      const _ConcursosStrip(),
       SizedBox(height: context.tokens.spacing.xxl),
       LayoutBuilder(
         builder: (context, constraints) {
@@ -129,8 +129,8 @@ class _Header extends StatelessWidget {
   );
 }
 
-class _ContestStrip extends StatelessWidget {
-  const _ContestStrip();
+class _ConcursosStrip extends StatelessWidget {
+  const _ConcursosStrip();
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -146,7 +146,7 @@ class _ContestStrip extends StatelessWidget {
               borderRadius: context.tokens.borders.md,
             ),
             child: Icon(
-              AppIcons.contests,
+              AppIcons.concursos,
               color: context.tokens.colors.actionForeground,
             ),
           ),
@@ -156,7 +156,7 @@ class _ContestStrip extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppMessages.mainContest,
+                  AppMessages.concursoPrioritario,
                   style: context.tokens.typography.labelMedium,
                 ),
                 SizedBox(height: context.tokens.spacing.xxxs),

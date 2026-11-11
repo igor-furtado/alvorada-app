@@ -12,7 +12,7 @@ class ReviewsPage extends StatelessWidget {
       interval: '1 dia',
       title: 'Princípios fundamentais',
       discipline: 'Direito Constitucional',
-      contest: 'Analista Legislativo',
+      concurso: 'Analista Legislativo',
       duration: '3 min',
       instruction: 'Leia somente as caixas Memorize e Atenção.',
       detail: 'Recupere a ideia antes de abrir cada caixa.',
@@ -22,7 +22,7 @@ class ReviewsPage extends StatelessWidget {
       interval: '7 dias',
       title: 'Poder constituinte',
       discipline: 'Direito Constitucional',
-      contest: 'Analista Legislativo',
+      concurso: 'Analista Legislativo',
       duration: '10 min',
       instruction: 'Caixas, quadro comparativo e cinco linhas De cabeça.',
       detail: 'O material fica fechado até terminar o De cabeça.',
@@ -32,7 +32,7 @@ class ReviewsPage extends StatelessWidget {
       interval: '30 dias',
       title: 'Direitos fundamentais',
       discipline: 'Direito Constitucional',
-      contest: 'Analista Legislativo',
+      concurso: 'Analista Legislativo',
       duration: '20 min',
       instruction: 'Responda 20 questões do Tópico.',
       detail: 'Acima de 80%, o Tópico fica Fixado.',
@@ -199,10 +199,10 @@ class _Filters extends StatelessWidget {
         ),
         SizedBox(width: context.tokens.spacing.sm),
         FilterChip(
-          avatar: Icon(AppIcons.contests, size: context.tokens.icons.sm),
+          avatar: Icon(AppIcons.concursos, size: context.tokens.icons.sm),
           selected: false,
           onSelected: (_) => _showFilterMessage(context),
-          label: const Text(AppMessages.allContests),
+          label: const Text(AppMessages.todosConcursos),
         ),
       ],
     ),
@@ -281,7 +281,7 @@ class _ReviewCard extends StatelessWidget {
                   ),
                   SizedBox(height: context.tokens.spacing.xxs),
                   Text(
-                    '${review.discipline} · ${review.contest}',
+                    '${review.discipline} · ${review.concurso}',
                     style: context.tokens.typography.bodySmall,
                   ),
                   SizedBox(height: context.tokens.spacing.lg),
@@ -644,7 +644,7 @@ class _ReviewPreview {
     required this.interval,
     required this.title,
     required this.discipline,
-    required this.contest,
+    required this.concurso,
     required this.duration,
     required this.instruction,
     required this.detail,
@@ -654,7 +654,7 @@ class _ReviewPreview {
   final String interval;
   final String title;
   final String discipline;
-  final String contest;
+  final String concurso;
   final String duration;
   final String instruction;
   final String detail;

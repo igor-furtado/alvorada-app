@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Prumo API
   version: 1.0.0
-  description: API para organização de disciplinas, tópicos e subtópicos de estudo.
+  description: API para organização de Concursos, disciplinas, tópicos e subtópicos de estudo.
   contact:
     name: Prumo.app
 servers:
@@ -14,6 +14,8 @@ tags:
     description: Disponibilidade do serviço
   - name: Disciplinas
     description: Organização das disciplinas
+  - name: Concursos
+    description: Concursos que orientam o Plano
   - name: Tópicos
     description: Conteúdo pertencente a uma disciplina
   - name: Subtópicos
@@ -31,6 +33,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Saude'
+  /api/v1/concursos:
+    get:
+      tags: [Concursos]
+      summary: Lista os Concursos ativos em ordem de prova
+      operationId: listarConcursos
+      responses:
+        '200':
+          description: Concursos ativos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Concurso'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+    post:
+      tags: [Concursos]
+      summary: Cria um Concurso
+      operationId: criarConcurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarConcurso'
+      responses:
+        '201':
+          description: Concurso criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecursoCriado'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    delete:
+      tags: [Concursos]
+      summary: Exclui definitivamente um Concurso
+      operationId: excluirConcurso
+      responses:
+        '204':
+          description: Concurso excluído
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}/prioridade:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    put:
+      tags: [Concursos]
+      summary: Define o Concurso prioritário
+      description: Remove a prioridade do Concurso anterior e a atribui ao Concurso informado.
+      operationId: definirConcursoPrioritario
+      responses:
+        '204':
+          description: Prioridade atualizada
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}/arquivamento:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    put:
+      tags: [Concursos]
+      summary: Arquiva um Concurso
+      operationId: arquivarConcurso
+      responses:
+        '204':
+          description: Concurso arquivado
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+    delete:
+      tags: [Concursos]
+      summary: Restaura um Concurso arquivado
+      operationId: restaurarConcurso
+      responses:
+        '204':
+          description: Concurso restaurado
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects:
     get:
       tags: [Disciplinas]
@@ -232,6 +325,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Erro'
+    RecursoNaoEncontrado:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
   schemas:
     Saude:
       type: object
@@ -247,6 +346,57 @@ components:
         id:
           type: string
           format: uuid
+    Concurso:
+      type: object
+      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital]
+      properties:
+        id:
+          type: string
+          format: uuid
+        instituicao:
+          type: string
+          minLength: 1
+          maxLength: 160
+        cargo:
+          type: string
+          minLength: 1
+          maxLength: 160
+        banca:
+          type: [string, 'null']
+          maxLength: 120
+        data_prova:
+          type: [string, 'null']
+          format: date
+        prioritario:
+          type: boolean
+        progresso_edital:
+          type: integer
+          minimum: 0
+          maximum: 100
+    CriarConcurso:
+      type: object
+      required: [instituicao, cargo]
+      properties:
+        instituicao:
+          type: string
+          minLength: 1
+          maxLength: 160
+          examples: [Tribunal Regional Federal da 5ª Região]
+        cargo:
+          type: string
+          minLength: 1
+          maxLength: 160
+          examples: [Técnico Judiciário — Área Administrativa]
+        banca:
+          type: [string, 'null']
+          maxLength: 120
+          examples: [FCC]
+        data_prova:
+          type: [string, 'null']
+          format: date
+        prioritario:
+          type: boolean
+          default: false
     CriarDisciplina:
       type: object
       required: [nome]

@@ -359,8 +359,8 @@ class _WeekSummary extends StatelessWidget {
           runSpacing: context.tokens.spacing.lg,
           children: const [
             _SummaryItem(
-              icon: AppIcons.contests,
-              label: AppMessages.mainContest,
+              icon: AppIcons.concursos,
+              label: AppMessages.concursoPrioritario,
               value: 'Analista Legislativo',
             ),
             _SummaryItem(

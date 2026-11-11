@@ -22,7 +22,7 @@ O repositório reúne:
 - uma especificação **OpenAPI 3.1** servida pela própria API.
 
 > [!IMPORTANT]
-> As telas Flutter ainda são protótipos navegáveis com dados demonstrativos. A funcionalidade de Disciplinas já está integrada de ponta a ponta à API e ao banco; as demais funcionalidades ainda não possuem integração e persistência.
+> O cadastro de Concursos e o catálogo de Disciplinas estão integrados à API e ao banco. O vínculo entre Editais e Disciplinas ainda não possui persistência e, por isso, é exibido somente para leitura. As demais telas Flutter ainda usam dados demonstrativos.
 
 ## Experiência atual
 
@@ -109,7 +109,7 @@ O Docker Compose lê as seguintes variáveis do arquivo `.env` na raiz:
 
 Ao executar a API sem Docker, também estão disponíveis `PORT` (padrão `8080`), `DB_HOST` (padrão `127.0.0.1`) e `DB_PORT` (padrão `3306`).
 
-O esquema MySQL usa o vocabulário do domínio em português: `disciplinas`, `topicos` e `subtopicos`, com colunas como `nome`, `dificuldade`, `cor`, `posicao`, `criado_em` e `atualizado_em`. Ao iniciar, a API migra de forma idempotente bancos locais que ainda usam os nomes legados em inglês.
+O esquema MySQL usa o vocabulário do domínio em português: `concursos`, `disciplinas`, `topicos` e `subtopicos`, com colunas como `instituicao`, `cargo`, `data_prova`, `nome`, `posicao`, `criado_em` e `atualizado_em`. Ao iniciar, a API migra de forma idempotente bancos locais que ainda usam os nomes legados em inglês e cria a estrutura de Concursos quando necessário.
 
 ## Arquitetura
 
@@ -154,6 +154,10 @@ Principais rotas:
 | Método | Rota | Ação |
 | --- | --- | --- |
 | `GET` | `/health` | Verifica a disponibilidade |
+| `GET`, `POST` | `/api/v1/concursos` | Lista ou cria Concursos |
+| `DELETE` | `/api/v1/concursos/{id}` | Exclui um Concurso |
+| `PUT` | `/api/v1/concursos/{id}/prioridade` | Define o Concurso prioritário |
+| `PUT`, `DELETE` | `/api/v1/concursos/{id}/arquivamento` | Arquiva ou restaura um Concurso |
 | `GET`, `POST` | `/api/v1/subjects` | Lista ou cria Disciplinas |
 | `PATCH`, `DELETE` | `/api/v1/subjects/{id}` | Atualiza ou exclui uma Disciplina |
 | `POST` | `/api/v1/subjects/{id}/topics` | Cria um Tópico |

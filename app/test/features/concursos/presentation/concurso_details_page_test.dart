@@ -1,0 +1,70 @@
+import 'package:estudos_app/src/core/content/app_messages.dart';
+import 'package:estudos_app/src/core/theme/app_theme.dart';
+import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'package:estudos_app/src/features/concursos/presentation/concurso_details_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../fakes/fake_concursos_repository.dart';
+
+void main() {
+  testWidgets('carrega um Concurso real ao abrir a rota diretamente', (
+    tester,
+  ) async {
+    final concurso = _concurso();
+
+    await _pump(
+      tester,
+      repository: FakeConcursosRepository(concursos: [concurso]),
+      child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+    );
+
+    expect(find.text(concurso.instituicao), findsWidgets);
+    expect(find.text(AppMessages.concursoNaoEncontrado), findsNothing);
+  });
+
+  testWidgets('não oferece edição local sem persistência do Edital', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      repository: FakeConcursosRepository(concursos: [_concurso()]),
+      child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+    );
+
+    expect(find.text(AppMessages.newDiscipline), findsNothing);
+    expect(find.text(AppMessages.seeDetails), findsNothing);
+    expect(find.text(AppMessages.noDiscipline), findsOneWidget);
+  });
+}
+
+Concurso _concurso() => Concurso(
+  id: 'concurso-real',
+  instituicao: 'Tribunal Regional Federal da 5ª Região',
+  cargo: 'Técnico Judiciário',
+  banca: 'FCC',
+  dataProva: DateTime(2027, 2, 21),
+  prioritario: false,
+  progressoEdital: 0,
+);
+
+Future<void> _pump(
+  WidgetTester tester, {
+  required FakeConcursosRepository repository,
+  required Widget child,
+}) async {
+  await tester.binding.setSurfaceSize(const Size(1440, 1200));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    RepositoryProvider<ConcursosUseCases>.value(
+      value: ConcursosUseCases(repository),
+      child: MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(body: child),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
 import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina_input.dart';
 import 'package:estudos_app/src/features/disciplinas/domain/repositories/disciplinas_repository.dart';
@@ -8,12 +10,12 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   final List<Disciplina> _disciplinas;
   bool failLoad = false;
   bool failMutation = false;
-  int loadCalls = 0;
+  bool failSynchronization = false;
+  Completer<void>? deleteSubtopicoGate;
   var _nextId = 100;
 
   @override
   Future<List<Disciplina>> getDisciplinas({bool forceRefresh = false}) async {
-    loadCalls++;
     if (failLoad) throw const DisciplinasRepositoryException('Falha simulada.');
     return List.unmodifiable(_disciplinas);
   }
@@ -122,6 +124,7 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   @override
   Future<void> deleteSubtopico(String subtopicId) async {
     _throwIfMutationFails();
+    await deleteSubtopicoGate?.future;
     for (final disciplina in [..._disciplinas]) {
       for (final topico in disciplina.topics) {
         if (topico.subtopics.any((item) => item.id == subtopicId)) {
@@ -184,6 +187,9 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   }
 
   void _throwIfMutationFails() {
+    if (failSynchronization) {
+      throw const DisciplinasSynchronizationException();
+    }
     if (failMutation) throw const DisciplinasRepositoryException('Falha simulada.');
   }
 

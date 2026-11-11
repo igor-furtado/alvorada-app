@@ -29,6 +29,7 @@ class AppSizeTokens {
     this.rowDividerHeight = 58,
     this.iconContainerLg = 62,
     this.largeVisual = 72,
+    this.drawerHandleLength = 100,
     this.weightColumn = 105,
     this.progressColumn = 110,
     this.compactField = 120,
@@ -44,7 +45,7 @@ class AppSizeTokens {
     this.detailsTable = 950,
     this.disciplineTable = 1080,
     this.disciplinePage = 1216,
-    this.contestPage = 1220,
+    this.concursosPage = 1220,
   });
 
   final double hairline;
@@ -70,6 +71,7 @@ class AppSizeTokens {
   final double rowDividerHeight;
   final double iconContainerLg;
   final double largeVisual;
+  final double drawerHandleLength;
   final double weightColumn;
   final double progressColumn;
   final double compactField;
@@ -85,7 +87,7 @@ class AppSizeTokens {
   final double detailsTable;
   final double disciplineTable;
   final double disciplinePage;
-  final double contestPage;
+  final double concursosPage;
 
   AppSizeTokens lerp(AppSizeTokens other, double t) => AppSizeTokens(
     hairline: lerpDouble(hairline, other.hairline, t)!,
@@ -123,6 +125,7 @@ class AppSizeTokens {
     rowDividerHeight: lerpDouble(rowDividerHeight, other.rowDividerHeight, t)!,
     iconContainerLg: lerpDouble(iconContainerLg, other.iconContainerLg, t)!,
     largeVisual: lerpDouble(largeVisual, other.largeVisual, t)!,
+    drawerHandleLength: lerpDouble(drawerHandleLength, other.drawerHandleLength, t)!,
     weightColumn: lerpDouble(weightColumn, other.weightColumn, t)!,
     progressColumn: lerpDouble(progressColumn, other.progressColumn, t)!,
     compactField: lerpDouble(compactField, other.compactField, t)!,
@@ -142,6 +145,6 @@ class AppSizeTokens {
     detailsTable: lerpDouble(detailsTable, other.detailsTable, t)!,
     disciplineTable: lerpDouble(disciplineTable, other.disciplineTable, t)!,
     disciplinePage: lerpDouble(disciplinePage, other.disciplinePage, t)!,
-    contestPage: lerpDouble(contestPage, other.contestPage, t)!,
+    concursosPage: lerpDouble(concursosPage, other.concursosPage, t)!,
   );
 }

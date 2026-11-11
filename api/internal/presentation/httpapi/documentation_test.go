@@ -9,7 +9,7 @@ import (
 )
 
 func TestOpenAPISpecIsServed(t *testing.T) {
-	handler := NewHandler(nil, slog.New(slog.NewTextHandler(&strings.Builder{}, nil))).Router()
+	handler := NewHandler(nil, nil, slog.New(slog.NewTextHandler(&strings.Builder{}, nil))).Router()
 	request := httptest.NewRequest(http.MethodGet, "/openapi.yaml", nil)
 	response := httptest.NewRecorder()
 
@@ -24,10 +24,13 @@ func TestOpenAPISpecIsServed(t *testing.T) {
 	if !strings.Contains(response.Body.String(), "openapi: 3.1.0") {
 		t.Fatal("response does not contain the OpenAPI version")
 	}
+	if !strings.Contains(response.Body.String(), "/api/v1/concursos:") {
+		t.Fatal("response does not document the Concursos endpoint")
+	}
 }
 
 func TestDocumentationPageIsServed(t *testing.T) {
-	handler := NewHandler(nil, slog.New(slog.NewTextHandler(&strings.Builder{}, nil))).Router()
+	handler := NewHandler(nil, nil, slog.New(slog.NewTextHandler(&strings.Builder{}, nil))).Router()
 	request := httptest.NewRequest(http.MethodGet, "/docs/", nil)
 	response := httptest.NewRecorder()
 

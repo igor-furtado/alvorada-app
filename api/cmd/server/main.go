@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	concursosApplication "concursosapp/api/internal/application/concursos"
 	application "concursosapp/api/internal/application/studies"
 	"concursosapp/api/internal/config"
 	mysqlrepo "concursosapp/api/internal/infrastructure/mysql"
@@ -42,10 +43,16 @@ func main() {
 		logger.Error("discipline data migration failed", "error", err)
 		os.Exit(1)
 	}
+	if err := mysqlrepo.EnsureConcursoSchema(rootCtx, db); err != nil {
+		logger.Error("concurso schema migration failed", "error", err)
+		os.Exit(1)
+	}
 
 	repository := mysqlrepo.NewStudyRepository(db)
 	service := application.NewService(repository)
-	handler := httpapi.NewHandler(service, logger)
+	concursosRepository := mysqlrepo.NewConcursoRepository(db)
+	concursosService := concursosApplication.NewService(concursosRepository)
+	handler := httpapi.NewHandler(service, concursosService, logger)
 	server := &http.Server{
 		Addr:              cfg.Address(),
 		Handler:           handler.Router(),

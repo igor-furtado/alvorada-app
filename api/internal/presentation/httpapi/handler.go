@@ -6,19 +6,24 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
+	"time"
 
 	apiDocs "concursosapp/api/docs"
+	concursosApplication "concursosapp/api/internal/application/concursos"
 	application "concursosapp/api/internal/application/studies"
+	concursosDomain "concursosapp/api/internal/domain/concursos"
 	domain "concursosapp/api/internal/domain/studies"
 )
 
 type Handler struct {
-	studies *application.Service
-	logger  *slog.Logger
+	studies   *application.Service
+	concursos *concursosApplication.Service
+	logger    *slog.Logger
 }
 
-func NewHandler(studies *application.Service, logger *slog.Logger) *Handler {
-	return &Handler{studies: studies, logger: logger}
+func NewHandler(studies *application.Service, concursos *concursosApplication.Service, logger *slog.Logger) *Handler {
+	return &Handler{studies: studies, concursos: concursos, logger: logger}
 }
 
 func (h *Handler) Router() http.Handler {
@@ -29,6 +34,12 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("GET /docs/", h.documentation)
 	mux.HandleFunc("GET /openapi.yaml", h.openAPI)
 	mux.HandleFunc("GET /health", h.health)
+	mux.HandleFunc("GET /api/v1/concursos", h.listConcursos)
+	mux.HandleFunc("POST /api/v1/concursos", h.createConcurso)
+	mux.HandleFunc("DELETE /api/v1/concursos/{id}", h.deleteConcurso)
+	mux.HandleFunc("PUT /api/v1/concursos/{id}/prioridade", h.setConcursoPrioritario)
+	mux.HandleFunc("PUT /api/v1/concursos/{id}/arquivamento", h.archiveConcurso)
+	mux.HandleFunc("DELETE /api/v1/concursos/{id}/arquivamento", h.restoreConcurso)
 	mux.HandleFunc("GET /api/v1/subjects", h.catalog)
 	mux.HandleFunc("POST /api/v1/subjects", h.createSubject)
 	mux.HandleFunc("PATCH /api/v1/subjects/{id}", h.updateSubject)
@@ -56,6 +67,118 @@ func (h *Handler) openAPI(w http.ResponseWriter, _ *http.Request) {
 
 func (h *Handler) health(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+type concursoRequest struct {
+	Instituicao string  `json:"instituicao"`
+	Cargo       string  `json:"cargo"`
+	Banca       *string `json:"banca"`
+	DataProva   *string `json:"data_prova"`
+	Prioritario bool    `json:"prioritario"`
+}
+
+type concursoResponse struct {
+	ID              string  `json:"id"`
+	Instituicao     string  `json:"instituicao"`
+	Cargo           string  `json:"cargo"`
+	Banca           *string `json:"banca"`
+	DataProva       *string `json:"data_prova"`
+	Prioritario     bool    `json:"prioritario"`
+	ProgressoEdital int     `json:"progresso_edital"`
+}
+
+func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
+	items, err := h.concursos.ListActive(r.Context())
+	if err != nil {
+		h.internalError(w, r, err)
+		return
+	}
+	response := make([]concursoResponse, 0, len(items))
+	for _, item := range items {
+		var dataProva *string
+		if item.DataProva != nil {
+			value := item.DataProva.Format(time.DateOnly)
+			dataProva = &value
+		}
+		response = append(response, concursoResponse{
+			ID:              item.ID,
+			Instituicao:     item.Instituicao,
+			Cargo:           item.Cargo,
+			Banca:           item.Banca,
+			DataProva:       dataProva,
+			Prioritario:     item.Prioritario,
+			ProgressoEdital: item.ProgressoEdital,
+		})
+	}
+	writeJSON(w, http.StatusOK, response)
+}
+
+func (h *Handler) createConcurso(w http.ResponseWriter, r *http.Request) {
+	var body concursoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	dataProva, err := parseOptionalDate(body.DataProva)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "a data da prova deve usar o formato AAAA-MM-DD")
+		return
+	}
+	id, err := h.concursos.Create(r.Context(), concursosDomain.CreateConcursoInput{
+		Instituicao: body.Instituicao,
+		Cargo:       body.Cargo,
+		Banca:       body.Banca,
+		DataProva:   dataProva,
+		Prioritario: body.Prioritario,
+	})
+	if err != nil {
+		h.serviceError(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]string{"id": id})
+}
+
+func (h *Handler) setConcursoPrioritario(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.SetPrioritario(r.Context(), r.PathValue("id"))
+	})
+}
+
+func (h *Handler) archiveConcurso(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.Archive(r.Context(), r.PathValue("id"))
+	})
+}
+
+func (h *Handler) restoreConcurso(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.Restore(r.Context(), r.PathValue("id"))
+	})
+}
+
+func (h *Handler) deleteConcurso(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.Delete(r.Context(), r.PathValue("id"))
+	})
+}
+
+func (h *Handler) runNoContent(w http.ResponseWriter, r *http.Request, operation func() error) {
+	if err := operation(); err != nil {
+		h.serviceError(w, r, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func parseOptionalDate(value *string) (*time.Time, error) {
+	if value == nil || strings.TrimSpace(*value) == "" {
+		return nil, nil
+	}
+	parsed, err := time.Parse(time.DateOnly, strings.TrimSpace(*value))
+	if err != nil {
+		return nil, err
+	}
+	return &parsed, nil
 }
 
 func (h *Handler) catalog(w http.ResponseWriter, r *http.Request) {
@@ -189,6 +312,18 @@ func (h *Handler) runDelete(w http.ResponseWriter, r *http.Request, operation fu
 }
 
 func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error) {
+	if errors.Is(err, concursosDomain.ErrConcursoNotFound) {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
+	if errors.Is(err, concursosApplication.ErrInstituicaoRequired) ||
+		errors.Is(err, concursosApplication.ErrCargoRequired) ||
+		errors.Is(err, concursosApplication.ErrInstituicaoTooLong) ||
+		errors.Is(err, concursosApplication.ErrCargoTooLong) ||
+		errors.Is(err, concursosApplication.ErrBancaTooLong) {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrNameTooLong) ||
 		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
 		errors.Is(err, domain.ErrMandatoryTopic) {

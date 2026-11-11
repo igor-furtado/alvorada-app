@@ -27,6 +27,8 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
       });
     } on DisciplinasRepositoryException {
       rethrow;
+    } on DisciplinasApiException catch (error) {
+      throw _translateApiError(error, 'Não foi possível criar a Disciplina.');
     } on Object catch (error) {
       throw DisciplinasRepositoryException('Não foi possível criar a Disciplina.', error);
     }
@@ -101,10 +103,26 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
       await operation();
     } on DisciplinasRepositoryException {
       rethrow;
+    } on DisciplinasApiException catch (error) {
+      throw _translateApiError(error, message);
     } on Object catch (error) {
       throw DisciplinasRepositoryException(message, error);
     }
     await _refreshAfterMutation();
+  }
+
+  DisciplinasRepositoryException _translateApiError(
+    DisciplinasApiException error,
+    String technicalMessage,
+  ) {
+    if (error.statusCode >= 400 && error.statusCode < 500) {
+      return DisciplinasRuleViolationException(
+        code: 'disciplinas.api.${error.statusCode}',
+        message: error.message,
+        cause: error,
+      );
+    }
+    return DisciplinasRepositoryException(technicalMessage, error);
   }
 
   Future<List<Disciplina>> _refreshAfterMutation() async {

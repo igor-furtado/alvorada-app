@@ -36,8 +36,8 @@ abstract final class AppIcons {
   static const todayActive = LucideIcons600.calendarCheck2;
   static const calendar = LucideIcons.calendarDays;
   static const calendarActive = LucideIcons600.calendarDays;
-  static const contests = LucideIcons.trophy;
-  static const contestsActive = LucideIcons600.trophy;
+  static const concursos = LucideIcons.trophy;
+  static const concursosActive = LucideIcons600.trophy;
   static const reviews = LucideIcons.repeat2;
   static const reviewsActive = LucideIcons600.repeat2;
   static const errorNotebook = LucideIcons.notebookPen;

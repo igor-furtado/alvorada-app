@@ -27,6 +27,27 @@ class _AppShellState extends State<AppShell> {
 
   static const _administrationBranchIndex = 6;
 
+  @override
+  void initState() {
+    super.initState();
+    _shellController.addListener(_synchronizeCommandQuery);
+  }
+
+  void _synchronizeCommandQuery() {
+    final config = _shellController.value;
+    final query = config?.query ?? '';
+    if (query == _commandController.text && query == _commandQuery) return;
+    if (query != _commandController.text) {
+      _commandController.value = TextEditingValue(
+        text: query,
+        selection: TextSelection.collapsed(offset: query.length),
+      );
+    }
+    if (mounted && _commandQuery != query) {
+      setState(() => _commandQuery = query);
+    }
+  }
+
   void _select(int index) {
     if (_commandQuery.isNotEmpty || _commandController.text.isNotEmpty) {
       _clearCommand();
@@ -77,6 +98,7 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    _shellController.removeListener(_synchronizeCommandQuery);
     _commandController.dispose();
     _shellController.dispose();
     super.dispose();
@@ -144,9 +166,9 @@ const _destinations = [
   _AppDestination(label: AppMessages.navigationToday, icon: AppIcons.today, selectedIcon: AppIcons.todayActive),
   _AppDestination(label: AppMessages.navigationWeek, icon: AppIcons.calendar, selectedIcon: AppIcons.calendarActive),
   _AppDestination(
-    label: AppMessages.navigationContests,
-    icon: AppIcons.contests,
-    selectedIcon: AppIcons.contestsActive,
+    label: AppMessages.navigationConcursos,
+    icon: AppIcons.concursos,
+    selectedIcon: AppIcons.concursosActive,
   ),
   _AppDestination(
     label: AppMessages.navigationDisciplines,

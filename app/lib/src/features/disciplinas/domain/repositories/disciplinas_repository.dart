@@ -33,6 +33,16 @@ class DisciplinasRepositoryException implements Exception {
   String toString() => message;
 }
 
+class DisciplinasRuleViolationException extends DisciplinasRepositoryException {
+  const DisciplinasRuleViolationException({
+    required this.code,
+    required String message,
+    Object? cause,
+  }) : super(message, cause);
+
+  final String code;
+}
+
 class DisciplinasSynchronizationException extends DisciplinasRepositoryException {
   const DisciplinasSynchronizationException([Object? cause])
     : super(

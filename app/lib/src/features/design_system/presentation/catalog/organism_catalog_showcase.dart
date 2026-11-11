@@ -45,6 +45,25 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
     ),
   );
 
+  Future<void> _showDrawer({AppDrawerDirection? direction}) => showAppDrawer<void>(
+    context,
+    title: 'Escolha um filtro',
+    description: 'Refine os resultados exibidos.',
+    direction: direction,
+    primaryLabel: 'Aplicar filtros',
+    onPrimary: () => Navigator.of(context, rootNavigator: true).pop(),
+    secondaryLabel: 'Cancelar',
+    onSecondary: () => Navigator.of(context, rootNavigator: true).pop(),
+    child: const AppRadioGroup<String>(
+      value: 'todos',
+      options: [
+        AppRadioOption(value: 'todos', label: 'Todos'),
+        AppRadioOption(value: 'ativos', label: 'Ativos'),
+        AppRadioOption(value: 'arquivados', label: 'Arquivados'),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => CatalogDemoGroup(
     children: [
@@ -241,22 +260,37 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
       ),
       CatalogDemoSection(
         title: 'AppDrawer',
-        description: 'Painel inferior para conteúdo complementar em contexto compacto.',
-        child: AppButton(
-          label: 'Abrir drawer',
-          variant: AppButtonVariant.outline,
-          onPressed: () => showAppDrawer<void>(
-            context,
-            title: 'Filtros',
-            description: 'Refine os resultados exibidos.',
-            child: const AppRadioGroup<String>(
-              value: 'todos',
-              options: [
-                AppRadioOption(value: 'todos', label: 'Todos'),
-                AppRadioOption(value: 'ativos', label: 'Ativos'),
-              ],
+        description: 'Painel responsivo pela direita no desktop e por baixo no compacto.',
+        child: Wrap(
+          spacing: context.tokens.spacing.sm,
+          runSpacing: context.tokens.spacing.sm,
+          children: [
+            AppButton(
+              label: 'Responsivo',
+              variant: AppButtonVariant.outline,
+              onPressed: _showDrawer,
             ),
-          ),
+            AppButton(
+              label: 'Acima',
+              variant: AppButtonVariant.outline,
+              onPressed: () => _showDrawer(direction: AppDrawerDirection.up),
+            ),
+            AppButton(
+              label: 'Direita',
+              variant: AppButtonVariant.outline,
+              onPressed: () => _showDrawer(direction: AppDrawerDirection.right),
+            ),
+            AppButton(
+              label: 'Abaixo',
+              variant: AppButtonVariant.outline,
+              onPressed: () => _showDrawer(direction: AppDrawerDirection.down),
+            ),
+            AppButton(
+              label: 'Esquerda',
+              variant: AppButtonVariant.outline,
+              onPressed: () => _showDrawer(direction: AppDrawerDirection.left),
+            ),
+          ],
         ),
       ),
       CatalogDemoSection(
@@ -381,20 +415,7 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
           content: const Text('Informações complementares sem interromper o fluxo atual.'),
         ),
       ),
-      CatalogDemoSection(
-        title: 'AppSheet',
-        description: 'Painel lateral sobreposto para tarefas auxiliares.',
-        child: AppButton(
-          label: 'Abrir sheet',
-          variant: AppButtonVariant.outline,
-          onPressed: () => showAppSheet<void>(
-            context,
-            title: 'Editar perfil',
-            description: 'Atualize os dados e feche o painel ao terminar.',
-            child: const AppTextInput(placeholder: 'Nome completo'),
-          ),
-        ),
-      ),
+
       CatalogDemoSection(
         title: 'AppPopover',
         description: 'Superfície flutuante acionada sem tirar o usuário do contexto.',
