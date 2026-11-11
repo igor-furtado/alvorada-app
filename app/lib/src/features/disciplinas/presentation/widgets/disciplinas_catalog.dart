@@ -71,7 +71,6 @@ class DisciplinasCatalog extends StatelessWidget {
           selectedDisciplina: selectedDisciplina,
           horizontal: constraints.maxWidth < context.tokens.layout.contentSplit,
           canMutate: canMutate,
-          onAdd: actions.onAddDiscipline,
           onSelect: actions.onSelectDisciplina,
           onRename: actions.onRenameDisciplina,
           onDelete: actions.onDeleteDisciplina,
@@ -82,6 +81,7 @@ class DisciplinasCatalog extends StatelessWidget {
                 child: AppStateView(
                   variant: AppStateVariant.empty,
                   title: AppMessages.noContentFound,
+                  message: AppMessages.noContentFoundMessage,
                   actionLabel: query.trim().isNotEmpty ? null : AppMessages.addDiscipline,
                   onAction: query.trim().isNotEmpty || !canMutate ? null : actions.onAddDiscipline,
                 ),
@@ -99,39 +99,34 @@ class DisciplinasCatalog extends StatelessWidget {
                 onDeleteSubtopico: actions.onDeleteSubtopico,
               );
         if (constraints.maxWidth < context.tokens.layout.contentSplit) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              master,
-              const AppDivider(margin: EdgeInsets.zero),
-              detail,
-            ],
+          return AppScrollArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                master,
+                const AppDivider(margin: EdgeInsets.zero),
+                detail,
+              ],
+            ),
           );
         }
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: context.tokens.layout.catalogMasterWidth,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: context.tokens.layout.catalogWorkspaceHeight),
-                child: master,
-              ),
+        return AppResizable(
+          key: const ValueKey('disciplines-resizable'),
+          initialRatio: .25,
+          first: SizedBox.expand(
+            key: const ValueKey('disciplines-master-panel'),
+            child: ColoredBox(
+              color: context.tokens.colors.card,
+              child: AppScrollArea(child: master),
             ),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: context.tokens.layout.catalogWorkspaceHeight),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      left: BorderSide(color: context.tokens.colors.border),
-                    ),
-                  ),
-                  child: detail,
-                ),
-              ),
+          ),
+          second: SizedBox.expand(
+            key: const ValueKey('discipline-detail-panel'),
+            child: ColoredBox(
+              color: context.tokens.colors.card,
+              child: AppScrollArea(child: detail),
             ),
-          ],
+          ),
         );
       },
     ),

@@ -85,9 +85,9 @@ class _DisciplinasPageState extends State<DisciplinasPage> {
           if (feedback == null) return;
           final (message, variant) = _feedbackPresentation(feedback);
           final synchronizationPending = feedback == DisciplinasFeedback.sincronizacaoPendente;
-          AppSnackbar.show(
+          AppToast.show(
             context,
-            message: message,
+            title: message,
             variant: variant,
             actionLabel: synchronizationPending ? AppMessages.update : null,
             onAction: synchronizationPending
@@ -99,79 +99,72 @@ class _DisciplinasPageState extends State<DisciplinasPage> {
         },
       ),
     ],
-    child: AppPageTemplate(
-      maxWidth: context.tokens.sizes.disciplinePage,
-      builder: (context, desktop) => BlocBuilder<DisciplinasBloc, DisciplinasState>(
-        builder: (context, state) {
-          final visibleDisciplines = state.disciplinasVisiveis;
-          final selectedDiscipline = visibleDisciplines.isEmpty
-              ? null
-              : visibleDisciplines.where((item) => item.id == _selectedDisciplineId).firstOrNull ??
-                    visibleDisciplines.first;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppMessages.contentCatalog,
-                style: context.tokens.typography.headlineLarge,
-              ),
-              SizedBox(height: context.tokens.spacing.sm),
-              Text(
-                AppMessages.contentCatalogSubtitle,
-                style: context.tokens.typography.bodyMedium.copyWith(
-                  color: context.tokens.colors.onSurfaceMuted,
-                ),
-              ),
-              SizedBox(height: context.tokens.spacing.xxl),
-              if (state.status == DisciplinasStatus.loading)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    child: SafeArea(
+      top: false,
+      child: ResponsiveBuilder(
+        builder: (context, windowClass) {
+          final pagePadding = windowClass.isExpanded ? context.tokens.spacing.page : context.tokens.spacing.xl;
+          return Padding(
+            padding: EdgeInsets.all(pagePadding),
+            child: BlocBuilder<DisciplinasBloc, DisciplinasState>(
+              builder: (context, state) {
+                final visibleDisciplines = state.disciplinasVisiveis;
+                final canMutate = state.status == DisciplinasStatus.success && !state.isRefreshing && !state.isMutating;
+                final selectedDiscipline = visibleDisciplines.isEmpty
+                    ? null
+                    : visibleDisciplines.where((item) => item.id == _selectedDisciplineId).firstOrNull ??
+                          visibleDisciplines.first;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AppSkeleton(
-                      height: context.tokens.layout.controlHeight,
-                      width: context.tokens.layout.reading,
-                      semanticLabel: AppMessages.loadingDisciplines,
+                    _DisciplinasHeader(
+                      canAdd: canMutate,
+                      onAdd: () => _addDisciplina(context),
                     ),
-                    SizedBox(height: context.tokens.spacing.xl),
-                    AppSkeleton(height: context.tokens.sizes.overviewPanel),
-                    SizedBox(height: context.tokens.spacing.lg),
-                    AppSkeleton(height: context.tokens.sizes.overviewPanel),
+                    SizedBox(height: context.tokens.spacing.xxl),
+                    Expanded(
+                      child: switch (state.status) {
+                        DisciplinasStatus.loading => const AppSkeleton(
+                          height: double.infinity,
+                          semanticLabel: AppMessages.loadingDisciplines,
+                        ),
+                        DisciplinasStatus.failure => AppStateView(
+                          variant: AppStateVariant.error,
+                          actionLabel: AppMessages.tryAgain,
+                          onAction: () => context.read<DisciplinasBloc>().add(
+                            const LoadDisciplinasRequested(),
+                          ),
+                        ),
+                        _ => DisciplinasCatalog(
+                          query: state.query,
+                          disciplinas: visibleDisciplines,
+                          selectedDisciplina: selectedDiscipline,
+                          expandedTopicIds: state.expandedTopicIds,
+                          canMutate: canMutate,
+                          actions: DisciplinasCatalogActions(
+                            onAddDiscipline: () => _addDisciplina(context),
+                            onSelectDisciplina: (disciplina) => setState(
+                              () => _selectedDisciplineId = disciplina.id,
+                            ),
+                            onToggleTopico: (topico) => context.read<DisciplinasBloc>().add(
+                              ToggleTopicoRequested(topico.id),
+                            ),
+                            onAddTopico: (disciplina) => _addTopico(context, disciplina),
+                            onRenameDisciplina: (disciplina) => _renameDisciplina(context, disciplina),
+                            onDeleteDisciplina: (disciplina) => _deleteDisciplina(context, disciplina),
+                            onRenameTopico: (topico) => _renameTopico(context, topico),
+                            onDeleteTopico: (topico) => _deleteTopico(context, topico),
+                            onAddSubtopico: (topico) => _addSubtopico(context, topico),
+                            onRenameSubtopico: (subtopico) => _renameSubtopico(context, subtopico),
+                            onDeleteSubtopico: (subtopico) => _deleteSubtopico(context, subtopico),
+                          ),
+                        ),
+                      },
+                    ),
                   ],
-                )
-              else if (state.status == DisciplinasStatus.failure)
-                AppStateView(
-                  variant: AppStateVariant.error,
-                  actionLabel: AppMessages.tryAgain,
-                  onAction: () => context.read<DisciplinasBloc>().add(
-                    const LoadDisciplinasRequested(),
-                  ),
-                )
-              else
-                DisciplinasCatalog(
-                  query: state.query,
-                  disciplinas: visibleDisciplines,
-                  selectedDisciplina: selectedDiscipline,
-                  expandedTopicIds: state.expandedTopicIds,
-                  canMutate: !state.isRefreshing && !state.isMutating,
-                  actions: DisciplinasCatalogActions(
-                    onAddDiscipline: () => _addDisciplina(context),
-                    onSelectDisciplina: (disciplina) => setState(
-                      () => _selectedDisciplineId = disciplina.id,
-                    ),
-                    onToggleTopico: (topico) => context.read<DisciplinasBloc>().add(
-                      ToggleTopicoRequested(topico.id),
-                    ),
-                    onAddTopico: (disciplina) => _addTopico(context, disciplina),
-                    onRenameDisciplina: (disciplina) => _renameDisciplina(context, disciplina),
-                    onDeleteDisciplina: (disciplina) => _deleteDisciplina(context, disciplina),
-                    onRenameTopico: (topico) => _renameTopico(context, topico),
-                    onDeleteTopico: (topico) => _deleteTopico(context, topico),
-                    onAddSubtopico: (topico) => _addSubtopico(context, topico),
-                    onRenameSubtopico: (subtopico) => _renameSubtopico(context, subtopico),
-                    onDeleteSubtopico: (subtopico) => _deleteSubtopico(context, subtopico),
-                  ),
-                ),
-            ],
+                );
+              },
+            ),
           );
         },
       ),
@@ -297,21 +290,76 @@ class _DisciplinasPageState extends State<DisciplinasPage> {
   }
 }
 
-(String, AppSnackbarVariant) _feedbackPresentation(DisciplinasFeedback feedback) => switch (feedback) {
-  DisciplinasFeedback.disciplinasAtualizadas => (AppMessages.disciplinesUpdated, AppSnackbarVariant.success),
-  DisciplinasFeedback.disciplinaCriada => (AppMessages.disciplineCreated, AppSnackbarVariant.success),
-  DisciplinasFeedback.disciplinaAtualizada => (AppMessages.disciplineUpdated, AppSnackbarVariant.success),
-  DisciplinasFeedback.disciplinaExcluida => (AppMessages.disciplineDeleted, AppSnackbarVariant.success),
-  DisciplinasFeedback.topicoCriado => (AppMessages.topicCreated, AppSnackbarVariant.success),
-  DisciplinasFeedback.topicoAtualizado => (AppMessages.topicUpdated, AppSnackbarVariant.success),
-  DisciplinasFeedback.topicoExcluido => (AppMessages.topicDeleted, AppSnackbarVariant.success),
-  DisciplinasFeedback.subtopicoCriado => (AppMessages.subtopicCreated, AppSnackbarVariant.success),
-  DisciplinasFeedback.subtopicoAtualizado => (AppMessages.subtopicUpdated, AppSnackbarVariant.success),
-  DisciplinasFeedback.subtopicoExcluido => (AppMessages.subtopicDeleted, AppSnackbarVariant.success),
-  DisciplinasFeedback.atualizacaoFalhou => (AppMessages.contentUpdateFailed, AppSnackbarVariant.error),
+class _DisciplinasHeader extends StatelessWidget {
+  const _DisciplinasHeader({required this.canAdd, required this.onAdd});
+
+  final bool canAdd;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final heading = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppMessages.contentCatalog,
+            style: context.tokens.typography.headlineLarge,
+          ),
+          SizedBox(height: context.tokens.spacing.xs),
+          Text(
+            AppMessages.contentCatalogSubtitle,
+            style: context.tokens.typography.bodyLarge.copyWith(
+              color: context.tokens.colors.onSurfaceMuted,
+            ),
+          ),
+        ],
+      );
+      final action = AppButton(
+        key: const ValueKey('add-discipline'),
+        label: AppMessages.newDiscipline,
+        icon: AppIcons.add,
+        onPressed: canAdd ? onAdd : null,
+      );
+
+      if (constraints.maxWidth < context.tokens.layout.toolbar) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            heading,
+            SizedBox(height: context.tokens.spacing.xl),
+            action,
+          ],
+        );
+      }
+
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(child: heading),
+          SizedBox(width: context.tokens.spacing.xxl),
+          action,
+        ],
+      );
+    },
+  );
+}
+
+(String, AppToastVariant) _feedbackPresentation(DisciplinasFeedback feedback) => switch (feedback) {
+  DisciplinasFeedback.disciplinasAtualizadas => (AppMessages.disciplinesUpdated, AppToastVariant.success),
+  DisciplinasFeedback.disciplinaCriada => (AppMessages.disciplineCreated, AppToastVariant.success),
+  DisciplinasFeedback.disciplinaAtualizada => (AppMessages.disciplineUpdated, AppToastVariant.success),
+  DisciplinasFeedback.disciplinaExcluida => (AppMessages.disciplineDeleted, AppToastVariant.success),
+  DisciplinasFeedback.topicoCriado => (AppMessages.topicCreated, AppToastVariant.success),
+  DisciplinasFeedback.topicoAtualizado => (AppMessages.topicUpdated, AppToastVariant.success),
+  DisciplinasFeedback.topicoExcluido => (AppMessages.topicDeleted, AppToastVariant.success),
+  DisciplinasFeedback.subtopicoCriado => (AppMessages.subtopicCreated, AppToastVariant.success),
+  DisciplinasFeedback.subtopicoAtualizado => (AppMessages.subtopicUpdated, AppToastVariant.success),
+  DisciplinasFeedback.subtopicoExcluido => (AppMessages.subtopicDeleted, AppToastVariant.success),
+  DisciplinasFeedback.atualizacaoFalhou => (AppMessages.contentUpdateFailed, AppToastVariant.error),
   DisciplinasFeedback.sincronizacaoPendente => (
     AppMessages.contentSavedSyncPending,
-    AppSnackbarVariant.info,
+    AppToastVariant.info,
   ),
-  DisciplinasFeedback.operacaoFalhou => (AppMessages.contentOperationFailed, AppSnackbarVariant.error),
+  DisciplinasFeedback.operacaoFalhou => (AppMessages.contentOperationFailed, AppToastVariant.error),
 };

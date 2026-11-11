@@ -6,7 +6,6 @@ class _DisciplinasMasterPanel extends StatelessWidget {
     required this.selectedDisciplina,
     required this.horizontal,
     required this.canMutate,
-    required this.onAdd,
     required this.onSelect,
     required this.onRename,
     required this.onDelete,
@@ -16,7 +15,6 @@ class _DisciplinasMasterPanel extends StatelessWidget {
   final Disciplina? selectedDisciplina;
   final bool horizontal;
   final bool canMutate;
-  final VoidCallback onAdd;
   final ValueChanged<Disciplina> onSelect;
   final ValueChanged<Disciplina> onRename;
   final ValueChanged<Disciplina> onDelete;
@@ -63,44 +61,25 @@ class _DisciplinasMasterPanel extends StatelessWidget {
           );
         })
         .toList(growable: false);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(context.tokens.spacing.lg),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: AppButton(
-              key: const ValueKey('add-discipline'),
-              label: AppMessages.newDiscipline,
-              icon: AppIcons.add,
-              size: AppButtonSize.sm,
-              onPressed: canMutate ? onAdd : null,
+    return Padding(
+      padding: EdgeInsets.all(context.tokens.spacing.sm),
+      child: horizontal
+          ? AppScrollArea(
+              axis: Axis.horizontal,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var index = 0; index < items.length; index++) ...[
+                    if (index > 0) SizedBox(width: context.tokens.spacing.sm),
+                    items[index],
+                  ],
+                ],
+              ),
+            )
+          : AppListItemGroup(
+              spacing: context.tokens.spacing.xxs,
+              children: items,
             ),
-          ),
-        ),
-        const AppDivider(margin: EdgeInsets.zero),
-        Padding(
-          padding: EdgeInsets.all(context.tokens.spacing.sm),
-          child: horizontal
-              ? AppScrollArea(
-                  axis: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var index = 0; index < items.length; index++) ...[
-                        if (index > 0) SizedBox(width: context.tokens.spacing.sm),
-                        items[index],
-                      ],
-                    ],
-                  ),
-                )
-              : AppListItemGroup(
-                  spacing: context.tokens.spacing.xxs,
-                  children: items,
-                ),
-        ),
-      ],
     );
   }
 }

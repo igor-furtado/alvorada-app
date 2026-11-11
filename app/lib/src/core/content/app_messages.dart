@@ -131,7 +131,8 @@ abstract final class AppMessages {
   static const deleteDisciplineQuestion = 'Excluir Disciplina?';
   static const deleteTopicQuestion = 'Excluir Tópico?';
   static const deleteSubtopicQuestion = 'Excluir Subtópico?';
-  static const noContentFound = 'Nenhum conteúdo encontrado. Ajuste a busca ou adicione uma Disciplina.';
+  static const noContentFound = 'Nenhuma Disciplina';
+  static const noContentFoundMessage = 'Adicione uma Disciplina para começar.';
   static const mandatoryTopic = 'Tópico obrigatório';
   static const protected = 'Protegido';
   static const topics = 'Tópicos';
