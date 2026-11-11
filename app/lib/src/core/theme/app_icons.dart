@@ -1,285 +1,71 @@
-import 'package:flutter/widgets.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_600.dart';
 
-/// Ícones Phosphor centralizados para manter a linguagem visual consistente.
-///
-/// Os glifos usam as fontes distribuídas por `phosphor_flutter`. O acesso
-/// direto por [IconData] evita a incompatibilidade temporária do pacote com
-/// versões do Flutter em que `IconData` passou a ser uma classe final.
+/// Widgets devem consumir somente este contrato. Os nomes expressam
+/// o papel do ícone no app e isolam o restante do código da biblioteca visual.
 abstract final class AppIcons {
-  static const String _regular = 'PhosphorLight';
-  static const String _regularStroke = 'PhosphorRegular';
-  static const String _fill = 'PhosphorFill';
-  static const String _package = 'phosphor_flutter';
-  static const String _fillPackage = 'phosphor_flutter';
-
-  static const chevronLeft = IconData(
-    0xe138,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const chevronLeftStrong = IconData(
-    0xe138,
-    fontFamily: _regularStroke,
-    fontPackage: _package,
-  );
-  static const chevronRight = IconData(
-    0xe13a,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const chevronRightStrong = IconData(
-    0xe13a,
-    fontFamily: _regularStroke,
-    fontPackage: _package,
-  );
-  static const edit = IconData(
-    0xe3b4,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const expandMore = IconData(
-    0xe136,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const expandMoreStrong = IconData(
-    0xe136,
-    fontFamily: _regularStroke,
-    fontPackage: _package,
-  );
+  static const chevronLeft = LucideIcons.chevronLeft;
+  static const chevronLeftStrong = LucideIcons600.chevronLeft;
+  static const chevronRight = LucideIcons.chevronRight;
+  static const chevronRightStrong = LucideIcons600.chevronRight;
+  static const edit = LucideIcons.pencil;
+  static const expandMore = LucideIcons.chevronDown;
+  static const expandMoreStrong = LucideIcons600.chevronDown;
   static const expandNext = chevronRight;
-  static const event = IconData(
-    0xe10a,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const institution = IconData(
-    0xe0b4,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const delete = IconData(
-    0xe4a6,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const deleteStrong = IconData(
-    0xe4a6,
-    fontFamily: _regularStroke,
-    fontPackage: _package,
-  );
-  static const bluetooth = IconData(
-    0xe0da,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const sortAscending = IconData(
-    0xe08e,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const sortDescending = IconData(
-    0xe03e,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const arrowsDownUp = IconData(
-    0xe098,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const search = IconData(
-    0xe30c,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const close = IconData(
-    0xe4f6,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const clock = IconData(
-    0xe19a,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const refresh = IconData(
-    0xe036,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const fileText = IconData(
-    0xe23a,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const fileWarning = IconData(
-    0xe4e4,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const moon = IconData(
-    0xe330,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const more = IconData(
-    0xe1fe,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const sun = IconData(
-    0xe472,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
+  static const event = LucideIcons.calendarClock;
+  static const institution = LucideIcons.landmark;
+  static const delete = LucideIcons.trash2;
+  static const deleteStrong = LucideIcons600.trash2;
+  static const bluetooth = LucideIcons.bluetooth;
+  static const sortAscending = LucideIcons.arrowUpAZ;
+  static const sortDescending = LucideIcons.arrowDownAZ;
+  static const arrowsDownUp = LucideIcons.arrowDownUp;
+  static const search = LucideIcons.search;
+  static const cloud = LucideIcons.cloud;
+  static const folderDashed = LucideIcons.folderOpen;
+  static const close = LucideIcons.x;
+  static const clock = LucideIcons.clock3;
+  static const refresh = LucideIcons.refreshCw;
+  static const fileText = LucideIcons.fileText;
+  static const fileWarning = LucideIcons.fileWarning;
+  static const moon = LucideIcons.moon;
+  static const more = LucideIcons.ellipsis;
+  static const sun = LucideIcons.sun;
 
-  static const today = IconData(
-    0xe5b6,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const todayActive = IconData(
-    0xe5b6,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const calendar = IconData(
-    0xe7b4,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const calendarActive = IconData(
-    0xe7b4,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const contests = IconData(
-    0xe47c,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const contestsActive = IconData(
-    0xe47c,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const reviews = IconData(
-    0xe094,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const reviewsActive = IconData(
-    0xe094,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const errorNotebook = IconData(
-    0xe34e,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const errorNotebookActive = IconData(
-    0xe34e,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const lockedTopic = IconData(
-    0xe308,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const statistics = IconData(
-    0xe156,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const settings = IconData(
-    0xe434,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const add = IconData(
-    0xe3d4,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const fromMemory = IconData(
-    0xe74e,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const mockExam = IconData(
-    0xe492,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const notification = IconData(
-    0xe0ce,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const sunnyDays = IconData(
-    0xe472,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const rest = IconData(
-    0xe1c2,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
+  static const today = LucideIcons.calendarCheck2;
+  static const todayActive = LucideIcons600.calendarCheck2;
+  static const calendar = LucideIcons.calendarDays;
+  static const calendarActive = LucideIcons600.calendarDays;
+  static const contests = LucideIcons.trophy;
+  static const contestsActive = LucideIcons600.trophy;
+  static const reviews = LucideIcons.repeat2;
+  static const reviewsActive = LucideIcons600.repeat2;
+  static const errorNotebook = LucideIcons.notebookPen;
+  static const errorNotebookActive = LucideIcons600.notebookPen;
+  static const lockedTopic = LucideIcons.lockKeyhole;
+  static const statistics = LucideIcons.chartNoAxesColumnIncreasing;
+  static const settings = LucideIcons.settings;
+  static const add = LucideIcons.plus;
+  static const fromMemory = LucideIcons.brain;
+  static const mockExam = LucideIcons.fileCheck2;
+  static const notification = LucideIcons.bell;
+  static const sunnyDays = LucideIcons.sun;
+  static const rest = LucideIcons.coffee;
 
-  static const memorize = IconData(
-    0xe74e,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const attention = IconData(
-    0xe4e0,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const scales = IconData(
-    0xe750,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
+  static const memorize = LucideIcons.brain;
+  static const scales = LucideIcons.scale;
   static const caseLaw = scales;
-  static const observation = IconData(
-    0xe2ce,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
+  static const observation = LucideIcons.messageSquareText;
 
-  static const book = IconData(
-    0xe0e6,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const bookText = IconData(
-    0xe8f2,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const questions = IconData(
-    0xe182,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const play = IconData(
-    0xe3d0,
-    fontFamily: _fill,
-    fontPackage: _fillPackage,
-  );
-  static const check = IconData(
-    0xe182,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
-  static const arrowRight = IconData(
-    0xe06c,
-    fontFamily: _regular,
-    fontPackage: _package,
-  );
+  static const book = LucideIcons.bookOpen;
+  static const bookText = LucideIcons.bookOpenText;
+  static const questions = LucideIcons.circleHelp;
+  static const play = LucideIcons.play;
+  static const check = LucideIcons.check;
+  static const checkCircle = LucideIcons.circleCheck;
+  static const error = LucideIcons.octagonX;
+  static const attention = LucideIcons.triangleAlert;
+  static const info = LucideIcons.info;
+  static const minus = LucideIcons.minus;
+  static const arrowRight = LucideIcons.arrowRight;
 }

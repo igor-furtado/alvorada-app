@@ -293,7 +293,7 @@ class _ComponentCatalogPageState extends State<ComponentCatalogPage> {
         ),
         _CatalogSection(
           title: 'Ícones',
-          description: 'Escala completa da iconografia Phosphor.',
+          description: 'Escala completa da iconografia Lucide.',
           child: _TokenValueList(
             values: [
               _TokenValue(name: 'sm', value: _dimension(tokens.icons.sm)),

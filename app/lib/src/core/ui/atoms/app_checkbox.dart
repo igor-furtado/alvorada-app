@@ -65,7 +65,7 @@ class _AppCheckboxState extends State<AppCheckbox> {
                   ),
                   child: selected
                       ? Icon(
-                          widget.value == null ? Icons.remove : Icons.check,
+                          widget.value == null ? AppIcons.minus : AppIcons.check,
                           size: tokens.spacing.md,
                           color: tokens.colors.onPrimary,
                         )

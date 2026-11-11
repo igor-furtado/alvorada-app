@@ -28,7 +28,7 @@ Features importam `core/ui/app_ui.dart` e consomem `App*`. A implementação usa
 
 Use `context.tokens.colors`, `context.tokens.typography`, `context.tokens.spacing`, `context.tokens.borders`, `context.tokens.layout`, `context.tokens.sizes`, `context.tokens.opacity`, `context.tokens.motion` e `AppIcons`. Um token novo descreve intenção, participa de `copyWith` e `lerp`, aparece integralmente no catálogo de tokens e recebe teste quando introduz um contrato visual.
 
-Todo texto visível recebe um estilo tipográfico semântico ou herda deliberadamente um estilo de um ancestral. Use Geist, inclusive em títulos, controles, rótulos e numerais. Ícones usam `AppIcons`/Phosphor Light e tamanhos semânticos.
+Todo texto visível recebe um estilo tipográfico semântico ou herda deliberadamente um estilo de um ancestral. Use Geist, inclusive em títulos, controles, rótulos e numerais. Ícones usam exclusivamente `AppIcons`, que centraliza os glifos Lucide, e tamanhos semânticos.
 
 Construa profundidade com superfícies semânticas, bordas e raios. A interface é plana; sombra pertence somente a overlays e popovers. Use borda semântica de 1 px como separação, raio discreto e foco por ring, preservando as dimensões entre estados.
 
