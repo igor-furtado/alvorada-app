@@ -260,13 +260,116 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
         ),
       ),
       CatalogDemoSection(
-        title: 'AppEmpty',
-        description: 'Estado vazio com explicação e próxima ação disponível.',
-        child: AppEmpty(
-          title: 'Nenhum Concurso cadastrado',
-          description: 'Adicione o primeiro Concurso para começar.',
-          actionLabel: 'Adicionar Concurso',
-          onAction: () {},
+        title: 'AppStateView — padrão',
+        description: 'Estado vazio com mídia, explicação, ações e link complementar.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.empty,
+            title: 'Nenhum Concurso ainda',
+            message: 'Você ainda não criou um Concurso. Comece adicionando o primeiro.',
+            actionLabel: 'Criar Concurso',
+            onAction: () {},
+            secondaryActionLabel: 'Importar Concurso',
+            onSecondaryAction: () {},
+            footer: AppButton(
+              label: 'Saiba mais',
+              variant: AppButtonVariant.text,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+      CatalogDemoSection(
+        title: 'AppStateView — contorno',
+        description: 'Superfície tracejada para destacar um estado vazio dentro de outra área.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.empty,
+            icon: AppIcons.cloud,
+            surface: AppStateSurface.outline,
+            title: 'Armazenamento vazio',
+            message: 'Envie arquivos para acessá-los em qualquer lugar.',
+            content: AppButton(
+              label: 'Enviar arquivos',
+              variant: AppButtonVariant.outline,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+      CatalogDemoSection(
+        title: 'AppStateView — fundo',
+        description: 'Fundo suave para separar o estado do restante da superfície.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.empty,
+            icon: AppIcons.notification,
+            surface: AppStateSurface.muted,
+            title: 'Nenhuma notificação',
+            message: 'Tudo certo por aqui. Novas notificações aparecerão neste espaço.',
+            content: AppButton(
+              label: 'Atualizar',
+              icon: AppIcons.refresh,
+              variant: AppButtonVariant.outline,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+      CatalogDemoSection(
+        title: 'AppStateView — avatar',
+        description: 'Mídia livre para representar uma pessoa sem o contêiner de ícone.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.offline,
+            media: const AppAvatar(
+              initials: 'LM',
+              size: AppAvatarSize.lg,
+              semanticLabel: 'Lucas Martins',
+            ),
+            mediaVariant: AppStateMediaVariant.custom,
+            title: 'Pessoa offline',
+            message: 'Esta pessoa está offline. Deixe uma mensagem ou tente novamente mais tarde.',
+            actionLabel: 'Deixar mensagem',
+            onAction: () {},
+          ),
+        ),
+      ),
+      CatalogDemoSection(
+        title: 'AppStateView — grupo de avatares',
+        description: 'Mídia composta para representar pessoas relacionadas ao estado.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.empty,
+            media: const _StateAvatarGroup(),
+            mediaVariant: AppStateMediaVariant.custom,
+            title: 'Nenhuma pessoa na equipe',
+            message: 'Convide sua equipe para colaborar neste Concurso.',
+            actionLabel: 'Convidar pessoas',
+            onAction: () {},
+          ),
+        ),
+      ),
+      CatalogDemoSection(
+        title: 'AppStateView — campo de busca',
+        description: 'Conteúdo livre para busca, formulários curtos e ajuda contextual.',
+        child: _StateDemoFrame(
+          child: AppStateView(
+            variant: AppStateVariant.error,
+            showMedia: false,
+            title: '404 — Página não encontrada',
+            message: 'A página procurada não existe. Busque abaixo o que você precisa.',
+            content: const AppInputGroup(
+              placeholder: 'Buscar páginas...',
+              leading: AppIcon(AppIcons.search, size: AppIconSize.sm),
+              trailing: _KeyboardHint('/'),
+            ),
+            footer: AppButton(
+              label: 'Precisa de ajuda? Fale com o suporte',
+              variant: AppButtonVariant.text,
+              onPressed: () {},
+            ),
+          ),
         ),
       ),
       CatalogDemoSection(
@@ -351,12 +454,23 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
 
       CatalogDemoSection(
         title: 'AppResizable',
-        description: 'Dois painéis redimensionáveis por ponteiro ou teclado.',
-        child: SizedBox(
-          height: context.tokens.sizes.overviewPanel,
-          child: AppResizable(
-            first: _ResizablePane(label: 'Painel principal', color: context.tokens.colors.surfaceSubtle),
-            second: _ResizablePane(label: 'Painel secundário', color: context.tokens.colors.card),
+        description: 'Painéis aninhados redimensionáveis por ponteiro ou teclado.',
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
+          child: SizedBox(
+            height: context.tokens.sizes.overviewPanel,
+            child: const AppCard(
+              padding: EdgeInsets.zero,
+              child: AppResizable(
+                first: _ResizablePane(label: 'Um'),
+                second: AppResizable(
+                  direction: Axis.vertical,
+                  initialRatio: .25,
+                  first: _ResizablePane(label: 'Dois'),
+                  second: _ResizablePane(label: 'Três'),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -380,6 +494,79 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
         ),
       ),
     ],
+  );
+}
+
+class _StateDemoFrame extends StatelessWidget {
+  const _StateDemoFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    height: context.tokens.sizes.guideMaxWidth,
+    child: child,
+  );
+}
+
+class _StateAvatarGroup extends StatelessWidget {
+  const _StateAvatarGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    final avatarSize = context.tokens.sizes.avatarLg;
+    final offset = avatarSize - context.tokens.spacing.xs;
+    return SizedBox(
+      width: avatarSize + (offset * 2),
+      height: avatarSize,
+      child: Stack(
+        children: [
+          const Positioned(
+            left: 0,
+            child: AppAvatar(
+              initials: 'LM',
+              size: AppAvatarSize.lg,
+              semanticLabel: 'Lucas Martins',
+            ),
+          ),
+          Positioned(
+            left: offset,
+            child: const AppAvatar(
+              initials: 'AS',
+              size: AppAvatarSize.lg,
+              semanticLabel: 'Ana Souza',
+            ),
+          ),
+          Positioned(
+            left: offset * 2,
+            child: const AppAvatar(
+              initials: 'RC',
+              size: AppAvatarSize.lg,
+              semanticLabel: 'Rafael Costa',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _KeyboardHint extends StatelessWidget {
+  const _KeyboardHint(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: context.tokens.sizes.avatarSm,
+    height: context.tokens.sizes.avatarSm,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: context.tokens.colors.surfaceSubtle,
+      borderRadius: context.tokens.borders.xs,
+    ),
+    child: Text(label, style: context.tokens.typography.labelMedium),
   );
 }
 
@@ -408,16 +595,19 @@ const _catalogPayments = [
 ];
 
 class _ResizablePane extends StatelessWidget {
-  const _ResizablePane({required this.label, required this.color});
+  const _ResizablePane({required this.label});
 
   final String label;
-  final Color color;
 
   @override
   Widget build(BuildContext context) => Container(
     alignment: Alignment.center,
-    color: color,
-    child: Text(label, textAlign: TextAlign.center),
+    color: context.tokens.colors.card,
+    child: Text(
+      label,
+      textAlign: TextAlign.center,
+      style: context.tokens.typography.titleSmall,
+    ),
   );
 }
 

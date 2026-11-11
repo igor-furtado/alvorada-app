@@ -628,7 +628,7 @@ Future<void> _showMethodDialog(BuildContext context) => showDialog<void>(
 );
 
 void _showFilterMessage(BuildContext context) {
-  AppSnackbar.show(context, message: AppMessages.filtersNotConnected);
+  AppToast.show(context, title: AppMessages.filtersNotConnected);
 }
 
 IconData _instructionIcon(_ReviewType type) => switch (type) {

@@ -237,13 +237,14 @@ class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
         child: AppButton(
           label: 'Mostrar toast',
           variant: AppButtonVariant.outline,
-          onPressed: () => AppToast.show(
-            context,
-            message: 'Alterações salvas.',
-            variant: AppSnackbarVariant.success,
-            actionLabel: 'Desfazer',
-            onAction: () {},
-          ),
+          onPressed: () {
+            final toast = AppToast.show(
+              context,
+              title: 'Criando evento',
+              description: 'Domingo, 3 de dezembro, às 9h',
+              variant: AppToastVariant.error,
+            );
+          },
         ),
       ),
       const CatalogDemoSection(

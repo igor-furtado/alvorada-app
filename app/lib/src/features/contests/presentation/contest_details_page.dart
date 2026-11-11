@@ -144,9 +144,9 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
   void _remove(ContestDisciplineProgress discipline) {
     final index = _disciplines.indexOf(discipline);
     setState(() => _disciplines.remove(discipline));
-    AppSnackbar.show(
+    AppToast.show(
       context,
-      message: AppMessages.disciplineRemoved(discipline.name),
+      title: AppMessages.disciplineRemoved(discipline.name),
       actionLabel: AppMessages.undo,
       onAction: () => setState(
         () => _disciplines.insert(

@@ -715,7 +715,7 @@ Future<void> _showAdjustmentDialog(BuildContext context) => showDialog<void>(
 );
 
 void _showPreviewMessage(BuildContext context) {
-  AppSnackbar.show(context, message: AppMessages.otherWeeksUnavailable);
+  AppToast.show(context, title: AppMessages.otherWeeksUnavailable);
 }
 
 enum _DayStatus { done, today, planned }

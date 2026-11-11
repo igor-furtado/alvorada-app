@@ -138,8 +138,11 @@ class _AppButtonState extends State<AppButton> {
             child: AnimatedContainer(
               duration: context.motionDuration(tokens.motion.fast),
               curve: tokens.motion.standard,
-              height: height,
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              constraints: BoxConstraints(minHeight: height),
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: tokens.spacing.xxs,
+              ),
               decoration: BoxDecoration(
                 color: background,
                 border: Border.all(

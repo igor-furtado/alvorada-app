@@ -62,7 +62,11 @@ abstract final class AppComponentRegistry {
     ),
     AppComponentDefinition(name: 'Dialog', interfaceName: 'AppDialog', category: AppComponentCategory.organism),
     AppComponentDefinition(name: 'Drawer', interfaceName: 'AppDrawer', category: AppComponentCategory.organism),
-    AppComponentDefinition(name: 'Empty', interfaceName: 'AppEmpty', category: AppComponentCategory.organism),
+    AppComponentDefinition(
+      name: 'State View',
+      interfaceName: 'AppStateView',
+      category: AppComponentCategory.organism,
+    ),
     AppComponentDefinition(name: 'Field', interfaceName: 'AppField', category: AppComponentCategory.molecule),
     AppComponentDefinition(
       name: 'Hover Card',

@@ -73,9 +73,9 @@ class _ContestsPageState extends State<ContestsPage> {
   void _archive(ContestViewData contest) {
     final index = _contests.indexOf(contest);
     setState(() => _contests.remove(contest));
-    AppSnackbar.show(
+    AppToast.show(
       context,
-      message: AppMessages.contestArchived(contest.shortName),
+      title: AppMessages.contestArchived(contest.shortName),
       actionLabel: AppMessages.undo,
       onAction: () => setState(() => _contests.insert(index, contest)),
     );

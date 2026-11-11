@@ -745,7 +745,7 @@ class _RegisterErrorDialogState extends State<_RegisterErrorDialog> {
 Future<void> _showRegisterDialog(BuildContext context) async {
   final saved = await showDialog<bool>(context: context, builder: (context) => const _RegisterErrorDialog());
   if (saved == true && context.mounted) {
-    AppSnackbar.show(context, message: AppMessages.errorRegistered, variant: AppSnackbarVariant.success);
+    AppToast.show(context, title: AppMessages.errorRegistered, variant: AppToastVariant.success);
   }
 }
 
@@ -801,7 +801,7 @@ Future<void> _showReviewPreview(
 );
 
 void _showDataMessage(BuildContext context) {
-  AppSnackbar.show(context, message: AppMessages.areaNotConnected);
+  AppToast.show(context, title: AppMessages.areaNotConnected);
 }
 
 String? _requiredText(String? value) =>
