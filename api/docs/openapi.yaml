@@ -73,6 +73,26 @@ paths:
   /api/v1/concursos/{id}:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
+    put:
+      tags: [Concursos]
+      summary: Atualiza um Concurso
+      description: Atualiza os dados do Concurso sem alterar o progresso do Edital.
+      operationId: atualizarConcurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarConcurso'
+      responses:
+        '204':
+          description: Concurso atualizado
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
     delete:
       tags: [Concursos]
       summary: Exclui definitivamente um Concurso
@@ -348,7 +368,7 @@ components:
           format: uuid
     Concurso:
       type: object
-      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital]
+      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital, sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal, local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao]
       properties:
         id:
           type: string
@@ -373,6 +393,36 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+        sigla:
+          type: [string, 'null']
+          maxLength: 24
+        quantidade_vagas:
+          type: [integer, 'null']
+          minimum: 0
+          maximum: 1000000
+        vencimento_centavos:
+          type: [integer, 'null']
+          format: int64
+          minimum: 0
+        carga_horaria_semanal:
+          type: [integer, 'null']
+          minimum: 1
+          maximum: 168
+        local_prova:
+          type: [string, 'null']
+          maxLength: 240
+        horario_inicio_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        horario_fim_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        requisitos:
+          type: [string, 'null']
+          maxLength: 10000
+        criterios_pontuacao:
+          type: [string, 'null']
+          maxLength: 10000
     CriarConcurso:
       type: object
       required: [instituicao, cargo]
@@ -397,6 +447,86 @@ components:
         prioritario:
           type: boolean
           default: false
+        sigla:
+          type: [string, 'null']
+          maxLength: 24
+        quantidade_vagas:
+          type: [integer, 'null']
+          minimum: 0
+          maximum: 1000000
+        vencimento_centavos:
+          type: [integer, 'null']
+          format: int64
+          minimum: 0
+        carga_horaria_semanal:
+          type: [integer, 'null']
+          minimum: 1
+          maximum: 168
+        local_prova:
+          type: [string, 'null']
+          maxLength: 240
+        horario_inicio_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        horario_fim_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        requisitos:
+          type: [string, 'null']
+          maxLength: 10000
+        criterios_pontuacao:
+          type: [string, 'null']
+          maxLength: 10000
+    AtualizarConcurso:
+      type: object
+      required: [instituicao, cargo, prioritario]
+      properties:
+        instituicao:
+          type: string
+          minLength: 1
+          maxLength: 160
+        cargo:
+          type: string
+          minLength: 1
+          maxLength: 160
+        banca:
+          type: [string, 'null']
+          maxLength: 120
+        data_prova:
+          type: [string, 'null']
+          format: date
+        prioritario:
+          type: boolean
+        sigla:
+          type: [string, 'null']
+          maxLength: 24
+        quantidade_vagas:
+          type: [integer, 'null']
+          minimum: 0
+          maximum: 1000000
+        vencimento_centavos:
+          type: [integer, 'null']
+          format: int64
+          minimum: 0
+        carga_horaria_semanal:
+          type: [integer, 'null']
+          minimum: 1
+          maximum: 168
+        local_prova:
+          type: [string, 'null']
+          maxLength: 240
+        horario_inicio_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        horario_fim_prova:
+          type: [string, 'null']
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        requisitos:
+          type: [string, 'null']
+          maxLength: 10000
+        criterios_pontuacao:
+          type: [string, 'null']
+          maxLength: 10000
     CriarDisciplina:
       type: object
       required: [nome]

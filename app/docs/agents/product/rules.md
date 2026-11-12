@@ -13,7 +13,10 @@ O produto organiza Concursos e Disciplinas. Ele mantém os dados dos Concursos e
 
 ## Concursos
 
-- Um Concurso reúne instituição, cargo, banca, data de prova opcional, prioridade, arquivamento e progresso do Edital.
+- Um Concurso reúne órgão e sigla opcional, cargo ou especialidade, banca, vagas, vencimento, carga horária semanal, local, data e horários da prova, requisitos, critérios de pontuação, prioridade, arquivamento e progresso do Edital.
+- Os dados complementares são opcionais para permitir Concursos ainda sem edital publicado ou com informações pendentes.
+- Instituição, cargo ou especialidade e prioridade podem ser editados sem alterar o progresso do Edital; os demais dados do Concurso podem ser preenchidos, alterados ou removidos.
+- Quando houver horário de prova, início e término são informados juntos e o término deve ser posterior ao início.
 - A pessoa pode manter mais de um Concurso e escolher um Concurso prioritário.
 - Somente um Concurso ativo pode ser prioritário por vez.
 - A prova mais próxima organiza a lista quando aplicável; Concursos sem data continuam acessíveis.

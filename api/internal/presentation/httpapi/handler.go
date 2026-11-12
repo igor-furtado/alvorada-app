@@ -36,6 +36,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("GET /health", h.health)
 	mux.HandleFunc("GET /api/v1/concursos", h.listConcursos)
 	mux.HandleFunc("POST /api/v1/concursos", h.createConcurso)
+	mux.HandleFunc("PUT /api/v1/concursos/{id}", h.updateConcurso)
 	mux.HandleFunc("DELETE /api/v1/concursos/{id}", h.deleteConcurso)
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/prioridade", h.setConcursoPrioritario)
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/arquivamento", h.archiveConcurso)
@@ -70,21 +71,39 @@ func (h *Handler) health(w http.ResponseWriter, _ *http.Request) {
 }
 
 type concursoRequest struct {
-	Instituicao string  `json:"instituicao"`
-	Cargo       string  `json:"cargo"`
-	Banca       *string `json:"banca"`
-	DataProva   *string `json:"data_prova"`
-	Prioritario bool    `json:"prioritario"`
+	Instituicao         string  `json:"instituicao"`
+	Cargo               string  `json:"cargo"`
+	Banca               *string `json:"banca"`
+	DataProva           *string `json:"data_prova"`
+	Prioritario         bool    `json:"prioritario"`
+	Sigla               *string `json:"sigla"`
+	QuantidadeVagas     *int    `json:"quantidade_vagas"`
+	VencimentoCentavos  *int64  `json:"vencimento_centavos"`
+	CargaHorariaSemanal *int    `json:"carga_horaria_semanal"`
+	LocalProva          *string `json:"local_prova"`
+	HorarioInicioProva  *string `json:"horario_inicio_prova"`
+	HorarioFimProva     *string `json:"horario_fim_prova"`
+	Requisitos          *string `json:"requisitos"`
+	CriteriosPontuacao  *string `json:"criterios_pontuacao"`
 }
 
 type concursoResponse struct {
-	ID              string  `json:"id"`
-	Instituicao     string  `json:"instituicao"`
-	Cargo           string  `json:"cargo"`
-	Banca           *string `json:"banca"`
-	DataProva       *string `json:"data_prova"`
-	Prioritario     bool    `json:"prioritario"`
-	ProgressoEdital int     `json:"progresso_edital"`
+	ID                  string  `json:"id"`
+	Instituicao         string  `json:"instituicao"`
+	Cargo               string  `json:"cargo"`
+	Banca               *string `json:"banca"`
+	DataProva           *string `json:"data_prova"`
+	Prioritario         bool    `json:"prioritario"`
+	ProgressoEdital     int     `json:"progresso_edital"`
+	Sigla               *string `json:"sigla"`
+	QuantidadeVagas     *int    `json:"quantidade_vagas"`
+	VencimentoCentavos  *int64  `json:"vencimento_centavos"`
+	CargaHorariaSemanal *int    `json:"carga_horaria_semanal"`
+	LocalProva          *string `json:"local_prova"`
+	HorarioInicioProva  *string `json:"horario_inicio_prova"`
+	HorarioFimProva     *string `json:"horario_fim_prova"`
+	Requisitos          *string `json:"requisitos"`
+	CriteriosPontuacao  *string `json:"criterios_pontuacao"`
 }
 
 func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +127,11 @@ func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
 			DataProva:       dataProva,
 			Prioritario:     item.Prioritario,
 			ProgressoEdital: item.ProgressoEdital,
+			Sigla:           item.Sigla, QuantidadeVagas: item.QuantidadeVagas,
+			VencimentoCentavos: item.VencimentoCentavos, CargaHorariaSemanal: item.CargaHorariaSemanal,
+			LocalProva: item.LocalProva, HorarioInicioProva: item.HorarioInicioProva,
+			HorarioFimProva: item.HorarioFimProva, Requisitos: item.Requisitos,
+			CriteriosPontuacao: item.CriteriosPontuacao,
 		})
 	}
 	writeJSON(w, http.StatusOK, response)
@@ -130,12 +154,44 @@ func (h *Handler) createConcurso(w http.ResponseWriter, r *http.Request) {
 		Banca:       body.Banca,
 		DataProva:   dataProva,
 		Prioritario: body.Prioritario,
+		Sigla:       body.Sigla, QuantidadeVagas: body.QuantidadeVagas,
+		VencimentoCentavos: body.VencimentoCentavos, CargaHorariaSemanal: body.CargaHorariaSemanal,
+		LocalProva: body.LocalProva, HorarioInicioProva: body.HorarioInicioProva,
+		HorarioFimProva: body.HorarioFimProva, Requisitos: body.Requisitos,
+		CriteriosPontuacao: body.CriteriosPontuacao,
 	})
 	if err != nil {
 		h.serviceError(w, r, err)
 		return
 	}
 	writeJSON(w, http.StatusCreated, map[string]string{"id": id})
+}
+
+func (h *Handler) updateConcurso(w http.ResponseWriter, r *http.Request) {
+	var body concursoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	dataProva, err := parseOptionalDate(body.DataProva)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "a data da prova deve usar o formato AAAA-MM-DD")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.concursos.Update(r.Context(), r.PathValue("id"), concursosDomain.UpdateConcursoInput{
+			Instituicao: body.Instituicao,
+			Cargo:       body.Cargo,
+			Banca:       body.Banca,
+			DataProva:   dataProva,
+			Prioritario: body.Prioritario,
+			Sigla:       body.Sigla, QuantidadeVagas: body.QuantidadeVagas,
+			VencimentoCentavos: body.VencimentoCentavos, CargaHorariaSemanal: body.CargaHorariaSemanal,
+			LocalProva: body.LocalProva, HorarioInicioProva: body.HorarioInicioProva,
+			HorarioFimProva: body.HorarioFimProva, Requisitos: body.Requisitos,
+			CriteriosPontuacao: body.CriteriosPontuacao,
+		})
+	})
 }
 
 func (h *Handler) setConcursoPrioritario(w http.ResponseWriter, r *http.Request) {
@@ -320,7 +376,15 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		errors.Is(err, concursosApplication.ErrCargoRequired) ||
 		errors.Is(err, concursosApplication.ErrInstituicaoTooLong) ||
 		errors.Is(err, concursosApplication.ErrCargoTooLong) ||
-		errors.Is(err, concursosApplication.ErrBancaTooLong) {
+		errors.Is(err, concursosApplication.ErrBancaTooLong) ||
+		errors.Is(err, concursosApplication.ErrSiglaTooLong) ||
+		errors.Is(err, concursosApplication.ErrQuantidadeVagas) ||
+		errors.Is(err, concursosApplication.ErrVencimento) ||
+		errors.Is(err, concursosApplication.ErrCargaHoraria) ||
+		errors.Is(err, concursosApplication.ErrLocalProvaTooLong) ||
+		errors.Is(err, concursosApplication.ErrHorariosProva) ||
+		errors.Is(err, concursosApplication.ErrRequisitosTooLong) ||
+		errors.Is(err, concursosApplication.ErrPontuacaoTooLong) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}

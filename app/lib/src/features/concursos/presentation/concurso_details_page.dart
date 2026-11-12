@@ -10,6 +10,7 @@ import '../../../core/ui/app_ui.dart';
 import '../domain/models/concurso.dart';
 import '../domain/use_cases/concursos_use_cases.dart';
 import 'concurso_view_data.dart';
+import 'concursos_form/concursos_form_view.dart';
 
 class ConcursoDetailsPage extends StatefulWidget {
   const ConcursoDetailsPage({
@@ -25,6 +26,7 @@ class ConcursoDetailsPage extends StatefulWidget {
 
 class _ConcursoDetailsPageState extends State<ConcursoDetailsPage> {
   ConcursoViewData? _concurso;
+  Concurso? _concursoDomain;
   bool _loading = true;
   bool _requested = false;
   _DisciplineSort _sort = _DisciplineSort.weight;
@@ -62,13 +64,32 @@ class _ConcursoDetailsPageState extends State<ConcursoDetailsPage> {
       forceRefresh: true,
     );
     if (!mounted) return;
+    final loaded = switch (result) {
+      Sucesso<Concurso>(:final valor) => valor,
+      ViolacaoRegra<Concurso>() || FalhaTecnica<Concurso>() => null,
+    };
     setState(() {
       _loading = false;
-      _concurso = switch (result) {
-        Sucesso<Concurso>(:final valor) => ConcursoViewData.fromDomain(valor),
-        ViolacaoRegra<Concurso>() || FalhaTecnica<Concurso>() => null,
-      };
+      _concursoDomain = loaded;
+      _concurso = loaded == null ? null : ConcursoViewData.fromDomain(loaded);
     });
+  }
+
+  Future<void> _editConcurso() async {
+    final concurso = _concursoDomain;
+    if (concurso == null) return;
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
+      builder: (_) => ConcursosFormView(concurso: concurso),
+    );
+    if (saved != true || !mounted) return;
+    await _loadConcurso();
+    if (!mounted) return;
+    AppToast.show(
+      context,
+      title: AppMessages.concursoAtualizado,
+      variant: AppToastVariant.success,
+    );
   }
 
   @override
@@ -102,7 +123,10 @@ class _ConcursoDetailsPageState extends State<ConcursoDetailsPage> {
             _ConcursoSummary(
               concurso: concurso,
               disciplineCount: concurso.disciplines.length,
+              onEdit: _editConcurso,
             ),
+            SizedBox(height: context.tokens.spacing.xl),
+            _ConcursoInformation(concurso: concurso),
             SizedBox(height: context.tokens.spacing.xl),
             _VerticalizedEdital(
               disciplines: _visibleDisciplines,
@@ -134,9 +158,11 @@ class _ConcursoSummary extends StatelessWidget {
   const _ConcursoSummary({
     required this.concurso,
     required this.disciplineCount,
+    required this.onEdit,
   });
   final ConcursoViewData concurso;
   final int disciplineCount;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -166,6 +192,15 @@ class _ConcursoSummary extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (concurso.organizationAcronym != null) ...[
+                    Text(
+                      concurso.organizationAcronym!,
+                      style: context.tokens.typography.labelMedium.copyWith(
+                        color: context.tokens.colors.onSurfaceMuted,
+                      ),
+                    ),
+                    SizedBox(height: context.tokens.spacing.xxs),
+                  ],
                   Row(
                     children: [
                       Flexible(
@@ -192,6 +227,10 @@ class _ConcursoSummary extends StatelessWidget {
                         text: concurso.examDate,
                       ),
                       _InlineInfo(
+                        icon: AppIcons.clock,
+                        text: concurso.examTime,
+                      ),
+                      _InlineInfo(
                         icon: AppIcons.bookText,
                         text: '$disciplineCount disciplinas',
                       ),
@@ -200,6 +239,13 @@ class _ConcursoSummary extends StatelessWidget {
                         text: concurso.board,
                       ),
                     ],
+                  ),
+                  SizedBox(height: context.tokens.spacing.lg),
+                  AppButton(
+                    label: AppMessages.editarConcurso,
+                    icon: AppIcons.edit,
+                    variant: AppButtonVariant.outline,
+                    onPressed: onEdit,
                   ),
                 ],
               ),
@@ -251,6 +297,84 @@ class _ConcursoSummary extends StatelessWidget {
         );
       },
     ),
+  );
+}
+
+class _ConcursoInformation extends StatelessWidget {
+  const _ConcursoInformation({required this.concurso});
+
+  final ConcursoViewData concurso;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: EdgeInsets.all(context.tokens.spacing.xl),
+    decoration: _cardDecoration(context),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(AppMessages.concursoInformation, style: context.tokens.typography.titleMedium),
+        SizedBox(height: context.tokens.spacing.lg),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < context.tokens.layout.compact;
+            final width = compact ? constraints.maxWidth : (constraints.maxWidth - context.tokens.spacing.lg) / 2;
+            return Wrap(
+              spacing: context.tokens.spacing.lg,
+              runSpacing: context.tokens.spacing.lg,
+              children: [
+                _ConcursoFact(width: width, label: AppMessages.vacancies, value: concurso.vacancies),
+                _ConcursoFact(width: width, label: AppMessages.remuneration, value: concurso.remuneration),
+                _ConcursoFact(width: width, label: AppMessages.weeklyWorkload, value: concurso.weeklyWorkload),
+                _ConcursoFact(width: width, label: AppMessages.examLocation, value: concurso.examLocation),
+              ],
+            );
+          },
+        ),
+        SizedBox(height: context.tokens.spacing.xl),
+        _ConcursoLongText(label: AppMessages.requirements, value: concurso.requirements),
+        SizedBox(height: context.tokens.spacing.xl),
+        _ConcursoLongText(label: AppMessages.scoringCriteria, value: concurso.scoringCriteria),
+      ],
+    ),
+  );
+}
+
+class _ConcursoFact extends StatelessWidget {
+  const _ConcursoFact({required this.width, required this.label, required this.value});
+
+  final double width;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: width,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.tokens.typography.labelSmall),
+        SizedBox(height: context.tokens.spacing.xxs),
+        Text(value, style: context.tokens.typography.bodyMedium),
+      ],
+    ),
+  );
+}
+
+class _ConcursoLongText extends StatelessWidget {
+  const _ConcursoLongText({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: context.tokens.typography.labelSmall),
+      SizedBox(height: context.tokens.spacing.xs),
+      Text(value, style: context.tokens.typography.bodyMedium),
+    ],
   );
 }
 

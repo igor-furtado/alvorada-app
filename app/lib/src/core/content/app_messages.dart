@@ -47,8 +47,28 @@ abstract final class AppMessages {
   static const exam = 'Prova';
   static const nenhumConcursoAtivo = 'Nenhum Concurso ativo';
   static const institution = 'Órgão ou instituição';
-  static const role = 'Cargo';
+  static const role = 'Cargo / Especialidade';
   static const board = 'Banca';
+  static const organizationAcronym = 'Sigla do órgão';
+  static const vacancies = 'Quantidade de vagas';
+  static const remuneration = 'Vencimento (remuneração)';
+  static const remunerationPlaceholder = 'Ex.: 12.345,67';
+  static const weeklyWorkload = 'Carga horária semanal';
+  static const weeklyWorkloadHelp = 'Informe a quantidade de horas por semana.';
+  static const examLocation = 'Local das provas';
+  static const examStartTime = 'Horário de início';
+  static const examEndTime = 'Horário de término';
+  static const timePlaceholder = 'HH:MM';
+  static const requirements = 'Requisitos';
+  static const requirementsHelp = 'Diplomas, escolaridade, registros e comprovações exigidos.';
+  static const scoringCriteria = 'Cálculo da pontuação';
+  static const scoringCriteriaHelp = 'Pesos, critérios de desempate e demais regras de pontuação.';
+  static const concursoInformation = 'Informações do Concurso';
+  static const invalidNonNegativeInteger = 'Informe um número inteiro igual ou maior que zero.';
+  static const invalidWeeklyWorkload = 'Informe de 1 a 168 horas por semana.';
+  static const invalidRemuneration = 'Informe um valor válido, como 12.345,67.';
+  static const invalidExamTime = 'Informe um horário válido no formato HH:MM.';
+  static const invalidExamTimeRange = 'Informe início e término, com o término posterior ao início.';
   static const examDate = 'Data da prova';
   static const examDatePlaceholder = 'DD/MM/AAAA';
   static const invalidExamDate = 'Informe uma data válida no formato DD/MM/AAAA.';
@@ -56,6 +76,7 @@ abstract final class AppMessages {
   static const concursoPrioritarioField = 'Usar como Concurso prioritário';
   static const concursoPrioritarioHelp = 'Ele receberá prioridade quando as horas não comportarem todo o escopo.';
   static const criarConcurso = 'Criar Concurso';
+  static const editarConcurso = 'Editar Concurso';
   static const toBeDefined = 'A definir';
   static const excluirConcurso = 'Excluir Concurso';
   static const excluirConcursoQuestion = 'Excluir Concurso?';
@@ -69,6 +90,7 @@ abstract final class AppMessages {
   static const notice = 'Edital';
   static const carregandoConcursos = 'Carregando Concursos';
   static const concursoCriado = 'Concurso criado.';
+  static const concursoAtualizado = 'Concurso atualizado.';
   static const concursoPriorizado = 'Concurso prioritário atualizado.';
   static const concursoRestaurado = 'Concurso restaurado.';
   static const concursoExcluido = 'Concurso excluído.';
@@ -151,6 +173,8 @@ abstract final class AppMessages {
   static String concursoArquivado(String name) => '$name foi arquivado.';
 
   static String nextExamIn(int days) => 'A próxima prova é em $days dias';
+
+  static String vacanciesCount(int count) => _count(count, 'vaga', 'vagas');
 
   static String excluirConcursoImpacto(String name) =>
       '$name e seu Edital serão removidos. Esta ação não pode ser desfeita.';

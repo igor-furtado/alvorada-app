@@ -38,7 +38,6 @@ class _DisciplinasFormContent extends StatefulWidget {
 }
 
 class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
-  final _formKey = GlobalKey<FormState>();
   final _nameFocus = FocusNode();
   late final TextEditingController _nameController = TextEditingController(
     text: widget.disciplina?.name,
@@ -56,8 +55,7 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
     listenWhen: (previous, current) =>
         previous.status != current.status && current.status == DisciplinasFormStatus.success,
     listener: (context, state) => Navigator.pop(context, true),
-    builder: (context, state) => AppValidatedForm(
-      formKey: _formKey,
+    builder: (context, state) => AppForm(
       firstInvalidFocusNode: () => _nameFocus,
       onSubmit: () async {
         final bloc = context.read<DisciplinasFormBloc>()..add(DisciplinasFormSubmitted(_nameController.text.trim()));
@@ -65,7 +63,25 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
           (state) => state.status == DisciplinasFormStatus.success || state.status == DisciplinasFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDrawer(
+      contentBuilder: (context, submitting, submit) => [
+        AppField(
+          label: AppMessages.disciplineName,
+          errorText: state.errorMessage,
+          required: true,
+          control: AppTextInput(
+            controller: _nameController,
+            focusNode: _nameFocus,
+            placeholder: AppMessages.disciplineNameExample,
+            errorText: state.errorMessage,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => submit(),
+            validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
+            semanticLabel: '${AppMessages.disciplineName}, ${AppMessages.requiredSuffix}',
+          ),
+        ),
+      ],
+      builder: (context, submitting, submit, content) => AppDrawer(
         title: widget.disciplina == null ? AppMessages.newDiscipline : AppMessages.editDiscipline,
         description: widget.disciplina == null ? AppMessages.newDisciplineDescription : null,
         dismissible: !submitting,
@@ -74,18 +90,7 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
         loading: submitting,
         secondaryLabel: AppMessages.cancel,
         onSecondary: submitting ? null : () => Navigator.pop(context),
-        child: AppFormField(
-          label: AppMessages.disciplineName,
-          placeholder: AppMessages.disciplineNameExample,
-          errorText: state.errorMessage,
-          controller: _nameController,
-          focusNode: _nameFocus,
-          autofocus: true,
-          required: true,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => submit(),
-          validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
-        ),
+        child: content,
       ),
     ),
   );

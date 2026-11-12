@@ -41,78 +41,80 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _Example(
-          title: 'Composição completa',
-          child: AppFieldset(
-            legend: 'Forma de pagamento',
+          title: 'AppForm',
+          child: AppForm(
+            title: 'Forma de pagamento',
             description: 'Todas as transações são seguras e criptografadas.',
-            child: AppFieldGroup(
+            onSubmit: () async {},
+            contentBuilder: (context, submitting, submit) => [
+              _textField(label: 'Nome no cartão', placeholder: 'Maria Silva'),
+              _textField(
+                label: 'Número do cartão',
+                placeholder: '1234 5678 9012 3456',
+                description: 'Digite os 16 números do cartão.',
+              ),
+              _ResponsiveFields(
+                children: [
+                  AppField(
+                    label: 'Mês',
+                    control: AppSelect<String>(
+                      value: _month,
+                      placeholder: 'MM',
+                      semanticLabel: 'Mês de validade',
+                      options: const [
+                        AppSelectOption(value: '01', label: '01'),
+                        AppSelectOption(value: '02', label: '02'),
+                        AppSelectOption(value: '03', label: '03'),
+                      ],
+                      onChanged: (value) => setState(() => _month = value),
+                    ),
+                  ),
+                  AppField(
+                    label: 'Ano',
+                    control: AppSelect<String>(
+                      value: _year,
+                      placeholder: 'AAAA',
+                      semanticLabel: 'Ano de validade',
+                      options: const [
+                        AppSelectOption(value: '2026', label: '2026'),
+                        AppSelectOption(value: '2027', label: '2027'),
+                        AppSelectOption(value: '2028', label: '2028'),
+                      ],
+                      onChanged: (value) => setState(() => _year = value),
+                    ),
+                  ),
+                  _textField(label: 'CVV', placeholder: '123'),
+                ],
+              ),
+              AppField(
+                label: 'Igual ao endereço de entrega',
+                description: 'O endereço de cobrança associado à sua forma de pagamento.',
+                orientation: AppFieldOrientation.horizontal,
+                controlPlacement: AppFieldControlPlacement.leading,
+                control: AppCheckbox(
+                  value: _sameAddress,
+                  semanticLabel: 'Igual ao endereço de entrega',
+                  onChanged: (value) => setState(() => _sameAddress = value ?? false),
+                ),
+              ),
+              const AppField(
+                label: 'Comentários',
+                control: AppTextarea(
+                  placeholder: 'Adicione observações',
+                  semanticLabel: 'Comentários',
+                ),
+              ),
+            ],
+            builder: (context, submitting, submit, content) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const AppFormField(label: 'Nome no cartão', placeholder: 'Maria Silva'),
-                const AppFormField(
-                  label: 'Número do cartão',
-                  placeholder: '1234 5678 9012 3456',
-                  helperText: 'Digite os 16 números do cartão.',
-                ),
-                _ResponsiveFields(
-                  children: [
-                    AppField(
-                      label: 'Mês',
-                      control: AppSelect<String>(
-                        value: _month,
-                        placeholder: 'MM',
-                        semanticLabel: 'Mês de validade',
-                        options: const [
-                          AppSelectOption(value: '01', label: '01'),
-                          AppSelectOption(value: '02', label: '02'),
-                          AppSelectOption(value: '03', label: '03'),
-                        ],
-                        onChanged: (value) => setState(() => _month = value),
-                      ),
-                    ),
-                    AppField(
-                      label: 'Ano',
-                      control: AppSelect<String>(
-                        value: _year,
-                        placeholder: 'AAAA',
-                        semanticLabel: 'Ano de validade',
-                        options: const [
-                          AppSelectOption(value: '2026', label: '2026'),
-                          AppSelectOption(value: '2027', label: '2027'),
-                          AppSelectOption(value: '2028', label: '2028'),
-                        ],
-                        onChanged: (value) => setState(() => _year = value),
-                      ),
-                    ),
-                    const AppFormField(label: 'CVV', placeholder: '123'),
-                  ],
-                ),
-                const AppFieldSeparator(),
-                AppFieldset(
-                  legend: 'Endereço de cobrança',
-                  description: 'O endereço de cobrança associado à sua forma de pagamento.',
-                  child: AppField(
-                    label: 'Igual ao endereço de entrega',
-                    orientation: AppFieldOrientation.horizontal,
-                    controlPlacement: AppFieldControlPlacement.leading,
-                    control: AppCheckbox(
-                      value: _sameAddress,
-                      semanticLabel: 'Igual ao endereço de entrega',
-                      onChanged: (value) => setState(() => _sameAddress = value ?? false),
-                    ),
-                  ),
-                ),
-                const AppField(
-                  label: 'Comentários',
-                  control: AppTextarea(
-                    placeholder: 'Adicione observações',
-                    semanticLabel: 'Comentários',
-                  ),
-                ),
+                content,
+                SizedBox(height: context.tokens.spacing.lg),
                 Wrap(
                   spacing: context.tokens.spacing.sm,
                   runSpacing: context.tokens.spacing.sm,
                   children: [
-                    AppButton(label: 'Enviar', onPressed: () {}),
+                    AppButton(label: 'Enviar', onPressed: submit),
                     AppButton(label: 'Cancelar', variant: AppButtonVariant.outline, onPressed: () {}),
                   ],
                 ),
@@ -120,19 +122,21 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
             ),
           ),
         ),
-        const _Example(
+        _Example(
           title: 'Input',
-          child: AppFieldGroup(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppFormField(
+              _textField(
                 label: 'Nome de usuário',
                 placeholder: 'Max Leiter',
-                helperText: 'Escolha um nome de usuário exclusivo para sua conta.',
+                description: 'Escolha um nome de usuário exclusivo para sua conta.',
               ),
-              AppFormField(
+              SizedBox(height: context.tokens.spacing.lg),
+              _textField(
                 label: 'Senha',
                 placeholder: '••••••••',
-                helperText: 'Deve ter pelo menos 8 caracteres.',
+                description: 'Deve ter pelo menos 8 caracteres.',
                 descriptionPlacement: AppFieldDescriptionPlacement.beforeControl,
                 obscureText: true,
               ),
@@ -164,59 +168,40 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
             ),
           ),
         ),
-        const _Example(
-          title: 'Fieldset',
-          child: AppFieldset(
-            legend: 'Informações de endereço',
-            description: 'Precisamos do seu endereço para entregar o pedido.',
-            child: AppFieldGroup(
-              children: [
-                AppFormField(label: 'Endereço', placeholder: 'Rua Principal, 123'),
-                _ResponsiveFields(
-                  children: [
-                    AppFormField(label: 'Cidade', placeholder: 'Fortaleza'),
-                    AppFormField(label: 'CEP', placeholder: '60000-000'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
         _Example(
           title: 'Checkbox',
-          child: AppFieldset(
-            legend: 'Mostrar estes itens na área de trabalho',
+          child: AppForm(
+            title: 'Mostrar estes itens na área de trabalho',
             description: 'Selecione os itens que deseja exibir na área de trabalho.',
-            child: AppFieldGroup(
-              spacing: context.tokens.spacing.xxs,
-              children: [
-                _checkboxField('Discos rígidos', _hardDisks, (value) => _hardDisks = value),
-                _checkboxField('Discos externos', _externalDisks, (value) => _externalDisks = value),
-                _checkboxField('CDs, DVDs e iPods', _mediaDevices, (value) => _mediaDevices = value),
-                _checkboxField('Servidores conectados', _servers, (value) => _servers = value),
-                const AppFieldSeparator(),
-                AppField(
-                  label: 'Sincronizar pastas Área de Trabalho e Documentos',
-                  description:
-                      'As pastas estão sendo sincronizadas com o armazenamento em nuvem e podem ser acessadas em outros dispositivos.',
-                  orientation: AppFieldOrientation.horizontal,
-                  controlPlacement: AppFieldControlPlacement.leading,
-                  control: AppCheckbox(
-                    value: _syncFolders,
-                    semanticLabel: 'Sincronizar pastas Área de Trabalho e Documentos',
-                    onChanged: (value) => setState(() => _syncFolders = value ?? false),
-                  ),
+            spacing: context.tokens.spacing.xxs,
+            onSubmit: () async {},
+            contentBuilder: (context, submitting, submit) => [
+              _checkboxField('Discos rígidos', _hardDisks, (value) => _hardDisks = value),
+              _checkboxField('Discos externos', _externalDisks, (value) => _externalDisks = value),
+              _checkboxField('CDs, DVDs e iPods', _mediaDevices, (value) => _mediaDevices = value),
+              _checkboxField('Servidores conectados', _servers, (value) => _servers = value),
+              AppField(
+                label: 'Sincronizar pastas Área de Trabalho e Documentos',
+                description:
+                    'As pastas estão sendo sincronizadas com o armazenamento em nuvem e podem ser acessadas em outros dispositivos.',
+                orientation: AppFieldOrientation.horizontal,
+                controlPlacement: AppFieldControlPlacement.leading,
+                control: AppCheckbox(
+                  value: _syncFolders,
+                  semanticLabel: 'Sincronizar pastas Área de Trabalho e Documentos',
+                  onChanged: (value) => setState(() => _syncFolders = value ?? false),
                 ),
-              ],
-            ),
+              ),
+            ],
+            builder: (context, submitting, submit, content) => content,
           ),
         ),
         _Example(
           title: 'Radio',
-          child: AppFieldset(
-            legend: 'Plano de assinatura',
+          child: AppField(
+            label: 'Plano de assinatura',
             description: 'Os planos anual e vitalício oferecem economia significativa.',
-            child: AppRadioGroup<String>(
+            control: AppRadioGroup<String>(
               value: _plan,
               options: const [
                 AppRadioOption(value: 'mensal', label: r'Mensal (R$ 9,99/mês)'),
@@ -240,6 +225,23 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
           ),
         ),
       ],
+    ),
+  );
+
+  Widget _textField({
+    required String label,
+    String? placeholder,
+    String? description,
+    AppFieldDescriptionPlacement descriptionPlacement = AppFieldDescriptionPlacement.afterControl,
+    bool obscureText = false,
+  }) => AppField(
+    label: label,
+    description: description,
+    descriptionPlacement: descriptionPlacement,
+    control: AppTextInput(
+      placeholder: placeholder,
+      obscureText: obscureText,
+      semanticLabel: label,
     ),
   );
 
@@ -284,7 +286,15 @@ class _ResponsiveFields extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       if (constraints.maxWidth < context.tokens.layout.compact) {
-        return AppFieldGroup(children: children);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var index = 0; index < children.length; index++) ...[
+              children[index],
+              if (index != children.length - 1) SizedBox(height: context.tokens.spacing.lg),
+            ],
+          ],
+        );
       }
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,

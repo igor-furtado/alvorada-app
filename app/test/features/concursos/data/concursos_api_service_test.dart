@@ -22,6 +22,9 @@ void main() {
 
     expect(concursos.single.instituicao, 'Câmara dos Deputados');
     expect(concursos.single.progressoEdital, 48);
+    expect(concursos.single.sigla, 'CD');
+    expect(concursos.single.vencimentoCentavos, 2200000);
+    expect(concursos.single.horarioInicioProva, '13:00');
   });
 
   test('envia dados em português e retorna o id criado', () async {
@@ -59,6 +62,33 @@ void main() {
 
     await service.setPrioritario('concurso-2');
   });
+
+  test('atualiza o Concurso com os campos editáveis', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/api/v1/concursos/concurso-2');
+      expect(jsonDecode(request.body), {
+        'instituicao': 'TRF da 5ª Região',
+        'cargo': 'Analista Judiciário',
+        'banca': null,
+        'data_prova': null,
+        'prioritario': false,
+      });
+      return http.Response('', 204);
+    });
+    final service = ConcursosApiService(
+      client,
+      baseUri: Uri.parse('http://api.test'),
+    );
+
+    await service.updateConcurso('concurso-2', {
+      'instituicao': 'TRF da 5ª Região',
+      'cargo': 'Analista Judiciário',
+      'banca': null,
+      'data_prova': null,
+      'prioritario': false,
+    });
+  });
 }
 
 const _concursoJson = <String, Object?>{
@@ -69,4 +99,13 @@ const _concursoJson = <String, Object?>{
   'data_prova': '2027-02-21',
   'prioritario': true,
   'progresso_edital': 48,
+  'sigla': 'CD',
+  'quantidade_vagas': 100,
+  'vencimento_centavos': 2200000,
+  'carga_horaria_semanal': 40,
+  'local_prova': 'Brasília/DF',
+  'horario_inicio_prova': '13:00',
+  'horario_fim_prova': '18:00',
+  'requisitos': 'Nível superior',
+  'criterios_pontuacao': 'Pesos por bloco',
 };

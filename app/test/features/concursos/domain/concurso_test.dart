@@ -29,6 +29,23 @@ void main() {
 
     expect(viewData.days, isNull);
   });
+
+  test('rejeita término de prova anterior ao início', () {
+    expect(
+      () => Concurso(
+        id: 'concurso-1',
+        instituicao: 'TRF da 5ª Região',
+        cargo: 'Técnico Judiciário',
+        banca: null,
+        dataProva: null,
+        prioritario: false,
+        progressoEdital: 0,
+        horarioInicioProva: '18:00',
+        horarioFimProva: '13:00',
+      ),
+      throwsFormatException,
+    );
+  });
 }
 
 Concurso _concurso({DateTime? dataProva, int progressoEdital = 0}) => Concurso(

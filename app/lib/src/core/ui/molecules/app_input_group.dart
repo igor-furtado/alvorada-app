@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../atoms/app_text_input.dart';
-import 'app_form_field.dart';
+import 'app_field.dart';
 
 class AppInputGroup extends StatelessWidget {
   const AppInputGroup({
@@ -37,15 +37,19 @@ class AppInputGroup extends StatelessWidget {
         onChanged: onChanged,
       );
     }
-    return AppFormField(
+    return AppField(
       label: label ?? '',
-      controller: controller,
-      placeholder: placeholder,
-      helperText: helperText,
+      description: helperText,
       errorText: errorText,
-      prefixIcon: leading,
-      suffixIcon: trailing,
-      onChanged: onChanged,
+      control: AppTextInput(
+        controller: controller,
+        placeholder: placeholder,
+        errorText: errorText,
+        prefixIcon: leading,
+        suffixIcon: trailing,
+        onChanged: onChanged,
+        semanticLabel: label,
+      ),
     );
   }
 }

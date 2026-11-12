@@ -103,9 +103,15 @@ class _AtomCatalogShowcaseState extends State<AtomCatalogShowcase> {
                   style: context.tokens.typography.bodySmall,
                 ),
                 SizedBox(height: context.tokens.spacing.lg),
-                const AppFormField(label: 'E-mail', placeholder: 'm@exemplo.com'),
+                const AppField(
+                  label: 'E-mail',
+                  control: AppTextInput(placeholder: 'm@exemplo.com', semanticLabel: 'E-mail'),
+                ),
                 SizedBox(height: context.tokens.spacing.md),
-                const AppFormField(label: 'Senha', obscureText: true),
+                const AppField(
+                  label: 'Senha',
+                  control: AppTextInput(obscureText: true, semanticLabel: 'Senha'),
+                ),
                 SizedBox(height: context.tokens.spacing.lg),
                 AppButton(label: 'Entrar', onPressed: () {}),
                 SizedBox(height: context.tokens.spacing.sm),
@@ -138,14 +144,16 @@ class _AtomCatalogShowcaseState extends State<AtomCatalogShowcase> {
         description: 'Entrada de uma linha com placeholder, ícones e estado de erro.',
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
-          child: const AppFieldGroup(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppField(
+              const AppField(
                 label: 'Nome de usuário',
                 description: 'Escolha um nome de usuário exclusivo para sua conta.',
                 control: AppTextInput(placeholder: 'Max Leiter', semanticLabel: 'Nome de usuário'),
               ),
-              AppField(
+              SizedBox(height: context.tokens.spacing.lg),
+              const AppField(
                 label: 'Senha',
                 description: 'Deve ter pelo menos 8 caracteres.',
                 descriptionPlacement: AppFieldDescriptionPlacement.beforeControl,

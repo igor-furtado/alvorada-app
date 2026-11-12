@@ -6,7 +6,7 @@ import '../../../../core/ui/app_ui.dart';
 import '../../domain/models/concurso.dart';
 import '../concurso_formatters.dart';
 
-enum ConcursoListItemMenuAction { details, prioritize, archive, delete }
+enum ConcursoListItemMenuAction { details, edit, prioritize, archive, delete }
 
 class ConcursoListItem extends StatelessWidget {
   const ConcursoListItem({
@@ -14,6 +14,7 @@ class ConcursoListItem extends StatelessWidget {
     required this.enabled,
     required this.onDetails,
     required this.onOpenEdital,
+    required this.onEdit,
     required this.onPrioritize,
     required this.onArchive,
     required this.onDelete,
@@ -25,6 +26,7 @@ class ConcursoListItem extends StatelessWidget {
   final bool enabled;
   final VoidCallback onDetails;
   final VoidCallback onOpenEdital;
+  final VoidCallback onEdit;
   final VoidCallback onPrioritize;
   final VoidCallback onArchive;
   final VoidCallback onDelete;
@@ -66,6 +68,7 @@ class ConcursoListItem extends StatelessWidget {
               enabled: enabled,
               onSelected: (action) => switch (action) {
                 ConcursoListItemMenuAction.details => onDetails(),
+                ConcursoListItemMenuAction.edit => onEdit(),
                 ConcursoListItemMenuAction.prioritize => onPrioritize(),
                 ConcursoListItemMenuAction.archive => onArchive(),
                 ConcursoListItemMenuAction.delete => onDelete(),
@@ -75,6 +78,11 @@ class ConcursoListItem extends StatelessWidget {
                   value: ConcursoListItemMenuAction.details,
                   label: AppMessages.seeDetails,
                   icon: AppIcons.arrowRight,
+                ),
+                const AppMenuItem(
+                  value: ConcursoListItemMenuAction.edit,
+                  label: AppMessages.editarConcurso,
+                  icon: AppIcons.edit,
                 ),
                 if (!concurso.prioritario)
                   const AppMenuItem(

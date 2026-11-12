@@ -28,6 +28,15 @@ void main() {
     );
   });
 
+  test('lê inteiro anulável', () {
+    expect(readJsonNullableInteger({'vagas': 10}, 'vagas'), 10);
+    expect(readJsonNullableInteger({'vagas': null}, 'vagas'), isNull);
+    expect(
+      () => readJsonNullableInteger({'vagas': 'dez'}, 'vagas'),
+      throwsFormatException,
+    );
+  });
+
   test('informa o campo quando o tipo recebido é inválido', () {
     expect(
       () => readJsonInteger(json, 'texto'),

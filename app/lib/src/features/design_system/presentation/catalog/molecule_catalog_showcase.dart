@@ -266,10 +266,10 @@ class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
         description: 'Escolha única com opções associadas a um mesmo grupo acessível.',
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
-          child: AppFieldset(
-            legend: 'Plano de assinatura',
+          child: AppField(
+            label: 'Plano de assinatura',
             description: 'Os planos anual e vitalício oferecem economia significativa.',
-            child: AppRadioGroup<String>(
+            control: AppRadioGroup<String>(
               value: _radioValue,
               options: const [
                 AppRadioOption(value: 'mensal', label: r'Mensal (R$ 9,99/mês)'),

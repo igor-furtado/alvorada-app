@@ -45,6 +45,7 @@ class ConcursosListView extends StatelessWidget {
         actions: ConcursosTimelineActions(
           details: (concurso) => ConcursosListActions.details(context, concurso),
           openEdital: (concurso) => ConcursosListActions.openEdital(context, concurso),
+          edit: (concurso) => ConcursosListActions.edit(context, concurso),
           prioritize: (concurso) => ConcursosListActions.prioritize(context, concurso),
           archive: (concurso) => ConcursosListActions.archive(context, concurso),
           delete: (concurso) => ConcursosListActions.delete(context, concurso),
@@ -90,7 +91,7 @@ void _showFeedback(
         ),
       );
     case ConcursosListFeedbackType.updated:
-      _toast(context, AppMessages.concursosAtualizados, AppToastVariant.success);
+      _toast(context, AppMessages.concursoAtualizado, AppToastVariant.success);
     case ConcursosListFeedbackType.created:
       _toast(context, AppMessages.concursoCriado, AppToastVariant.success);
     case ConcursosListFeedbackType.prioritized:

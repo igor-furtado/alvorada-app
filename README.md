@@ -151,7 +151,7 @@ Principais rotas:
 | --- | --- | --- |
 | `GET` | `/health` | Verifica a disponibilidade |
 | `GET`, `POST` | `/api/v1/concursos` | Lista ou cria Concursos |
-| `DELETE` | `/api/v1/concursos/{id}` | Exclui um Concurso |
+| `PUT`, `DELETE` | `/api/v1/concursos/{id}` | Atualiza ou exclui um Concurso |
 | `PUT` | `/api/v1/concursos/{id}/prioridade` | Define o Concurso prioritário |
 | `PUT`, `DELETE` | `/api/v1/concursos/{id}/arquivamento` | Arquiva ou restaura um Concurso |
 | `GET`, `POST` | `/api/v1/subjects` | Lista ou cria Disciplinas |

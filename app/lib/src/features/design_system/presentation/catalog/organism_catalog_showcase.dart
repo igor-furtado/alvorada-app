@@ -249,7 +249,10 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
             builder: (dialogContext) => AppDialog(
               title: 'Editar perfil',
               description: 'Faça suas alterações e salve para continuar.',
-              content: const AppFormField(label: 'Nome', placeholder: 'Nome completo'),
+              content: const AppField(
+                label: 'Nome',
+                control: AppTextInput(placeholder: 'Nome completo', semanticLabel: 'Nome'),
+              ),
               secondaryLabel: 'Cancelar',
               onSecondary: () => Navigator.pop(dialogContext),
               primaryLabel: 'Salvar alterações',

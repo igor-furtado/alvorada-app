@@ -3,6 +3,7 @@ abstract final class ConcursosResultadoCodes {
   static const carregamentoFalhou = 'concursos.carregamento_falhou';
   static const concursoNaoEncontrado = 'concurso.nao_encontrado';
   static const criacaoFalhou = 'concurso.criacao_falhou';
+  static const atualizacaoFalhou = 'concurso.atualizacao_falhou';
   static const priorizacaoFalhou = 'concurso.priorizacao_falhou';
   static const arquivamentoFalhou = 'concurso.arquivamento_falhou';
   static const restauracaoFalhou = 'concurso.restauracao_falhou';
@@ -12,4 +13,12 @@ abstract final class ConcursosResultadoCodes {
   static const cargoObrigatorio = 'concurso.cargo_obrigatorio';
   static const cargoMuitoLongo = 'concurso.cargo_muito_longo';
   static const bancaMuitoLonga = 'concurso.banca_muito_longa';
+  static const siglaMuitoLonga = 'concurso.sigla_muito_longa';
+  static const quantidadeVagasInvalida = 'concurso.quantidade_vagas_invalida';
+  static const vencimentoInvalido = 'concurso.vencimento_invalido';
+  static const cargaHorariaInvalida = 'concurso.carga_horaria_invalida';
+  static const localProvaMuitoLongo = 'concurso.local_prova_muito_longo';
+  static const horariosProvaInvalidos = 'concurso.horarios_prova_invalidos';
+  static const requisitosMuitoLongos = 'concurso.requisitos_muito_longos';
+  static const criteriosPontuacaoMuitoLongos = 'concurso.criterios_pontuacao_muito_longos';
 }

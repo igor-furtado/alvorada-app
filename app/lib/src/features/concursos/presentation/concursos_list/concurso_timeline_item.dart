@@ -16,6 +16,7 @@ class ConcursoTimelineItem extends StatelessWidget {
     required this.enabled,
     required this.onDetails,
     required this.onOpenEdital,
+    required this.onEdit,
     required this.onPrioritize,
     required this.onArchive,
     required this.onDelete,
@@ -31,6 +32,7 @@ class ConcursoTimelineItem extends StatelessWidget {
   final bool enabled;
   final VoidCallback onDetails;
   final VoidCallback onOpenEdital;
+  final VoidCallback onEdit;
   final VoidCallback onPrioritize;
   final VoidCallback onArchive;
   final VoidCallback onDelete;
@@ -70,6 +72,7 @@ class ConcursoTimelineItem extends StatelessWidget {
               compact: compact,
               onDetails: onDetails,
               onOpenEdital: onOpenEdital,
+              onEdit: onEdit,
               onPrioritize: onPrioritize,
               onArchive: onArchive,
               onDelete: onDelete,

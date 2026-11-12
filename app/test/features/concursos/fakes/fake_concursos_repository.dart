@@ -31,10 +31,46 @@ class FakeConcursosRepository implements ConcursosRepository {
       dataProva: input.dataProva,
       prioritario: input.prioritario,
       progressoEdital: 0,
+      sigla: input.sigla,
+      quantidadeVagas: input.quantidadeVagas,
+      vencimentoCentavos: input.vencimentoCentavos,
+      cargaHorariaSemanal: input.cargaHorariaSemanal,
+      localProva: input.localProva,
+      horarioInicioProva: input.horarioInicioProva,
+      horarioFimProva: input.horarioFimProva,
+      requisitos: input.requisitos,
+      criteriosPontuacao: input.criteriosPontuacao,
     );
     if (input.prioritario) _clearPriority();
     _concursos.add(concurso);
     return concurso;
+  }
+
+  @override
+  Future<void> updateConcurso(String id, UpdateConcursoInput input) async {
+    _throwIfMutationFails();
+    if (input.prioritario) _clearPriority();
+    _replace(
+      id,
+      (item) => Concurso(
+        id: item.id,
+        instituicao: input.instituicao,
+        cargo: input.cargo,
+        banca: input.banca,
+        dataProva: input.dataProva,
+        prioritario: input.prioritario,
+        progressoEdital: item.progressoEdital,
+        sigla: input.sigla,
+        quantidadeVagas: input.quantidadeVagas,
+        vencimentoCentavos: input.vencimentoCentavos,
+        cargaHorariaSemanal: input.cargaHorariaSemanal,
+        localProva: input.localProva,
+        horarioInicioProva: input.horarioInicioProva,
+        horarioFimProva: input.horarioFimProva,
+        requisitos: input.requisitos,
+        criteriosPontuacao: input.criteriosPontuacao,
+      ),
+    );
   }
 
   @override
@@ -93,6 +129,15 @@ Concurso _copy(Concurso source, {bool? prioritario}) => Concurso(
   dataProva: source.dataProva,
   prioritario: prioritario ?? source.prioritario,
   progressoEdital: source.progressoEdital,
+  sigla: source.sigla,
+  quantidadeVagas: source.quantidadeVagas,
+  vencimentoCentavos: source.vencimentoCentavos,
+  cargaHorariaSemanal: source.cargaHorariaSemanal,
+  localProva: source.localProva,
+  horarioInicioProva: source.horarioInicioProva,
+  horarioFimProva: source.horarioFimProva,
+  requisitos: source.requisitos,
+  criteriosPontuacao: source.criteriosPontuacao,
 );
 
 List<Concurso> concursosFixture() => [

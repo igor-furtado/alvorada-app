@@ -68,6 +68,7 @@ abstract final class AppComponentRegistry {
       category: AppComponentCategory.organism,
     ),
     AppComponentDefinition(name: 'Field', interfaceName: 'AppField', category: AppComponentCategory.molecule),
+    AppComponentDefinition(name: 'Form', interfaceName: 'AppForm', category: AppComponentCategory.organism),
     AppComponentDefinition(
       name: 'Hover Card',
       interfaceName: 'AppHoverCard',

@@ -44,7 +44,6 @@ class _SubtopicosFormContent extends StatefulWidget {
 }
 
 class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
-  final _formKey = GlobalKey<FormState>();
   final _nameFocus = FocusNode();
   late final TextEditingController _nameController = TextEditingController(
     text: widget.subtopico?.name,
@@ -62,8 +61,7 @@ class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
     listenWhen: (previous, current) =>
         previous.status != current.status && current.status == SubtopicosFormStatus.success,
     listener: (context, state) => Navigator.pop(context, true),
-    builder: (context, state) => AppValidatedForm(
-      formKey: _formKey,
+    builder: (context, state) => AppForm(
       firstInvalidFocusNode: () => _nameFocus,
       onSubmit: () async {
         final bloc = context.read<SubtopicosFormBloc>()..add(SubtopicosFormSubmitted(_nameController.text.trim()));
@@ -71,7 +69,24 @@ class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
           (state) => state.status == SubtopicosFormStatus.success || state.status == SubtopicosFormStatus.failure,
         );
       },
-      builder: (context, submitting, submit) => AppDrawer(
+      contentBuilder: (context, submitting, submit) => [
+        AppField(
+          label: AppMessages.name,
+          errorText: state.errorMessage,
+          required: true,
+          control: AppTextInput(
+            controller: _nameController,
+            focusNode: _nameFocus,
+            errorText: state.errorMessage,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => submit(),
+            validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
+            semanticLabel: '${AppMessages.name}, ${AppMessages.requiredSuffix}',
+          ),
+        ),
+      ],
+      builder: (context, submitting, submit, content) => AppDrawer(
         title: widget.subtopico == null ? AppMessages.addSubtopic : AppMessages.editSubtopic,
         dismissible: !submitting,
         primaryLabel: widget.subtopico == null ? AppMessages.addSubtopic : AppMessages.saveChanges,
@@ -79,17 +94,7 @@ class _SubtopicosFormContentState extends State<_SubtopicosFormContent> {
         loading: submitting,
         secondaryLabel: AppMessages.cancel,
         onSecondary: submitting ? null : () => Navigator.pop(context),
-        child: AppFormField(
-          label: AppMessages.name,
-          errorText: state.errorMessage,
-          controller: _nameController,
-          focusNode: _nameFocus,
-          autofocus: true,
-          required: true,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => submit(),
-          validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
-        ),
+        child: content,
       ),
     ),
   );

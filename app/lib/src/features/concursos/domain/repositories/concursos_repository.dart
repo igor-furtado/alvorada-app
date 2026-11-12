@@ -6,6 +6,8 @@ abstract interface class ConcursosRepository {
 
   Future<Concurso> createConcurso(CreateConcursoInput input);
 
+  Future<void> updateConcurso(String id, UpdateConcursoInput input);
+
   Future<void> setPrioritario(String id);
 
   Future<void> archiveConcurso(String id);

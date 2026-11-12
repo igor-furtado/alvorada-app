@@ -32,11 +32,32 @@ void main() {
     expect(created.id, 'concurso-1');
     expect(api.createdBody?['data_prova'], '2026-12-13');
   });
+
+  test('atualiza os dados e renova o cache', () async {
+    final api = _FakeApi();
+    final repository = ApiConcursosRepository(api);
+    await repository.getConcursos();
+
+    await repository.updateConcurso(
+      'concurso-1',
+      UpdateConcursoInput(
+        instituicao: 'TRF da 5ª Região',
+        cargo: 'Analista Judiciário',
+        dataProva: DateTime(2027, 1, 31),
+        prioritario: true,
+      ),
+    );
+
+    expect(api.updatedBody?['data_prova'], '2027-01-31');
+    expect(api.updatedBody?['prioritario'], isTrue);
+    expect(api.getCalls, 2);
+  });
 }
 
 class _FakeApi implements ConcursosApi {
   int getCalls = 0;
   Map<String, Object?>? createdBody;
+  Map<String, Object?>? updatedBody;
 
   @override
   Future<List<ConcursoApiModel>> getConcursos() async {
@@ -48,6 +69,11 @@ class _FakeApi implements ConcursosApi {
   Future<String> createConcurso(Map<String, Object?> body) async {
     createdBody = body;
     return 'concurso-1';
+  }
+
+  @override
+  Future<void> updateConcurso(String id, Map<String, Object?> body) async {
+    updatedBody = body;
   }
 
   @override

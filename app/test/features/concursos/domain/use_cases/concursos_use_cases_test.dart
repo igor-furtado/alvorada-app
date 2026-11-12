@@ -89,6 +89,68 @@ void main() {
     );
   });
 
+  test('edita o Concurso sem alterar o progresso do Edital', () async {
+    final repository = FakeConcursosRepository(concursos: concursosFixture());
+    final useCases = ConcursosUseCases(repository);
+
+    final result = await useCases.updateConcurso(
+      'trf5',
+      const UpdateConcursoInput(
+        instituicao: '  TRF da 5ª Região  ',
+        cargo: '  Analista Judiciário  ',
+        banca: '  FGV  ',
+        prioritario: true,
+        sigla: '  TRF5  ',
+        quantidadeVagas: 25,
+        vencimentoCentavos: 1234567,
+        cargaHorariaSemanal: 40,
+        localProva: '  Recife/PE  ',
+        horarioInicioProva: ' 13:00 ',
+        horarioFimProva: ' 18:00 ',
+        requisitos: '  Nível superior  ',
+        criteriosPontuacao: '  Pesos por bloco  ',
+      ),
+    );
+    final concursos = await repository.getConcursos();
+    final updated = concursos.firstWhere((item) => item.id == 'trf5');
+    final previousPriority = concursos.firstWhere((item) => item.id == 'camara');
+
+    expect(result, isA<Sucesso<void>>());
+    expect(updated.instituicao, 'TRF da 5ª Região');
+    expect(updated.cargo, 'Analista Judiciário');
+    expect(updated.banca, 'FGV');
+    expect(updated.progressoEdital, 72);
+    expect(updated.prioritario, isTrue);
+    expect(previousPriority.prioritario, isFalse);
+    expect(updated.sigla, 'TRF5');
+    expect(updated.quantidadeVagas, 25);
+    expect(updated.vencimentoCentavos, 1234567);
+    expect(updated.localProva, 'Recife/PE');
+    expect(updated.horarioInicioProva, '13:00');
+    expect(updated.requisitos, 'Nível superior');
+  });
+
+  test('rejeita horários de prova incompletos', () async {
+    final useCases = ConcursosUseCases(FakeConcursosRepository());
+
+    final result = await useCases.createConcurso(
+      const CreateConcursoInput(
+        instituicao: 'TRF da 5ª Região',
+        cargo: 'Técnico Judiciário',
+        horarioInicioProva: '13:00',
+      ),
+    );
+
+    expect(
+      result,
+      isA<ViolacaoRegra<Concurso>>().having(
+        (failure) => failure.codigo,
+        'código',
+        ConcursosResultadoCodes.horariosProvaInvalidos,
+      ),
+    );
+  });
+
   test('traduz falha de sincronização ao arquivar', () async {
     final repository = FakeConcursosRepository(
       concursos: concursosFixture(),

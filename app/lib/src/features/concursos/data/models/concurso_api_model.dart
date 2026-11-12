@@ -10,6 +10,15 @@ class ConcursoApiModel {
     required this.dataProva,
     required this.prioritario,
     required this.progressoEdital,
+    this.sigla,
+    this.quantidadeVagas,
+    this.vencimentoCentavos,
+    this.cargaHorariaSemanal,
+    this.localProva,
+    this.horarioInicioProva,
+    this.horarioFimProva,
+    this.requisitos,
+    this.criteriosPontuacao,
   });
 
   factory ConcursoApiModel.fromJson(Map<String, Object?> json) => ConcursoApiModel(
@@ -20,6 +29,15 @@ class ConcursoApiModel {
     dataProva: readJsonNullableString(json, 'data_prova'),
     prioritario: readJsonBoolean(json, 'prioritario'),
     progressoEdital: readJsonInteger(json, 'progresso_edital'),
+    sigla: readJsonNullableString(json, 'sigla'),
+    quantidadeVagas: readJsonNullableInteger(json, 'quantidade_vagas'),
+    vencimentoCentavos: readJsonNullableInteger(json, 'vencimento_centavos'),
+    cargaHorariaSemanal: readJsonNullableInteger(json, 'carga_horaria_semanal'),
+    localProva: readJsonNullableString(json, 'local_prova'),
+    horarioInicioProva: readJsonNullableString(json, 'horario_inicio_prova'),
+    horarioFimProva: readJsonNullableString(json, 'horario_fim_prova'),
+    requisitos: readJsonNullableString(json, 'requisitos'),
+    criteriosPontuacao: readJsonNullableString(json, 'criterios_pontuacao'),
   );
 
   final String id;
@@ -29,6 +47,15 @@ class ConcursoApiModel {
   final String? dataProva;
   final bool prioritario;
   final int progressoEdital;
+  final String? sigla;
+  final int? quantidadeVagas;
+  final int? vencimentoCentavos;
+  final int? cargaHorariaSemanal;
+  final String? localProva;
+  final String? horarioInicioProva;
+  final String? horarioFimProva;
+  final String? requisitos;
+  final String? criteriosPontuacao;
 
   Concurso toDomain() => Concurso(
     id: id,
@@ -38,5 +65,14 @@ class ConcursoApiModel {
     dataProva: dataProva == null ? null : DateTime.parse(dataProva!),
     prioritario: prioritario,
     progressoEdital: progressoEdital,
+    sigla: sigla,
+    quantidadeVagas: quantidadeVagas,
+    vencimentoCentavos: vencimentoCentavos,
+    cargaHorariaSemanal: cargaHorariaSemanal,
+    localProva: localProva,
+    horarioInicioProva: horarioInicioProva,
+    horarioFimProva: horarioFimProva,
+    requisitos: requisitos,
+    criteriosPontuacao: criteriosPontuacao,
   );
 }

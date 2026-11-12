@@ -18,6 +18,14 @@ int readJsonInteger(Map<String, Object?> json, String key) {
   );
 }
 
+int? readJsonNullableInteger(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value == null || value is int) return value as int?;
+  throw FormatException(
+    'O campo "$key" da API deve ser um número inteiro ou nulo.',
+  );
+}
+
 bool readJsonBoolean(Map<String, Object?> json, String key) {
   final value = json[key];
   if (value is bool) return value;

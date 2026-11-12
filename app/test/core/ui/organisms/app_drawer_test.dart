@@ -122,6 +122,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
   });
+
+  testWidgets('formulário não fecha ao tocar o fundo e fecha com Esc quando ocioso', (tester) async {
+    await _pumpDismissibilityLauncher(tester, width: 390, height: 844);
+
+    await tester.tap(find.text('Abrir formulário'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
+  });
 }
 
 Future<void> _pumpDrawerLauncher(

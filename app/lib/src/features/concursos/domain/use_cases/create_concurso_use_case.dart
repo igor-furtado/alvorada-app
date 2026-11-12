@@ -11,43 +11,27 @@ class CreateConcursoUseCase {
   final ConcursosRepository _repository;
 
   Future<Resultado<Concurso>> call(CreateConcursoInput input) {
-    final instituicao = input.instituicao.trim();
-    final cargo = input.cargo.trim();
-    final banca = input.banca?.trim();
-    final instituicaoInvalida = validarTextoConcurso<Concurso>(
-      instituicao,
-      mensagemObrigatorio: 'Informe o órgão ou instituição do Concurso.',
-      codigoObrigatorio: ConcursosResultadoCodes.instituicaoObrigatoria,
-      limite: 160,
-      mensagemMuitoLongo: 'O órgão ou instituição deve ter no máximo 160 caracteres.',
-      codigoMuitoLongo: ConcursosResultadoCodes.instituicaoMuitoLonga,
-    );
-    if (instituicaoInvalida != null) return Future.value(instituicaoInvalida);
-    final cargoInvalido = validarTextoConcurso<Concurso>(
-      cargo,
-      mensagemObrigatorio: 'Informe o cargo do Concurso.',
-      codigoObrigatorio: ConcursosResultadoCodes.cargoObrigatorio,
-      limite: 160,
-      mensagemMuitoLongo: 'O cargo deve ter no máximo 160 caracteres.',
-      codigoMuitoLongo: ConcursosResultadoCodes.cargoMuitoLongo,
-    );
-    if (cargoInvalido != null) return Future.value(cargoInvalido);
-    if (banca != null && banca.runes.length > 120) {
-      return Future.value(
-        const ViolacaoRegra(
-          codigo: ConcursosResultadoCodes.bancaMuitoLonga,
-          mensagem: 'A banca deve ter no máximo 120 caracteres.',
-        ),
-      );
-    }
+    final normalizado = normalizarConcursoInput<Concurso>(input);
+    final erro = normalizado.erro;
+    if (erro != null) return Future.value(erro);
+    final valor = normalizado.valor!;
     return executarConcursosUseCase(
       operacao: () => _repository.createConcurso(
         CreateConcursoInput(
-          instituicao: instituicao,
-          cargo: cargo,
-          banca: banca == null || banca.isEmpty ? null : banca,
-          dataProva: input.dataProva,
-          prioritario: input.prioritario,
+          instituicao: valor.instituicao,
+          cargo: valor.cargo,
+          banca: valor.banca,
+          dataProva: valor.dataProva,
+          prioritario: valor.prioritario,
+          sigla: valor.sigla,
+          quantidadeVagas: valor.quantidadeVagas,
+          vencimentoCentavos: valor.vencimentoCentavos,
+          cargaHorariaSemanal: valor.cargaHorariaSemanal,
+          localProva: valor.localProva,
+          horarioInicioProva: valor.horarioInicioProva,
+          horarioFimProva: valor.horarioFimProva,
+          requisitos: valor.requisitos,
+          criteriosPontuacao: valor.criteriosPontuacao,
         ),
       ),
       codigoFalha: ConcursosResultadoCodes.criacaoFalhou,

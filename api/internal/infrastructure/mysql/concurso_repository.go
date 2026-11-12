@@ -18,7 +18,10 @@ func NewConcursoRepository(db *sql.DB) *ConcursoRepository {
 
 func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital
+		SELECT id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital,
+			sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal,
+			local_prova, TIME_FORMAT(horario_inicio_prova, '%H:%i'),
+			TIME_FORMAT(horario_fim_prova, '%H:%i'), requisitos, criterios_pontuacao
 		FROM concursos
 		WHERE arquivado_em IS NULL
 		ORDER BY data_prova IS NULL, data_prova, criado_em, id`)
@@ -32,6 +35,8 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 		var concurso domain.Concurso
 		var banca sql.NullString
 		var dataProva sql.NullTime
+		var sigla, localProva, horarioInicio, horarioFim, requisitos, criterios sql.NullString
+		var quantidadeVagas, vencimentoCentavos, cargaHoraria sql.NullInt64
 		if err := rows.Scan(
 			&concurso.ID,
 			&concurso.Instituicao,
@@ -40,6 +45,15 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 			&dataProva,
 			&concurso.Prioritario,
 			&concurso.ProgressoEdital,
+			&sigla,
+			&quantidadeVagas,
+			&vencimentoCentavos,
+			&cargaHoraria,
+			&localProva,
+			&horarioInicio,
+			&horarioFim,
+			&requisitos,
+			&criterios,
 		); err != nil {
 			return nil, fmt.Errorf("scan concurso: %w", err)
 		}
@@ -48,6 +62,35 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 		}
 		if dataProva.Valid {
 			concurso.DataProva = &dataProva.Time
+		}
+		if sigla.Valid {
+			concurso.Sigla = &sigla.String
+		}
+		if quantidadeVagas.Valid {
+			value := int(quantidadeVagas.Int64)
+			concurso.QuantidadeVagas = &value
+		}
+		if vencimentoCentavos.Valid {
+			concurso.VencimentoCentavos = &vencimentoCentavos.Int64
+		}
+		if cargaHoraria.Valid {
+			value := int(cargaHoraria.Int64)
+			concurso.CargaHorariaSemanal = &value
+		}
+		if localProva.Valid {
+			concurso.LocalProva = &localProva.String
+		}
+		if horarioInicio.Valid {
+			concurso.HorarioInicioProva = &horarioInicio.String
+		}
+		if horarioFim.Valid {
+			concurso.HorarioFimProva = &horarioFim.String
+		}
+		if requisitos.Valid {
+			concurso.Requisitos = &requisitos.String
+		}
+		if criterios.Valid {
+			concurso.CriteriosPontuacao = &criterios.String
 		}
 		result = append(result, concurso)
 	}
@@ -74,14 +117,27 @@ func (r *ConcursoRepository) Create(ctx context.Context, input domain.CreateConc
 		}
 	}
 	if _, err := tx.ExecContext(ctx, `
-		INSERT INTO concursos (id, instituicao, cargo, banca, data_prova, prioritario)
-		VALUES (?, ?, ?, ?, ?, ?)`,
+		INSERT INTO concursos (
+			id, instituicao, cargo, banca, data_prova, prioritario, sigla,
+			quantidade_vagas, vencimento_centavos, carga_horaria_semanal,
+			local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao
+		)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		id,
 		input.Instituicao,
 		input.Cargo,
 		input.Banca,
 		input.DataProva,
 		input.Prioritario,
+		input.Sigla,
+		input.QuantidadeVagas,
+		input.VencimentoCentavos,
+		input.CargaHorariaSemanal,
+		input.LocalProva,
+		input.HorarioInicioProva,
+		input.HorarioFimProva,
+		input.Requisitos,
+		input.CriteriosPontuacao,
 	); err != nil {
 		return "", fmt.Errorf("insert concurso: %w", err)
 	}
@@ -89,6 +145,75 @@ func (r *ConcursoRepository) Create(ctx context.Context, input domain.CreateConc
 		return "", fmt.Errorf("commit create concurso transaction: %w", err)
 	}
 	return id, nil
+}
+
+func (r *ConcursoRepository) Update(ctx context.Context, id string, input domain.UpdateConcursoInput) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin update concurso transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if input.Prioritario {
+		if _, err := tx.ExecContext(ctx, `UPDATE concursos SET prioritario = 0 WHERE prioritario = 1`); err != nil {
+			return fmt.Errorf("clear concurso prioritario: %w", err)
+		}
+	}
+	result, err := tx.ExecContext(ctx, `
+		UPDATE concursos
+		SET instituicao = ?, cargo = ?, banca = ?, data_prova = ?, prioritario = ?,
+			sigla = ?, quantidade_vagas = ?, vencimento_centavos = ?, carga_horaria_semanal = ?,
+			local_prova = ?, horario_inicio_prova = ?, horario_fim_prova = ?,
+			requisitos = ?, criterios_pontuacao = ?
+		WHERE id = ? AND arquivado_em IS NULL`,
+		input.Instituicao,
+		input.Cargo,
+		input.Banca,
+		input.DataProva,
+		input.Prioritario,
+		input.Sigla,
+		input.QuantidadeVagas,
+		input.VencimentoCentavos,
+		input.CargaHorariaSemanal,
+		input.LocalProva,
+		input.HorarioInicioProva,
+		input.HorarioFimProva,
+		input.Requisitos,
+		input.CriteriosPontuacao,
+		id,
+	)
+	if err != nil {
+		return fmt.Errorf("update concurso: %w", err)
+	}
+	if err := requireUpdatedOrExisting(ctx, tx, result, id); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit update concurso transaction: %w", err)
+	}
+	return nil
+}
+
+func requireUpdatedOrExisting(ctx context.Context, tx *sql.Tx, result sql.Result, id string) error {
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("read concurso update rows affected: %w", err)
+	}
+	if affected > 0 {
+		return nil
+	}
+	var exists bool
+	if err := tx.QueryRowContext(
+		ctx,
+		`SELECT EXISTS(SELECT 1 FROM concursos WHERE id = ? AND arquivado_em IS NULL)`,
+		id,
+	).Scan(&exists); err != nil {
+		return fmt.Errorf("check concurso after update: %w", err)
+	}
+	if !exists {
+		return domain.ErrConcursoNotFound
+	}
+	return nil
 }
 
 func (r *ConcursoRepository) SetPrioritario(ctx context.Context, id string) error {

@@ -27,6 +27,22 @@ abstract final class ConcursosListActions {
     }
   }
 
+  static Future<void> edit(BuildContext context, Concurso concurso) async {
+    final saved = await showAppDrawerBuilder<bool>(
+      context,
+      builder: (_) => ConcursosFormView(concurso: concurso),
+    );
+    if (saved == true && context.mounted) {
+      context.read<ConcursosListBloc>().add(
+        const ConcursosListRefreshRequested(
+          feedback: ConcursosListFeedback(
+            ConcursosListFeedbackType.updated,
+          ),
+        ),
+      );
+    }
+  }
+
   static void details(BuildContext context, Concurso concurso) {
     context.go(
       '/concursos/${Uri.encodeComponent(concurso.id)}',

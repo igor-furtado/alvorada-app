@@ -11,6 +11,8 @@ abstract interface class ConcursosApi {
 
   Future<String> createConcurso(Map<String, Object?> body);
 
+  Future<void> updateConcurso(String id, Map<String, Object?> body);
+
   Future<void> setPrioritario(String id);
 
   Future<void> archiveConcurso(String id);
@@ -58,6 +60,10 @@ class ConcursosApiService implements ConcursosApi {
   }
 
   @override
+  Future<void> updateConcurso(String id, Map<String, Object?> body) =>
+      _sendEmpty('PUT', '/api/v1/concursos/${Uri.encodeComponent(id)}', body: body);
+
+  @override
   Future<void> setPrioritario(String id) =>
       _sendEmpty('PUT', '/api/v1/concursos/${Uri.encodeComponent(id)}/prioridade');
 
@@ -72,8 +78,16 @@ class ConcursosApiService implements ConcursosApi {
   @override
   Future<void> deleteConcurso(String id) => _sendEmpty('DELETE', '/api/v1/concursos/${Uri.encodeComponent(id)}');
 
-  Future<void> _sendEmpty(String method, String path) async {
+  Future<void> _sendEmpty(
+    String method,
+    String path, {
+    Map<String, Object?>? body,
+  }) async {
     final request = http.Request(method, _uri(path));
+    if (body != null) {
+      request.headers.addAll(_jsonHeaders);
+      request.body = jsonEncode(body);
+    }
     final response = await http.Response.fromStream(await _client.send(request));
     _decode(response, expectedStatus: 204);
   }

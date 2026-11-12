@@ -5,7 +5,7 @@ O Prumo organiza Concursos e Disciplinas em um catálogo compartilhado. Seu voca
 ## Concursos
 
 **Concurso**:
-O concurso-alvo que reúne cargo, instituição organizadora, data de prova, dados de inscrição e um Edital. Uma pessoa pode manter mais de um Concurso.
+O concurso-alvo que reúne órgão, cargo ou especialidade, condições de ingresso, vagas, remuneração, jornada, prova, critérios de pontuação, dados de inscrição e um Edital. Uma pessoa pode manter mais de um Concurso.
 _Evitar_: Concurso cadastrado, projeto, meta
 
 **Concurso prioritário**:

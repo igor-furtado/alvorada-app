@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
+import '../atoms/app_text_input.dart';
 
 class AppCombobox<T extends Object> extends StatelessWidget {
   const AppCombobox({
@@ -30,15 +31,13 @@ class AppCombobox<T extends Object> extends StatelessWidget {
       return options.where((option) => displayStringForOption(option).toLowerCase().contains(query));
     },
     onSelected: onSelected,
-    fieldViewBuilder: (context, controller, focusNode, onSubmitted) => TextFormField(
+    fieldViewBuilder: (context, controller, focusNode, onSubmitted) => AppTextInput(
       controller: controller,
       focusNode: focusNode,
-      onFieldSubmitted: (_) => onSubmitted(),
-      style: context.tokens.typography.bodySmall.copyWith(color: context.tokens.colors.onSurface),
-      decoration: InputDecoration(
-        hintText: placeholder,
-        suffixIcon: Icon(AppIcons.expandMore, size: context.tokens.icons.md),
-      ),
+      onSubmitted: (_) => onSubmitted(),
+      placeholder: placeholder,
+      semanticLabel: placeholder,
+      suffixIcon: Icon(AppIcons.expandMore, size: context.tokens.icons.md),
     ),
     optionsViewBuilder: (context, select, options) => Align(
       alignment: Alignment.topLeft,

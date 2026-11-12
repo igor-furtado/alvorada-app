@@ -11,6 +11,7 @@ class ConcursosTimelineActions {
   const ConcursosTimelineActions({
     required this.details,
     required this.openEdital,
+    required this.edit,
     required this.prioritize,
     required this.archive,
     required this.delete,
@@ -18,6 +19,7 @@ class ConcursosTimelineActions {
 
   final ConcursoAction details;
   final ConcursoAction openEdital;
+  final ConcursoAction edit;
   final ConcursoAction prioritize;
   final ConcursoAction archive;
   final ConcursoAction delete;
@@ -89,6 +91,7 @@ class ConcursosTimeline extends StatelessWidget {
               enabled: enabled,
               onDetails: () => actions.details(concursos[index]),
               onOpenEdital: () => actions.openEdital(concursos[index]),
+              onEdit: () => actions.edit(concursos[index]),
               onPrioritize: () => actions.prioritize(concursos[index]),
               onArchive: () => actions.archive(concursos[index]),
               onDelete: () => actions.delete(concursos[index]),
