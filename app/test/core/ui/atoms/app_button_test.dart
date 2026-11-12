@@ -38,4 +38,61 @@ void main() {
     expect(buttonHeight, inputHeight);
     expect(buttonHeight, AppTheme.light.extension<AppTokens>()!.layout.controlHeight);
   });
+
+  testWidgets('mantém a mesma altura interna com e sem ícone', (tester) async {
+    const plainInputKey = ValueKey('plain-input');
+    const iconInputKey = ValueKey('icon-input');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 240,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppTextInput(key: plainInputKey),
+                  AppTextInput(
+                    key: iconInputKey,
+                    prefixIcon: AppIcon(AppIcons.search),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final plainInputHeight = _inputContainerHeight(tester, plainInputKey);
+    final iconInputHeight = _inputContainerHeight(tester, iconInputKey);
+    final controlHeight = AppTheme.light.extension<AppTokens>()!.layout.controlHeight;
+    final plainField = tester.widget<TextField>(
+      find.descendant(
+        of: find.byKey(plainInputKey),
+        matching: find.byType(TextField),
+      ),
+    );
+    final plainDecoration = plainField.decoration!;
+
+    expect(plainInputHeight, controlHeight);
+    expect(iconInputHeight, controlHeight);
+    expect(plainDecoration.prefixIcon, isNotNull);
+    expect(
+      plainDecoration.prefixIconConstraints,
+      BoxConstraints.tightFor(width: 0, height: controlHeight),
+    );
+  });
+}
+
+double _inputContainerHeight(WidgetTester tester, ValueKey<String> key) {
+  final editable = find.descendant(
+    of: find.byKey(key),
+    matching: find.byType(EditableText),
+  );
+  final container = InputDecorator.containerOf(tester.element(editable));
+
+  return container!.size.height;
 }

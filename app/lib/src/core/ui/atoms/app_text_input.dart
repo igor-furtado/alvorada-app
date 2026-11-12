@@ -52,34 +52,46 @@ class AppTextInput extends StatelessWidget {
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: semanticLabel,
-    textField: true,
-    enabled: enabled,
-    child: TextFormField(
-      controller: controller,
-      initialValue: initialValue,
-      focusNode: focusNode,
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final effectiveMaxLines = obscureText ? 1 : maxLines;
+    final needsHeightAnchor = minLines == 1 && effectiveMaxLines == 1 && prefixIcon == null && suffixIcon == null;
+
+    return Semantics(
+      label: semanticLabel,
+      textField: true,
       enabled: enabled,
-      obscureText: obscureText,
-      autofocus: autofocus,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      textAlign: textAlign,
-      textInputAction: textInputAction,
-      validator: validator,
-      autovalidateMode: autovalidateMode,
-      onChanged: onChanged,
-      onFieldSubmitted: onSubmitted,
-      minLines: minLines,
-      maxLines: obscureText ? 1 : maxLines,
-      style: context.tokens.typography.labelLarge,
-      forceErrorText: errorText,
-      decoration: InputDecoration(
-        hintText: placeholder,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
+      child: TextFormField(
+        controller: controller,
+        initialValue: initialValue,
+        focusNode: focusNode,
+        enabled: enabled,
+        obscureText: obscureText,
+        autofocus: autofocus,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
+        textAlign: textAlign,
+        textInputAction: textInputAction,
+        validator: validator,
+        autovalidateMode: autovalidateMode,
+        onChanged: onChanged,
+        onFieldSubmitted: onSubmitted,
+        minLines: minLines,
+        maxLines: effectiveMaxLines,
+        style: tokens.typography.labelLarge,
+        forceErrorText: errorText,
+        decoration: InputDecoration(
+          hintText: placeholder,
+          prefixIcon: needsHeightAnchor ? const SizedBox.shrink() : prefixIcon,
+          prefixIconConstraints: needsHeightAnchor
+              ? BoxConstraints.tightFor(
+                  width: 0,
+                  height: tokens.layout.controlHeight,
+                )
+              : null,
+          suffixIcon: suffixIcon,
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
