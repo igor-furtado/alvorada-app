@@ -80,6 +80,7 @@ class _AppResizableState extends State<AppResizable> {
           children: [
             Row(
               textDirection: textDirection,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(width: firstExtent, child: widget.first),
                 SizedBox(width: dividerExtent),
@@ -100,6 +101,7 @@ class _AppResizableState extends State<AppResizable> {
       return Stack(
         children: [
           Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: firstExtent, child: widget.first),
               SizedBox(height: dividerExtent),

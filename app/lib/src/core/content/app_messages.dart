@@ -40,6 +40,7 @@ abstract final class AppMessages {
   static const undo = 'Desfazer';
 
   static const novoConcurso = 'Novo Concurso';
+  static const novoConcursoDescription = 'Cadastre os dados principais e as informações da prova.';
   static const concurso = 'Concurso';
   static const concursoPrioritario = 'Concurso prioritário';
   static const concursosSubtitle = 'Seus concursos-alvo em ordem de prova.';
@@ -77,6 +78,7 @@ abstract final class AppMessages {
   static const concursoPrioritarioHelp = 'Ele receberá prioridade quando as horas não comportarem todo o escopo.';
   static const criarConcurso = 'Criar Concurso';
   static const editarConcurso = 'Editar Concurso';
+  static const editarConcursoDescription = 'Atualize os dados e as informações deste Concurso.';
   static const toBeDefined = 'A definir';
   static const excluirConcurso = 'Excluir Concurso';
   static const excluirConcursoQuestion = 'Excluir Concurso?';
@@ -99,6 +101,7 @@ abstract final class AppMessages {
   static const concursosSincronizacaoPendente = 'Alteração salva. Atualize para ver os Concursos mais recentes.';
   static const newDiscipline = 'Nova Disciplina';
   static const newDisciplineDescription = 'Adicione uma Disciplina para organizar seus Tópicos.';
+  static const editDisciplineDescription = 'Atualize o nome da Disciplina no catálogo compartilhado.';
   static const disciplineNameExample = 'Ex.: Língua Portuguesa';
   static const main = 'Principal';
   static const disciplineName = 'Nome';
@@ -107,21 +110,22 @@ abstract final class AppMessages {
   static const concursoNaoEncontrado = 'Concurso não encontrado';
   static const contentCatalog = 'Disciplinas';
   static const contentCatalogSubtitle = 'Catálogo de Disciplinas e Tópicos compartilhado entre Concursos.';
-  static const searchContent = 'Buscar Disciplina ou Tópico';
-  static const orderDisciplines = 'Ordenar Disciplinas';
-  static const defaultDisciplineOrder = 'Ordem padrão';
-  static const alphabeticalDisciplineOrder = 'Ordem alfabética';
+  static const searchContent = 'Buscar Disciplinas e Tópicos';
   static const addDiscipline = 'Adicionar Disciplina';
   static const addTopic = 'Adicionar Tópico';
+  static const addTopicDescription = 'Adicione um Tópico à Disciplina selecionada.';
   static const rename = 'Renomear';
   static const editDiscipline = 'Editar Disciplina';
   static const editTopic = 'Editar Tópico';
+  static const editTopicDescription = 'Atualize o nome do Tópico no catálogo compartilhado.';
   static const saveChanges = 'Salvar alterações';
+  static const deleteDiscipline = 'Excluir Disciplina';
   static const deleteDisciplineQuestion = 'Excluir Disciplina?';
   static const deleteTopicQuestion = 'Excluir Tópico?';
   static const noContentFound = 'Nenhuma Disciplina';
   static const noContentFoundMessage = 'Adicione uma Disciplina para começar.';
   static const mandatoryTopic = 'Tópico obrigatório';
+  static const mandatory = 'Obrigatório';
   static const protected = 'Protegido';
   static const topics = 'Tópicos';
   static const loadingDisciplines = 'Carregando Disciplinas';
@@ -150,6 +154,8 @@ abstract final class AppMessages {
   static String disciplineResults(int count) => _count(count, 'Disciplina', 'Disciplinas');
 
   static String topicCount(int count) => _count(count, 'Tópico', 'Tópicos');
+
+  static String topicCountInCatalog(int count) => '${topicCount(count)} no catálogo.';
 
   static String disciplineDeletedImpact(String name) =>
       '$name e seus Tópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';

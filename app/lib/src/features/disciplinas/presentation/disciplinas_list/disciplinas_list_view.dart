@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import 'disciplinas_list_actions.dart';
 import 'disciplinas_list_bloc.dart';
@@ -10,9 +11,7 @@ import 'disciplinas_list_panel.dart';
 import 'disciplinas_list_state.dart';
 
 class DisciplinasListView extends StatelessWidget {
-  const DisciplinasListView({required this.horizontal, super.key});
-
-  final bool horizontal;
+  const DisciplinasListView({super.key});
 
   @override
   Widget build(BuildContext context) => BlocConsumer<DisciplinasListBloc, DisciplinasListState>(
@@ -22,13 +21,12 @@ class DisciplinasListView extends StatelessWidget {
         previous.status != current.status ||
         previous.items != current.items ||
         previous.query != current.query ||
-        previous.order != current.order ||
         previous.selectedDisciplineId != current.selectedDisciplineId ||
         previous.isRefreshing != current.isRefreshing ||
         previous.isDeleting != current.isDeleting,
     builder: (context, state) => switch (state.status) {
-      DisciplinasListStatus.loading => const AppSkeleton(
-        height: double.infinity,
+      DisciplinasListStatus.loading => AppSkeleton(
+        height: context.tokens.sizes.listItemHeaderHeight,
         semanticLabel: AppMessages.loadingDisciplines,
       ),
       DisciplinasListStatus.failure => AppStateView(
@@ -38,11 +36,8 @@ class DisciplinasListView extends StatelessWidget {
       ),
       _ => DisciplinasListPanel(
         state: state,
-        horizontal: horizontal,
-        onOrderChanged: (order) => context.read<DisciplinasListBloc>().add(DisciplinasListOrderChanged(order)),
+        onAdd: () => DisciplinasListActions.add(context),
         onSelect: (item) => context.read<DisciplinasListBloc>().add(DisciplinasListSelectionChanged(item.id)),
-        onRename: (item) => DisciplinasListActions.rename(context, item),
-        onDelete: (item) => DisciplinasListActions.delete(context, item),
       ),
     },
   );

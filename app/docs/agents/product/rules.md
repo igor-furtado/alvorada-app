@@ -35,7 +35,7 @@ O produto organiza Concursos e Disciplinas. Ele mantém os dados dos Concursos e
 
 ## Disciplinas
 
-- A área Disciplinas preserva a ordem do catálogo por padrão e oferece ordenação alfabética sem alterar a ordem persistida.
+- A área Disciplinas preserva a ordem do catálogo.
 - Uma Disciplina contém Tópicos.
 - Cada Tópico compartilhado entre Editais existe uma única vez no catálogo.
 - Não é permitido excluir uma Disciplina ou um Tópico usado por algum Edital.

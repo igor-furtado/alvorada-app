@@ -56,6 +56,23 @@ void main() {
     );
   });
 
+  testWidgets('estende os dois painéis por todo o eixo transversal', (tester) async {
+    await _pumpResizable(
+      tester,
+      const AppResizable(
+        first: SizedBox(key: ValueKey('short-first'), height: 40),
+        second: SizedBox(key: ValueKey('short-second'), height: 60),
+      ),
+    );
+
+    expect(tester.getSize(find.byKey(const ValueKey('short-first'))).height, 200);
+    expect(tester.getSize(find.byKey(const ValueKey('short-second'))).height, 200);
+    expect(
+      tester.getTopLeft(find.byKey(const ValueKey('short-first'))).dy,
+      tester.getTopLeft(find.byKey(const ValueKey('short-second'))).dy,
+    );
+  });
+
   testWidgets('permite ocultar a alça sem remover o divisor acessível', (tester) async {
     await _pumpResizable(
       tester,

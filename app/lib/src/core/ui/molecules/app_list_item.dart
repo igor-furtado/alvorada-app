@@ -5,7 +5,7 @@ import '../atoms/app_badge.dart';
 import '../atoms/app_icon.dart';
 import '../responsive/app_responsive.dart';
 
-enum AppListItemVariant { plain, outline, muted }
+enum AppListItemVariant { plain, outline, muted, primary }
 
 enum AppListItemSize { standard, sm, xs }
 
@@ -188,12 +188,21 @@ class _AppListItemState extends State<AppListItem> {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final interactive = widget.onTap != null;
-    final effectiveVariant = widget.selected ? AppListItemVariant.muted : widget.variant;
+    final effectiveVariant = widget.selected && widget.variant != AppListItemVariant.primary
+        ? AppListItemVariant.muted
+        : widget.variant;
     final background = switch (effectiveVariant) {
       AppListItemVariant.plain => tokens.colors.transparent,
       AppListItemVariant.outline => tokens.colors.surface,
       AppListItemVariant.muted => tokens.colors.surfaceSubtle,
+      AppListItemVariant.primary => tokens.colors.primary,
     };
+    final foreground = effectiveVariant == AppListItemVariant.primary
+        ? tokens.colors.onPrimary
+        : tokens.colors.onSurface;
+    final hoverBackground = effectiveVariant == AppListItemVariant.primary
+        ? tokens.colors.primary
+        : tokens.colors.surfaceSubtle;
     final borderColor = _focused
         ? tokens.colors.focusRing
         : effectiveVariant == AppListItemVariant.outline || widget.selected
@@ -213,12 +222,17 @@ class _AppListItemState extends State<AppListItem> {
       AppListItemSize.standard => tokens.typography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
       AppListItemSize.sm => tokens.typography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
       AppListItemSize.xs => tokens.typography.labelLarge,
-    };
-    final subtitleStyle = switch (widget.size) {
-      AppListItemSize.standard => tokens.typography.bodyMedium,
-      AppListItemSize.sm => tokens.typography.bodySmall,
-      AppListItemSize.xs => tokens.typography.labelMedium,
-    }.copyWith(color: tokens.colors.onSurfaceMuted);
+    }.copyWith(color: foreground);
+    final subtitleStyle =
+        switch (widget.size) {
+          AppListItemSize.standard => tokens.typography.bodyMedium,
+          AppListItemSize.sm => tokens.typography.bodySmall,
+          AppListItemSize.xs => tokens.typography.labelMedium,
+        }.copyWith(
+          color: effectiveVariant == AppListItemVariant.primary
+              ? tokens.colors.onPrimary.withValues(alpha: tokens.opacity.hint)
+              : tokens.colors.onSurfaceMuted,
+        );
     final effectiveMedia =
         widget.media ??
         (widget.leadingIcon == null
@@ -226,6 +240,7 @@ class _AppListItemState extends State<AppListItem> {
             : AppListItemMedia.icon(
                 widget.leadingIcon,
                 size: widget.size == AppListItemSize.xs ? AppIconSize.sm : AppIconSize.md,
+                color: foreground,
               ));
     final effectiveTrailing = widget.trailing ?? (widget.badge == null ? null : AppBadge(label: widget.badge!));
 
@@ -239,16 +254,18 @@ class _AppListItemState extends State<AppListItem> {
             SizedBox(width: gap),
           ],
           Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.title, style: titleStyle),
-                if (widget.subtitle != null) ...[
-                  SizedBox(height: tokens.spacing.xxxs),
-                  Text(widget.subtitle!, style: subtitleStyle),
+            child: ExcludeSemantics(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.title, style: titleStyle),
+                  if (widget.subtitle != null) ...[
+                    SizedBox(height: tokens.spacing.xxxs),
+                    Text(widget.subtitle!, style: subtitleStyle),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           if (effectiveTrailing != null) ...[
@@ -262,7 +279,7 @@ class _AppListItemState extends State<AppListItem> {
       key: const ValueKey('app-list-item-surface'),
       duration: context.motionDuration(tokens.motion.fast),
       decoration: BoxDecoration(
-        color: _hovered && interactive ? tokens.colors.surfaceSubtle : background,
+        color: _hovered && interactive ? hoverBackground : background,
         border: Border.all(
           color: borderColor,
           width: _focused ? tokens.borders.widthStrong : tokens.borders.widthHairline,

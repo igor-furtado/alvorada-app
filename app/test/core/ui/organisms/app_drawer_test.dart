@@ -98,15 +98,15 @@ void main() {
     expect(find.text('Abrir drawer'), findsOneWidget);
   });
 
-  testWidgets('bloqueia fundo e Esc durante loading sem impedir conclusão programática', (tester) async {
-    await _pumpDismissibilityLauncher(tester, width: 390, height: 844);
+  testWidgets('bloqueia clique externo e Esc durante loading sem impedir conclusão programática', (tester) async {
+    await _pumpDismissibilityLauncher(tester, width: 1440, height: 900);
 
     await tester.tap(find.text('Abrir formulário'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Salvar'));
     await tester.pump();
 
-    await tester.tapAt(const Offset(10, 10));
+    await tester.tapAt(const Offset(100, 450));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
 
@@ -119,17 +119,34 @@ void main() {
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
   });
 
-  testWidgets('formulário não fecha ao tocar o fundo e fecha com Esc quando ocioso', (tester) async {
+  testWidgets('clique no fundo interno remove o foco sem fechar o formulário', (tester) async {
     await _pumpDismissibilityLauncher(tester, width: 390, height: 844);
 
     await tester.tap(find.text('Abrir formulário'));
     await tester.pumpAndSettle();
-    await tester.tapAt(const Offset(10, 10));
+    final input = tester.widget<EditableText>(find.byType(EditableText));
+    await tester.tap(find.byType(EditableText));
+    await tester.pump();
+    expect(input.focusNode.hasFocus, isTrue);
+
+    await tester.tapAt(const Offset(200, 400));
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+    expect(input.focusNode.hasFocus, isFalse);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
+  });
+
+  testWidgets('clique fora fecha o formulário quando está ocioso', (tester) async {
+    await _pumpDismissibilityLauncher(tester, width: 1440, height: 900);
+
+    await tester.tap(find.text('Abrir formulário'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(100, 450));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
@@ -209,6 +226,7 @@ Future<void> _pumpNestedDrawerLauncher(
                 onPressed: () => showAppDrawer<void>(
                   context,
                   title: 'Escolha um filtro',
+                  description: 'Refine os resultados exibidos.',
                   child: const Text('Conteúdo'),
                 ),
               ),
@@ -263,13 +281,19 @@ class _DismissibilityDrawerState extends State<_DismissibilityDrawer> {
   @override
   Widget build(BuildContext context) => AppDrawer(
     title: 'Formulário',
+    description: 'Preencha os dados solicitados.',
     dismissible: !_loading,
     primaryLabel: 'Salvar',
     onPrimary: () => setState(() => _loading = true),
     loading: _loading,
-    child: AppButton(
-      label: 'Concluir',
-      onPressed: () => Navigator.pop(context),
+    child: Column(
+      children: [
+        const AppTextInput(autofocus: true),
+        AppButton(
+          label: 'Concluir',
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
     ),
   );
 }

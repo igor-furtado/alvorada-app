@@ -13,17 +13,14 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     required this.getDisciplinas,
     required this.deleteDisciplina,
     String initialQuery = '',
-    DisciplinasListOrder initialOrder = DisciplinasListOrder.catalog,
   }) : super(
          DisciplinasListState(
            query: initialQuery,
-           order: initialOrder,
          ),
        ) {
     on<DisciplinasListLoadRequested>(_onLoad);
     on<DisciplinasListRefreshRequested>(_onRefresh);
     on<DisciplinasListSearchChanged>(_onSearchChanged);
-    on<DisciplinasListOrderChanged>(_onOrderChanged);
     on<DisciplinasListSelectionChanged>(_onSelectionChanged);
     on<DisciplinasListDeleteRequested>(_onDelete);
   }
@@ -79,11 +76,6 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     DisciplinasListSearchChanged event,
     Emitter<DisciplinasListState> emit,
   ) => emit(_state(query: event.query, feedback: null));
-
-  void _onOrderChanged(
-    DisciplinasListOrderChanged event,
-    Emitter<DisciplinasListState> emit,
-  ) => emit(_state(order: event.order, feedback: null));
 
   void _onSelectionChanged(
     DisciplinasListSelectionChanged event,
@@ -142,18 +134,16 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
   DisciplinasListState _state({
     DisciplinasListStatus? status,
     String? query,
-    DisciplinasListOrder? order,
     bool? isRefreshing,
     bool? isDeleting,
     Object? feedback = _unchanged,
   }) {
     final effectiveQuery = query ?? state.query;
-    final effectiveOrder = order ?? state.order;
     if (_preferredDisciplineId != null && !_catalog.any((item) => item.id == _preferredDisciplineId)) {
       _preferredDisciplineId = null;
     }
     _preferredDisciplineId ??= _catalog.firstOrNull?.id;
-    final items = _visibleItems(effectiveQuery, effectiveOrder);
+    final items = _visibleItems(effectiveQuery);
     final selectedId = items.any((item) => item.id == _preferredDisciplineId)
         ? _preferredDisciplineId
         : items.firstOrNull?.id;
@@ -161,7 +151,6 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
       status: status ?? state.status,
       items: items,
       query: effectiveQuery,
-      order: effectiveOrder,
       selectedDisciplineId: selectedId,
       isRefreshing: isRefreshing ?? state.isRefreshing,
       isDeleting: isDeleting ?? state.isDeleting,
@@ -169,10 +158,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     );
   }
 
-  List<DisciplinaListItemData> _visibleItems(
-    String query,
-    DisciplinasListOrder order,
-  ) {
+  List<DisciplinaListItemData> _visibleItems(String query) {
     final normalizedQuery = query.trim().toLowerCase();
     final items = <DisciplinaListItemData>[
       for (final disciplina in _catalog)
@@ -183,13 +169,6 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
             topicCount: disciplina.topics.length,
           ),
     ];
-    if (order == DisciplinasListOrder.alphabetical) {
-      items.sort(
-        (left, right) => _alphabeticalKey(left.name).compareTo(
-          _alphabeticalKey(right.name),
-        ),
-      );
-    }
     return items;
   }
 
@@ -199,40 +178,3 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
 }
 
 const _unchanged = Object();
-
-String _alphabeticalKey(String value) {
-  const replacements = {
-    'á': 'a',
-    'à': 'a',
-    'â': 'a',
-    'ã': 'a',
-    'ä': 'a',
-    'å': 'a',
-    'ç': 'c',
-    'é': 'e',
-    'è': 'e',
-    'ê': 'e',
-    'ë': 'e',
-    'í': 'i',
-    'ì': 'i',
-    'î': 'i',
-    'ï': 'i',
-    'ñ': 'n',
-    'ó': 'o',
-    'ò': 'o',
-    'ô': 'o',
-    'õ': 'o',
-    'ö': 'o',
-    'ú': 'u',
-    'ù': 'u',
-    'û': 'u',
-    'ü': 'u',
-    'ý': 'y',
-    'ÿ': 'y',
-  };
-  final normalized = StringBuffer();
-  for (final character in value.toLowerCase().split('')) {
-    normalized.write(replacements[character] ?? character);
-  }
-  return normalized.toString();
-}

@@ -9,19 +9,17 @@ import '../../fakes/fake_disciplinas_repository.dart';
 
 void main() {
   group('DisciplinasListBloc', () {
-    test('inicia com busca e ordenação recebidas pela rota', () {
+    test('inicia com a busca recebida pela rota', () {
       final repository = FakeDisciplinasRepository();
       final useCases = DisciplinasUseCases(repository);
       final bloc = DisciplinasListBloc(
         getDisciplinas: useCases.getDisciplinas,
         deleteDisciplina: useCases.deleteDisciplina,
         initialQuery: 'direito',
-        initialOrder: DisciplinasListOrder.alphabetical,
       );
       addTearDown(bloc.close);
 
       expect(bloc.state.query, 'direito');
-      expect(bloc.state.order, DisciplinasListOrder.alphabetical);
     });
 
     blocTest<DisciplinasListBloc, DisciplinasListState>(
@@ -92,44 +90,6 @@ void main() {
       final state = await filtered;
 
       expect(state.items.single.name, 'Direito Constitucional');
-    });
-
-    test('ordena alfabeticamente sem alterar a ordem persistida', () async {
-      final repository = FakeDisciplinasRepository(
-        disciplinas: disciplinasFixture(),
-      );
-      final bloc = _bloc(repository);
-      addTearDown(bloc.close);
-      await _load(bloc);
-
-      final ordered = bloc.stream.firstWhere(
-        (state) => state.order == DisciplinasListOrder.alphabetical,
-      );
-      bloc.add(
-        const DisciplinasListOrderChanged(
-          DisciplinasListOrder.alphabetical,
-        ),
-      );
-      final state = await ordered;
-
-      expect(
-        state.items.map((disciplina) => disciplina.name),
-        [
-          'Direito Administrativo',
-          'Direito Constitucional',
-          'Língua Portuguesa',
-        ],
-      );
-      expect(
-        (await repository.getDisciplinas()).map(
-          (disciplina) => disciplina.name,
-        ),
-        [
-          'Língua Portuguesa',
-          'Direito Constitucional',
-          'Direito Administrativo',
-        ],
-      );
     });
 
     test('exclui a Disciplina e publica o catálogo atualizado', () async {

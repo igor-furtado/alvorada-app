@@ -83,7 +83,9 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
       ],
       builder: (context, submitting, submit, content) => AppDrawer(
         title: widget.disciplina == null ? AppMessages.newDiscipline : AppMessages.editDiscipline,
-        description: widget.disciplina == null ? AppMessages.newDisciplineDescription : null,
+        description: widget.disciplina == null
+            ? AppMessages.newDisciplineDescription
+            : AppMessages.editDisciplineDescription,
         dismissible: !submitting,
         primaryLabel: widget.disciplina == null ? AppMessages.addDiscipline : AppMessages.saveChanges,
         onPrimary: submit,

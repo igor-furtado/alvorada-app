@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 
 enum DisciplinasListStatus { initial, loading, success, failure }
 
-enum DisciplinasListOrder { catalog, alphabetical }
-
 enum DisciplinasListFeedback {
   updated,
   created,
@@ -41,7 +39,6 @@ class DisciplinasListState {
     this.status = DisciplinasListStatus.initial,
     List<DisciplinaListItemData> items = const [],
     this.query = '',
-    this.order = DisciplinasListOrder.catalog,
     this.selectedDisciplineId,
     this.isRefreshing = false,
     this.isDeleting = false,
@@ -51,7 +48,6 @@ class DisciplinasListState {
   final DisciplinasListStatus status;
   final List<DisciplinaListItemData> items;
   final String query;
-  final DisciplinasListOrder order;
   final String? selectedDisciplineId;
   final bool isRefreshing;
   final bool isDeleting;
@@ -66,7 +62,6 @@ class DisciplinasListState {
           status == other.status &&
           listEquals(items, other.items) &&
           query == other.query &&
-          order == other.order &&
           selectedDisciplineId == other.selectedDisciplineId &&
           isRefreshing == other.isRefreshing &&
           isDeleting == other.isDeleting &&
@@ -77,7 +72,6 @@ class DisciplinasListState {
     status,
     Object.hashAll(items),
     query,
-    order,
     selectedDisciplineId,
     isRefreshing,
     isDeleting,

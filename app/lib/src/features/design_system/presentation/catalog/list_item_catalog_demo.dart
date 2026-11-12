@@ -57,6 +57,13 @@ class ListItemCatalogDemo extends StatelessWidget {
                 media: AppListItemMedia.icon(AppIcons.book),
                 variant: AppListItemVariant.muted,
               ),
+              AppListItem(
+                title: 'Variante primária',
+                subtitle: 'Destaque para o item selecionado.',
+                media: AppListItemMedia.icon(AppIcons.book),
+                variant: AppListItemVariant.primary,
+                selected: true,
+              ),
             ],
           ),
         ),

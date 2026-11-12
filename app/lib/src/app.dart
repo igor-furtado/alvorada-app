@@ -19,7 +19,6 @@ import 'features/disciplinas/data/repositories/api_disciplinas_repository.dart';
 import 'features/disciplinas/data/services/disciplinas_api_service.dart';
 import 'features/disciplinas/domain/repositories/disciplinas_repository.dart';
 import 'features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
-import 'features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart';
 import 'features/disciplinas/presentation/disciplinas_page.dart';
 
 final _router = GoRouter(
@@ -52,9 +51,6 @@ final _router = GoRouter(
               path: '/disciplinas',
               builder: (context, state) => DisciplinasPage(
                 initialQuery: state.uri.queryParameters['busca'] ?? '',
-                initialOrder: state.uri.queryParameters['ordem'] == 'alfabetica'
-                    ? DisciplinasListOrder.alphabetical
-                    : DisciplinasListOrder.catalog,
               ),
             ),
           ],

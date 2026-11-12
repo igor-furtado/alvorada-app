@@ -80,6 +80,12 @@ class _AtomCatalogShowcaseState extends State<AtomCatalogShowcase> {
               label: 'Mover para cima',
               onPressed: () {},
             ),
+            AppAccessibleIconButton(
+              icon: AppIcons.add,
+              label: 'Adicionar item',
+              variant: AppIconButtonVariant.primary,
+              onPressed: () {},
+            ),
           ],
         ),
       ),

@@ -87,6 +87,7 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
       ],
       builder: (context, submitting, submit, content) => AppDrawer(
         title: widget.topico == null ? AppMessages.addTopic : AppMessages.editTopic,
+        description: widget.topico == null ? AppMessages.addTopicDescription : AppMessages.editTopicDescription,
         dismissible: !submitting,
         primaryLabel: widget.topico == null ? AppMessages.addTopic : AppMessages.saveChanges,
         onPrimary: submit,

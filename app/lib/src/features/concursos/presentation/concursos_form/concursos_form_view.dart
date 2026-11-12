@@ -300,6 +300,9 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
       ],
       builder: (context, submitting, submit, content) => AppDrawer(
         title: widget.concurso == null ? AppMessages.novoConcurso : AppMessages.editarConcurso,
+        description: widget.concurso == null
+            ? AppMessages.novoConcursoDescription
+            : AppMessages.editarConcursoDescription,
         dismissible: !submitting,
         primaryLabel: widget.concurso == null ? AppMessages.criarConcurso : AppMessages.saveChanges,
         onPrimary: submit,

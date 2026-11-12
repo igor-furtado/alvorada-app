@@ -15,9 +15,9 @@ enum AppDrawerDirection { up, right, down, left }
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
     required this.title,
+    required this.description,
     required this.child,
     this.eyebrow,
-    this.description,
     this.direction,
     this.showSwipeHandle,
     this.primaryLabel,
@@ -33,7 +33,7 @@ class AppDrawer extends StatelessWidget {
 
   final String title;
   final String? eyebrow;
-  final String? description;
+  final String description;
   final Widget child;
   final AppDrawerDirection? direction;
   final bool? showSwipeHandle;
@@ -106,15 +106,19 @@ class AppDrawer extends StatelessWidget {
                     ),
                     child: Material(
                       color: tokens.colors.transparent,
-                      child: _AppDrawerPanel(
-                        eyebrow: eyebrow,
-                        title: title,
-                        description: description,
-                        direction: resolvedDirection,
-                        showSwipeHandle: displayHandle,
-                        footerActions: footerActions,
-                        dismissible: dismissible,
-                        child: child,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                        child: _AppDrawerPanel(
+                          eyebrow: eyebrow,
+                          title: title,
+                          description: description,
+                          direction: resolvedDirection,
+                          showSwipeHandle: displayHandle,
+                          footerActions: footerActions,
+                          dismissible: dismissible,
+                          child: child,
+                        ),
                       ),
                     ),
                   ),
@@ -161,7 +165,7 @@ class _AppDrawerPanel extends StatelessWidget {
 
   final String? eyebrow;
   final String title;
-  final String? description;
+  final String description;
   final AppDrawerDirection direction;
   final bool showSwipeHandle;
   final List<Widget> footerActions;
@@ -238,7 +242,7 @@ class _AppDrawerHeader extends StatelessWidget {
 
   final String? eyebrow;
   final String title;
-  final String? description;
+  final String description;
   final bool horizontal;
   final bool dismissible;
 
@@ -267,13 +271,11 @@ class _AppDrawerHeader extends StatelessWidget {
                   SizedBox(height: tokens.spacing.xs),
                 ],
                 Text(title, style: tokens.typography.headlineSmall),
-                if (description != null) ...[
-                  SizedBox(height: tokens.spacing.xs),
-                  Text(
-                    description!,
-                    style: tokens.typography.bodyMedium.copyWith(color: tokens.colors.onSurfaceMuted),
-                  ),
-                ],
+                SizedBox(height: tokens.spacing.xs),
+                Text(
+                  description,
+                  style: tokens.typography.bodyMedium.copyWith(color: tokens.colors.onSurfaceMuted),
+                ),
               ],
             ),
           ),
@@ -368,9 +370,9 @@ class _AppDrawerSwipeHandle extends StatelessWidget {
 Future<T?> showAppDrawer<T>(
   BuildContext context, {
   required String title,
+  required String description,
   required Widget child,
   String? eyebrow,
-  String? description,
   AppDrawerDirection? direction,
   bool? showSwipeHandle,
   String? primaryLabel,
@@ -412,7 +414,7 @@ Future<T?> showAppDrawer<T>(
 Future<T?> showAppDrawerBuilder<T>(
   BuildContext context, {
   required WidgetBuilder builder,
-  bool dismissible = false,
+  bool dismissible = true,
   bool useRootNavigator = true,
 }) => _showAppDrawerRoute<T>(
   context,

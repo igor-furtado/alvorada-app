@@ -21,12 +21,10 @@ import 'topicos_list/topicos_list_view.dart';
 class DisciplinasPage extends StatelessWidget {
   const DisciplinasPage({
     this.initialQuery = '',
-    this.initialOrder = DisciplinasListOrder.catalog,
     super.key,
   });
 
   final String initialQuery;
-  final DisciplinasListOrder initialOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,6 @@ class DisciplinasPage extends StatelessWidget {
             getDisciplinas: useCases.getDisciplinas,
             deleteDisciplina: useCases.deleteDisciplina,
             initialQuery: initialQuery,
-            initialOrder: initialOrder,
           )..add(const DisciplinasListLoadRequested()),
         ),
         BlocProvider(
@@ -50,7 +47,6 @@ class DisciplinasPage extends StatelessWidget {
       ],
       child: _DisciplinasPageContent(
         routeQuery: initialQuery,
-        routeOrder: initialOrder,
       ),
     );
   }
@@ -59,11 +55,9 @@ class DisciplinasPage extends StatelessWidget {
 class _DisciplinasPageContent extends StatefulWidget {
   const _DisciplinasPageContent({
     required this.routeQuery,
-    required this.routeOrder,
   });
 
   final String routeQuery;
-  final DisciplinasListOrder routeOrder;
 
   @override
   State<_DisciplinasPageContent> createState() => _DisciplinasPageContentState();
@@ -79,15 +73,6 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
     _searchController = TextEditingController(text: widget.routeQuery);
   }
 
-  void _refreshAll() {
-    context.read<DisciplinasListBloc>().add(
-      const DisciplinasListRefreshRequested(
-        feedback: DisciplinasListFeedback.updated,
-        forceRefresh: true,
-      ),
-    );
-  }
-
   @override
   void didUpdateWidget(_DisciplinasPageContent oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -99,9 +84,6 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
       );
       bloc.add(DisciplinasListSearchChanged(widget.routeQuery));
     }
-    if (oldWidget.routeOrder != widget.routeOrder && bloc.state.order != widget.routeOrder) {
-      bloc.add(DisciplinasListOrderChanged(widget.routeOrder));
-    }
   }
 
   void _synchronizeUrl(DisciplinasListState state) {
@@ -110,7 +92,6 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
       path: '/disciplinas',
       queryParameters: {
         if (state.query.trim().isNotEmpty) 'busca': state.query.trim(),
-        if (state.order == DisciplinasListOrder.alphabetical) 'ordem': 'alfabetica',
       },
     );
     if (GoRouterState.of(context).uri == uri) return;
@@ -138,7 +119,7 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
         },
       ),
       BlocListener<DisciplinasListBloc, DisciplinasListState>(
-        listenWhen: (previous, current) => previous.query != current.query || previous.order != current.order,
+        listenWhen: (previous, current) => previous.query != current.query,
         listener: (context, state) => _synchronizeUrl(state),
       ),
       BlocListener<DisciplinasListBloc, DisciplinasListState>(
@@ -170,23 +151,11 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                BlocBuilder<DisciplinasListBloc, DisciplinasListState>(
-                  buildWhen: (previous, current) =>
-                      previous.canMutate != current.canMutate ||
-                      previous.status != current.status ||
-                      previous.isRefreshing != current.isRefreshing ||
-                      previous.isDeleting != current.isDeleting,
-                  builder: (context, state) => RepaintBoundary(
-                    child: DisciplinasListHeader(
-                      searchController: _searchController,
-                      canAdd: state.canMutate,
-                      canRefresh:
-                          state.status == DisciplinasListStatus.success && !state.isRefreshing && !state.isDeleting,
-                      onSearchChanged: (value) => context.read<DisciplinasListBloc>().add(
-                        DisciplinasListSearchChanged(value),
-                      ),
-                      onRefresh: _refreshAll,
-                      onAdd: () => DisciplinasListActions.add(context),
+                RepaintBoundary(
+                  child: DisciplinasListHeader(
+                    searchController: _searchController,
+                    onSearchChanged: (value) => context.read<DisciplinasListBloc>().add(
+                      DisciplinasListSearchChanged(value),
                     ),
                   ),
                 ),
@@ -205,32 +174,48 @@ class _DisciplinasWorkspace extends StatelessWidget {
   const _DisciplinasWorkspace();
 
   @override
-  Widget build(BuildContext context) => AppCard(
-    padding: EdgeInsets.zero,
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final horizontal = constraints.maxWidth < context.tokens.layout.contentSplit;
-        final master = DisciplinasListView(horizontal: horizontal);
-        const detail = TopicosListView();
-        if (horizontal) {
-          return AppScrollArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                master,
-                const AppDivider(margin: EdgeInsets.zero),
-                detail,
-              ],
-            ),
-          );
-        }
-        return AppResizable(
-          initialRatio: .25,
-          first: AppScrollArea(child: master),
-          second: const AppScrollArea(child: detail),
-        );
-      },
-    ),
+  Widget build(BuildContext context) => BlocBuilder<DisciplinasListBloc, DisciplinasListState>(
+    buildWhen: (previous, current) =>
+        previous.items != current.items ||
+        previous.query != current.query ||
+        previous.selectedDisciplineId != current.selectedDisciplineId ||
+        previous.canMutate != current.canMutate,
+    builder: (context, state) {
+      final selected = state.items.where((item) => item.id == state.selectedDisciplineId).firstOrNull;
+      const master = DisciplinasListView();
+      final detail = TopicosListView(
+        disciplina: selected,
+        query: state.query,
+        canMutateDiscipline: state.canMutate,
+        onRenameDiscipline: selected == null ? null : () => DisciplinasListActions.rename(context, selected),
+        onDeleteDiscipline: selected == null ? null : () => DisciplinasListActions.delete(context, selected),
+      );
+      return AppCard(
+        padding: EdgeInsets.zero,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final stacked = constraints.maxWidth < context.tokens.layout.contentSplit;
+            if (stacked) {
+              return AppScrollArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    master,
+                    const AppDivider(margin: EdgeInsets.zero),
+                    detail,
+                  ],
+                ),
+              );
+            }
+            return AppResizable(
+              initialRatio: .25,
+              first: const AppScrollArea(child: DisciplinasListView()),
+              second: AppScrollArea(child: detail),
+            );
+          },
+        ),
+      );
+    },
   );
 }
 

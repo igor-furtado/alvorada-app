@@ -5,13 +5,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/content/app_messages.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
+import '../disciplinas_list/disciplinas_list_state.dart';
 import 'topicos_list_bloc.dart';
 import 'topicos_list_event.dart';
 import 'topicos_list_panel.dart';
 import 'topicos_list_state.dart';
 
 class TopicosListView extends StatelessWidget {
-  const TopicosListView({super.key});
+  const TopicosListView({
+    required this.disciplina,
+    required this.query,
+    required this.canMutateDiscipline,
+    required this.onRenameDiscipline,
+    required this.onDeleteDiscipline,
+    super.key,
+  });
+
+  final DisciplinaListItemData? disciplina;
+  final String query;
+  final bool canMutateDiscipline;
+  final VoidCallback? onRenameDiscipline;
+  final VoidCallback? onDeleteDiscipline;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<TopicosListBloc, TopicosListState>(
@@ -24,8 +38,8 @@ class TopicosListView extends StatelessWidget {
         previous.isDeleting != current.isDeleting,
     builder: (context, state) => switch (state.status) {
       TopicosListStatus.initial => _empty(context),
-      TopicosListStatus.loading => const AppSkeleton(
-        height: double.infinity,
+      TopicosListStatus.loading => AppSkeleton(
+        height: context.tokens.sizes.listItemHeaderHeight,
         semanticLabel: AppMessages.loadingDisciplines,
       ),
       TopicosListStatus.failure => AppStateView(
@@ -35,9 +49,17 @@ class TopicosListView extends StatelessWidget {
           const TopicosListRefreshRequested(),
         ),
       ),
-      TopicosListStatus.success => RepaintBoundary(
-        child: TopicosListPanel(state: state),
+      TopicosListStatus.success when disciplina != null => RepaintBoundary(
+        child: TopicosListPanel(
+          state: state,
+          disciplina: disciplina!,
+          query: query,
+          canMutateDiscipline: canMutateDiscipline,
+          onRenameDiscipline: onRenameDiscipline,
+          onDeleteDiscipline: onDeleteDiscipline,
+        ),
       ),
+      TopicosListStatus.success => _empty(context),
     },
   );
 

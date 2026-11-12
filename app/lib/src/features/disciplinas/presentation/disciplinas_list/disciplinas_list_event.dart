@@ -21,12 +21,6 @@ final class DisciplinasListSearchChanged extends DisciplinasListEvent {
   final String query;
 }
 
-final class DisciplinasListOrderChanged extends DisciplinasListEvent {
-  const DisciplinasListOrderChanged(this.order);
-
-  final DisciplinasListOrder order;
-}
-
 final class DisciplinasListSelectionChanged extends DisciplinasListEvent {
   const DisciplinasListSelectionChanged(this.disciplineId);
 
