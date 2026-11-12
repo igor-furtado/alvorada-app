@@ -16,12 +16,6 @@ final class TopicosListRefreshRequested extends TopicosListEvent {
   final TopicosListFeedback? feedback;
 }
 
-final class TopicosListToggleRequested extends TopicosListEvent {
-  const TopicosListToggleRequested(this.topicId);
-
-  final String topicId;
-}
-
 final class TopicosListDeleteRequested extends TopicosListEvent {
   const TopicosListDeleteRequested(this.topicId);
 

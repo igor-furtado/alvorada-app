@@ -11,7 +11,7 @@
 ## Nomenclatura
 
 - Português sem acentos e `snake_case`.
-- Tabelas no plural: `disciplinas`, `topicos`, `subtopicos`.
+- Tabelas no plural: `concursos`, `disciplinas`, `topicos`, `concursos_topicos`.
 - Colunas: `nome`, `dificuldade`, `cor`, `posicao`, `criado_em`, `atualizado_em`.
 - PK `id`; FK `<entidade>_id`, como `disciplina_id`.
 - `idx_<tabela>_<finalidade>`, `fk_<origem>_<destino>`, `chk_<tabela>_<regra>`.

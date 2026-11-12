@@ -15,12 +15,6 @@ abstract interface class DisciplinasRepository {
   Future<void> updateTopico({required String topicId, required String name});
 
   Future<void> deleteTopico(String topicId);
-
-  Future<void> createSubtopico({required String topicId, required String name});
-
-  Future<void> updateSubtopico({required String subtopicId, required String name});
-
-  Future<void> deleteSubtopico(String subtopicId);
 }
 
 class DisciplinasRepositoryException implements Exception {

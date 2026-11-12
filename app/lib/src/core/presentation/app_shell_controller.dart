@@ -1,57 +1,39 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class AppShellSearchConfig {
-  const AppShellSearchConfig({
-    required this.placeholder,
-    required this.onChanged,
-    this.query = '',
-    this.actionIcon,
-    this.actionLabel,
-    this.onAction,
-  });
+class AppShellBreadcrumb {
+  const AppShellBreadcrumb({required this.label, this.route});
 
-  final String placeholder;
-  final ValueChanged<String> onChanged;
-  final String query;
-  final IconData? actionIcon;
-  final String? actionLabel;
-  final VoidCallback? onAction;
+  final String label;
+  final String? route;
 }
 
-class AppShellController extends ValueNotifier<AppShellSearchConfig?> {
+class AppShellController extends ValueNotifier<List<AppShellBreadcrumb>?> {
   AppShellController() : super(null);
 
   Object? _owner;
 
-  void setSearch(Object owner, AppShellSearchConfig config) {
+  void setBreadcrumbs(Object owner, List<AppShellBreadcrumb> breadcrumbs) {
     _owner = owner;
-    value = config;
+    value = List.unmodifiable(breadcrumbs);
   }
 
-  void clearSearch(Object owner) {
-    if (identical(_owner, owner)) {
-      _owner = null;
-      value = null;
-    }
+  void clearBreadcrumbs(Object owner) {
+    if (!identical(_owner, owner)) return;
+    _owner = null;
+    value = null;
+  }
+
+  void resetBreadcrumbs() {
+    _owner = null;
+    value = null;
   }
 }
 
-class AppShellScope extends InheritedWidget {
-  const AppShellScope({
-    required this.controller,
-    required super.child,
-    super.key,
-  });
+class AppShellScope extends InheritedNotifier<AppShellController> {
+  const AppShellScope({required AppShellController controller, required super.child, super.key})
+    : super(notifier: controller);
 
-  final AppShellController controller;
-
-  static AppShellController read(BuildContext context) {
-    final scope = context.getInheritedWidgetOfExactType<AppShellScope>();
-    assert(scope != null, 'AppShellScope não encontrado na árvore.');
-    return scope!.controller;
-  }
-
-  @override
-  bool updateShouldNotify(AppShellScope oldWidget) => controller != oldWidget.controller;
+  static AppShellController? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AppShellScope>()?.notifier;
 }

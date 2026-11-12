@@ -1,5 +1,6 @@
 import 'package:estudos_app/src/core/content/app_messages.dart';
 import 'package:estudos_app/src/core/theme/app_theme.dart';
+import 'package:estudos_app/src/core/ui/app_ui.dart';
 import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
 import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
 import 'package:estudos_app/src/features/concursos/presentation/concurso_details_page.dart';
@@ -22,7 +23,10 @@ void main() {
     );
 
     expect(find.text(concurso.instituicao), findsWidgets);
+    expect(find.text(concurso.sigla!), findsOneWidget);
     expect(find.text(AppMessages.concursoNaoEncontrado), findsNothing);
+    expect(find.byType(AppBreadcrumbs), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
   });
 
   testWidgets('não oferece edição local sem persistência do Edital', (
@@ -53,7 +57,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final inputs = tester.widgetList<EditableText>(find.byType(EditableText)).toList();
-    expect(inputs.map((input) => input.controller.text), [
+    expect(inputs.map((input) => input.controller.text).where((text) => text.isNotEmpty), [
       concurso.instituicao,
       concurso.sigla,
       concurso.cargo,
@@ -69,6 +73,25 @@ void main() {
       concurso.criteriosPontuacao,
     ]);
     expect(find.text(AppMessages.saveChanges), findsOneWidget);
+    expect(find.text(AppMessages.cancel), findsNothing);
+  });
+
+  testWidgets('mantém a estrutura por faixas sem inventar avanço por Disciplina', (tester) async {
+    await _pump(
+      tester,
+      repository: FakeConcursosRepository(concursos: [_concursoComEdital()]),
+      child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+    );
+
+    expect(find.text('Avanço ainda não calculado'), findsOneWidget);
+    expect(find.text('A estrutura está pronta para receber esta métrica'), findsOneWidget);
+    expect(find.text('Direito Tributário'), findsOneWidget);
+    expect(find.text('—'), findsWidgets);
+
+    await tester.tap(find.text('Desempenho'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Desempenho ainda não calculado'), findsOneWidget);
   });
 }
 
@@ -89,6 +112,26 @@ Concurso _concurso() => Concurso(
   horarioFimProva: '18:00',
   requisitos: 'Nível superior completo.',
   criteriosPontuacao: 'Provas com pesos por bloco.',
+);
+
+Concurso _concursoComEdital() => Concurso(
+  id: 'concurso-real',
+  instituicao: 'Receita Federal',
+  cargo: 'Auditor-Fiscal',
+  banca: 'FGV',
+  dataProva: null,
+  prioritario: true,
+  progressoEdital: 42,
+  disciplinas: [
+    DisciplinaEdital(
+      id: 'tributario',
+      nome: 'Direito Tributário',
+      topicos: [
+        TopicoEdital(id: 'obrigacao', nome: 'Obrigação tributária', obrigatorio: false),
+        TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),
+      ],
+    ),
+  ],
 );
 
 Future<void> _pump(

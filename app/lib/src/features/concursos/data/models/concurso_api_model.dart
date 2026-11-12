@@ -10,6 +10,7 @@ class ConcursoApiModel {
     required this.dataProva,
     required this.prioritario,
     required this.progressoEdital,
+    required this.disciplinas,
     this.sigla,
     this.quantidadeVagas,
     this.vencimentoCentavos,
@@ -38,6 +39,7 @@ class ConcursoApiModel {
     horarioFimProva: readJsonNullableString(json, 'horario_fim_prova'),
     requisitos: readJsonNullableString(json, 'requisitos'),
     criteriosPontuacao: readJsonNullableString(json, 'criterios_pontuacao'),
+    disciplinas: readJsonList(json, 'disciplinas').map(DisciplinaEditalApiModel.fromJson).toList(growable: false),
   );
 
   final String id;
@@ -56,6 +58,7 @@ class ConcursoApiModel {
   final String? horarioFimProva;
   final String? requisitos;
   final String? criteriosPontuacao;
+  final List<DisciplinaEditalApiModel> disciplinas;
 
   Concurso toDomain() => Concurso(
     id: id,
@@ -74,5 +77,54 @@ class ConcursoApiModel {
     horarioFimProva: horarioFimProva,
     requisitos: requisitos,
     criteriosPontuacao: criteriosPontuacao,
+    disciplinas: disciplinas.map((item) => item.toDomain()).toList(growable: false),
+  );
+}
+
+class DisciplinaEditalApiModel {
+  const DisciplinaEditalApiModel({
+    required this.id,
+    required this.nome,
+    required this.topicos,
+  });
+
+  factory DisciplinaEditalApiModel.fromJson(Map<String, Object?> json) => DisciplinaEditalApiModel(
+    id: readJsonString(json, 'id'),
+    nome: readJsonString(json, 'nome'),
+    topicos: readJsonList(json, 'topicos').map(TopicoEditalApiModel.fromJson).toList(growable: false),
+  );
+
+  final String id;
+  final String nome;
+  final List<TopicoEditalApiModel> topicos;
+
+  DisciplinaEdital toDomain() => DisciplinaEdital(
+    id: id,
+    nome: nome,
+    topicos: topicos.map((item) => item.toDomain()).toList(growable: false),
+  );
+}
+
+class TopicoEditalApiModel {
+  const TopicoEditalApiModel({
+    required this.id,
+    required this.nome,
+    required this.obrigatorio,
+  });
+
+  factory TopicoEditalApiModel.fromJson(Map<String, Object?> json) => TopicoEditalApiModel(
+    id: readJsonString(json, 'id'),
+    nome: readJsonString(json, 'nome'),
+    obrigatorio: readJsonBoolean(json, 'obrigatorio'),
+  );
+
+  final String id;
+  final String nome;
+  final bool obrigatorio;
+
+  TopicoEdital toDomain() => TopicoEdital(
+    id: id,
+    nome: nome,
+    obrigatorio: obrigatorio,
   );
 }

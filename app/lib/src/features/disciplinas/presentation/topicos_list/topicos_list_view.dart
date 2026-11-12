@@ -21,7 +21,6 @@ class TopicosListView extends StatelessWidget {
         previous.status != current.status ||
         previous.disciplineId != current.disciplineId ||
         !listEquals(previous.items, current.items) ||
-        !setEquals(previous.expandedTopicIds, current.expandedTopicIds) ||
         previous.isDeleting != current.isDeleting,
     builder: (context, state) => switch (state.status) {
       TopicosListStatus.initial => _empty(context),
@@ -37,12 +36,7 @@ class TopicosListView extends StatelessWidget {
         ),
       ),
       TopicosListStatus.success => RepaintBoundary(
-        child: TopicosListPanel(
-          state: state,
-          onToggle: (topicId) => context.read<TopicosListBloc>().add(
-            TopicosListToggleRequested(topicId),
-          ),
-        ),
+        child: TopicosListPanel(state: state),
       ),
     },
   );

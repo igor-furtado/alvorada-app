@@ -37,16 +37,13 @@ class TopicosListState {
     this.status = TopicosListStatus.initial,
     this.disciplineId,
     List<TopicoListItemData> items = const [],
-    Set<String> expandedTopicIds = const {},
     this.isDeleting = false,
     this.feedback,
-  }) : items = List.unmodifiable(items),
-       expandedTopicIds = Set.unmodifiable(expandedTopicIds);
+  }) : items = List.unmodifiable(items);
 
   final TopicosListStatus status;
   final String? disciplineId;
   final List<TopicoListItemData> items;
-  final Set<String> expandedTopicIds;
   final bool isDeleting;
   final TopicosListFeedback? feedback;
 

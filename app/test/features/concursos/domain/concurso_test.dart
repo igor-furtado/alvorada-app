@@ -46,6 +46,84 @@ void main() {
       throwsFormatException,
     );
   });
+
+  test('rejeita Disciplina do Edital sem Revisão de Véspera', () {
+    expect(
+      () => DisciplinaEdital(
+        id: 'direito',
+        nome: 'Direito',
+        topicos: [
+          TopicoEdital(id: 'constitucional', nome: 'Constituição', obrigatorio: false),
+        ],
+      ),
+      throwsFormatException,
+    );
+  });
+
+  test('rejeita Tópicos repetidos na Disciplina do Edital', () {
+    expect(
+      () => DisciplinaEdital(
+        id: 'direito',
+        nome: 'Direito',
+        topicos: [
+          TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),
+          TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),
+        ],
+      ),
+      throwsFormatException,
+    );
+  });
+
+  test('rejeita Disciplina do Edital sem Tópico comum vinculado', () {
+    expect(
+      () => DisciplinaEdital(
+        id: 'direito',
+        nome: 'Direito',
+        topicos: [
+          TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),
+        ],
+      ),
+      throwsFormatException,
+    );
+  });
+
+  test('reserva Revisão de Véspera ao Tópico obrigatório', () {
+    expect(
+      () => TopicoEdital(
+        id: 'revisao-comum',
+        nome: 'Revisão de Véspera',
+        obrigatorio: false,
+      ),
+      throwsFormatException,
+    );
+  });
+
+  test('não fabrica métricas de Disciplina ainda não definidas', () {
+    final concurso = Concurso(
+      id: 'concurso-1',
+      instituicao: 'TRF da 5ª Região',
+      cargo: 'Técnico Judiciário',
+      banca: null,
+      dataProva: null,
+      prioritario: false,
+      progressoEdital: 0,
+      disciplinas: [
+        DisciplinaEdital(
+          id: 'direito',
+          nome: 'Direito',
+          topicos: [
+            TopicoEdital(id: 'constitucional', nome: 'Constituição', obrigatorio: false),
+            TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),
+          ],
+        ),
+      ],
+    );
+
+    final disciplina = ConcursoViewData.fromDomain(concurso).disciplines.single;
+
+    expect(disciplina.progress, isNull);
+    expect(disciplina.performance, isNull);
+  });
 }
 
 Concurso _concurso({DateTime? dataProva, int progressoEdital = 0}) => Concurso(

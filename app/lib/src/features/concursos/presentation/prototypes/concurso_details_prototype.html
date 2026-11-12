@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Receita Federal · Protótipo Prumo</title>
+    <!--
+      PROTÓTIPO DESCARTÁVEL — não é código de produção.
+      Protótipo consolidado: a aba Informações usa a jornada do Concurso,
+      preservando o shell, o cabeçalho e o conteúdo aprovado da aba Edital.
+    -->
+    <style>
+      :root {
+        --ink:#18181b; --muted:#71717a; --soft:#a1a1aa;
+        --line:#e4e4e7; --line-strong:#d4d4d8; --canvas:#f8f8f7;
+        --paper:#fff; --wash:#f4f4f5; --blue:#2563eb; --blue-dark:#1e40af;
+        --blue-soft:#eff6ff; --green:#15803d; --green-soft:#f0fdf4;
+        --navy:#101d3f; --radius-sm:8px; --radius:12px; --radius-lg:18px;
+        --shadow:0 16px 44px rgba(24,24,27,.14),0 2px 8px rgba(24,24,27,.08);
+      }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; padding-left:232px; color:var(--ink); background:var(--canvas); font-family:Geist,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+      button,input,select { font:inherit; }
+      button { color:inherit; }
+      a { color:inherit; text-decoration:none; }
+      svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+      :focus-visible { outline:3px solid rgba(37,99,235,.3); outline-offset:2px; }
+      h1,h2,p { margin-top:0; }
+      h1 { margin-bottom:8px; font-size:clamp(30px,3vw,42px); line-height:1.06; letter-spacing:-.045em; }
+      h2 { margin-bottom:5px; font-size:18px; line-height:1.25; letter-spacing:-.02em; }
+      .muted { color:var(--muted); }
+      .small { font-size:12px; }
+      .container { width:min(1180px,calc(100% - 48px)); margin:0 auto; }
+      .row { display:flex; align-items:center; }
+      .between { justify-content:space-between; }
+      .gap-8 { gap:8px; }
+      .gap-12 { gap:12px; }
+      .wrap { flex-wrap:wrap; }
+
+      .button { min-height:38px; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 14px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); background:var(--paper); cursor:pointer; font-weight:630; white-space:nowrap; }
+      .button:hover { background:var(--wash); }
+      .button.primary { border-color:var(--ink); background:var(--ink); color:white; }
+      .button.add { color:var(--blue-dark); border-color:#bfdbfe; background:var(--blue-soft); }
+      .button.ghost { border-color:transparent; background:transparent; color:var(--muted); }
+      .button.icon { width:38px; padding:0; }
+      .badge { display:inline-flex; align-items:center; gap:6px; width:max-content; padding:4px 8px; border-radius:999px; background:var(--wash); color:var(--muted); font-size:11px; font-weight:690; }
+      .badge.blue { background:var(--blue-soft); color:var(--blue-dark); }
+      .badge::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+      .brand { display:flex; align-items:center; gap:11px; font-size:18px; font-weight:760; letter-spacing:-.03em; }
+      .brand-mark { width:29px; height:29px; display:grid; place-items:center; border-radius:8px; background:var(--ink); color:white; }
+      .brand-mark svg { width:17px; height:17px; }
+      .app-nav { display:flex; align-items:center; gap:5px; margin-left:42px; }
+      .app-nav a { padding:8px 12px; border-radius:8px; color:var(--muted); font-weight:580; }
+      .app-nav a.active { color:var(--ink); background:var(--wash); }
+      .account { display:flex; align-items:center; gap:10px; margin-left:auto; color:var(--muted); }
+      .avatar { width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; background:var(--wash); color:var(--ink); font-size:12px; font-weight:720; }
+      .topbar { height:64px; display:flex; align-items:center; padding:0 30px; border-bottom:1px solid var(--line); background:var(--paper); }
+
+      .sidebar { position:fixed; inset:0 auto 0 0; z-index:80; width:232px; display:flex; flex-direction:column; padding:20px 14px; border-right:1px solid var(--line); background:var(--paper); }
+      .sidebar .brand { min-height:44px; padding:0 10px; }
+      .sidebar-nav { display:flex; flex-direction:column; gap:4px; margin-top:34px; }
+      .sidebar-nav a { min-height:42px; display:flex; align-items:center; gap:12px; padding:0 12px; border-radius:9px; color:var(--muted); font-weight:620; }
+      .sidebar-nav a:hover { background:var(--wash); color:var(--ink); }
+      .sidebar-nav a.active { background:var(--ink); color:white; }
+      .sidebar-nav svg { flex:0 0 auto; }
+      .sidebar-account { display:flex; align-items:center; gap:11px; margin-top:auto; padding:14px 10px 0; border-top:1px solid var(--line); }
+      .sidebar-account strong,.sidebar-account span { display:block; }
+      .sidebar-account span { color:var(--muted); font-size:11px; }
+
+      /* A — breadcrumb editorial, ações junto do título e resumo em cartões. */
+      .header-a { padding:25px 0 0; background:var(--paper); border-bottom:1px solid var(--line); }
+      .breadcrumbs { display:flex; align-items:center; gap:7px; margin-bottom:24px; color:var(--muted); font-size:12px; }
+      .breadcrumbs svg { width:14px; height:14px; }
+      .header-a-main { display:flex; align-items:flex-start; justify-content:space-between; gap:28px; }
+      .header-a-main p { max-width:650px; margin-bottom:0; color:var(--muted); font-size:15px; }
+      .header-actions { display:flex; align-items:center; gap:8px; }
+      .header-a-facts { display:grid; grid-template-columns:repeat(4,1fr); margin-top:28px; border:1px solid var(--line); border-bottom:0; border-radius:var(--radius) var(--radius) 0 0; overflow:hidden; }
+      .header-fact { min-height:84px; padding:17px 20px; border-left:1px solid var(--line); background:var(--paper); }
+      .header-fact:first-child { border-left:0; }
+      .header-fact span { display:block; color:var(--muted); font-size:11px; }
+      .header-fact strong { display:block; margin-top:5px; font-size:18px; letter-spacing:-.02em; }
+
+      /* B — barra compacta com título, metadados e navegação interna. */
+      .topbar-b .context-path { display:flex; align-items:center; gap:8px; margin-left:26px; padding-left:26px; border-left:1px solid var(--line); color:var(--muted); font-size:12px; }
+      .header-b { padding:20px 0 0; background:var(--paper); border-bottom:1px solid var(--line); }
+      .header-b .breadcrumbs { margin-bottom:18px; }
+      .header-b-main { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:16px; }
+      .header-b-title h1 { margin:0; font-size:28px; }
+      .header-b-title p { margin:3px 0 0; color:var(--muted); }
+      .header-b-strip { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-top:22px; }
+      .page-tabs { display:flex; align-items:center; gap:24px; }
+      .page-tabs button { position:relative; padding:13px 1px; border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:12px; font-weight:650; }
+      .page-tabs button.active { color:var(--ink); }
+      .page-tabs button.active::after { content:""; position:absolute; inset:auto 0 -1px; height:2px; background:var(--ink); }
+      .inline-facts { display:flex; align-items:center; gap:18px; color:var(--muted); font-size:12px; }
+      .inline-facts strong { color:var(--ink); }
+      .fact-dot { width:3px; height:3px; border-radius:50%; background:var(--soft); }
+
+      /* C — contexto de alto contraste, com informações agrupadas à direita. */
+      .header-c-shell { background:var(--navy); color:white; }
+      .topbar-c { border-color:rgba(255,255,255,.12); background:transparent; }
+      .topbar-c .brand-mark { background:white; color:var(--navy); }
+      .topbar-c .app-nav a,.topbar-c .account { color:#b9c7e5; }
+      .topbar-c .app-nav a.active { color:white; background:rgba(255,255,255,.1); }
+      .topbar-c .avatar { border-color:rgba(255,255,255,.18); background:rgba(255,255,255,.1); color:white; }
+      .header-c { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(340px,.7fr); gap:54px; padding:34px 0 38px; }
+      .header-c .breadcrumbs { color:#9fb0d3; margin-bottom:28px; }
+      .header-c h1 { font-size:44px; }
+      .header-c p { max-width:650px; margin-bottom:25px; color:#b9c7e5; font-size:15px; }
+      .header-c .button { border-color:rgba(255,255,255,.22); background:transparent; color:white; }
+      .header-c .button.primary { border-color:white; background:white; color:var(--navy); }
+      .header-c-info { align-self:end; display:grid; grid-template-columns:1fr 1fr; border:1px solid rgba(255,255,255,.14); border-radius:var(--radius); overflow:hidden; }
+      .header-c-info div { min-height:82px; padding:16px; border-left:1px solid rgba(255,255,255,.12); border-top:1px solid rgba(255,255,255,.12); }
+      .header-c-info div:nth-child(odd) { border-left:0; }
+      .header-c-info div:nth-child(-n+2) { border-top:0; }
+      .header-c-info span { display:block; color:#9fb0d3; font-size:11px; }
+      .header-c-info strong { display:block; margin-top:4px; font-size:17px; }
+
+      /* Conteúdo idêntico nas três opções. */
+      .content { padding:28px 0 120px; }
+      .content-top { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:22px; }
+      .content-heading { margin:0; }
+      .content-heading h2 { margin-bottom:4px; font-size:24px; }
+      .text-link { min-height:30px; display:inline-flex; align-items:center; padding:0; border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+      .text-link:hover { color:var(--ink); }
+      .content-tools { display:flex; align-items:center; justify-content:flex-end; gap:18px; margin:0; }
+      .view-toggle { display:flex; align-items:center; gap:4px; padding:4px; border:1px solid var(--line); border-radius:10px; background:var(--paper); }
+      .view-toggle button { min-height:34px; min-width:118px; padding:0 13px; border:0; border-radius:7px; background:transparent; color:var(--muted); cursor:pointer; font-size:12px; font-weight:680; }
+      .view-toggle button.active { background:var(--ink); color:white; }
+      .tool-right { display:flex; align-items:center; gap:8px; }
+      .search { position:relative; width:270px; }
+      .search svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; color:var(--muted); }
+      .search input { width:100%; height:40px; padding:0 12px 0 37px; border:1px solid var(--line-strong); border-radius:9px; background:var(--paper); }
+      .content-layout { display:grid; grid-template-columns:250px minmax(0,1fr); gap:28px; }
+      .rail { align-self:start; position:sticky; top:20px; }
+      .rail-card { padding:22px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper); }
+      .rail .view-toggle { width:calc(100% + 28px); margin:-14px -14px 18px; }
+      .rail .view-toggle button { flex:1; min-width:0; }
+      .overall strong { display:block; margin:5px 0 10px; font-size:38px; letter-spacing:-.05em; }
+      .track { width:100%; height:6px; overflow:hidden; border-radius:99px; background:var(--line); }
+      .track i { display:block; width:var(--value); height:100%; border-radius:inherit; background:var(--blue); }
+      .track.performance i { background:var(--green); }
+      .range-nav { display:flex; flex-direction:column; margin-top:20px; border-top:1px solid var(--line); }
+      .range-nav a { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); color:var(--muted); }
+      .range-nav b { color:var(--ink); }
+      .group { margin-bottom:18px; overflow:hidden; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper); }
+      .group-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding:18px; }
+      .group-head p { margin:0; color:var(--muted); font-size:12px; }
+      .group-list { border-top:1px solid var(--line); }
+      .discipline-row { min-height:68px; display:grid; grid-template-columns:minmax(190px,1fr) 240px 28px; align-items:center; gap:18px; padding:0 18px; border-bottom:1px solid var(--line); cursor:pointer; }
+      .discipline-row:last-child { border-bottom:0; }
+      .discipline-row:hover { background:#fafafa; }
+      .discipline-row > svg { color:var(--muted); }
+      .metric { display:flex; align-items:center; gap:9px; }
+      .metric strong { min-width:38px; text-align:right; font-size:13px; font-variant-numeric:tabular-nums; }
+      .metric-label { display:none; color:var(--muted); font-size:10px; text-transform:uppercase; }
+
+      /* Conteúdo da aba Informações. */
+      [hidden] { display:none !important; }
+      .info-content { padding:34px 0 130px; }
+      .info-kicker { margin:0 0 8px; color:var(--blue-dark); font-size:11px; font-weight:760; letter-spacing:.08em; text-transform:uppercase; }
+      .info-lead { max-width:680px; margin:0; color:var(--muted); font-size:15px; }
+      .info-title { margin-bottom:8px; font-size:30px; }
+      .info-section-title { margin-bottom:6px; font-size:17px; }
+      .info-label { display:block; color:var(--muted); font-size:11px; font-weight:650; letter-spacing:.02em; }
+      .source-link { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:12px; font-weight:650; text-decoration:underline; text-underline-offset:3px; }
+
+      .info-c-head { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:24px; margin-bottom:34px; }
+      .info-c-flow { position:relative; max-width:880px; margin-left:18px; }
+      .info-c-flow::before { content:""; position:absolute; left:17px; top:24px; bottom:24px; width:1px; background:var(--line-strong); }
+      .info-c-step { position:relative; display:grid; grid-template-columns:36px 150px minmax(0,1fr); gap:22px; padding:0 0 32px; }
+      .info-c-step:last-child { padding-bottom:0; }
+      .info-c-marker { z-index:1; width:35px; height:35px; display:grid; place-items:center; border:1px solid var(--line-strong); border-radius:50%; background:var(--paper); font-size:11px; font-weight:760; }
+      .info-c-stage { padding-top:6px; font-weight:720; }
+      .info-c-card { padding:20px 22px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper); }
+      .info-c-card p { margin:9px 0 0; color:var(--muted); }
+      .info-c-values { display:flex; flex-wrap:wrap; gap:26px; margin-top:16px; }
+      .info-c-values strong { display:block; margin-top:3px; font-size:17px; }
+
+      /* Edição secundária do Edital: vincula itens existentes no catálogo. */
+      .editor-backdrop { position:fixed; inset:0; z-index:120; display:none; justify-content:flex-end; background:rgba(24,24,27,.35); backdrop-filter:blur(2px); }
+      .editor-backdrop.open { display:flex; }
+      .editor { width:min(460px,100%); height:100%; padding:26px; overflow:auto; background:var(--paper); box-shadow:-18px 0 50px rgba(24,24,27,.14); }
+      .editor-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+      .editor-head h2 { font-size:24px; }
+      .close { width:38px; height:38px; display:grid; place-items:center; border:1px solid var(--line); border-radius:9px; background:var(--paper); cursor:pointer; }
+      .editor-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:24px 0; padding:4px; border-radius:10px; background:var(--wash); }
+      .editor-tab { min-height:36px; border:0; border-radius:7px; background:transparent; color:var(--muted); cursor:pointer; font-size:12px; font-weight:670; }
+      .editor-tab.active { background:var(--paper); color:var(--ink); box-shadow:0 1px 4px rgba(24,24,27,.08); }
+      .editor-note { margin:0 0 20px; padding:12px; border-radius:9px; background:var(--blue-soft); color:var(--blue-dark); font-size:12px; }
+      .field { display:block; margin-bottom:18px; }
+      .field span { display:block; margin-bottom:6px; font-size:12px; font-weight:650; }
+      .field input,.field select { width:100%; height:42px; padding:0 12px; border:1px solid var(--line-strong); border-radius:9px; background:var(--paper); }
+      .catalog-item { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:13px 0; border-top:1px solid var(--line); }
+      .catalog-item:first-of-type { border-top:0; }
+      .catalog-item span { display:block; color:var(--muted); font-size:11px; }
+
+
+      @media (max-width:900px) {
+        body { padding-left:78px; }
+        .sidebar { width:78px; padding:18px 12px; }
+        .sidebar .brand { justify-content:center; padding:0; }
+        .sidebar .brand > span:last-child,.sidebar-nav span,.sidebar-account > div:last-child { display:none; }
+        .sidebar-nav a { justify-content:center; padding:0; }
+        .sidebar-account { justify-content:center; padding:14px 0 0; }
+        .header-a-main { align-items:flex-start; flex-direction:column; }
+        .header-a-facts { grid-template-columns:1fr 1fr; }
+        .header-fact:nth-child(3) { border-left:0; }
+        .header-fact:nth-child(n+3) { border-top:1px solid var(--line); }
+        .header-c { grid-template-columns:1fr; gap:26px; }
+        .header-c-info { width:100%; }
+        .content-layout { grid-template-columns:1fr; }
+        .rail { position:static; }
+        .rail-card { display:grid; grid-template-columns:190px 1fr; gap:26px; }
+        .range-nav { margin:0; border-top:0; }
+      }
+      @media (max-width:680px) {
+        body { padding-left:62px; }
+        .sidebar { width:62px; padding:14px 9px; }
+        .container { width:calc(100% - 28px); }
+        .topbar { height:58px; padding:0 15px; }
+        .app-nav,.account span:first-child,.topbar-b .context-path { display:none; }
+        .header-a { padding-top:18px; }
+        .breadcrumbs { margin-bottom:18px; }
+        .header-actions { width:100%; }
+        .header-actions .button { flex:1; padding:0 9px; font-size:12px; }
+        .header-a-facts { margin-top:22px; }
+        .header-fact { min-height:74px; padding:13px; }
+        .header-fact strong { font-size:16px; }
+        .header-b { padding-top:18px; }
+        .header-b-main { grid-template-columns:1fr; }
+        .header-b-main > .header-actions { grid-column:1/-1; }
+        .header-b-strip { align-items:flex-start; flex-direction:column; gap:8px; }
+        .page-tabs { width:100%; justify-content:space-between; gap:10px; }
+        .inline-facts { width:100%; overflow:auto; padding-bottom:10px; }
+        .header-c { padding:24px 0 28px; }
+        .header-c h1 { font-size:34px; }
+        .header-c-info { grid-template-columns:1fr 1fr; }
+        .content { padding-top:20px; }
+        .content-top { align-items:stretch; flex-direction:column; gap:14px; }
+        .content-tools { align-items:stretch; flex-direction:column; }
+        .view-toggle { width:100%; }
+        .view-toggle button { flex:1; min-width:0; }
+        .tool-right { width:100%; }
+        .search { flex:1; width:auto; }
+        .tool-right .button { padding:0 11px; font-size:12px; }
+        .rail-card { display:block; }
+        .overall { margin-bottom:20px; }
+        .discipline-row { min-height:76px; grid-template-columns:minmax(0,1fr) 72px 18px; gap:8px; padding:0 14px; }
+        .metric { display:block; }
+        .metric .track { display:none; }
+        .metric strong { display:block; min-width:0; text-align:left; }
+        .metric-label { display:block; }
+        .editor { padding:22px 16px 90px; }
+        .info-content { padding-top:24px; }
+        .info-title { font-size:25px; }
+        .info-c-head { align-items:flex-start; flex-direction:column; display:flex; }
+        .info-c-flow { margin-left:0; }
+        .info-c-flow::before { left:14px; }
+        .info-c-step { grid-template-columns:29px minmax(0,1fr); gap:12px; }
+        .info-c-marker { width:29px; height:29px; }
+        .info-c-stage { padding-top:4px; }
+        .info-c-card { grid-column:2; }
+      }
+    </style>
+  </head>
+  <body>
+    <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+      <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.2 8.8-2 4.4-4.4 2 2-4.4 4.4-2Z"/></symbol>
+      <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5h8v2M3 12h18M10 12v2h4v-2"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5Z"/></symbol>
+      <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/></symbol>
+    </svg>
+
+    <div id="header-host"></div>
+
+    <main class="content container" id="edital-content">
+      <div class="content-top">
+        <section class="content-heading"><h2>Auditor-Fiscal</h2><button class="text-link">Ver atribuições do cargo</button></section>
+        <div class="content-tools"><div class="tool-right"><label class="search"><svg><use href="#i-search"/></svg><input type="search" placeholder="Buscar Disciplina" aria-label="Buscar Disciplina" /></label><button class="button primary edit-action" data-kind="discipline"><svg><use href="#i-edit"/></svg>Editar Edital</button></div></div>
+      </div>
+      <div class="content-layout">
+        <aside class="rail"><div class="rail-card"><div class="overall"><div class="view-toggle" role="group" aria-label="Indicador exibido"><button class="active" data-mode="progress">Avanço</button><button data-mode="performance">Desempenho</button></div><strong id="rail-value">42%</strong><div class="track" id="rail-track" style="--value:42%"><i></i></div><p class="muted small" id="rail-copy" style="margin:10px 0 0">Avanço no Edital</p></div><nav class="range-nav" id="range-nav" aria-label="Faixas do indicador"></nav></div></aside>
+        <div id="grouped-list"></div>
+      </div>
+    </main>
+
+    <main class="info-content container" id="info-content" hidden>
+      <div id="info-variant"></div>
+    </main>
+
+    <div class="editor-backdrop" id="editor" aria-hidden="true"><aside class="editor" role="dialog" aria-modal="true" aria-labelledby="editor-title"><header class="editor-head"><div><h2 id="editor-title">Adicionar ao Edital</h2><p class="muted">Vincule conteúdo existente no catálogo.</p></div><button class="close" id="close-editor" aria-label="Fechar edição"><svg><use href="#i-x"/></svg></button></header><div class="editor-tabs" role="tablist" aria-label="Tipo de conteúdo"><button class="editor-tab active" data-kind="discipline" role="tab">Disciplina</button><button class="editor-tab" data-kind="topic" role="tab">Tópico</button></div><div id="editor-content"></div></aside></div>
+
+    <script>
+      const sidebar=`<aside class="sidebar" aria-label="Navegação principal"><a class="brand" href="#"><span class="brand-mark"><svg><use href="#i-compass"/></svg></span><span>Prumo</span></a><nav class="sidebar-nav"><a class="active" href="#" aria-current="page"><svg><use href="#i-briefcase"/></svg><span>Concursos</span></a><a href="#"><svg><use href="#i-book"/></svg><span>Disciplinas</span></a></nav><div class="sidebar-account"><span class="avatar">FR</span><div><strong>Meu espaço</strong><span>Conta pessoal</span></div></div></aside>`;
+      const headerHtml=`${sidebar}<header class="header-b"><div class="container"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="#">Concursos</a><svg><use href="#i-right"/></svg><span aria-current="page">Receita Federal</span></nav><div class="header-b-main"><div class="header-b-title"><h1>Receita Federal</h1></div><div class="header-actions"><button class="button"><svg><use href="#i-edit"/></svg>Editar Concurso</button></div></div><div class="header-b-strip"><nav class="page-tabs" aria-label="Seções do Concurso"><button class="active" data-tab="edital" aria-current="page">Edital</button><button data-tab="info">Informações</button></nav><div class="inline-facts"><span class="badge blue">Prioritário</span><span>Banca <strong>FGV</strong></span><i class="fact-dot"></i><span>Prova <strong>18 jan. 2027</strong></span><i class="fact-dot"></i><span>Local <strong>Fortaleza</strong></span></div></div></div></header>`;
+
+      const disciplines=[['Direito Tributário',38,72],['Legislação Tributária',21,64],['Contabilidade Geral',46,58],['Auditoria',12,61],['Língua Portuguesa',65,83],['Direito Constitucional',31,77],['Direito Administrativo',54,74],['Raciocínio Lógico',78,86],['Estatística',19,52],['Economia',26,69],['Finanças Públicas',42,70],['Tecnologia da Informação',33,75],['Comércio Internacional',8,48],['Língua Inglesa',82,91],['Contabilidade Avançada',17,55],['Direito Previdenciário',29,66],['Direito Civil',67,79],['Ética no Serviço Público',90,94]].map(([name,progress,performance])=>({name,progress,performance}));
+      const progressGroups=[{title:'Até 25% de avanço',copy:'Disciplinas no início do Edital',short:'Até 25%',test:d=>d.progress<=25},{title:'De 26% a 60% de avanço',copy:'Disciplinas em desenvolvimento',short:'26% a 60%',test:d=>d.progress>=26&&d.progress<=60},{title:'Acima de 60% de avanço',copy:'Disciplinas mais percorridas',short:'Acima de 60%',test:d=>d.progress>60}];
+      const performanceGroups=[{title:'Abaixo de 60% de desempenho',copy:'Disciplinas com menor aproveitamento',short:'Abaixo de 60%',test:d=>d.performance<60},{title:'De 60% a 79% de desempenho',copy:'Disciplinas com aproveitamento intermediário',short:'60% a 79%',test:d=>d.performance>=60&&d.performance<80},{title:'A partir de 80% de desempenho',copy:'Disciplinas com maior aproveitamento',short:'A partir de 80%',test:d=>d.performance>=80}];
+      const information={vacancies:'230 vagas',remuneration:'R$ 22.921,71',workload:'40 horas semanais',examTime:'8h às 12h30',requirements:'Diploma de conclusão de curso superior, em nível de graduação, em qualquer área de formação.',scoring:'Prova objetiva com 140 questões, divididas entre conhecimentos básicos e específicos, além de prova discursiva.'};
+      const informationTemplate=()=>`<section class="info-c"><div class="info-c-head"><div><p class="info-kicker">Jornada do Concurso</p><h2 class="info-title">Da habilitação à posse</h2><p class="info-lead">As condições do Concurso apresentadas na ordem em que influenciam sua decisão.</p></div><a class="source-link" href="#">Abrir edital oficial</a></div><div class="info-c-flow"><article class="info-c-step"><span class="info-c-marker">1</span><strong class="info-c-stage">Habilitação</strong><div class="info-c-card"><h3 class="info-section-title">Requisito de ingresso</h3><p>${information.requirements}</p></div></article><article class="info-c-step"><span class="info-c-marker">2</span><strong class="info-c-stage">Avaliação</strong><div class="info-c-card"><h3 class="info-section-title">Provas objetiva e discursiva</h3><p>${information.scoring}</p><div class="info-c-values"><div><span class="info-label">Horário</span><strong>${information.examTime}</strong></div></div></div></article><article class="info-c-step"><span class="info-c-marker">3</span><strong class="info-c-stage">Classificação</strong><div class="info-c-card"><h3 class="info-section-title">Oferta prevista</h3><div class="info-c-values"><div><span class="info-label">Total</span><strong>${information.vacancies}</strong></div></div></div></article><article class="info-c-step"><span class="info-c-marker">4</span><strong class="info-c-stage">Posse</strong><div class="info-c-card"><h3 class="info-section-title">Condições do cargo</h3><div class="info-c-values"><div><span class="info-label">Vencimento inicial</span><strong>${information.remuneration}</strong></div><div><span class="info-label">Jornada</span><strong>${information.workload}</strong></div></div><a class="source-link" href="#" style="margin-top:16px">Consultar atribuições do cargo</a></div></article></div></section>`;
+      const arrow='<svg aria-hidden="true"><use href="#i-right"/></svg>';
+      const metric=(value,performance=false)=>`<div><span class="metric-label">${performance?'Desempenho':'Avanço'}</span><div class="metric"><div class="track ${performance?'performance':''}" style="--value:${value}%"><i></i></div><strong>${value}%</strong></div></div>`;
+      let metricMode='progress';
+      function renderGroups(mode){metricMode=mode;const performance=mode==='performance';const groups=performance?performanceGroups:progressGroups;document.getElementById('rail-value').textContent=performance?'71%':'42%';document.getElementById('rail-track').style.setProperty('--value',performance?'71%':'42%');document.getElementById('rail-track').classList.toggle('performance',performance);document.getElementById('rail-copy').textContent=performance?'Desempenho médio':'Avanço no Edital';document.getElementById('range-nav').innerHTML=groups.map((g,i)=>`<a href="#faixa-${i+1}">${g.short}<b>${disciplines.filter(g.test).length}</b></a>`).join('');document.getElementById('grouped-list').innerHTML=groups.map((g,i)=>{const items=disciplines.filter(g.test);return `<section class="group" id="faixa-${i+1}"><div class="group-head"><div><h2>${g.title}</h2><p>${g.copy}</p></div><span class="badge">${items.length} Disciplinas</span></div><div class="group-list">${items.map(d=>`<div class="discipline-row" tabindex="0" aria-label="Abrir ${d.name}"><strong>${d.name}</strong>${metric(performance?d.performance:d.progress,performance)}${arrow}</div>`).join('')}</div></section>`}).join('');document.querySelectorAll('.view-toggle button').forEach(button=>{const active=button.dataset.mode===mode;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});}
+
+      function renderInformation(){document.getElementById('info-variant').innerHTML=informationTemplate();}
+      function setActiveTab(tab){const information=tab==='info';document.getElementById('edital-content').hidden=information;document.getElementById('info-content').hidden=!information;document.querySelectorAll('.page-tabs button').forEach(button=>{const active=button.dataset.tab===tab;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});}
+
+      const editor=document.getElementById('editor');
+      const editorContent=document.getElementById('editor-content');
+      const editorTemplates={discipline:`<p class="editor-note">Vincule ao Edital uma Disciplina já existente no catálogo compartilhado.</p><label class="field"><span>Buscar Disciplina</span><input type="search" placeholder="Ex.: Direito Penal" /></label><div class="catalog-item"><div><strong>Direito Penal</strong><span>24 Tópicos no catálogo</span></div><button class="button add">Adicionar</button></div><div class="catalog-item"><div><strong>Direito Empresarial</strong><span>18 Tópicos no catálogo</span></div><button class="button add">Adicionar</button></div>`,topic:`<p class="editor-note">Escolha uma Disciplina do Edital e vincule um Tópico existente.</p><label class="field"><span>Disciplina</span><select><option>Direito Tributário</option><option>Legislação Tributária</option></select></label><label class="field"><span>Buscar Tópico</span><input type="search" placeholder="Ex.: Obrigação tributária" /></label><div class="catalog-item"><div><strong>Obrigação tributária</strong><span>Catálogo compartilhado</span></div><button class="button add">Adicionar</button></div>`};
+      function selectEditor(kind){document.querySelectorAll('.editor-tab').forEach(tab=>{const active=tab.dataset.kind===kind;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));});editorContent.innerHTML=editorTemplates[kind];}
+      function openEditor(kind='discipline'){selectEditor(kind);editor.classList.add('open');editor.setAttribute('aria-hidden','false');document.getElementById('close-editor').focus();}
+      function closeEditor(){editor.classList.remove('open');editor.setAttribute('aria-hidden','true');}
+      document.querySelectorAll('.view-toggle button').forEach(button=>button.addEventListener('click',()=>renderGroups(button.dataset.mode)));
+      document.querySelectorAll('.tool-right .edit-action').forEach(button=>button.addEventListener('click',()=>openEditor(button.dataset.kind)));
+      document.querySelectorAll('.editor-tab').forEach(tab=>tab.addEventListener('click',()=>selectEditor(tab.dataset.kind)));
+      document.getElementById('close-editor').addEventListener('click',closeEditor);
+      editor.addEventListener('click',event=>{if(event.target===editor)closeEditor();});
+      document.addEventListener('keydown',event=>{if(event.key==='Escape'&&editor.classList.contains('open'))closeEditor();});
+      document.getElementById('header-host').innerHTML=headerHtml;
+      document.querySelectorAll('.page-tabs button').forEach(button=>button.addEventListener('click',()=>setActiveTab(button.dataset.tab)));
+      const cleanUrl=new URL(location.href);cleanUrl.searchParams.delete('variant');history.replaceState({},'',cleanUrl);
+      document.title='Receita Federal · Protótipo Prumo';
+      renderGroups('progress');
+      renderInformation();
+      setActiveTab('edital');
+    </script>
+  </body>
+</html>

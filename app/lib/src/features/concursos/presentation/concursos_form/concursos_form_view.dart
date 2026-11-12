@@ -304,8 +304,6 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
         primaryLabel: widget.concurso == null ? AppMessages.criarConcurso : AppMessages.saveChanges,
         onPrimary: submit,
         loading: submitting,
-        secondaryLabel: AppMessages.cancel,
-        onSecondary: submitting ? null : () => Navigator.pop(context),
         child: content,
       ),
     ),

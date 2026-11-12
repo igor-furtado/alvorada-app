@@ -91,26 +91,6 @@ func (s *Service) DeleteTopic(ctx context.Context, id string) error {
 	return s.repository.DeleteTopic(ctx, id)
 }
 
-func (s *Service) CreateSubtopic(ctx context.Context, topicID, name string) error {
-	value, err := validateName(name)
-	if err != nil {
-		return err
-	}
-	return s.repository.CreateSubtopic(ctx, topicID, value)
-}
-
-func (s *Service) UpdateSubtopic(ctx context.Context, id, name string) error {
-	value, err := validateName(name)
-	if err != nil {
-		return err
-	}
-	return s.repository.UpdateSubtopic(ctx, id, value)
-}
-
-func (s *Service) DeleteSubtopic(ctx context.Context, id string) error {
-	return s.repository.DeleteSubtopic(ctx, id)
-}
-
 func validateName(name string) (string, error) {
 	value := strings.TrimSpace(name)
 	if value == "" {

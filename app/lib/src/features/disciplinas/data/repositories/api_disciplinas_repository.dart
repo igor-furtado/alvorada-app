@@ -73,20 +73,6 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
   Future<void> deleteTopico(String topicId) =>
       _mutate(() => _api.deleteTopico(topicId), 'Não foi possível excluir o Tópico.');
 
-  @override
-  Future<void> createSubtopico({required String topicId, required String name}) => _mutate(
-    () => _api.createSubtopico(topicId, name),
-    'Não foi possível adicionar o Subtópico.',
-  );
-
-  @override
-  Future<void> updateSubtopico({required String subtopicId, required String name}) =>
-      _mutate(() => _api.updateSubtopico(subtopicId, name), 'Não foi possível atualizar o Subtópico.');
-
-  @override
-  Future<void> deleteSubtopico(String subtopicId) =>
-      _mutate(() => _api.deleteSubtopico(subtopicId), 'Não foi possível excluir o Subtópico.');
-
   Future<List<Disciplina>> _refresh() async {
     try {
       final response = await _api.getDisciplinas();

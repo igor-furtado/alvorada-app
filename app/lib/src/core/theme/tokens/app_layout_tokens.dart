@@ -13,6 +13,7 @@ class AppLayoutTokens {
     this.wide = AppDimensionPrimitives.breakpointWide,
     this.contentMaxWidth = AppDimensionPrimitives.contentMaxWidth,
     this.dialogMaxWidth = 384,
+    this.drawerWidth = 460,
     this.drawerSideFraction = .75,
     this.alertDialogSmallMaxWidth = 320,
     this.iconRailWidth = 68,
@@ -21,7 +22,7 @@ class AppLayoutTokens {
     this.catalogMasterWidth = 304,
     this.catalogWorkspaceHeight = 608,
     this.brandWidth = 144,
-    this.controlHeight = AppDimensionPrimitives.size32,
+    this.controlHeight = AppDimensionPrimitives.size40,
     this.topicSelectionIndent = 42,
     this.tableActionsColumn = 56,
     this.narrow = 520,
@@ -46,6 +47,7 @@ class AppLayoutTokens {
   final double wide;
   final double contentMaxWidth;
   final double dialogMaxWidth;
+  final double drawerWidth;
   final double drawerSideFraction;
   final double alertDialogSmallMaxWidth;
   final double iconRailWidth;
@@ -81,6 +83,7 @@ class AppLayoutTokens {
     wide: lerpDouble(wide, other.wide, t)!,
     contentMaxWidth: lerpDouble(contentMaxWidth, other.contentMaxWidth, t)!,
     dialogMaxWidth: lerpDouble(dialogMaxWidth, other.dialogMaxWidth, t)!,
+    drawerWidth: lerpDouble(drawerWidth, other.drawerWidth, t)!,
     drawerSideFraction: lerpDouble(drawerSideFraction, other.drawerSideFraction, t)!,
     alertDialogSmallMaxWidth: lerpDouble(
       alertDialogSmallMaxWidth,

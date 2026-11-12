@@ -20,6 +20,12 @@ abstract interface class ConcursosApi {
   Future<void> restoreConcurso(String id);
 
   Future<void> deleteConcurso(String id);
+
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId});
+
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId});
+
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId});
 }
 
 class ConcursosApiService implements ConcursosApi {
@@ -77,6 +83,24 @@ class ConcursosApiService implements ConcursosApi {
 
   @override
   Future<void> deleteConcurso(String id) => _sendEmpty('DELETE', '/api/v1/concursos/${Uri.encodeComponent(id)}');
+
+  @override
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId}) => _sendEmpty(
+    'PUT',
+    '/api/v1/concursos/${Uri.encodeComponent(concursoId)}/edital/disciplinas/${Uri.encodeComponent(disciplinaId)}',
+  );
+
+  @override
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) => _sendEmpty(
+    'PUT',
+    '/api/v1/concursos/${Uri.encodeComponent(concursoId)}/edital/topicos/${Uri.encodeComponent(topicoId)}',
+  );
+
+  @override
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) => _sendEmpty(
+    'DELETE',
+    '/api/v1/concursos/${Uri.encodeComponent(concursoId)}/edital/topicos/${Uri.encodeComponent(topicoId)}',
+  );
 
   Future<void> _sendEmpty(
     String method,

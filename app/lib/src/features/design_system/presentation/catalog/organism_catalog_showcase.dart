@@ -464,14 +464,38 @@ class _OrganismCatalogShowcaseState extends State<OrganismCatalogShowcase> {
           ],
         ),
       ),
-      const CatalogDemoSection(
+      CatalogDemoSection(
         title: 'AppTabs',
-        description: 'Painéis relacionados apresentados um de cada vez.',
-        child: AppTabs<String>(
-          initialValue: 'visao',
-          items: [
-            AppTabItem(value: 'visao', label: 'Visão geral', content: Text('Resumo do conteúdo.')),
-            AppTabItem(value: 'historico', label: 'Histórico', content: Text('Alterações recentes.')),
+        description: 'Painéis relacionados nas variações segmentada, preenchida e sublinhada.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AppTabs<String>(
+              initialValue: 'visao',
+              items: [
+                AppTabItem(value: 'visao', label: 'Visão geral', content: Text('Resumo do conteúdo.')),
+                AppTabItem(value: 'historico', label: 'Histórico', content: Text('Alterações recentes.')),
+              ],
+            ),
+            SizedBox(height: context.tokens.spacing.xl),
+            const AppTabs<String>(
+              initialValue: 'avanco',
+              variant: AppTabsVariant.filled,
+              expanded: true,
+              items: [
+                AppTabItem(value: 'avanco', label: 'Avanço', content: Text('42% no Edital.')),
+                AppTabItem(value: 'desempenho', label: 'Desempenho', content: Text('71% de aproveitamento.')),
+              ],
+            ),
+            SizedBox(height: context.tokens.spacing.xl),
+            const AppTabs<String>(
+              initialValue: 'edital',
+              variant: AppTabsVariant.line,
+              items: [
+                AppTabItem(value: 'edital', label: 'Edital', content: Text('Conteúdo do Edital.')),
+                AppTabItem(value: 'informacoes', label: 'Informações', content: Text('Dados do Concurso.')),
+              ],
+            ),
           ],
         ),
       ),

@@ -10,7 +10,4 @@ type Repository interface {
 	CreateTopic(ctx context.Context, subjectID, name string) error
 	UpdateTopic(ctx context.Context, id, name string) error
 	DeleteTopic(ctx context.Context, id string) error
-	CreateSubtopic(ctx context.Context, topicID, name string) error
-	UpdateSubtopic(ctx context.Context, id, name string) error
-	DeleteSubtopic(ctx context.Context, id string) error
 }

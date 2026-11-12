@@ -8,6 +8,7 @@ abstract final class ConcursosResultadoCodes {
   static const arquivamentoFalhou = 'concurso.arquivamento_falhou';
   static const restauracaoFalhou = 'concurso.restauracao_falhou';
   static const exclusaoFalhou = 'concurso.exclusao_falhou';
+  static const editalAtualizacaoFalhou = 'edital.atualizacao_falhou';
   static const instituicaoObrigatoria = 'concurso.instituicao_obrigatoria';
   static const instituicaoMuitoLonga = 'concurso.instituicao_muito_longa';
   static const cargoObrigatorio = 'concurso.cargo_obrigatorio';

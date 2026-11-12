@@ -12,22 +12,22 @@
 
 ## Visão geral
 
-O Prumo reúne Concursos e Disciplinas para manter os Editais organizados em um catálogo compartilhado de Tópicos e Subtópicos.
+O Prumo reúne Concursos e Disciplinas para manter os Editais organizados em um catálogo compartilhado de Tópicos.
 
 O repositório reúne:
 
 - uma interface responsiva em **Flutter Web**, com temas claro e escuro, navegação adaptativa e componentes acessíveis;
-- uma **API REST em Go** para o catálogo de Disciplinas, Tópicos e Subtópicos;
+- uma **API REST em Go** para Concursos, Editais e o catálogo de Disciplinas e Tópicos;
 - persistência em **MySQL 8.4**, inicializada e executada com Docker Compose;
 - uma especificação **OpenAPI 3.1** servida pela própria API.
 
 > [!IMPORTANT]
-> O cadastro de Concursos e o catálogo de Disciplinas estão integrados à API e ao banco. O vínculo entre Editais e Disciplinas ainda não possui persistência e, por isso, é exibido somente para leitura.
+> O Edital de cada Concurso é composto por Tópicos do catálogo. As Disciplinas presentes são derivadas desses vínculos.
 
 ## Experiência atual
 
-- **Concursos:** concursos-alvo e progresso de cada Edital.
-- **Disciplinas:** catálogo compartilhado de Disciplinas, Tópicos e Subtópicos, incluindo a Revisão de Véspera fixa de cada Disciplina.
+- **Concursos:** concursos-alvo e composição do Edital por Tópicos.
+- **Disciplinas:** catálogo compartilhado de Disciplinas e Tópicos, incluindo a Revisão de Véspera fixa de cada Disciplina.
 
 ## Executar localmente
 
@@ -105,7 +105,7 @@ O Docker Compose lê as seguintes variáveis do arquivo `.env` na raiz:
 
 Ao executar a API sem Docker, também estão disponíveis `PORT` (padrão `8080`), `DB_HOST` (padrão `127.0.0.1`) e `DB_PORT` (padrão `3306`).
 
-O esquema MySQL usa o vocabulário do domínio em português: `concursos`, `disciplinas`, `topicos` e `subtopicos`, com colunas como `instituicao`, `cargo`, `data_prova`, `nome`, `posicao`, `criado_em` e `atualizado_em`. Ao iniciar, a API migra de forma idempotente bancos locais que ainda usam os nomes legados em inglês e cria a estrutura de Concursos quando necessário.
+O esquema MySQL usa o vocabulário do domínio em português: `concursos`, `disciplinas`, `topicos` e `concursos_topicos`, com colunas como `instituicao`, `cargo`, `data_prova`, `nome`, `posicao`, `criado_em` e `atualizado_em`. Ao iniciar, a API migra de forma idempotente bancos locais que ainda usam os nomes legados em inglês, remove a estrutura descontinuada de Subtópicos e cria os vínculos de Edital quando necessário.
 
 ## Arquitetura
 
@@ -143,7 +143,7 @@ A API aceita e retorna JSON. O catálogo completo é obtido com:
 curl http://localhost:8080/api/v1/subjects
 ```
 
-Os campos serializados seguem o vocabulário em português: `nome`, `dificuldade`, `cor`, `topicos`, `obrigatorio`, `subtopicos` e `erro`.
+Os campos serializados seguem o vocabulário em português: `nome`, `dificuldade`, `cor`, `disciplinas`, `topicos`, `obrigatorio` e `erro`.
 
 Principais rotas:
 
@@ -154,12 +154,12 @@ Principais rotas:
 | `PUT`, `DELETE` | `/api/v1/concursos/{id}` | Atualiza ou exclui um Concurso |
 | `PUT` | `/api/v1/concursos/{id}/prioridade` | Define o Concurso prioritário |
 | `PUT`, `DELETE` | `/api/v1/concursos/{id}/arquivamento` | Arquiva ou restaura um Concurso |
+| `PUT` | `/api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}` | Vincula ao Edital os Tópicos atuais de uma Disciplina |
+| `PUT`, `DELETE` | `/api/v1/concursos/{id}/edital/topicos/{topicoId}` | Vincula ou remove um Tópico do Edital |
 | `GET`, `POST` | `/api/v1/subjects` | Lista ou cria Disciplinas |
 | `PATCH`, `DELETE` | `/api/v1/subjects/{id}` | Atualiza ou exclui uma Disciplina |
 | `POST` | `/api/v1/subjects/{id}/topics` | Cria um Tópico |
 | `PATCH`, `DELETE` | `/api/v1/topics/{id}` | Renomeia ou exclui um Tópico |
-| `POST` | `/api/v1/topics/{id}/subtopics` | Cria um Subtópico |
-| `PATCH`, `DELETE` | `/api/v1/subtopics/{id}` | Renomeia ou exclui um Subtópico |
 
 A definição completa de corpos, respostas e validações está em [`api/docs/openapi.yaml`](api/docs/openapi.yaml).
 

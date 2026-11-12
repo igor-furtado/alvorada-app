@@ -28,11 +28,15 @@ void main() {
     expect(find.bySemanticsLabel('Semana'), findsNothing);
     expect(find.bySemanticsLabel('Revisões'), findsNothing);
     expect(find.bySemanticsLabel('Caderno'), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
+    expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
+    expect(find.text('Concursos'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
 
     expect(find.text('Nova Disciplina'), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
     semantics.dispose();
   });
 }

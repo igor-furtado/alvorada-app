@@ -34,36 +34,21 @@ class DisciplinaApiModel {
 }
 
 class TopicoApiModel {
-  const TopicoApiModel({required this.id, required this.name, required this.mandatory, required this.subtopics});
+  const TopicoApiModel({required this.id, required this.name, required this.mandatory});
 
   factory TopicoApiModel.fromJson(Map<String, Object?> json) => TopicoApiModel(
     id: readJsonString(json, 'id'),
     name: readJsonString(json, 'nome'),
     mandatory: readJsonBoolean(json, 'obrigatorio'),
-    subtopics: readJsonList(json, 'subtopicos').map(SubtopicoApiModel.fromJson).toList(growable: false),
   );
 
   final String id;
   final String name;
   final bool mandatory;
-  final List<SubtopicoApiModel> subtopics;
 
   Topico toDomain() => Topico(
     id: id,
     name: name,
     mandatory: mandatory,
-    subtopics: subtopics.map((subtopic) => subtopic.toDomain()).toList(growable: false),
   );
-}
-
-class SubtopicoApiModel {
-  const SubtopicoApiModel({required this.id, required this.name});
-
-  factory SubtopicoApiModel.fromJson(Map<String, Object?> json) =>
-      SubtopicoApiModel(id: readJsonString(json, 'id'), name: readJsonString(json, 'nome'));
-
-  final String id;
-  final String name;
-
-  Subtopico toDomain() => Subtopico(id: id, name: name);
 }

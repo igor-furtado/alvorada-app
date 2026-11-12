@@ -255,10 +255,26 @@ class _AtomCatalogShowcaseState extends State<AtomCatalogShowcase> {
           control: AppCheckbox(value: false, semanticLabel: 'Aceitar termos e condições'),
         ),
       ),
-      const CatalogDemoSection(
+      CatalogDemoSection(
         title: 'AppProgress',
-        description: 'Progresso determinado com valor anunciado semanticamente.',
-        child: AppProgress(value: .13, semanticLabel: 'Progresso da tarefa'),
+        description: 'Progresso determinado com variantes semânticas e valor anunciado.',
+        child: Column(
+          children: [
+            const AppProgress(value: .13, semanticLabel: 'Progresso da tarefa'),
+            SizedBox(height: context.tokens.spacing.sm),
+            const AppProgress(
+              value: .42,
+              semanticLabel: 'Avanço informativo',
+              variant: AppProgressVariant.info,
+            ),
+            SizedBox(height: context.tokens.spacing.sm),
+            const AppProgress(
+              value: .71,
+              semanticLabel: 'Desempenho positivo',
+              variant: AppProgressVariant.success,
+            ),
+          ],
+        ),
       ),
     ],
   );

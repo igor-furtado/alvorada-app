@@ -198,6 +198,18 @@ func (s *Service) Delete(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }
 
+func (s *Service) AddDisciplinaToEdital(ctx context.Context, concursoID, disciplinaID string) error {
+	return s.repository.AddDisciplinaToEdital(ctx, concursoID, disciplinaID)
+}
+
+func (s *Service) AddTopicoToEdital(ctx context.Context, concursoID, topicoID string) error {
+	return s.repository.AddTopicoToEdital(ctx, concursoID, topicoID)
+}
+
+func (s *Service) RemoveTopicoFromEdital(ctx context.Context, concursoID, topicoID string) error {
+	return s.repository.RemoveTopicoFromEdital(ctx, concursoID, topicoID)
+}
+
 func requiredText(value string, limit int, requiredError, lengthError error) (string, error) {
 	normalized := strings.TrimSpace(value)
 	if normalized == "" {

@@ -6,12 +6,20 @@ import '../../../../core/ui/app_ui.dart';
 
 class DisciplinasListHeader extends StatelessWidget {
   const DisciplinasListHeader({
+    required this.searchController,
     required this.canAdd,
+    required this.canRefresh,
+    required this.onSearchChanged,
+    required this.onRefresh,
     required this.onAdd,
     super.key,
   });
 
+  final TextEditingController searchController;
   final bool canAdd;
+  final bool canRefresh;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onRefresh;
   final VoidCallback onAdd;
 
   @override
@@ -30,10 +38,31 @@ class DisciplinasListHeader extends StatelessWidget {
           ),
         ],
       );
-      final action = AppButton(
-        label: AppMessages.newDiscipline,
-        icon: AppIcons.add,
-        onPressed: canAdd ? onAdd : null,
+      final actions = Wrap(
+        alignment: WrapAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: context.tokens.spacing.sm,
+        runSpacing: context.tokens.spacing.sm,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
+            child: AppSearchField(
+              controller: searchController,
+              placeholder: AppMessages.searchContent,
+              onChanged: onSearchChanged,
+            ),
+          ),
+          AppAccessibleIconButton(
+            icon: AppIcons.refresh,
+            label: AppMessages.update,
+            onPressed: canRefresh ? onRefresh : null,
+          ),
+          AppButton(
+            label: AppMessages.newDiscipline,
+            icon: AppIcons.add,
+            onPressed: canAdd ? onAdd : null,
+          ),
+        ],
       );
       if (constraints.maxWidth < context.tokens.layout.toolbar) {
         return Column(
@@ -41,7 +70,7 @@ class DisciplinasListHeader extends StatelessWidget {
           children: [
             heading,
             SizedBox(height: context.tokens.spacing.xl),
-            action,
+            actions,
           ],
         );
       }
@@ -50,7 +79,7 @@ class DisciplinasListHeader extends StatelessWidget {
         children: [
           Expanded(child: heading),
           SizedBox(width: context.tokens.spacing.xxl),
-          action,
+          actions,
         ],
       );
     },

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
 import 'package:estudos_app/src/features/concursos/domain/models/concurso_input.dart';
 import 'package:estudos_app/src/features/concursos/domain/repositories/concursos_repository.dart';
@@ -9,8 +11,13 @@ class FakeConcursosRepository implements ConcursosRepository {
   final Map<String, Concurso> _archived = {};
   bool failLoad = false;
   bool failMutation = false;
+  bool failRuleViolation = false;
   bool failSynchronization = false;
   int loadCalls = 0;
+  int addDisciplinaCalls = 0;
+  int addTopicoCalls = 0;
+  int removeTopicoCalls = 0;
+  Completer<void>? editalMutationGate;
   var _nextId = 10;
 
   @override
@@ -69,6 +76,7 @@ class FakeConcursosRepository implements ConcursosRepository {
         horarioFimProva: input.horarioFimProva,
         requisitos: input.requisitos,
         criteriosPontuacao: input.criteriosPontuacao,
+        disciplinas: item.disciplinas,
       ),
     );
   }
@@ -102,6 +110,27 @@ class FakeConcursosRepository implements ConcursosRepository {
     _archived.remove(id);
   }
 
+  @override
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId}) async {
+    addDisciplinaCalls++;
+    await editalMutationGate?.future;
+    _throwIfMutationFails();
+  }
+
+  @override
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) async {
+    addTopicoCalls++;
+    await editalMutationGate?.future;
+    _throwIfMutationFails();
+  }
+
+  @override
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) async {
+    removeTopicoCalls++;
+    await editalMutationGate?.future;
+    _throwIfMutationFails();
+  }
+
   void _clearPriority() {
     for (final concurso in [..._concursos]) {
       _replace(concurso.id, (item) => _copy(item, prioritario: false));
@@ -114,6 +143,12 @@ class FakeConcursosRepository implements ConcursosRepository {
   }
 
   void _throwIfMutationFails() {
+    if (failRuleViolation) {
+      throw const ConcursosRuleViolationException(
+        code: 'concursos.teste.regra',
+        message: 'Alteração rejeitada.',
+      );
+    }
     if (failSynchronization) {
       throw const ConcursosSynchronizationException();
     }
@@ -138,6 +173,7 @@ Concurso _copy(Concurso source, {bool? prioritario}) => Concurso(
   horarioFimProva: source.horarioFimProva,
   requisitos: source.requisitos,
   criteriosPontuacao: source.criteriosPontuacao,
+  disciplinas: source.disciplinas,
 );
 
 List<Concurso> concursosFixture() => [

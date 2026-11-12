@@ -10,12 +10,10 @@ import 'topicos_list_state.dart';
 class TopicosListPanel extends StatelessWidget {
   const TopicosListPanel({
     required this.state,
-    required this.onToggle,
     super.key,
   });
 
   final TopicosListState state;
-  final ValueChanged<String> onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -34,24 +32,19 @@ class TopicosListPanel extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.md),
           const AppDivider(margin: EdgeInsets.zero),
           if (regular.isNotEmpty)
-            AppAccordion<String>(
-              expandedValues: state.expandedTopicIds,
-              onToggle: onToggle,
-              items: [
+            AppListItemGroup(
+              spacing: context.tokens.spacing.sm,
+              children: [
                 for (final topico in regular)
-                  AppAccordionItem<String>(
-                    value: topico.id,
-                    title: AppLabel(topico.name, style: AppLabelStyle.control),
-                    child: TopicoListItem(
-                      topico: topico,
-                      canMutate: state.canMutate,
-                      onRename: () => TopicosListActions.rename(
-                        context,
-                        disciplineId,
-                        topico,
-                      ),
-                      onDelete: () => TopicosListActions.delete(context, topico),
+                  TopicoListItem(
+                    topico: topico,
+                    canMutate: state.canMutate,
+                    onRename: () => TopicosListActions.rename(
+                      context,
+                      disciplineId,
+                      topico,
                     ),
+                    onDelete: () => TopicosListActions.delete(context, topico),
                   ),
               ],
             ),

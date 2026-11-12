@@ -16,6 +16,7 @@ class AppDrawer extends StatelessWidget {
   const AppDrawer({
     required this.title,
     required this.child,
+    this.eyebrow,
     this.description,
     this.direction,
     this.showSwipeHandle,
@@ -31,6 +32,7 @@ class AppDrawer extends StatelessWidget {
   });
 
   final String title;
+  final String? eyebrow;
   final String? description;
   final Widget child;
   final AppDrawerDirection? direction;
@@ -49,7 +51,7 @@ class AppDrawer extends StatelessWidget {
     final tokens = context.tokens;
     final resolvedDirection = direction ?? _responsiveDirection(context);
     final horizontal = resolvedDirection == AppDrawerDirection.left || resolvedDirection == AppDrawerDirection.right;
-    final displayHandle = showSwipeHandle ?? context.windowClass.isCompact;
+    final displayHandle = showSwipeHandle ?? false;
     final footerActions = <Widget>[
       if (primaryLabel != null)
         AppButton(
@@ -82,9 +84,7 @@ class AppDrawer extends StatelessWidget {
               final viewport = MediaQuery.sizeOf(context);
               final width = constraints.hasBoundedWidth ? constraints.maxWidth : viewport.width;
               final height = constraints.hasBoundedHeight ? constraints.maxHeight : viewport.height;
-              final panelWidth = horizontal
-                  ? math.min(width * tokens.layout.drawerSideFraction, tokens.layout.dialogMaxWidth)
-                  : width;
+              final panelWidth = horizontal ? math.min(width, tokens.layout.drawerWidth) : width;
               final panelHeight = horizontal ? height : null;
               final maxPanelHeight = math.max(tokens.spacing.none, height - (tokens.spacing.huge * 2));
               final panel = Semantics(
@@ -101,21 +101,19 @@ class AppDrawer extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
                       color: tokens.colors.popover,
-                      border: Border.all(
-                        color: tokens.colors.border,
-                        width: tokens.borders.widthHairline,
-                      ),
-                      borderRadius: tokens.borders.xxxl,
+                      border: _drawerBorder(resolvedDirection, tokens.colors.border),
                       boxShadow: tokens.shadows.overlay,
                     ),
                     child: Material(
                       color: tokens.colors.transparent,
                       child: _AppDrawerPanel(
+                        eyebrow: eyebrow,
                         title: title,
                         description: description,
                         direction: resolvedDirection,
                         showSwipeHandle: displayHandle,
                         footerActions: footerActions,
+                        dismissible: dismissible,
                         child: child,
                       ),
                     ),
@@ -136,7 +134,6 @@ class AppDrawer extends StatelessWidget {
                   : panel;
 
               return SafeArea(
-                minimum: EdgeInsets.all(tokens.spacing.sm),
                 child: Align(
                   alignment: _alignment(resolvedDirection),
                   child: dismissiblePanel,
@@ -152,19 +149,23 @@ class AppDrawer extends StatelessWidget {
 
 class _AppDrawerPanel extends StatelessWidget {
   const _AppDrawerPanel({
+    required this.eyebrow,
     required this.title,
     required this.description,
     required this.direction,
     required this.showSwipeHandle,
     required this.footerActions,
+    required this.dismissible,
     required this.child,
   });
 
+  final String? eyebrow;
   final String title;
   final String? description;
   final AppDrawerDirection direction;
   final bool showSwipeHandle;
   final List<Widget> footerActions;
+  final bool dismissible;
   final Widget child;
 
   @override
@@ -174,7 +175,13 @@ class _AppDrawerPanel extends StatelessWidget {
       mainAxisSize: horizontal ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _AppDrawerHeader(title: title, description: description, horizontal: horizontal),
+        _AppDrawerHeader(
+          eyebrow: eyebrow,
+          title: title,
+          description: description,
+          horizontal: horizontal,
+          dismissible: dismissible,
+        ),
         if (horizontal)
           Expanded(child: _AppDrawerBody(child: child))
         else
@@ -221,37 +228,67 @@ class _AppDrawerPanel extends StatelessWidget {
 }
 
 class _AppDrawerHeader extends StatelessWidget {
-  const _AppDrawerHeader({required this.title, required this.description, required this.horizontal});
+  const _AppDrawerHeader({
+    required this.eyebrow,
+    required this.title,
+    required this.description,
+    required this.horizontal,
+    required this.dismissible,
+  });
 
+  final String? eyebrow;
   final String title;
   final String? description;
   final bool horizontal;
+  final bool dismissible;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final centered = !horizontal && context.windowClass.isCompact;
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        tokens.spacing.lg,
-        tokens.spacing.lg,
-        tokens.spacing.lg,
+        tokens.spacing.xxl,
+        tokens.spacing.xxl,
+        tokens.spacing.xxl,
         tokens.spacing.none,
       ),
-      child: Column(
-        crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            textAlign: centered ? TextAlign.center : TextAlign.start,
-            style: tokens.typography.titleMedium.copyWith(fontWeight: FontWeight.w500),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (eyebrow != null) ...[
+                  Text(
+                    eyebrow!,
+                    style: tokens.typography.bodySmall.copyWith(color: tokens.colors.onSurfaceMuted),
+                  ),
+                  SizedBox(height: tokens.spacing.xs),
+                ],
+                Text(title, style: tokens.typography.headlineSmall),
+                if (description != null) ...[
+                  SizedBox(height: tokens.spacing.xs),
+                  Text(
+                    description!,
+                    style: tokens.typography.bodyMedium.copyWith(color: tokens.colors.onSurfaceMuted),
+                  ),
+                ],
+              ],
+            ),
           ),
-          if (description != null) ...[
-            SizedBox(height: centered ? tokens.spacing.xs : tokens.spacing.xxxs),
-            Text(
-              description!,
-              textAlign: centered ? TextAlign.center : TextAlign.start,
-              style: tokens.typography.bodySmall.copyWith(color: tokens.colors.onSurfaceMuted),
+          if (dismissible) ...[
+            SizedBox(width: tokens.spacing.lg),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: tokens.colors.border),
+                borderRadius: tokens.borders.lg,
+              ),
+              child: IconButton(
+                tooltip: AppMessages.close,
+                onPressed: () => Navigator.maybePop(context),
+                icon: const Icon(AppIcons.close),
+              ),
             ),
           ],
         ],
@@ -267,7 +304,7 @@ class _AppDrawerBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-    padding: EdgeInsets.all(context.tokens.spacing.lg),
+    padding: EdgeInsets.all(context.tokens.spacing.xxl),
     child: child,
   );
 }
@@ -282,10 +319,10 @@ class _AppDrawerFooter extends StatelessWidget {
     final tokens = context.tokens;
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        tokens.spacing.lg,
+        tokens.spacing.xxl,
         tokens.spacing.none,
-        tokens.spacing.lg,
-        tokens.spacing.lg,
+        tokens.spacing.xxl,
+        tokens.spacing.xxl,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -332,6 +369,7 @@ Future<T?> showAppDrawer<T>(
   BuildContext context, {
   required String title,
   required Widget child,
+  String? eyebrow,
   String? description,
   AppDrawerDirection? direction,
   bool? showSwipeHandle,
@@ -346,13 +384,14 @@ Future<T?> showAppDrawer<T>(
   bool useRootNavigator = true,
 }) {
   final resolvedDirection = direction ?? _responsiveDirection(context);
-  final displayHandle = showSwipeHandle ?? context.windowClass.isCompact;
+  final displayHandle = showSwipeHandle ?? false;
   return _showAppDrawerRoute<T>(
     context,
     direction: resolvedDirection,
     dismissible: dismissible,
     useRootNavigator: useRootNavigator,
     builder: (context) => AppDrawer(
+      eyebrow: eyebrow,
       title: title,
       description: description,
       direction: resolvedDirection,
@@ -430,8 +469,14 @@ Future<T?> _showAppDrawerRoute<T>(
   );
 }
 
-AppDrawerDirection _responsiveDirection(BuildContext context) =>
-    context.windowClass.isCompact ? AppDrawerDirection.down : AppDrawerDirection.right;
+AppDrawerDirection _responsiveDirection(BuildContext context) => AppDrawerDirection.right;
+
+Border _drawerBorder(AppDrawerDirection direction, Color color) => switch (direction) {
+  AppDrawerDirection.right => Border(left: BorderSide(color: color)),
+  AppDrawerDirection.left => Border(right: BorderSide(color: color)),
+  AppDrawerDirection.up => Border(bottom: BorderSide(color: color)),
+  AppDrawerDirection.down => Border(top: BorderSide(color: color)),
+};
 
 Alignment _alignment(AppDrawerDirection direction) => switch (direction) {
   AppDrawerDirection.up => Alignment.topCenter,

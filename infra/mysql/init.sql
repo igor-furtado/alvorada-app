@@ -75,16 +75,16 @@ CREATE TABLE IF NOT EXISTS topicos (
   UNIQUE INDEX idx_topicos_revisao_vespera_unica (disciplina_id, obrigatorio)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS subtopicos (
-  id CHAR(36) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS concursos_topicos (
+  concurso_id CHAR(36) NOT NULL,
   topico_id CHAR(36) NOT NULL,
-  nome VARCHAR(120) NOT NULL,
-  posicao INT UNSIGNED NOT NULL DEFAULT 0,
   criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_subtopico_topico FOREIGN KEY (topico_id)
-    REFERENCES topicos(id) ON DELETE CASCADE,
-  INDEX idx_subtopico_topico_posicao (topico_id, posicao, criado_em)
+  PRIMARY KEY (concurso_id, topico_id),
+  CONSTRAINT fk_concurso_topico_concurso FOREIGN KEY (concurso_id)
+    REFERENCES concursos(id) ON DELETE CASCADE,
+  CONSTRAINT fk_concurso_topico_topico FOREIGN KEY (topico_id)
+    REFERENCES topicos(id) ON DELETE RESTRICT,
+  INDEX idx_concursos_topicos_topico (topico_id, concurso_id)
 ) ENGINE=InnoDB;
 
 -- Mantém bancos locais criados antes da invariável de produto coerentes ao

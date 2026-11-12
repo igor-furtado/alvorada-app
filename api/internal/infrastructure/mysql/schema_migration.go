@@ -38,7 +38,6 @@ type indexRename struct {
 var portugueseTables = []tableRename{
 	{from: "subjects", to: "disciplinas"},
 	{from: "topics", to: "topicos"},
-	{from: "subtopics", to: "subtopicos"},
 }
 
 var portugueseColumns = []columnRename{
@@ -53,11 +52,6 @@ var portugueseColumns = []columnRename{
 	{table: "topicos", from: "position", to: "posicao"},
 	{table: "topicos", from: "created_at", to: "criado_em"},
 	{table: "topicos", from: "updated_at", to: "atualizado_em"},
-	{table: "subtopicos", from: "topic_id", to: "topico_id"},
-	{table: "subtopicos", from: "name", to: "nome"},
-	{table: "subtopicos", from: "position", to: "posicao"},
-	{table: "subtopicos", from: "created_at", to: "criado_em"},
-	{table: "subtopicos", from: "updated_at", to: "atualizado_em"},
 }
 
 var portugueseConstraints = []constraintMigration{
@@ -75,19 +69,20 @@ var portugueseConstraints = []constraintMigration{
 		dropClause: "DROP FOREIGN KEY",
 		definition: "FOREIGN KEY (`disciplina_id`) REFERENCES `disciplinas` (`id`) ON DELETE CASCADE",
 	},
-	{
-		table:      "subtopicos",
-		from:       "fk_subtopic_topic",
-		to:         "fk_subtopico_topico",
-		dropClause: "DROP FOREIGN KEY",
-		definition: "FOREIGN KEY (`topico_id`) REFERENCES `topicos` (`id`) ON DELETE CASCADE",
-	},
 }
 
 var portugueseIndexes = []indexRename{
 	{table: "disciplinas", from: "idx_subject_position", to: "idx_disciplina_posicao"},
 	{table: "topicos", from: "idx_topic_subject_position", to: "idx_topico_disciplina_posicao"},
-	{table: "subtopicos", from: "idx_subtopic_topic_position", to: "idx_subtopico_topico_posicao"},
+}
+
+// RemoveSubtopicsSchema permanently removes the abandoned concept from both
+// current and legacy local schemas. The operation is idempotent.
+func RemoveSubtopicsSchema(ctx context.Context, db *sql.DB) error {
+	if _, err := db.ExecContext(ctx, "DROP TABLE IF EXISTS subtopicos, subtopics"); err != nil {
+		return fmt.Errorf("remove subtopics schema: %w", err)
+	}
+	return nil
 }
 
 // EnsurePortugueseSchema renames the legacy English database schema without

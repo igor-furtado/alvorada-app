@@ -24,6 +24,19 @@ type Concurso struct {
 	HorarioFimProva     *string
 	Requisitos          *string
 	CriteriosPontuacao  *string
+	Disciplinas         []EditalDisciplina
+}
+
+type EditalDisciplina struct {
+	ID      string         `json:"id"`
+	Nome    string         `json:"nome"`
+	Topicos []EditalTopico `json:"topicos"`
+}
+
+type EditalTopico struct {
+	ID          string `json:"id"`
+	Nome        string `json:"nome"`
+	Obrigatorio bool   `json:"obrigatorio"`
 }
 
 type CreateConcursoInput struct {

@@ -73,6 +73,24 @@ class ApiConcursosRepository implements ConcursosRepository {
   Future<void> deleteConcurso(String id) =>
       _mutate(() => _api.deleteConcurso(id), 'Não foi possível excluir o Concurso.');
 
+  @override
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId}) => _mutate(
+    () => _api.addDisciplinaToEdital(concursoId: concursoId, disciplinaId: disciplinaId),
+    'Não foi possível adicionar a Disciplina ao Edital.',
+  );
+
+  @override
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) => _mutate(
+    () => _api.addTopicoToEdital(concursoId: concursoId, topicoId: topicoId),
+    'Não foi possível adicionar o Tópico ao Edital.',
+  );
+
+  @override
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) => _mutate(
+    () => _api.removeTopicoFromEdital(concursoId: concursoId, topicoId: topicoId),
+    'Não foi possível remover o Tópico do Edital.',
+  );
+
   Future<List<Concurso>> _refresh() async {
     try {
       final concursos = (await _api.getConcursos()).map((item) => item.toDomain()).toList(growable: false);
@@ -97,6 +115,17 @@ class ApiConcursosRepository implements ConcursosRepository {
   Future<void> _mutate(Future<void> Function() operation, String message) async {
     try {
       await operation();
+    } on ConcursosRepositoryException {
+      rethrow;
+    } on ConcursosApiException catch (error) {
+      if (error.statusCode >= 400 && error.statusCode < 500) {
+        throw ConcursosRuleViolationException(
+          code: 'concursos.api.${error.statusCode}',
+          message: error.message,
+          cause: error,
+        );
+      }
+      throw ConcursosRepositoryException(message, error);
     } on Object catch (error) {
       throw ConcursosRepositoryException(message, error);
     }

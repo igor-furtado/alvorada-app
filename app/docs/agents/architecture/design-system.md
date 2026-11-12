@@ -95,7 +95,7 @@ Conclua quando toda divergência observada for corrigida ou registrada como deci
 
 | Padrão | Composição | Aceite observável |
 | --- | --- | --- |
-| Formulário | `AppForm` organiza os campos dentro de `AppDrawer`; ação primária envia e secundária cancela. | Clique no fundo não descarta dados; Cancelar ou Esc fecha quando ocioso; primeiro erro recebe foco; loading bloqueia repetição e fechamento. |
+| Formulário | `AppForm` organiza os campos dentro de `AppDrawer`; a ação primária envia e o X do cabeçalho cancela. | Clique no fundo não descarta dados; X ou Esc fecha quando ocioso; primeiro erro recebe foco; loading bloqueia repetição e fechamento. |
 | Destrutiva | `AppAlertDialog` nomeia ação, objeto e impacto. | Esc cancela; fechar devolve foco; confirmação é inequívoca. |
 | Estado remoto | `AppSkeleton`, `AppStateView` e conteúdo preservado durante refresh. | Retry mantém contexto; loading inicial conserva a estrutura. |
 | Feedback | Inline corrige campo; toast informa resultado transitório; estado persistente permanece na página. | Mudança dinâmica é anunciada uma vez. |

@@ -46,13 +46,6 @@ func EnsureDisciplineInvariants(ctx context.Context, db *sql.DB) (resultErr erro
 	defer func() { _ = tx.Rollback() }()
 
 	if _, err := tx.ExecContext(ctx, `
-		DELETE subtopicos
-		FROM subtopicos
-		INNER JOIN topicos ON topicos.id = subtopicos.topico_id
-		WHERE BINARY topicos.nome = BINARY ?`, domain.MandatoryReviewTopicName); err != nil {
-		return fmt.Errorf("remove mandatory topic subtopics: %w", err)
-	}
-	if _, err := tx.ExecContext(ctx, `
 		DELETE duplicate
 		FROM topicos AS duplicate
 		INNER JOIN topicos AS canonical

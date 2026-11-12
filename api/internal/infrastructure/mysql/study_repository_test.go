@@ -63,10 +63,6 @@ func TestFindCatalogReturnsMandatoryReviewTopicLast(t *testing.T) {
 				AddRow("topic-1", "discipline-1", "Pontuação", false).
 				AddRow("topic-2", "discipline-1", domain.MandatoryReviewTopicName, true),
 		)
-	mock.ExpectQuery("SELECT id, topico_id, nome").WillReturnRows(
-		sqlmock.NewRows([]string{"id", "topico_id", "nome"}).
-			AddRow("subtopic-1", "topic-1", "Uso da vírgula"),
-	)
 	mock.ExpectCommit()
 
 	repository := NewStudyRepository(db)
@@ -81,9 +77,6 @@ func TestFindCatalogReturnsMandatoryReviewTopicLast(t *testing.T) {
 	if !catalog[0].Topics[1].Mandatory {
 		t.Fatal("mandatory review topic was not returned last")
 	}
-	if len(catalog[0].Topics[0].Subtopics) != 1 || catalog[0].Topics[0].Subtopics[0].Name != "Uso da vírgula" {
-		t.Fatalf("subtopics were not attached to the correct topic: %#v", catalog[0].Topics)
-	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("database expectations: %v", err)
 	}
@@ -96,6 +89,9 @@ func TestDeleteTopicRejectsMandatoryReviewTopic(t *testing.T) {
 	}
 	defer db.Close()
 
+	mock.ExpectQuery("SELECT EXISTS").
+		WithArgs("topic-1").
+		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 	mock.ExpectExec("DELETE FROM topicos").
 		WithArgs("topic-1", domain.MandatoryReviewTopicName).
 		WillReturnResult(sqlmock.NewResult(0, 0))
@@ -114,25 +110,20 @@ func TestDeleteTopicRejectsMandatoryReviewTopic(t *testing.T) {
 	}
 }
 
-func TestCreateSubtopicRejectsMandatoryReviewTopic(t *testing.T) {
+func TestDeleteTopicRejectsTopicLinkedToEdital(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("sqlmock.New() error = %v", err)
 	}
 	defer db.Close()
-
-	mock.ExpectExec("INSERT INTO subtopicos").
-		WithArgs(sqlmock.AnyArg(), "Conteúdo externo", "topic-1", domain.MandatoryReviewTopicName).
-		WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectQuery("SELECT EXISTS").
-		WithArgs("topic-1", domain.MandatoryReviewTopicName).
+		WithArgs("topic-1").
 		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
 
-	repository := NewStudyRepository(db)
-	err = repository.CreateSubtopic(context.Background(), "topic-1", "Conteúdo externo")
+	err = NewStudyRepository(db).DeleteTopic(context.Background(), "topic-1")
 
-	if !errors.Is(err, domain.ErrMandatoryTopic) {
-		t.Fatalf("CreateSubtopic() error = %v, want %v", err, domain.ErrMandatoryTopic)
+	if !errors.Is(err, domain.ErrContentLinked) {
+		t.Fatalf("DeleteTopic() error = %v, want %v", err, domain.ErrContentLinked)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("database expectations: %v", err)

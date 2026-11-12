@@ -2,6 +2,7 @@ import '../repositories/concursos_repository.dart';
 import 'archive_concurso_use_case.dart';
 import 'create_concurso_use_case.dart';
 import 'delete_concurso_use_case.dart';
+import 'edital_use_cases.dart';
 import 'get_concurso_use_case.dart';
 import 'get_concursos_use_case.dart';
 import 'restore_concurso_use_case.dart';
@@ -17,7 +18,8 @@ class ConcursosUseCases {
       setConcursoPrioritario = SetConcursoPrioritarioUseCase(repository),
       archiveConcurso = ArchiveConcursoUseCase(repository),
       restoreConcurso = RestoreConcursoUseCase(repository),
-      deleteConcurso = DeleteConcursoUseCase(repository);
+      deleteConcurso = DeleteConcursoUseCase(repository),
+      edital = EditalUseCases(repository);
 
   final GetConcursoUseCase getConcurso;
   final GetConcursosUseCase getConcursos;
@@ -27,4 +29,5 @@ class ConcursosUseCases {
   final ArchiveConcursoUseCase archiveConcurso;
   final RestoreConcursoUseCase restoreConcurso;
   final DeleteConcursoUseCase deleteConcurso;
+  final EditalUseCases edital;
 }

@@ -15,7 +15,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
   }) : super(TopicosListState()) {
     on<TopicosListDisciplineChanged>(_onDisciplineChanged);
     on<TopicosListRefreshRequested>(_onRefresh);
-    on<TopicosListToggleRequested>(_onToggle);
     on<TopicosListDeleteRequested>(_onDelete);
   }
 
@@ -46,7 +45,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
         status: state.status,
         disciplineId: id,
         items: state.items,
-        expandedTopicIds: state.expandedTopicIds,
         isDeleting: state.isDeleting,
       ),
     );
@@ -54,24 +52,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
       emit,
       disciplineId: id,
       feedback: event.feedback,
-      expandedTopicIds: state.expandedTopicIds,
-    );
-  }
-
-  void _onToggle(
-    TopicosListToggleRequested event,
-    Emitter<TopicosListState> emit,
-  ) {
-    final expanded = {...state.expandedTopicIds};
-    if (!expanded.add(event.topicId)) expanded.remove(event.topicId);
-    emit(
-      TopicosListState(
-        status: state.status,
-        disciplineId: state.disciplineId,
-        items: state.items,
-        expandedTopicIds: expanded,
-        feedback: null,
-      ),
     );
   }
 
@@ -86,7 +66,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
         status: state.status,
         disciplineId: id,
         items: state.items,
-        expandedTopicIds: state.expandedTopicIds,
         isDeleting: true,
       ),
     );
@@ -97,7 +76,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
           emit,
           disciplineId: id,
           feedback: TopicosListFeedback.deleted,
-          expandedTopicIds: state.expandedTopicIds,
         );
       case FalhaTecnica<void>(
         codigo: DisciplinasResultadoCodes.sincronizacaoPendente,
@@ -111,7 +89,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
   Future<void> _load(
     Emitter<TopicosListState> emit, {
     required String disciplineId,
-    Set<String> expandedTopicIds = const {},
     TopicosListFeedback? feedback,
   }) async {
     final result = await getDisciplinas();
@@ -130,13 +107,11 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
               mandatory: topic.mandatory,
             ),
         ];
-        final ids = items.map((item) => item.id).toSet();
         emit(
           TopicosListState(
             status: TopicosListStatus.success,
             disciplineId: disciplineId,
             items: items,
-            expandedTopicIds: expandedTopicIds.where(ids.contains).toSet(),
             feedback: feedback,
           ),
         );
@@ -149,7 +124,6 @@ class TopicosListBloc extends Bloc<TopicosListEvent, TopicosListState> {
     status: state.status,
     disciplineId: state.disciplineId,
     items: state.items,
-    expandedTopicIds: state.expandedTopicIds,
     feedback: feedback,
   );
 }

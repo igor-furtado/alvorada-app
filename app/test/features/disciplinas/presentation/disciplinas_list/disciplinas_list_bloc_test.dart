@@ -74,7 +74,7 @@ void main() {
       ],
     );
 
-    test('filtra Disciplinas por nome de Subtópico', () async {
+    test('filtra Disciplinas por nome de Tópico', () async {
       final bloc = _bloc(
         FakeDisciplinasRepository(
           disciplinas: disciplinasFixture(),
@@ -84,10 +84,10 @@ void main() {
       await _load(bloc);
 
       final filtered = bloc.stream.firstWhere(
-        (state) => state.query == 'remédios constitucionais',
+        (state) => state.query == 'direitos e garantias fundamentais',
       );
       bloc.add(
-        const DisciplinasListSearchChanged('remédios constitucionais'),
+        const DisciplinasListSearchChanged('direitos e garantias fundamentais'),
       );
       final state = await filtered;
 

@@ -91,8 +91,6 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
         primaryLabel: widget.topico == null ? AppMessages.addTopic : AppMessages.saveChanges,
         onPrimary: submit,
         loading: submitting,
-        secondaryLabel: AppMessages.cancel,
-        onSecondary: submitting ? null : () => Navigator.pop(context),
         child: content,
       ),
     ),

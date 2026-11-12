@@ -62,10 +62,7 @@ const _disciplineJson = <String, Object?>{
       'id': 'topic-1',
       'nome': 'Direitos fundamentais',
       'obrigatorio': false,
-      'subtopicos': [
-        {'id': 'subtopic-1', 'nome': 'Direitos individuais'},
-      ],
     },
-    {'id': 'topic-2', 'nome': 'Revisão de Véspera', 'obrigatorio': true, 'subtopicos': <Object?>[]},
+    {'id': 'topic-2', 'nome': 'Revisão de Véspera', 'obrigatorio': true},
   ],
 };

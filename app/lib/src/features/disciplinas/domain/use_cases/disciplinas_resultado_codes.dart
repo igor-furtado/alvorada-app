@@ -7,14 +7,9 @@ abstract final class DisciplinasResultadoCodes {
   static const topicoCriacaoFalhou = 'topico.criacao_falhou';
   static const topicoAtualizacaoFalhou = 'topico.atualizacao_falhou';
   static const topicoExclusaoFalhou = 'topico.exclusao_falhou';
-  static const subtopicoCriacaoFalhou = 'subtopico.criacao_falhou';
-  static const subtopicoAtualizacaoFalhou = 'subtopico.atualizacao_falhou';
-  static const subtopicoExclusaoFalhou = 'subtopico.exclusao_falhou';
   static const disciplinaNomeObrigatorio = 'disciplina.nome_obrigatorio';
   static const disciplinaNomeMuitoLongo = 'disciplina.nome_muito_longo';
   static const disciplinaCorInvalida = 'disciplina.cor_invalida';
   static const topicoNomeObrigatorio = 'topico.nome_obrigatorio';
   static const topicoNomeMuitoLongo = 'topico.nome_muito_longo';
-  static const subtopicoNomeObrigatorio = 'subtopico.nome_obrigatorio';
-  static const subtopicoNomeMuitoLongo = 'subtopico.nome_muito_longo';
 }

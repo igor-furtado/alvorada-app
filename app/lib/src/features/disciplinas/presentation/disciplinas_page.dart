@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/content/app_messages.dart';
-import '../../../core/presentation/app_shell_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/ui/app_ui.dart';
 import '../domain/use_cases/disciplinas_use_cases.dart';
@@ -15,9 +13,6 @@ import 'disciplinas_list/disciplinas_list_event.dart';
 import 'disciplinas_list/disciplinas_list_header.dart';
 import 'disciplinas_list/disciplinas_list_state.dart';
 import 'disciplinas_list/disciplinas_list_view.dart';
-import 'subtopicos_list/subtopicos_list_bloc.dart';
-import 'subtopicos_list/subtopicos_list_event.dart';
-import 'subtopicos_list/subtopicos_list_state.dart';
 import 'topicos_list/topicos_list_bloc.dart';
 import 'topicos_list/topicos_list_event.dart';
 import 'topicos_list/topicos_list_state.dart';
@@ -52,12 +47,6 @@ class DisciplinasPage extends StatelessWidget {
             deleteTopico: useCases.deleteTopico,
           ),
         ),
-        BlocProvider(
-          create: (_) => SubtopicosListBloc(
-            getDisciplinas: useCases.getDisciplinas,
-            deleteSubtopico: useCases.deleteSubtopico,
-          ),
-        ),
       ],
       child: _DisciplinasPageContent(
         routeQuery: initialQuery,
@@ -81,39 +70,13 @@ class _DisciplinasPageContent extends StatefulWidget {
 }
 
 class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
-  final _shellOwner = Object();
-  AppShellController? _shellController;
+  late final TextEditingController _searchController;
   Timer? _urlTimer;
 
-  void _configureShellSearch() {
-    final controller = _shellController;
-    if (controller == null) return;
-    final disciplinas = context.read<DisciplinasListBloc>().state;
-    final topicos = context.read<TopicosListBloc>().state;
-    final subtopicos = context.read<SubtopicosListBloc>().state;
-    final canRefresh =
-        disciplinas.status == DisciplinasListStatus.success &&
-        !disciplinas.isRefreshing &&
-        !disciplinas.isDeleting &&
-        !topicos.isDeleting &&
-        !subtopicos.byTopic.values.any((state) => state.isDeleting);
-    controller.setSearch(
-      _shellOwner,
-      AppShellSearchConfig(
-        placeholder: AppMessages.searchContent,
-        query: disciplinas.query,
-        actionIcon: AppIcons.refresh,
-        actionLabel: AppMessages.update,
-        onAction: canRefresh ? _refreshAll : null,
-        onChanged: (value) {
-          if (mounted) {
-            context.read<DisciplinasListBloc>().add(
-              DisciplinasListSearchChanged(value),
-            );
-          }
-        },
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(text: widget.routeQuery);
   }
 
   void _refreshAll() {
@@ -126,22 +89,14 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final controller = AppShellScope.read(context);
-    if (identical(controller, _shellController)) return;
-    _shellController?.clearSearch(_shellOwner);
-    _shellController = controller;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _configureShellSearch();
-    });
-  }
-
-  @override
   void didUpdateWidget(_DisciplinasPageContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     final bloc = context.read<DisciplinasListBloc>();
     if (oldWidget.routeQuery != widget.routeQuery && bloc.state.query != widget.routeQuery) {
+      _searchController.value = TextEditingValue(
+        text: widget.routeQuery,
+        selection: TextSelection.collapsed(offset: widget.routeQuery.length),
+      );
       bloc.add(DisciplinasListSearchChanged(widget.routeQuery));
     }
     if (oldWidget.routeOrder != widget.routeOrder && bloc.state.order != widget.routeOrder) {
@@ -167,7 +122,7 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
   @override
   void dispose() {
     _urlTimer?.cancel();
-    _shellController?.clearSearch(_shellOwner);
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -180,17 +135,11 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
           context.read<TopicosListBloc>().add(
             TopicosListDisciplineChanged(state.selectedDisciplineId),
           );
-          context.read<SubtopicosListBloc>().add(
-            SubtopicosListDisciplineChanged(state.selectedDisciplineId),
-          );
         },
       ),
       BlocListener<DisciplinasListBloc, DisciplinasListState>(
         listenWhen: (previous, current) => previous.query != current.query || previous.order != current.order,
-        listener: (context, state) {
-          _configureShellSearch();
-          _synchronizeUrl(state);
-        },
+        listener: (context, state) => _synchronizeUrl(state),
       ),
       BlocListener<DisciplinasListBloc, DisciplinasListState>(
         listenWhen: (previous, current) =>
@@ -198,9 +147,6 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
         listener: (context, state) {
           context.read<TopicosListBloc>().add(
             const TopicosListRefreshRequested(),
-          );
-          context.read<SubtopicosListBloc>().add(
-            const SubtopicosListRefreshRequested(),
           );
         },
       ),
@@ -211,37 +157,7 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
           context.read<DisciplinasListBloc>().add(
             const DisciplinasListRefreshRequested(),
           );
-          context.read<SubtopicosListBloc>().add(
-            const SubtopicosListRefreshRequested(),
-          );
         },
-      ),
-      BlocListener<SubtopicosListBloc, SubtopicosListState>(
-        listenWhen: (previous, current) => previous.feedback != current.feedback && current.feedback != null,
-        listener: (context, state) {
-          final feedback = state.feedback!;
-          if (_subtopicosChanged(feedback)) {
-            context.read<DisciplinasListBloc>().add(
-              const DisciplinasListRefreshRequested(),
-            );
-          }
-          _showSubtopicosFeedback(context, feedback);
-        },
-      ),
-      BlocListener<DisciplinasListBloc, DisciplinasListState>(
-        listenWhen: (previous, current) =>
-            previous.status != current.status ||
-            previous.isRefreshing != current.isRefreshing ||
-            previous.isDeleting != current.isDeleting,
-        listener: (context, state) => _configureShellSearch(),
-      ),
-      BlocListener<TopicosListBloc, TopicosListState>(
-        listenWhen: (previous, current) => previous.isDeleting != current.isDeleting,
-        listener: (context, state) => _configureShellSearch(),
-      ),
-      BlocListener<SubtopicosListBloc, SubtopicosListState>(
-        listenWhen: (previous, current) => _hasDeletingSubtopic(previous) != _hasDeletingSubtopic(current),
-        listener: (context, state) => _configureShellSearch(),
       ),
     ],
     child: SafeArea(
@@ -254,11 +170,22 @@ class _DisciplinasPageContentState extends State<_DisciplinasPageContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                BlocSelector<DisciplinasListBloc, DisciplinasListState, bool>(
-                  selector: (state) => state.canMutate,
-                  builder: (context, canAdd) => RepaintBoundary(
+                BlocBuilder<DisciplinasListBloc, DisciplinasListState>(
+                  buildWhen: (previous, current) =>
+                      previous.canMutate != current.canMutate ||
+                      previous.status != current.status ||
+                      previous.isRefreshing != current.isRefreshing ||
+                      previous.isDeleting != current.isDeleting,
+                  builder: (context, state) => RepaintBoundary(
                     child: DisciplinasListHeader(
-                      canAdd: canAdd,
+                      searchController: _searchController,
+                      canAdd: state.canMutate,
+                      canRefresh:
+                          state.status == DisciplinasListStatus.success && !state.isRefreshing && !state.isDeleting,
+                      onSearchChanged: (value) => context.read<DisciplinasListBloc>().add(
+                        DisciplinasListSearchChanged(value),
+                      ),
+                      onRefresh: _refreshAll,
                       onAdd: () => DisciplinasListActions.add(context),
                     ),
                   ),
@@ -311,29 +238,3 @@ bool _topicosChanged(TopicosListFeedback feedback) => switch (feedback) {
   TopicosListFeedback.created || TopicosListFeedback.renamed || TopicosListFeedback.deleted => true,
   _ => false,
 };
-
-bool _subtopicosChanged(SubtopicosListFeedback feedback) => switch (feedback) {
-  SubtopicosListFeedback.created || SubtopicosListFeedback.renamed || SubtopicosListFeedback.deleted => true,
-  _ => false,
-};
-
-bool _hasDeletingSubtopic(SubtopicosListState state) => state.byTopic.values.any(
-  (topic) => topic.isDeleting,
-);
-
-void _showSubtopicosFeedback(
-  BuildContext context,
-  SubtopicosListFeedback feedback,
-) {
-  final (message, variant) = switch (feedback) {
-    SubtopicosListFeedback.created => (AppMessages.subtopicCreated, AppToastVariant.success),
-    SubtopicosListFeedback.renamed => (AppMessages.subtopicUpdated, AppToastVariant.success),
-    SubtopicosListFeedback.deleted => (AppMessages.subtopicDeleted, AppToastVariant.success),
-    SubtopicosListFeedback.synchronizationPending => (
-      AppMessages.contentSavedSyncPending,
-      AppToastVariant.info,
-    ),
-    SubtopicosListFeedback.operationFailed => (AppMessages.contentOperationFailed, AppToastVariant.error),
-  };
-  AppToast.show(context, title: message, variant: variant);
-}

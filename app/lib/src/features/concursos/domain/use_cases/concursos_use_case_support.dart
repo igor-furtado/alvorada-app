@@ -9,6 +9,8 @@ Future<Resultado<T>> executarConcursosUseCase<T>({
 }) async {
   try {
     return Sucesso(await operacao());
+  } on ConcursosRuleViolationException catch (error) {
+    return ViolacaoRegra(codigo: error.code, mensagem: error.message);
   } on ConcursosSynchronizationException catch (error) {
     return FalhaTecnica(
       codigo: ConcursosResultadoCodes.sincronizacaoPendente,

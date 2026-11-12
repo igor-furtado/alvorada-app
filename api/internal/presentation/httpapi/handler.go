@@ -41,6 +41,9 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/prioridade", h.setConcursoPrioritario)
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/arquivamento", h.archiveConcurso)
 	mux.HandleFunc("DELETE /api/v1/concursos/{id}/arquivamento", h.restoreConcurso)
+	mux.HandleFunc("PUT /api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}", h.addDisciplinaToEdital)
+	mux.HandleFunc("PUT /api/v1/concursos/{id}/edital/topicos/{topicoId}", h.addTopicoToEdital)
+	mux.HandleFunc("DELETE /api/v1/concursos/{id}/edital/topicos/{topicoId}", h.removeTopicoFromEdital)
 	mux.HandleFunc("GET /api/v1/subjects", h.catalog)
 	mux.HandleFunc("POST /api/v1/subjects", h.createSubject)
 	mux.HandleFunc("PATCH /api/v1/subjects/{id}", h.updateSubject)
@@ -48,9 +51,6 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics", h.createTopic)
 	mux.HandleFunc("PATCH /api/v1/topics/{id}", h.updateTopic)
 	mux.HandleFunc("DELETE /api/v1/topics/{id}", h.deleteTopic)
-	mux.HandleFunc("POST /api/v1/topics/{id}/subtopics", h.createSubtopic)
-	mux.HandleFunc("PATCH /api/v1/subtopics/{id}", h.updateSubtopic)
-	mux.HandleFunc("DELETE /api/v1/subtopics/{id}", h.deleteSubtopic)
 	return recovery(h.logger, cors(requestLogger(h.logger, mux)))
 }
 
@@ -88,22 +88,23 @@ type concursoRequest struct {
 }
 
 type concursoResponse struct {
-	ID                  string  `json:"id"`
-	Instituicao         string  `json:"instituicao"`
-	Cargo               string  `json:"cargo"`
-	Banca               *string `json:"banca"`
-	DataProva           *string `json:"data_prova"`
-	Prioritario         bool    `json:"prioritario"`
-	ProgressoEdital     int     `json:"progresso_edital"`
-	Sigla               *string `json:"sigla"`
-	QuantidadeVagas     *int    `json:"quantidade_vagas"`
-	VencimentoCentavos  *int64  `json:"vencimento_centavos"`
-	CargaHorariaSemanal *int    `json:"carga_horaria_semanal"`
-	LocalProva          *string `json:"local_prova"`
-	HorarioInicioProva  *string `json:"horario_inicio_prova"`
-	HorarioFimProva     *string `json:"horario_fim_prova"`
-	Requisitos          *string `json:"requisitos"`
-	CriteriosPontuacao  *string `json:"criterios_pontuacao"`
+	ID                  string                             `json:"id"`
+	Instituicao         string                             `json:"instituicao"`
+	Cargo               string                             `json:"cargo"`
+	Banca               *string                            `json:"banca"`
+	DataProva           *string                            `json:"data_prova"`
+	Prioritario         bool                               `json:"prioritario"`
+	ProgressoEdital     int                                `json:"progresso_edital"`
+	Sigla               *string                            `json:"sigla"`
+	QuantidadeVagas     *int                               `json:"quantidade_vagas"`
+	VencimentoCentavos  *int64                             `json:"vencimento_centavos"`
+	CargaHorariaSemanal *int                               `json:"carga_horaria_semanal"`
+	LocalProva          *string                            `json:"local_prova"`
+	HorarioInicioProva  *string                            `json:"horario_inicio_prova"`
+	HorarioFimProva     *string                            `json:"horario_fim_prova"`
+	Requisitos          *string                            `json:"requisitos"`
+	CriteriosPontuacao  *string                            `json:"criterios_pontuacao"`
+	Disciplinas         []concursosDomain.EditalDisciplina `json:"disciplinas"`
 }
 
 func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
@@ -132,6 +133,7 @@ func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
 			LocalProva: item.LocalProva, HorarioInicioProva: item.HorarioInicioProva,
 			HorarioFimProva: item.HorarioFimProva, Requisitos: item.Requisitos,
 			CriteriosPontuacao: item.CriteriosPontuacao,
+			Disciplinas:        item.Disciplinas,
 		})
 	}
 	writeJSON(w, http.StatusOK, response)
@@ -215,6 +217,24 @@ func (h *Handler) restoreConcurso(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteConcurso(w http.ResponseWriter, r *http.Request) {
 	h.runNoContent(w, r, func() error {
 		return h.concursos.Delete(r.Context(), r.PathValue("id"))
+	})
+}
+
+func (h *Handler) addDisciplinaToEdital(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.AddDisciplinaToEdital(r.Context(), r.PathValue("id"), r.PathValue("disciplinaId"))
+	})
+}
+
+func (h *Handler) addTopicoToEdital(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.AddTopicoToEdital(r.Context(), r.PathValue("id"), r.PathValue("topicoId"))
+	})
+}
+
+func (h *Handler) removeTopicoFromEdital(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.concursos.RemoveTopicoFromEdital(r.Context(), r.PathValue("id"), r.PathValue("topicoId"))
 	})
 }
 
@@ -321,18 +341,6 @@ func (h *Handler) deleteTopic(w http.ResponseWriter, r *http.Request) {
 	h.runDelete(w, r, func() error { return h.studies.DeleteTopic(r.Context(), r.PathValue("id")) })
 }
 
-func (h *Handler) createSubtopic(w http.ResponseWriter, r *http.Request) {
-	h.runCreateName(w, r, func(name string) error { return h.studies.CreateSubtopic(r.Context(), r.PathValue("id"), name) })
-}
-
-func (h *Handler) updateSubtopic(w http.ResponseWriter, r *http.Request) {
-	h.runUpdateName(w, r, func(name string) error { return h.studies.UpdateSubtopic(r.Context(), r.PathValue("id"), name) })
-}
-
-func (h *Handler) deleteSubtopic(w http.ResponseWriter, r *http.Request) {
-	h.runDelete(w, r, func() error { return h.studies.DeleteSubtopic(r.Context(), r.PathValue("id")) })
-}
-
 func (h *Handler) runCreateName(w http.ResponseWriter, r *http.Request, operation func(string) error) {
 	var body nameRequest
 	if err := decodeJSON(r, &body); err != nil {
@@ -392,6 +400,10 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
 		errors.Is(err, domain.ErrMandatoryTopic) {
 		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if errors.Is(err, domain.ErrContentLinked) {
+		writeError(w, http.StatusConflict, err.Error())
 		return
 	}
 	h.internalError(w, r, err)

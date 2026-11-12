@@ -29,11 +29,7 @@ func (r *StudyRepository) FindCatalog(ctx context.Context) ([]domain.Subject, er
 	if err != nil {
 		return nil, err
 	}
-	topicIndexes, err := queryTopics(ctx, tx, catalog, subjectIndexes)
-	if err != nil {
-		return nil, err
-	}
-	if err := querySubtopics(ctx, tx, catalog, topicIndexes); err != nil {
+	if err := queryTopics(ctx, tx, catalog, subjectIndexes); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {
@@ -69,78 +65,35 @@ func querySubjects(ctx context.Context, tx *sql.Tx) ([]domain.Subject, map[strin
 	return catalog, indexes, nil
 }
 
-type topicLocation struct {
-	subject int
-	topic   int
-}
-
 func queryTopics(
 	ctx context.Context,
 	tx *sql.Tx,
 	catalog []domain.Subject,
 	subjectIndexes map[string]int,
-) (map[string]topicLocation, error) {
+) error {
 	rows, err := tx.QueryContext(ctx, `
 		SELECT id, disciplina_id, nome, BINARY nome = BINARY ? AS obrigatorio
 		FROM topicos
 		ORDER BY disciplina_id, obrigatorio, posicao, criado_em`, domain.MandatoryReviewTopicName)
 	if err != nil {
-		return nil, fmt.Errorf("query topics: %w", err)
+		return fmt.Errorf("query topics: %w", err)
 	}
 	defer rows.Close()
 
-	topicIndexes := make(map[string]topicLocation)
 	for rows.Next() {
 		var topic domain.Topic
 		var subjectID string
 		if err := rows.Scan(&topic.ID, &subjectID, &topic.Name, &topic.Mandatory); err != nil {
-			return nil, fmt.Errorf("scan topic: %w", err)
+			return fmt.Errorf("scan topic: %w", err)
 		}
-		topic.Subtopics = make([]domain.Subtopic, 0)
 		subjectIndex, exists := subjectIndexes[subjectID]
 		if !exists {
 			continue
 		}
 		catalog[subjectIndex].Topics = append(catalog[subjectIndex].Topics, topic)
-		topicIndexes[topic.ID] = topicLocation{
-			subject: subjectIndex,
-			topic:   len(catalog[subjectIndex].Topics) - 1,
-		}
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate topics: %w", err)
-	}
-	return topicIndexes, nil
-}
-
-func querySubtopics(
-	ctx context.Context,
-	tx *sql.Tx,
-	catalog []domain.Subject,
-	topicIndexes map[string]topicLocation,
-) error {
-	rows, err := tx.QueryContext(ctx, `
-		SELECT id, topico_id, nome
-		FROM subtopicos
-		ORDER BY posicao, criado_em`)
-	if err != nil {
-		return fmt.Errorf("query subtopics: %w", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var subtopic domain.Subtopic
-		var topicID string
-		if err := rows.Scan(&subtopic.ID, &topicID, &subtopic.Name); err != nil {
-			return fmt.Errorf("scan subtopic: %w", err)
-		}
-		if location, exists := topicIndexes[topicID]; exists {
-			topic := &catalog[location.subject].Topics[location.topic]
-			topic.Subtopics = append(topic.Subtopics, subtopic)
-		}
-	}
-	if err := rows.Err(); err != nil {
-		return fmt.Errorf("iterate subtopics: %w", err)
+		return fmt.Errorf("iterate topics: %w", err)
 	}
 	return nil
 }
@@ -204,6 +157,19 @@ func (r *StudyRepository) UpdateSubject(ctx context.Context, id string, input do
 }
 
 func (r *StudyRepository) DeleteSubject(ctx context.Context, id string) error {
+	var linked bool
+	if err := r.db.QueryRowContext(ctx, `
+		SELECT EXISTS(
+			SELECT 1
+			FROM concursos_topicos
+			INNER JOIN topicos ON topicos.id = concursos_topicos.topico_id
+			WHERE topicos.disciplina_id = ?
+		)`, id).Scan(&linked); err != nil {
+		return fmt.Errorf("check linked subject: %w", err)
+	}
+	if linked {
+		return domain.ErrContentLinked
+	}
 	return exec(ctx, r.db, "delete subject", "DELETE FROM disciplinas WHERE id = ?", id)
 }
 
@@ -229,6 +195,14 @@ func (r *StudyRepository) UpdateTopic(ctx context.Context, id, name string) erro
 }
 
 func (r *StudyRepository) DeleteTopic(ctx context.Context, id string) error {
+	var linked bool
+	if err := r.db.QueryRowContext(ctx, `
+		SELECT EXISTS(SELECT 1 FROM concursos_topicos WHERE topico_id = ?)`, id).Scan(&linked); err != nil {
+		return fmt.Errorf("check linked topic: %w", err)
+	}
+	if linked {
+		return domain.ErrContentLinked
+	}
 	return execMutableTopic(
 		ctx,
 		r.db,
@@ -238,33 +212,6 @@ func (r *StudyRepository) DeleteTopic(ctx context.Context, id string) error {
 		id,
 		domain.MandatoryReviewTopicName,
 	)
-}
-
-func (r *StudyRepository) CreateSubtopic(ctx context.Context, topicID, name string) error {
-	id, err := newUUID()
-	if err != nil {
-		return err
-	}
-	return execMutableTopic(
-		ctx,
-		r.db,
-		"insert subtopic",
-		`INSERT INTO subtopicos (id, topico_id, nome)
-		 SELECT ?, id, ? FROM topicos WHERE id = ? AND BINARY nome <> BINARY ?`,
-		topicID,
-		id,
-		name,
-		topicID,
-		domain.MandatoryReviewTopicName,
-	)
-}
-
-func (r *StudyRepository) UpdateSubtopic(ctx context.Context, id, name string) error {
-	return exec(ctx, r.db, "update subtopic", "UPDATE subtopicos SET nome = ? WHERE id = ?", name, id)
-}
-
-func (r *StudyRepository) DeleteSubtopic(ctx context.Context, id string) error {
-	return exec(ctx, r.db, "delete subtopic", "DELETE FROM subtopicos WHERE id = ?", id)
 }
 
 func exec(ctx context.Context, db *sql.DB, operation, query string, args ...any) error {

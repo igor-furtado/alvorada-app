@@ -20,87 +20,30 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  final _commandController = TextEditingController();
-  final _shellController = AppShellController();
-  var _commandQuery = '';
-  var _lastPrimaryIndex = 0;
-
-  static const _disciplinasBranchIndex = 1;
   static const _administrationBranchIndex = 2;
 
-  @override
-  void initState() {
-    super.initState();
-    _shellController.addListener(_synchronizeCommandQuery);
-  }
-
-  void _synchronizeCommandQuery() {
-    final config = _shellController.value;
-    final query = config?.query ?? '';
-    if (query == _commandController.text && query == _commandQuery) return;
-    if (query != _commandController.text) {
-      _commandController.value = TextEditingValue(
-        text: query,
-        selection: TextSelection.collapsed(offset: query.length),
-      );
-    }
-    if (mounted && _commandQuery != query) {
-      setState(() => _commandQuery = query);
-    }
-  }
+  final _shellController = AppShellController();
+  var _lastPrimaryIndex = 0;
 
   void _select(int index) {
-    if (_commandQuery.isNotEmpty || _commandController.text.isNotEmpty) {
-      _clearCommand();
-    }
+    _shellController.resetBreadcrumbs();
     widget.navigationShell.goBranch(
       index,
       initialLocation: index == widget.navigationShell.currentIndex,
     );
-    _lastPrimaryIndex = index;
+    setState(() => _lastPrimaryIndex = index);
   }
 
   void _openAdministration() {
-    if (_commandQuery.isNotEmpty || _commandController.text.isNotEmpty) {
-      _clearCommand();
-    }
+    _shellController.resetBreadcrumbs();
     widget.navigationShell.goBranch(
       _administrationBranchIndex,
       initialLocation: widget.navigationShell.currentIndex == _administrationBranchIndex,
     );
   }
 
-  void _submitCommand(String value) {
-    if (widget.navigationShell.currentIndex == _disciplinasBranchIndex && _shellController.value != null) return;
-    final query = value.trim().toLowerCase();
-    if (query.isEmpty) return;
-    final index = _destinations.indexWhere(
-      (destination) => destination.label.toLowerCase().contains(query),
-    );
-    if (index < 0) return;
-    _select(index);
-    FocusManager.instance.primaryFocus?.unfocus();
-  }
-
-  void _changeCommand(String value) {
-    setState(() => _commandQuery = value);
-    if (widget.navigationShell.currentIndex == _disciplinasBranchIndex) {
-      _shellController.value?.onChanged(value);
-    }
-  }
-
-  void _clearCommand() {
-    _commandController.clear();
-    if (_commandQuery.isNotEmpty) {
-      setState(() => _commandQuery = '');
-    }
-    _shellController.value?.onChanged('');
-  }
-
   @override
   void dispose() {
-    _shellController.removeListener(_synchronizeCommandQuery);
-    _commandController.dispose();
     _shellController.dispose();
     super.dispose();
   }
@@ -108,9 +51,9 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) => AppShellScope(
     controller: _shellController,
-    child: ValueListenableBuilder<AppShellSearchConfig?>(
+    child: ValueListenableBuilder<List<AppShellBreadcrumb>?>(
       valueListenable: _shellController,
-      builder: (context, searchConfig, child) => ResponsiveBuilder(
+      builder: (context, breadcrumbs, child) => ResponsiveBuilder(
         builder: (context, windowClass) => FocusTraversalGroup(
           child: Scaffold(
             bottomNavigationBar: windowClass.isCompact
@@ -132,16 +75,8 @@ class _AppShellState extends State<AppShell> {
                 Expanded(
                   child: Column(
                     children: [
-                      _CommandBar(
-                        compact: windowClass.isCompact,
-                        controller: _commandController,
-                        query: _commandQuery,
-                        searchConfig: widget.navigationShell.currentIndex == _disciplinasBranchIndex
-                            ? searchConfig
-                            : null,
-                        onChanged: _changeCommand,
-                        onClear: _clearCommand,
-                        onSubmitted: _submitCommand,
+                      _HeaderBar(
+                        breadcrumbs: breadcrumbs ?? _defaultBreadcrumbs(widget.navigationShell.currentIndex),
                       ),
                       Expanded(child: widget.navigationShell),
                     ],
@@ -155,6 +90,16 @@ class _AppShellState extends State<AppShell> {
     ),
   );
 }
+
+List<AppShellBreadcrumb> _defaultBreadcrumbs(int branchIndex) => [
+  AppShellBreadcrumb(
+    label: switch (branchIndex) {
+      0 => AppMessages.navigationConcursos,
+      1 => AppMessages.navigationDisciplines,
+      _ => AppMessages.administration,
+    },
+  ),
+];
 
 @immutable
 class _AppDestination {
@@ -178,6 +123,57 @@ const _destinations = [
   ),
 ];
 
+class _HeaderBar extends StatelessWidget {
+  const _HeaderBar({required this.breadcrumbs});
+
+  final List<AppShellBreadcrumb> breadcrumbs;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: context.tokens.colors.surface,
+      border: Border(bottom: BorderSide(color: context.tokens.colors.border)),
+    ),
+    child: SafeArea(
+      bottom: false,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: context.tokens.layout.commandBarHeight),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xl),
+          child: Row(
+            children: [
+              Expanded(
+                child: AppBreadcrumbs(
+                  items: [
+                    for (final item in breadcrumbs) AppBreadcrumbItem(label: item.label, route: item.route),
+                  ],
+                ),
+              ),
+              SizedBox(width: context.tokens.spacing.lg),
+              const _ThemeToggle(),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _ThemeToggle extends StatelessWidget {
+  const _ThemeToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return AppAccessibleIconButton(
+      key: const ValueKey('theme-toggle'),
+      icon: dark ? AppIcons.sun : AppIcons.moon,
+      label: dark ? AppMessages.useLightTheme : AppMessages.useDarkTheme,
+      onPressed: () => AppThemeModeScope.of(context).toggle(Theme.of(context).brightness),
+    );
+  }
+}
+
 class _IconRail extends StatelessWidget {
   const _IconRail({
     required this.selectedIndex,
@@ -194,9 +190,7 @@ class _IconRail extends StatelessWidget {
     width: context.tokens.layout.iconRailWidth,
     decoration: BoxDecoration(
       color: context.tokens.colors.surface,
-      border: Border(
-        right: BorderSide(color: context.tokens.colors.border),
-      ),
+      border: Border(right: BorderSide(color: context.tokens.colors.border)),
     ),
     child: SafeArea(
       child: Column(
@@ -242,146 +236,6 @@ class _IconRail extends StatelessWidget {
   );
 }
 
-class _CommandBar extends StatelessWidget {
-  const _CommandBar({
-    required this.compact,
-    required this.controller,
-    required this.query,
-    required this.searchConfig,
-    required this.onChanged,
-    required this.onClear,
-    required this.onSubmitted,
-  });
-
-  final bool compact;
-  final TextEditingController controller;
-  final String query;
-  final AppShellSearchConfig? searchConfig;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-  final ValueChanged<String> onSubmitted;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: context.tokens.colors.surface,
-      border: Border(
-        bottom: BorderSide(color: context.tokens.colors.border),
-      ),
-    ),
-    child: SafeArea(
-      bottom: false,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: context.tokens.layout.commandBarHeight),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xl),
-          child: compact
-              ? Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.sm),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _CommandSearch(
-                          controller: controller,
-                          query: query,
-                          searchConfig: searchConfig,
-                          onChanged: onChanged,
-                          onClear: onClear,
-                          onSubmitted: onSubmitted,
-                        ),
-                      ),
-                      SizedBox(width: context.tokens.spacing.sm),
-                      if (searchConfig?.actionIcon case final icon?) ...[
-                        AppAccessibleIconButton(
-                          key: const ValueKey('shell-search-action'),
-                          icon: icon,
-                          label: searchConfig?.actionLabel ?? AppMessages.update,
-                          onPressed: searchConfig?.onAction,
-                        ),
-                        SizedBox(width: context.tokens.spacing.sm),
-                      ],
-                      const _ThemeToggle(),
-                    ],
-                  ),
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: Align(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: context.tokens.layout.commandSearchWidth),
-                          child: _CommandSearch(
-                            controller: controller,
-                            query: query,
-                            searchConfig: searchConfig,
-                            onChanged: onChanged,
-                            onClear: onClear,
-                            onSubmitted: onSubmitted,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: context.tokens.spacing.xxl),
-                    if (searchConfig?.actionIcon case final icon?) ...[
-                      AppAccessibleIconButton(
-                        key: const ValueKey('shell-search-action'),
-                        icon: icon,
-                        label: searchConfig?.actionLabel ?? AppMessages.update,
-                        onPressed: searchConfig?.onAction,
-                      ),
-                      SizedBox(width: context.tokens.spacing.sm),
-                    ],
-                    const _ThemeToggle(),
-                  ],
-                ),
-        ),
-      ),
-    ),
-  );
-}
-
-class _CommandSearch extends StatelessWidget {
-  const _CommandSearch({
-    required this.controller,
-    required this.query,
-    required this.searchConfig,
-    required this.onChanged,
-    required this.onClear,
-    required this.onSubmitted,
-  });
-
-  final TextEditingController controller;
-  final String query;
-  final AppShellSearchConfig? searchConfig;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-  final ValueChanged<String> onSubmitted;
-
-  @override
-  Widget build(BuildContext context) => AppSearchField(
-    controller: controller,
-    placeholder: searchConfig?.placeholder ?? AppMessages.navigationSearch,
-    onChanged: onChanged,
-    onSubmitted: onSubmitted,
-    onClear: query.isEmpty ? null : onClear,
-  );
-}
-
-class _ThemeToggle extends StatelessWidget {
-  const _ThemeToggle();
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return AppAccessibleIconButton(
-      key: const ValueKey('theme-toggle'),
-      icon: dark ? AppIcons.sun : AppIcons.moon,
-      label: dark ? AppMessages.useLightTheme : AppMessages.useDarkTheme,
-      onPressed: () => AppThemeModeScope.of(context).toggle(Theme.of(context).brightness),
-    );
-  }
-}
-
 class _CompactNavigation extends StatelessWidget {
   const _CompactNavigation({required this.selectedIndex, required this.onSelected});
 
@@ -391,9 +245,7 @@ class _CompactNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DecoratedBox(
     decoration: BoxDecoration(
-      border: Border(
-        top: BorderSide(color: context.tokens.colors.border),
-      ),
+      border: Border(top: BorderSide(color: context.tokens.colors.border)),
     ),
     child: NavigationBar(
       selectedIndex: selectedIndex,

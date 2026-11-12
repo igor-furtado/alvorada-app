@@ -92,12 +92,99 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 		if criterios.Valid {
 			concurso.CriteriosPontuacao = &criterios.String
 		}
+		concurso.Disciplinas = make([]domain.EditalDisciplina, 0)
 		result = append(result, concurso)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate concursos: %w", err)
 	}
+	if err := rows.Close(); err != nil {
+		return nil, fmt.Errorf("close concursos rows: %w", err)
+	}
+	if err := r.loadEditais(ctx, result); err != nil {
+		return nil, err
+	}
 	return result, nil
+}
+
+func (r *ConcursoRepository) loadEditais(ctx context.Context, concursos []domain.Concurso) error {
+	if len(concursos) == 0 {
+		return nil
+	}
+	concursoIndexes := make(map[string]int, len(concursos))
+	disciplinaIndexes := make(map[string]map[string]int, len(concursos))
+	for index := range concursos {
+		concursoIndexes[concursos[index].ID] = index
+		disciplinaIndexes[concursos[index].ID] = make(map[string]int)
+	}
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT vinculo.concurso_id, disciplina.id, disciplina.nome,
+			topico.id, topico.nome, 0 AS obrigatorio
+		FROM concursos_topicos AS vinculo
+		INNER JOIN concursos AS concurso ON concurso.id = vinculo.concurso_id AND concurso.arquivado_em IS NULL
+		INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id
+		INNER JOIN disciplinas AS disciplina ON disciplina.id = topico.disciplina_id
+		WHERE BINARY topico.nome <> BINARY 'Revisão de Véspera'
+		ORDER BY disciplina.posicao, disciplina.criado_em, disciplina.id,
+			topico.posicao, topico.criado_em, topico.id`)
+	if err != nil {
+		return fmt.Errorf("query edital topics: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var concursoID, disciplinaID, disciplinaNome string
+		var topico domain.EditalTopico
+		if err := rows.Scan(
+			&concursoID,
+			&disciplinaID,
+			&disciplinaNome,
+			&topico.ID,
+			&topico.Nome,
+			&topico.Obrigatorio,
+		); err != nil {
+			return fmt.Errorf("scan edital topic: %w", err)
+		}
+		concursoIndex, exists := concursoIndexes[concursoID]
+		if !exists {
+			continue
+		}
+		disciplinaIndex, exists := disciplinaIndexes[concursoID][disciplinaID]
+		if !exists {
+			disciplinaIndex = len(concursos[concursoIndex].Disciplinas)
+			disciplinaIndexes[concursoID][disciplinaID] = disciplinaIndex
+			concursos[concursoIndex].Disciplinas = append(
+				concursos[concursoIndex].Disciplinas,
+				domain.EditalDisciplina{ID: disciplinaID, Nome: disciplinaNome, Topicos: make([]domain.EditalTopico, 0)},
+			)
+		}
+		disciplina := &concursos[concursoIndex].Disciplinas[disciplinaIndex]
+		disciplina.Topicos = append(disciplina.Topicos, topico)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate edital topics: %w", err)
+	}
+	if err := rows.Close(); err != nil {
+		return fmt.Errorf("close edital topics rows: %w", err)
+	}
+	for concursoIndex := range concursos {
+		for disciplinaIndex := range concursos[concursoIndex].Disciplinas {
+			disciplina := &concursos[concursoIndex].Disciplinas[disciplinaIndex]
+			var revisao domain.EditalTopico
+			err := r.db.QueryRowContext(ctx, `
+				SELECT id, nome, 1
+				FROM topicos
+				WHERE disciplina_id = ? AND BINARY nome = BINARY 'Revisão de Véspera'`, disciplina.ID).Scan(
+				&revisao.ID,
+				&revisao.Nome,
+				&revisao.Obrigatorio,
+			)
+			if err != nil {
+				return fmt.Errorf("query mandatory edital topic: %w", err)
+			}
+			disciplina.Topicos = append(disciplina.Topicos, revisao)
+		}
+	}
+	return nil
 }
 
 func (r *ConcursoRepository) Create(ctx context.Context, input domain.CreateConcursoInput) (string, error) {
@@ -273,6 +360,48 @@ func (r *ConcursoRepository) Delete(ctx context.Context, id string) error {
 		return fmt.Errorf("delete concurso: %w", err)
 	}
 	return requireAffected(result)
+}
+
+func (r *ConcursoRepository) AddDisciplinaToEdital(ctx context.Context, concursoID, disciplinaID string) error {
+	_, err := r.db.ExecContext(ctx, `
+		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
+		SELECT concurso.id, topico.id
+		FROM concursos AS concurso
+		INNER JOIN topicos AS topico
+			ON topico.disciplina_id = ?
+			AND BINARY topico.nome <> BINARY 'Revisão de Véspera'
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, disciplinaID, concursoID)
+	if err != nil {
+		return fmt.Errorf("add disciplina to edital: %w", err)
+	}
+	return nil
+}
+
+func (r *ConcursoRepository) AddTopicoToEdital(ctx context.Context, concursoID, topicoID string) error {
+	_, err := r.db.ExecContext(ctx, `
+		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
+		SELECT concurso.id, topico.id
+		FROM concursos AS concurso
+		INNER JOIN topicos AS topico
+			ON topico.id = ?
+			AND BINARY topico.nome <> BINARY 'Revisão de Véspera'
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, topicoID, concursoID)
+	if err != nil {
+		return fmt.Errorf("add topic to edital: %w", err)
+	}
+	return nil
+}
+
+func (r *ConcursoRepository) RemoveTopicoFromEdital(ctx context.Context, concursoID, topicoID string) error {
+	if _, err := r.db.ExecContext(
+		ctx,
+		"DELETE FROM concursos_topicos WHERE concurso_id = ? AND topico_id = ?",
+		concursoID,
+		topicoID,
+	); err != nil {
+		return fmt.Errorf("remove topic from edital: %w", err)
+	}
+	return nil
 }
 
 func requireAffected(result sql.Result) error {

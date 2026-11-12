@@ -88,8 +88,6 @@ class _DisciplinasFormContentState extends State<_DisciplinasFormContent> {
         primaryLabel: widget.disciplina == null ? AppMessages.addDiscipline : AppMessages.saveChanges,
         onPrimary: submit,
         loading: submitting,
-        secondaryLabel: AppMessages.cancel,
-        onSecondary: submitting ? null : () => Navigator.pop(context),
         child: content,
       ),
     ),

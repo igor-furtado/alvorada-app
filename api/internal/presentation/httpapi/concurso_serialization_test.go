@@ -118,3 +118,12 @@ func (r *concursoSerializationRepository) SetPrioritario(context.Context, string
 func (r *concursoSerializationRepository) Archive(context.Context, string) error        { return nil }
 func (r *concursoSerializationRepository) Restore(context.Context, string) error        { return nil }
 func (r *concursoSerializationRepository) Delete(context.Context, string) error         { return nil }
+func (r *concursoSerializationRepository) AddDisciplinaToEdital(context.Context, string, string) error {
+	return nil
+}
+func (r *concursoSerializationRepository) AddTopicoToEdital(context.Context, string, string) error {
+	return nil
+}
+func (r *concursoSerializationRepository) RemoveTopicoFromEdital(context.Context, string, string) error {
+	return nil
+}

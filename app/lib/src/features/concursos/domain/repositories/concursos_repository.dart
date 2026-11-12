@@ -15,6 +15,12 @@ abstract interface class ConcursosRepository {
   Future<void> restoreConcurso(String id);
 
   Future<void> deleteConcurso(String id);
+
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId});
+
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId});
+
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId});
 }
 
 class ConcursosRepositoryException implements Exception {
@@ -25,6 +31,16 @@ class ConcursosRepositoryException implements Exception {
 
   @override
   String toString() => message;
+}
+
+class ConcursosRuleViolationException extends ConcursosRepositoryException {
+  const ConcursosRuleViolationException({
+    required this.code,
+    required String message,
+    Object? cause,
+  }) : super(message, cause);
+
+  final String code;
 }
 
 class ConcursosSynchronizationException extends ConcursosRepositoryException {

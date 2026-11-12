@@ -8,14 +8,13 @@ void main() {
   test('mantém os tokens visuais do drawer alinhados à referência', () {
     final tokens = AppTheme.light.extension<AppTokens>()!;
 
-    expect(tokens.borders.radius3xl, 24);
-    expect(tokens.layout.drawerSideFraction, .75);
+    expect(tokens.layout.drawerWidth, 460);
     expect(tokens.opacity.drawerBarrier, .30);
     expect(tokens.motion.drawer, const Duration(milliseconds: 450));
     expect(tokens.sizes.drawerHandleLength, 100);
   });
 
-  testWidgets('abre por baixo no compacto com a anatomia da referência', (tester) async {
+  testWidgets('ocupa a lateral inteira no compacto com a anatomia da referência', (tester) async {
     await _pumpDrawerLauncher(tester, width: 390, height: 844);
 
     await tester.tap(find.text('Abrir drawer'));
@@ -23,17 +22,16 @@ void main() {
 
     final surface = find.byKey(const ValueKey('app-drawer-surface'));
     final surfaceRect = tester.getRect(surface);
-    final tokens = AppTheme.light.extension<AppTokens>()!;
     final container = tester.widget<Container>(surface);
     final decoration = container.decoration! as BoxDecoration;
 
-    expect(surfaceRect.left, tokens.spacing.sm);
-    expect(surfaceRect.right, 390 - tokens.spacing.sm);
-    expect(surfaceRect.bottom, 844 - tokens.spacing.sm);
-    expect(surfaceRect.height, lessThanOrEqualTo(844 - (tokens.spacing.huge * 2)));
-    expect(decoration.borderRadius, tokens.borders.xxxl);
-    expect(find.byKey(const ValueKey('app-drawer-swipe-handle')), findsOneWidget);
-    expect(find.byIcon(AppIcons.close), findsNothing);
+    expect(surfaceRect.left, 0);
+    expect(surfaceRect.right, 390);
+    expect(surfaceRect.top, 0);
+    expect(surfaceRect.bottom, 844);
+    expect(decoration.borderRadius, isNull);
+    expect(find.byKey(const ValueKey('app-drawer-swipe-handle')), findsNothing);
+    expect(find.byIcon(AppIcons.close), findsOneWidget);
     expect(find.text('Escolha um filtro'), findsOneWidget);
     expect(find.text('Refine os resultados exibidos.'), findsOneWidget);
     expect(find.text('Aplicar filtros'), findsOneWidget);
@@ -49,10 +47,10 @@ void main() {
     final surfaceRect = tester.getRect(find.byKey(const ValueKey('app-drawer-surface')));
     final tokens = AppTheme.light.extension<AppTokens>()!;
 
-    expect(surfaceRect.width, tokens.layout.dialogMaxWidth);
-    expect(surfaceRect.top, tokens.spacing.sm);
-    expect(surfaceRect.right, 1440 - tokens.spacing.sm);
-    expect(surfaceRect.bottom, 900 - tokens.spacing.sm);
+    expect(surfaceRect.width, tokens.layout.drawerWidth);
+    expect(surfaceRect.top, 0);
+    expect(surfaceRect.right, 1440);
+    expect(surfaceRect.bottom, 900);
     expect(find.byKey(const ValueKey('app-drawer-swipe-handle')), findsNothing);
   });
 
@@ -63,9 +61,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final surfaceRect = tester.getRect(find.byKey(const ValueKey('app-drawer-surface')));
-    final tokens = AppTheme.light.extension<AppTokens>()!;
-
-    expect(surfaceRect.bottom, 844 - tokens.spacing.sm);
+    expect(surfaceRect.bottom, 844);
     expect(surfaceRect.bottom, greaterThan(tester.getTopLeft(find.byKey(const ValueKey('bottom-bar'))).dy));
   });
 
@@ -94,7 +90,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.drag(
       find.byKey(const ValueKey('app-drawer-surface')),
-      const Offset(0, 500),
+      const Offset(500, 0),
     );
     await tester.pumpAndSettle();
 

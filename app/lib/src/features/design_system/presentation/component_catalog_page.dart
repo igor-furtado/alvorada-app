@@ -364,6 +364,10 @@ class _ComponentCatalogPageState extends State<ComponentCatalogPage> {
                 value: _dimension(tokens.sizes.rowDividerHeight),
               ),
               _TokenValue(name: 'iconContainerLg', value: _dimension(tokens.sizes.iconContainerLg)),
+              _TokenValue(
+                name: 'disciplineRowHeight',
+                value: _dimension(tokens.sizes.disciplineRowHeight),
+              ),
               _TokenValue(name: 'largeVisual', value: _dimension(tokens.sizes.largeVisual)),
               _TokenValue(
                 name: 'drawerHandleLength',
@@ -372,6 +376,8 @@ class _ComponentCatalogPageState extends State<ComponentCatalogPage> {
               _TokenValue(name: 'weightColumn', value: _dimension(tokens.sizes.weightColumn)),
               _TokenValue(name: 'progressColumn', value: _dimension(tokens.sizes.progressColumn)),
               _TokenValue(name: 'compactField', value: _dimension(tokens.sizes.compactField)),
+              _TokenValue(name: 'summaryRail', value: _dimension(tokens.sizes.summaryRail)),
+              _TokenValue(name: 'searchField', value: _dimension(tokens.sizes.searchField)),
               _TokenValue(name: 'navigationBrand', value: _dimension(tokens.sizes.navigationBrand)),
               _TokenValue(name: 'summaryPanel', value: _dimension(tokens.sizes.summaryPanel)),
               _TokenValue(name: 'overviewPanel', value: _dimension(tokens.sizes.overviewPanel)),

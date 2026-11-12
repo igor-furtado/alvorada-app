@@ -38,8 +38,6 @@ class Disciplina {
   final DificuldadeDisciplina difficulty;
   final String color;
   final List<Topico> topics;
-
-  int get subtopicCount => topics.fold(0, (total, topic) => total + topic.subtopics.length);
 }
 
 class Topico {
@@ -47,27 +45,15 @@ class Topico {
     required this.id,
     required this.name,
     required this.mandatory,
-    required List<Subtopico> subtopics,
-  }) : subtopics = List.unmodifiable(subtopics) {
+  }) {
     if (mandatory && name != nomeTopicoRevisaoVespera) {
       throw const FormatException('O Tópico obrigatório deve se chamar Revisão de Véspera.');
-    }
-    if (mandatory && subtopics.isNotEmpty) {
-      throw const FormatException('O Tópico Revisão de Véspera não recebe Subtópicos.');
     }
   }
 
   final String id;
   final String name;
   final bool mandatory;
-  final List<Subtopico> subtopics;
-}
-
-class Subtopico {
-  const Subtopico({required this.id, required this.name});
-
-  final String id;
-  final String name;
 }
 
 extension<T> on List<T> {

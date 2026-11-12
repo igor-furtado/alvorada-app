@@ -25,6 +25,8 @@ void main() {
     expect(concursos.single.sigla, 'CD');
     expect(concursos.single.vencimentoCentavos, 2200000);
     expect(concursos.single.horarioInicioProva, '13:00');
+    expect(concursos.single.disciplinas.single.nome, 'Direito Tributário');
+    expect(concursos.single.disciplinas.single.topicos.last.obrigatorio, isTrue);
   });
 
   test('envia dados em português e retorna o id criado', () async {
@@ -89,6 +91,25 @@ void main() {
       'prioritario': false,
     });
   });
+
+  test('vincula Disciplina e adiciona ou remove Tópico do Edital', () async {
+    final requests = <String>[];
+    final client = MockClient((request) async {
+      requests.add('${request.method} ${request.url.path}');
+      return http.Response('', 204);
+    });
+    final service = ConcursosApiService(client, baseUri: Uri.parse('http://api.test'));
+
+    await service.addDisciplinaToEdital(concursoId: 'concurso-1', disciplinaId: 'disciplina-1');
+    await service.addTopicoToEdital(concursoId: 'concurso-1', topicoId: 'topico-1');
+    await service.removeTopicoFromEdital(concursoId: 'concurso-1', topicoId: 'topico-1');
+
+    expect(requests, [
+      'PUT /api/v1/concursos/concurso-1/edital/disciplinas/disciplina-1',
+      'PUT /api/v1/concursos/concurso-1/edital/topicos/topico-1',
+      'DELETE /api/v1/concursos/concurso-1/edital/topicos/topico-1',
+    ]);
+  });
 }
 
 const _concursoJson = <String, Object?>{
@@ -108,4 +129,14 @@ const _concursoJson = <String, Object?>{
   'horario_fim_prova': '18:00',
   'requisitos': 'Nível superior',
   'criterios_pontuacao': 'Pesos por bloco',
+  'disciplinas': <Object?>[
+    {
+      'id': 'disciplina-1',
+      'nome': 'Direito Tributário',
+      'topicos': <Object?>[
+        {'id': 'topico-1', 'nome': 'Obrigação tributária', 'obrigatorio': false},
+        {'id': 'topico-revisao', 'nome': 'Revisão de Véspera', 'obrigatorio': true},
+      ],
+    },
+  ],
 };

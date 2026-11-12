@@ -1,4 +1,4 @@
-## Agent skills
+## Documentação do projeto
 
 ### Issue tracker
 
@@ -16,17 +16,9 @@ O projeto usa documentação de domínio single-context. Consulte `docs/agents/d
 
 Ao alterar comportamento, método, priorização, descanso, métricas, navegação, vocabulário ou termos do produto, siga `app/docs/agents/product/index.md`.
 
-### Flutter presentation
+### Flutter
 
-Presentation: ao criar ou alterar página, fluxo, rota, Bloc, estado de interface, ação ou texto visível Flutter, siga `app/docs/agents/architecture/presentation.md`.
-
-### Design system Flutter
-
-Design system: ao criar ou alterar componente `App*`, token, tema, ícone, responsividade, interação visual ou acessibilidade Flutter, siga `app/docs/agents/architecture/design-system.md`.
-
-### Flutter domain e data
-
-Ao criar ou alterar models, inputs, use cases, repositories, services, serialização ou integração HTTP Flutter, siga `app/docs/agents/architecture/index.md`.
+Mudanças no app Flutter seguem o roteamento de `app/docs/agents/architecture/index.md`.
 
 ### Banco de dados
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Prumo API
   version: 1.0.0
-  description: API para organização de Concursos, disciplinas, tópicos e subtópicos de estudo.
+  description: API para organização de Concursos, disciplinas e tópicos de estudo.
   contact:
     name: Prumo.app
 servers:
@@ -18,8 +18,6 @@ tags:
     description: Concursos que orientam o Plano
   - name: Tópicos
     description: Conteúdo pertencente a uma disciplina
-  - name: Subtópicos
-    description: Detalhamento de um tópico
 paths:
   /health:
     get:
@@ -144,11 +142,56 @@ paths:
           $ref: '#/components/responses/RecursoNaoEncontrado'
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+      - name: disciplinaId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags: [Concursos]
+      summary: Vincula ao Edital todos os Tópicos comuns atuais de uma Disciplina
+      operationId: adicionarDisciplinaAoEdital
+      responses:
+        '204':
+          description: Tópicos ausentes vinculados
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}/edital/topicos/{topicoId}:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+      - name: topicoId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags: [Concursos]
+      summary: Vincula um Tópico ao Edital
+      operationId: adicionarTopicoAoEdital
+      responses:
+        '204':
+          description: Tópico vinculado
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+    delete:
+      tags: [Concursos]
+      summary: Remove o vínculo de um Tópico com o Edital
+      operationId: removerTopicoDoEdital
+      responses:
+        '204':
+          description: Vínculo removido
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects:
     get:
       tags: [Disciplinas]
       summary: Lista o catálogo completo de estudos
-      description: Retorna disciplinas com seus tópicos e subtópicos aninhados.
+      description: Retorna disciplinas com seus tópicos aninhados.
       operationId: listarDisciplinas
       responses:
         '200':
@@ -206,7 +249,7 @@ paths:
     delete:
       tags: [Disciplinas]
       summary: Exclui uma disciplina
-      description: Os tópicos e subtópicos relacionados também são excluídos.
+      description: Os Tópicos relacionados também são excluídos quando nenhum deles estiver vinculado a um Edital.
       operationId: excluirDisciplina
       responses:
         '204':
@@ -260,66 +303,13 @@ paths:
     delete:
       tags: [Tópicos]
       summary: Exclui um tópico
-      description: Seus subtópicos também são excluídos.
+      description: A exclusão é bloqueada enquanto o Tópico estiver vinculado a um Edital.
       operationId: excluirTopico
       responses:
         '204':
           description: Tópico excluído
         '400':
           $ref: '#/components/responses/ErroValidacao'
-        '500':
-          $ref: '#/components/responses/ErroInterno'
-  /api/v1/topics/{id}/subtopics:
-    parameters:
-      - $ref: '#/components/parameters/IdRecurso'
-    post:
-      tags: [Subtópicos]
-      summary: Adiciona um subtópico a um tópico
-      operationId: criarSubtopico
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EntradaNome'
-      responses:
-        '201':
-          description: Subtópico criado
-          content:
-            application/json:
-              schema:
-                type: object
-        '400':
-          $ref: '#/components/responses/ErroValidacao'
-        '500':
-          $ref: '#/components/responses/ErroInterno'
-  /api/v1/subtopics/{id}:
-    parameters:
-      - $ref: '#/components/parameters/IdRecurso'
-    patch:
-      tags: [Subtópicos]
-      summary: Renomeia um subtópico
-      operationId: atualizarSubtopico
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EntradaNome'
-      responses:
-        '204':
-          description: Subtópico atualizado
-        '400':
-          $ref: '#/components/responses/ErroValidacao'
-        '500':
-          $ref: '#/components/responses/ErroInterno'
-    delete:
-      tags: [Subtópicos]
-      summary: Exclui um subtópico
-      operationId: excluirSubtopico
-      responses:
-        '204':
-          description: Subtópico excluído
         '500':
           $ref: '#/components/responses/ErroInterno'
 components:
@@ -368,7 +358,7 @@ components:
           format: uuid
     Concurso:
       type: object
-      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital, sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal, local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao]
+      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital, sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal, local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao, disciplinas]
       properties:
         id:
           type: string
@@ -423,6 +413,35 @@ components:
         criterios_pontuacao:
           type: [string, 'null']
           maxLength: 10000
+        disciplinas:
+          type: array
+          description: Disciplinas derivadas dos Tópicos vinculados ao Edital.
+          items:
+            $ref: '#/components/schemas/DisciplinaEdital'
+    DisciplinaEdital:
+      type: object
+      required: [id, nome, topicos]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        topicos:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopicoEdital'
+    TopicoEdital:
+      type: object
+      required: [id, nome, obrigatorio]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        obrigatorio:
+          type: boolean
     CriarConcurso:
       type: object
       required: [instituicao, cargo]
@@ -591,7 +610,7 @@ components:
             $ref: '#/components/schemas/Topico'
     Topico:
       type: object
-      required: [id, nome, obrigatorio, subtopicos]
+      required: [id, nome, obrigatorio]
       properties:
         id:
           type: string
@@ -601,19 +620,6 @@ components:
         obrigatorio:
           type: boolean
           description: Indica o Tópico estrutural Revisão de Véspera, que não pode ser alterado nem excluído.
-        subtopicos:
-          type: array
-          items:
-            $ref: '#/components/schemas/Subtopico'
-    Subtopico:
-      type: object
-      required: [id, nome]
-      properties:
-        id:
-          type: string
-          format: uuid
-        nome:
-          type: string
     Erro:
       type: object
       required: [erro]

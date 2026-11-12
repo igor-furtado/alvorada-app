@@ -20,12 +20,6 @@ abstract interface class DisciplinasApi {
   Future<void> updateTopico(String topicId, String name);
 
   Future<void> deleteTopico(String topicId);
-
-  Future<void> createSubtopico(String topicId, String name);
-
-  Future<void> updateSubtopico(String subtopicId, String name);
-
-  Future<void> deleteSubtopico(String subtopicId);
 }
 
 class DisciplinasApiService implements DisciplinasApi {
@@ -79,18 +73,6 @@ class DisciplinasApiService implements DisciplinasApi {
 
   @override
   Future<void> deleteTopico(String topicId) => _sendEmpty('DELETE', '/api/v1/topics/${Uri.encodeComponent(topicId)}');
-
-  @override
-  Future<void> createSubtopico(String topicId, String name) =>
-      _sendCreated('/api/v1/topics/${Uri.encodeComponent(topicId)}/subtopics', name);
-
-  @override
-  Future<void> updateSubtopico(String subtopicId, String name) =>
-      _sendEmpty('PATCH', '/api/v1/subtopics/${Uri.encodeComponent(subtopicId)}', body: {'nome': name});
-
-  @override
-  Future<void> deleteSubtopico(String subtopicId) =>
-      _sendEmpty('DELETE', '/api/v1/subtopics/${Uri.encodeComponent(subtopicId)}');
 
   Future<void> _sendCreated(String path, String name) async {
     final response = await _client.post(_uri(path), headers: _jsonHeaders, body: jsonEncode({'nome': name}));

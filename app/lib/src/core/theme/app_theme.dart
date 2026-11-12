@@ -129,7 +129,7 @@ abstract final class AppTheme {
         labelStyle: textTheme.bodySmall?.copyWith(
           color: colors.onSurfaceMuted,
         ),
-        hintStyle: textTheme.bodySmall,
+        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceMuted),
         prefixIconConstraints: BoxConstraints(
           minWidth: tokens.layout.controlHeight,
           minHeight: tokens.layout.controlHeight,

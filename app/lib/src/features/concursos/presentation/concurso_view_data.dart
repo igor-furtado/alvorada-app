@@ -36,7 +36,21 @@ class ConcursoViewData {
     examDate: formatExamDate(concurso.dataProva),
     days: concurso.diasAteProva(now ?? DateTime.now()),
     progress: concurso.progressoEdital / 100,
-    disciplines: const [],
+    disciplines: [
+      for (final disciplina in concurso.disciplinas)
+        ConcursoDisciplinaProgress(
+          id: disciplina.id,
+          name: disciplina.nome,
+          topics: [
+            for (final topico in disciplina.topicos)
+              ConcursoTopicoViewData(
+                id: topico.id,
+                name: topico.nome,
+                mandatory: topico.obrigatorio,
+              ),
+          ],
+        ),
+    ],
     organizationAcronym: concurso.sigla,
     vacancies: concurso.quantidadeVagas == null
         ? AppMessages.toBeDefined
@@ -75,13 +89,29 @@ class ConcursoViewData {
 class ConcursoDisciplinaProgress {
   const ConcursoDisciplinaProgress({
     required this.name,
-    required this.progress,
-    this.performance = 0,
-    this.weight = 0,
+    this.id = '',
+    this.topics = const [],
+    this.progress,
+    this.performance,
+    this.weight,
   });
 
+  final String id;
   final String name;
-  final double progress;
-  final double performance;
-  final int weight;
+  final List<ConcursoTopicoViewData> topics;
+  final double? progress;
+  final double? performance;
+  final int? weight;
+}
+
+class ConcursoTopicoViewData {
+  const ConcursoTopicoViewData({
+    required this.id,
+    required this.name,
+    required this.mandatory,
+  });
+
+  final String id;
+  final String name;
+  final bool mandatory;
 }

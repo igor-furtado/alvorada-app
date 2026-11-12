@@ -29,6 +29,14 @@ func TestFindActiveConcursosPreservesDatabaseOrder(t *testing.T) {
 				AddRow("concurso-2", "TCE-PE", "Auditor", nil, nil, false, 0,
 					nil, nil, nil, nil, nil, nil, nil, nil, nil),
 		)
+	mock.ExpectQuery("SELECT vinculo.concurso_id, disciplina.id, disciplina.nome").
+		WillReturnRows(sqlmock.NewRows([]string{
+			"concurso_id", "disciplina_id", "disciplina_nome", "topico_id", "topico_nome", "obrigatorio",
+		}).AddRow("concurso-1", "disciplina-1", "Direito Tributário", "topico-1", "Obrigação tributária", false))
+	mock.ExpectQuery("SELECT id, nome, 1").
+		WithArgs("disciplina-1").
+		WillReturnRows(sqlmock.NewRows([]string{"id", "nome", "obrigatorio"}).
+			AddRow("topico-revisao", "Revisão de Véspera", true))
 
 	items, err := NewConcursoRepository(db).FindActive(context.Background())
 
@@ -43,6 +51,10 @@ func TestFindActiveConcursosPreservesDatabaseOrder(t *testing.T) {
 	}
 	if items[0].Sigla == nil || *items[0].Sigla != "CD" || items[0].VencimentoCentavos == nil || *items[0].VencimentoCentavos != 2200000 {
 		t.Fatalf("new Concurso fields were not preserved: %#v", items[0])
+	}
+	if len(items[0].Disciplinas) != 1 || len(items[0].Disciplinas[0].Topicos) != 2 ||
+		!items[0].Disciplinas[0].Topicos[1].Obrigatorio {
+		t.Fatalf("edital projection did not derive discipline and review topic: %#v", items[0].Disciplinas)
 	}
 }
 
@@ -160,6 +172,30 @@ func TestUpdateAcceptsUnchangedValuesForExistingConcurso(t *testing.T) {
 	}
 }
 
+func TestAddDisciplinaToEditalLinksOnlyCurrentCommonTopicsIdempotently(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+	mock.ExpectExec("INSERT IGNORE INTO concursos_topicos").
+		WithArgs("disciplina-1", "concurso-1").
+		WillReturnResult(sqlmock.NewResult(0, 2))
+
+	err = NewConcursoRepository(db).AddDisciplinaToEdital(
+		context.Background(),
+		"concurso-1",
+		"disciplina-1",
+	)
+
+	if err != nil {
+		t.Fatalf("AddDisciplinaToEdital() error = %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
 func TestEnsureConcursoSchemaIsIdempotent(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -183,6 +219,8 @@ func TestEnsureConcursoSchemaIsIdempotent(t *testing.T) {
 			WithArgs("concursos", constraint).
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
 	}
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS concursos_topicos").
+		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	if err := EnsureConcursoSchema(context.Background(), db); err != nil {
 		t.Fatalf("EnsureConcursoSchema() error = %v", err)
@@ -217,6 +255,8 @@ func TestEnsureConcursoSchemaAddsComplementaryFieldsToLegacyTable(t *testing.T) 
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 		mock.ExpectExec("ALTER TABLE concursos ADD CONSTRAINT").WillReturnResult(sqlmock.NewResult(0, 0))
 	}
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS concursos_topicos").
+		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	if err := EnsureConcursoSchema(context.Background(), db); err != nil {
 		t.Fatalf("EnsureConcursoSchema() error = %v", err)

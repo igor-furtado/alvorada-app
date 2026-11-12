@@ -195,13 +195,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
 
   bool _matches(Disciplina disciplina, String query) =>
       disciplina.name.toLowerCase().contains(query) ||
-      disciplina.topics.any(
-        (topic) =>
-            topic.name.toLowerCase().contains(query) ||
-            topic.subtopics.any(
-              (subtopic) => subtopic.name.toLowerCase().contains(query),
-            ),
-      );
+      disciplina.topics.any((topic) => topic.name.toLowerCase().contains(query));
 }
 
 const _unchanged = Object();

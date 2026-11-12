@@ -25,7 +25,6 @@ func TestDisciplineContractUsesPortugueseJSONFields(t *testing.T) {
 						ID:        "topico-1",
 						Name:      domain.MandatoryReviewTopicName,
 						Mandatory: true,
-						Subtopics: []domain.Subtopic{},
 					},
 				},
 			},
@@ -45,7 +44,7 @@ func TestDisciplineContractUsesPortugueseJSONFields(t *testing.T) {
 		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
 	}
 	body := response.Body.String()
-	for _, field := range []string{"nome", "dificuldade", "cor", "topicos", "obrigatorio", "subtopicos"} {
+	for _, field := range []string{"nome", "dificuldade", "cor", "topicos", "obrigatorio"} {
 		if !strings.Contains(body, `"`+field+`"`) {
 			t.Fatalf("response does not contain %q: %s", field, body)
 		}
@@ -115,6 +114,23 @@ func TestDeleteMandatoryTopicReturnsValidationError(t *testing.T) {
 	}
 }
 
+func TestDeleteLinkedTopicReturnsConflict(t *testing.T) {
+	repository := &serializationRepository{deleteTopicError: domain.ErrContentLinked}
+	handler := NewHandler(
+		application.NewService(repository),
+		nil,
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(http.MethodDelete, "/api/v1/topics/topico-1", nil)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusConflict {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusConflict, response.Body.String())
+	}
+}
+
 type serializationRepository struct {
 	catalog          []domain.Subject
 	createdSubject   domain.CreateSubjectInput
@@ -143,9 +159,3 @@ func (r *serializationRepository) UpdateTopic(context.Context, string, string) e
 func (r *serializationRepository) DeleteTopic(context.Context, string) error {
 	return r.deleteTopicError
 }
-
-func (r *serializationRepository) CreateSubtopic(context.Context, string, string) error { return nil }
-
-func (r *serializationRepository) UpdateSubtopic(context.Context, string, string) error { return nil }
-
-func (r *serializationRepository) DeleteSubtopic(context.Context, string) error { return nil }

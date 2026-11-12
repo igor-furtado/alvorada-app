@@ -25,11 +25,14 @@ class AppSizeTokens {
     this.identityIcon = 56,
     this.rowDividerHeight = 58,
     this.iconContainerLg = 62,
+    this.disciplineRowHeight = 68,
     this.largeVisual = 72,
     this.drawerHandleLength = 100,
     this.weightColumn = 105,
     this.progressColumn = 110,
     this.compactField = 120,
+    this.summaryRail = 250,
+    this.searchField = 270,
     this.navigationBrand = 184,
     this.summaryPanel = 220,
     this.overviewPanel = 240,
@@ -64,11 +67,14 @@ class AppSizeTokens {
   final double identityIcon;
   final double rowDividerHeight;
   final double iconContainerLg;
+  final double disciplineRowHeight;
   final double largeVisual;
   final double drawerHandleLength;
   final double weightColumn;
   final double progressColumn;
   final double compactField;
+  final double summaryRail;
+  final double searchField;
   final double navigationBrand;
   final double summaryPanel;
   final double overviewPanel;
@@ -115,11 +121,14 @@ class AppSizeTokens {
     identityIcon: lerpDouble(identityIcon, other.identityIcon, t)!,
     rowDividerHeight: lerpDouble(rowDividerHeight, other.rowDividerHeight, t)!,
     iconContainerLg: lerpDouble(iconContainerLg, other.iconContainerLg, t)!,
+    disciplineRowHeight: lerpDouble(disciplineRowHeight, other.disciplineRowHeight, t)!,
     largeVisual: lerpDouble(largeVisual, other.largeVisual, t)!,
     drawerHandleLength: lerpDouble(drawerHandleLength, other.drawerHandleLength, t)!,
     weightColumn: lerpDouble(weightColumn, other.weightColumn, t)!,
     progressColumn: lerpDouble(progressColumn, other.progressColumn, t)!,
     compactField: lerpDouble(compactField, other.compactField, t)!,
+    summaryRail: lerpDouble(summaryRail, other.summaryRail, t)!,
+    searchField: lerpDouble(searchField, other.searchField, t)!,
     navigationBrand: lerpDouble(navigationBrand, other.navigationBrand, t)!,
     summaryPanel: lerpDouble(summaryPanel, other.summaryPanel, t)!,
     overviewPanel: lerpDouble(overviewPanel, other.overviewPanel, t)!,

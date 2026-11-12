@@ -7,7 +7,7 @@ void main() {
       final discipline = _discipline();
 
       expect(discipline.topics.last.mandatory, isTrue);
-      expect(discipline.subtopicCount, 1);
+      expect(discipline.topics, hasLength(2));
     });
 
     test('rejeita catálogo sem Revisão de Véspera', () {
@@ -17,7 +17,7 @@ void main() {
           name: 'Direito Constitucional',
           difficulty: DificuldadeDisciplina.hard,
           color: '#3178C6',
-          topics: [Topico(id: 'topic-1', name: 'Direitos fundamentais', mandatory: false, subtopics: const [])],
+          topics: [Topico(id: 'topic-1', name: 'Direitos fundamentais', mandatory: false)],
         ),
         throwsFormatException,
       );
@@ -31,12 +31,7 @@ Disciplina _discipline() => Disciplina(
   difficulty: DificuldadeDisciplina.hard,
   color: '#3178C6',
   topics: [
-    Topico(
-      id: 'topic-1',
-      name: 'Direitos fundamentais',
-      mandatory: false,
-      subtopics: const [Subtopico(id: 'subtopic-1', name: 'Direitos individuais')],
-    ),
-    Topico(id: 'topic-2', name: nomeTopicoRevisaoVespera, mandatory: true, subtopics: const []),
+    Topico(id: 'topic-1', name: 'Direitos fundamentais', mandatory: false),
+    Topico(id: 'topic-2', name: nomeTopicoRevisaoVespera, mandatory: true),
   ],
 );

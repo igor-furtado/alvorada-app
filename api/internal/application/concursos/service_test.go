@@ -107,3 +107,10 @@ func (f *fakeRepository) SetPrioritario(context.Context, string) error { return 
 func (f *fakeRepository) Archive(context.Context, string) error        { return nil }
 func (f *fakeRepository) Restore(context.Context, string) error        { return nil }
 func (f *fakeRepository) Delete(context.Context, string) error         { return nil }
+func (f *fakeRepository) AddDisciplinaToEdital(context.Context, string, string) error {
+	return nil
+}
+func (f *fakeRepository) AddTopicoToEdital(context.Context, string, string) error { return nil }
+func (f *fakeRepository) RemoveTopicoFromEdital(context.Context, string, string) error {
+	return nil
+}

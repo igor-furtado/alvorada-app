@@ -117,22 +117,13 @@ class _FakeApi implements DisciplinasApi {
   }
 
   @override
-  Future<void> createSubtopico(String topicId, String name) async {}
-
-  @override
   Future<void> deleteDisciplina(String id) async {}
-
-  @override
-  Future<void> deleteSubtopico(String subtopicId) async {}
 
   @override
   Future<void> deleteTopico(String topicId) async {}
 
   @override
   Future<void> updateDisciplina(String id, Map<String, Object?> body) async {}
-
-  @override
-  Future<void> updateSubtopico(String subtopicId, String name) async {}
 
   @override
   Future<void> updateTopico(String topicId, String name) async {}
@@ -144,11 +135,6 @@ const _discipline = DisciplinaApiModel(
   difficulty: 3,
   color: '#E8742A',
   topics: [
-    TopicoApiModel(
-      id: 'topic-1',
-      name: nomeTopicoRevisaoVespera,
-      mandatory: true,
-      subtopics: [],
-    ),
+    TopicoApiModel(id: 'topic-1', name: nomeTopicoRevisaoVespera, mandatory: true),
   ],
 );

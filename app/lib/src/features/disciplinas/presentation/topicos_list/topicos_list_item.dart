@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/content/app_messages.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
-import '../subtopicos_list/subtopicos_list_view.dart';
 import 'topicos_list_state.dart';
+
+enum _TopicoListAction { rename, delete }
 
 class TopicoListItem extends StatelessWidget {
   const TopicoListItem({
@@ -23,11 +24,31 @@ class TopicoListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!topico.mandatory) {
-      return SubtopicosListView(
-        topico: topico,
-        canMutateTopic: canMutate,
-        onRenameTopic: onRename,
-        onDeleteTopic: onDelete,
+      return AppListItem(
+        title: topico.name,
+        leadingIcon: AppIcons.bookText,
+        trailing: AppMenuButton<_TopicoListAction>(
+          icon: AppIcons.more,
+          label: '${AppMessages.moreActions}: ${topico.name}',
+          items: const [
+            AppMenuItem(
+              value: _TopicoListAction.rename,
+              label: AppMessages.rename,
+              icon: AppIcons.edit,
+            ),
+            AppMenuItem(
+              value: _TopicoListAction.delete,
+              label: AppMessages.delete,
+              icon: AppIcons.delete,
+              destructive: true,
+            ),
+          ],
+          enabled: canMutate,
+          onSelected: (action) => switch (action) {
+            _TopicoListAction.rename => onRename(),
+            _TopicoListAction.delete => onDelete(),
+          },
+        ),
       );
     }
     return AppCard(

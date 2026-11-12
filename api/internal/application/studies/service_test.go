@@ -70,10 +70,7 @@ func (f *fakeRepository) CreateSubject(_ context.Context, input domain.CreateSub
 func (f *fakeRepository) UpdateSubject(context.Context, string, domain.UpdateSubjectInput) error {
 	return nil
 }
-func (f *fakeRepository) DeleteSubject(context.Context, string) error          { return nil }
-func (f *fakeRepository) CreateTopic(context.Context, string, string) error    { return nil }
-func (f *fakeRepository) UpdateTopic(context.Context, string, string) error    { return nil }
-func (f *fakeRepository) DeleteTopic(context.Context, string) error            { return nil }
-func (f *fakeRepository) CreateSubtopic(context.Context, string, string) error { return nil }
-func (f *fakeRepository) UpdateSubtopic(context.Context, string, string) error { return nil }
-func (f *fakeRepository) DeleteSubtopic(context.Context, string) error         { return nil }
+func (f *fakeRepository) DeleteSubject(context.Context, string) error       { return nil }
+func (f *fakeRepository) CreateTopic(context.Context, string, string) error { return nil }
+func (f *fakeRepository) UpdateTopic(context.Context, string, string) error { return nil }
+func (f *fakeRepository) DeleteTopic(context.Context, string) error         { return nil }

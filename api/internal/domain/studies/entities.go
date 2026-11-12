@@ -5,6 +5,7 @@ import "errors"
 const MandatoryReviewTopicName = "Revisão de Véspera"
 
 var ErrMandatoryTopic = errors.New("o Tópico Revisão de Véspera é obrigatório e não pode ser alterado ou excluído")
+var ErrContentLinked = errors.New("o conteúdo está vinculado a um Edital e não pode ser excluído")
 
 type Difficulty int
 
@@ -29,15 +30,9 @@ type Subject struct {
 }
 
 type Topic struct {
-	ID        string     `json:"id"`
-	Name      string     `json:"nome"`
-	Mandatory bool       `json:"obrigatorio"`
-	Subtopics []Subtopic `json:"subtopicos"`
-}
-
-type Subtopic struct {
-	ID   string `json:"id"`
-	Name string `json:"nome"`
+	ID        string `json:"id"`
+	Name      string `json:"nome"`
+	Mandatory bool   `json:"obrigatorio"`
 }
 
 type CreateSubjectInput struct {

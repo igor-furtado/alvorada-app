@@ -19,9 +19,6 @@ func TestEnsureDisciplineInvariantsRepairsLegacyDataAndProtectsUniqueness(t *tes
 		WithArgs(disciplineInvariantLock).
 		WillReturnRows(sqlmock.NewRows([]string{"acquired"}).AddRow(true))
 	mock.ExpectBegin()
-	mock.ExpectExec("DELETE subtopicos").
-		WithArgs(domain.MandatoryReviewTopicName).
-		WillReturnResult(sqlmock.NewResult(0, 3))
 	mock.ExpectExec("DELETE duplicate").
 		WithArgs(domain.MandatoryReviewTopicName, domain.MandatoryReviewTopicName).
 		WillReturnResult(sqlmock.NewResult(0, 2))
@@ -62,9 +59,6 @@ func TestEnsureDisciplineInvariantsIsIdempotentOnCurrentSchema(t *testing.T) {
 		WithArgs(disciplineInvariantLock).
 		WillReturnRows(sqlmock.NewRows([]string{"acquired"}).AddRow(true))
 	mock.ExpectBegin()
-	mock.ExpectExec("DELETE subtopicos").
-		WithArgs(domain.MandatoryReviewTopicName).
-		WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectExec("DELETE duplicate").
 		WithArgs(domain.MandatoryReviewTopicName, domain.MandatoryReviewTopicName).
 		WillReturnResult(sqlmock.NewResult(0, 0))

@@ -106,29 +106,24 @@ abstract final class AppMessages {
   static const noDiscipline = 'Nenhuma Disciplina vinculada a este Edital.';
   static const concursoNaoEncontrado = 'Concurso não encontrado';
   static const contentCatalog = 'Disciplinas';
-  static const contentCatalogSubtitle = 'Organize Tópicos e Subtópicos sem perder o contexto do catálogo.';
-  static const searchContent = 'Buscar Disciplina, Tópico ou Subtópico';
+  static const contentCatalogSubtitle = 'Catálogo de Disciplinas e Tópicos compartilhado entre Concursos.';
+  static const searchContent = 'Buscar Disciplina ou Tópico';
   static const orderDisciplines = 'Ordenar Disciplinas';
   static const defaultDisciplineOrder = 'Ordem padrão';
   static const alphabeticalDisciplineOrder = 'Ordem alfabética';
   static const addDiscipline = 'Adicionar Disciplina';
   static const addTopic = 'Adicionar Tópico';
-  static const addSubtopic = 'Adicionar Subtópico';
   static const rename = 'Renomear';
   static const editDiscipline = 'Editar Disciplina';
   static const editTopic = 'Editar Tópico';
-  static const editSubtopic = 'Editar Subtópico';
   static const saveChanges = 'Salvar alterações';
   static const deleteDisciplineQuestion = 'Excluir Disciplina?';
   static const deleteTopicQuestion = 'Excluir Tópico?';
-  static const deleteSubtopicQuestion = 'Excluir Subtópico?';
   static const noContentFound = 'Nenhuma Disciplina';
   static const noContentFoundMessage = 'Adicione uma Disciplina para começar.';
   static const mandatoryTopic = 'Tópico obrigatório';
   static const protected = 'Protegido';
   static const topics = 'Tópicos';
-  static const subtopics = 'Subtópicos';
-  static const noSubtopics = 'Nenhum Subtópico cadastrado.';
   static const loadingDisciplines = 'Carregando Disciplinas';
   static const disciplinesUpdated = 'Disciplinas atualizadas.';
   static const disciplineCreated = 'Disciplina adicionada.';
@@ -137,9 +132,6 @@ abstract final class AppMessages {
   static const topicCreated = 'Tópico adicionado.';
   static const topicUpdated = 'Tópico atualizado.';
   static const topicDeleted = 'Tópico excluído.';
-  static const subtopicCreated = 'Subtópico adicionado.';
-  static const subtopicUpdated = 'Subtópico atualizado.';
-  static const subtopicDeleted = 'Subtópico excluído.';
   static const contentUpdateFailed = 'Não foi possível atualizar. Os dados exibidos foram preservados.';
   static const contentSavedSyncPending = 'Alteração salva. Atualize para ver os dados mais recentes.';
   static const contentOperationFailed = 'Não foi possível salvar a alteração. Tente novamente.';
@@ -151,23 +143,18 @@ abstract final class AppMessages {
   static String catalogSummary(
     int disciplineCount,
     int topicCount,
-    int subtopicCount,
   ) =>
       '${_count(disciplineCount, 'Disciplina', 'Disciplinas')}  ·  '
-      '${_count(topicCount, 'Tópico', 'Tópicos')}  ·  '
-      '${_count(subtopicCount, 'Subtópico', 'Subtópicos')}';
+      '${_count(topicCount, 'Tópico', 'Tópicos')}';
 
   static String disciplineResults(int count) => _count(count, 'Disciplina', 'Disciplinas');
 
   static String topicCount(int count) => _count(count, 'Tópico', 'Tópicos');
 
   static String disciplineDeletedImpact(String name) =>
-      '$name, seus Tópicos e Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
+      '$name e seus Tópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
 
   static String topicDeletedImpact(String name) =>
-      '$name e seus Subtópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';
-
-  static String subtopicDeletedImpact(String name) =>
       '$name será excluído do catálogo compartilhado. Esta ação não pode ser desfeita.';
 
   static String concursoArquivado(String name) => '$name foi arquivado.';

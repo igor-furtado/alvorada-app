@@ -2,6 +2,7 @@ import 'package:estudos_app/src/features/concursos/data/models/concurso_api_mode
 import 'package:estudos_app/src/features/concursos/data/repositories/api_concursos_repository.dart';
 import 'package:estudos_app/src/features/concursos/data/services/concursos_api_service.dart';
 import 'package:estudos_app/src/features/concursos/domain/models/concurso_input.dart';
+import 'package:estudos_app/src/features/concursos/domain/repositories/concursos_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -52,12 +53,23 @@ void main() {
     expect(api.updatedBody?['prioritario'], isTrue);
     expect(api.getCalls, 2);
   });
+
+  test('traduz rejeição da API em violação de regra', () async {
+    final api = _FakeApi()..ruleViolation = true;
+    final repository = ApiConcursosRepository(api);
+
+    expect(
+      () => repository.addTopicoToEdital(concursoId: 'concurso-1', topicoId: 'topico-1'),
+      throwsA(isA<ConcursosRuleViolationException>()),
+    );
+  });
 }
 
 class _FakeApi implements ConcursosApi {
   int getCalls = 0;
   Map<String, Object?>? createdBody;
   Map<String, Object?>? updatedBody;
+  bool ruleViolation = false;
 
   @override
   Future<List<ConcursoApiModel>> getConcursos() async {
@@ -87,6 +99,19 @@ class _FakeApi implements ConcursosApi {
 
   @override
   Future<void> setPrioritario(String id) async {}
+
+  @override
+  Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId}) async {}
+
+  @override
+  Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) async {
+    if (ruleViolation) {
+      throw const ConcursosApiException(statusCode: 409, message: 'Tópico incompatível.');
+    }
+  }
+
+  @override
+  Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) async {}
 }
 
 const _concurso = ConcursoApiModel(
@@ -97,4 +122,5 @@ const _concurso = ConcursoApiModel(
   dataProva: '2026-12-13',
   prioritario: false,
   progressoEdital: 0,
+  disciplinas: [],
 );

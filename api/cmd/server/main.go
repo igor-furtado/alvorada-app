@@ -35,6 +35,10 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+	if err := mysqlrepo.RemoveSubtopicsSchema(rootCtx, db); err != nil {
+		logger.Error("subtopics schema removal failed", "error", err)
+		os.Exit(1)
+	}
 	if err := mysqlrepo.EnsurePortugueseSchema(rootCtx, db); err != nil {
 		logger.Error("database schema migration failed", "error", err)
 		os.Exit(1)

@@ -29,24 +29,6 @@ void main() {
     expect(state.mandatoryItems.single.mandatory, isTrue);
   });
 
-  test('expande um Tópico preservando os itens carregados', () async {
-    final repository = FakeDisciplinasRepository(
-      disciplinas: disciplinasFixture(),
-    );
-    final bloc = _bloc(repository);
-    addTearDown(bloc.close);
-    await _load(bloc);
-    final items = bloc.state.items;
-
-    final toggled = bloc.stream.firstWhere(
-      (state) => state.expandedTopicIds.contains('interpretacao'),
-    );
-    bloc.add(const TopicosListToggleRequested('interpretacao'));
-    final state = await toggled;
-
-    expect(state.items, items);
-  });
-
   test('exclui o Tópico e atualiza somente sua lista', () async {
     final bloc = _bloc(
       FakeDisciplinasRepository(disciplinas: disciplinasFixture()),

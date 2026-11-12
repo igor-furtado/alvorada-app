@@ -17,7 +17,6 @@ func TestSubjectSerializesBusinessFieldsInPortuguese(t *testing.T) {
 				ID:        "topico-1",
 				Name:      MandatoryReviewTopicName,
 				Mandatory: true,
-				Subtopics: []Subtopic{},
 			},
 		},
 	})
@@ -26,12 +25,12 @@ func TestSubjectSerializesBusinessFieldsInPortuguese(t *testing.T) {
 	}
 
 	serialized := string(payload)
-	for _, field := range []string{"nome", "dificuldade", "cor", "topicos", "obrigatorio", "subtopicos"} {
+	for _, field := range []string{"nome", "dificuldade", "cor", "topicos", "obrigatorio"} {
 		if !strings.Contains(serialized, `"`+field+`"`) {
 			t.Fatalf("serialized subject does not contain %q: %s", field, serialized)
 		}
 	}
-	for _, legacyField := range []string{"name", "difficulty", "color", "topics", "mandatory", "subtopics"} {
+	for _, legacyField := range []string{"name", "difficulty", "color", "topics", "mandatory"} {
 		if strings.Contains(serialized, `"`+legacyField+`"`) {
 			t.Fatalf("serialized subject contains legacy field %q: %s", legacyField, serialized)
 		}

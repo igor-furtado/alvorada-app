@@ -70,7 +70,7 @@ Conclua quando cada intenção e cada resposta de use case tiverem um destino ob
 - Use um enum `*Feedback` para resultados transitórios. Limpe o feedback ao iniciar nova operação para que o listener anuncie cada resultado uma vez.
 - Modele seleção, expansão, busca e ordem no estado quando afetam o que a pessoa vê.
 
-Use [`disciplinas_list_state.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart) para o contrato de lista e [`subtopicos_list_state.dart`](../../../lib/src/features/disciplinas/presentation/subtopicos_list/subtopicos_list_state.dart) para estado particionado por item pai.
+Use [`disciplinas_list_state.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart) para o contrato de lista e [`topicos_list_state.dart`](../../../lib/src/features/disciplinas/presentation/topicos_list/topicos_list_state.dart) para o recorte de Tópicos da Disciplina selecionada.
 
 Conclua quando toda transição puder ser descrita como `estado atual + evento → novo estado`, incluindo repetição de envio e operações simultâneas.
 

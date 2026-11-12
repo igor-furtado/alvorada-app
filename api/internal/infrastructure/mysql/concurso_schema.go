@@ -50,6 +50,19 @@ CREATE TABLE IF NOT EXISTS concursos (
   UNIQUE INDEX idx_concursos_prioridade_unica (prioridade_ativa)
 ) ENGINE=InnoDB`
 
+const editalTopicosSchema = `
+CREATE TABLE IF NOT EXISTS concursos_topicos (
+  concurso_id CHAR(36) NOT NULL,
+  topico_id CHAR(36) NOT NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (concurso_id, topico_id),
+  CONSTRAINT fk_concurso_topico_concurso FOREIGN KEY (concurso_id)
+    REFERENCES concursos(id) ON DELETE CASCADE,
+  CONSTRAINT fk_concurso_topico_topico FOREIGN KEY (topico_id)
+    REFERENCES topicos(id) ON DELETE RESTRICT,
+  INDEX idx_concursos_topicos_topico (topico_id, concurso_id)
+) ENGINE=InnoDB`
+
 // EnsureConcursoSchema creates the new aggregate storage without changing
 // existing rows. CREATE TABLE IF NOT EXISTS makes interrupted runs resumable.
 func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
@@ -115,6 +128,9 @@ func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
 				return fmt.Errorf("add concurso constraint %s: %w", constraint.name, err)
 			}
 		}
+	}
+	if _, err := db.ExecContext(ctx, editalTopicosSchema); err != nil {
+		return fmt.Errorf("ensure edital topics schema: %w", err)
 	}
 	return nil
 }
