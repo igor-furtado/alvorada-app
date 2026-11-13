@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrNameRequired      = errors.New("informe um nome")
+	ErrTopicsRequired    = errors.New("informe ao menos um Tópico")
 	ErrNameTooLong       = errors.New("o nome deve ter no máximo 120 caracteres")
 	ErrInvalidDifficulty = errors.New("a dificuldade deve estar entre 1 e 5")
 	ErrInvalidColor      = errors.New("a cor deve estar no formato hexadecimal #RRGGBB")
@@ -66,14 +67,25 @@ func (s *Service) DeleteSubject(ctx context.Context, id string) error {
 }
 
 func (s *Service) CreateTopic(ctx context.Context, subjectID, name string) error {
-	value, err := validateName(name)
-	if err != nil {
-		return err
+	return s.CreateTopics(ctx, subjectID, []string{name})
+}
+
+func (s *Service) CreateTopics(ctx context.Context, subjectID string, names []string) error {
+	if len(names) == 0 {
+		return ErrTopicsRequired
 	}
-	if value == domain.MandatoryReviewTopicName {
-		return domain.ErrMandatoryTopic
+	values := make([]string, 0, len(names))
+	for _, name := range names {
+		value, err := validateName(name)
+		if err != nil {
+			return err
+		}
+		if value == domain.MandatoryReviewTopicName {
+			return domain.ErrMandatoryTopic
+		}
+		values = append(values, value)
 	}
-	return s.repository.CreateTopic(ctx, subjectID, value)
+	return s.repository.CreateTopics(ctx, subjectID, values)
 }
 
 func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {

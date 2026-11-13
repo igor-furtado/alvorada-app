@@ -82,6 +82,78 @@ func TestFindCatalogReturnsMandatoryReviewTopicLast(t *testing.T) {
 	}
 }
 
+func TestCreateTopicsPersistsBatchInOrderInSameTransaction(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT id FROM disciplinas WHERE id = ? FOR UPDATE")).
+		WithArgs("discipline-1").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow("discipline-1"))
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT COALESCE(MAX(posicao), 0) FROM topicos WHERE disciplina_id = ?")).
+		WithArgs("discipline-1").
+		WillReturnRows(sqlmock.NewRows([]string{"posicao"}).AddRow(4))
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO topicos (id, disciplina_id, nome, posicao) VALUES (?, ?, ?, ?)")).
+		WithArgs(sqlmock.AnyArg(), "discipline-1", "Pontuação", 5).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO topicos (id, disciplina_id, nome, posicao) VALUES (?, ?, ?, ?)")).
+		WithArgs(sqlmock.AnyArg(), "discipline-1", "Concordância", 6).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	err = NewStudyRepository(db).CreateTopics(
+		context.Background(),
+		"discipline-1",
+		[]string{"Pontuação", "Concordância"},
+	)
+
+	if err != nil {
+		t.Fatalf("CreateTopics() error = %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
+func TestCreateTopicsRollsBackWholeBatchWhenOneInsertFails(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT id FROM disciplinas").
+		WithArgs("discipline-1").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow("discipline-1"))
+	mock.ExpectQuery("SELECT COALESCE").
+		WithArgs("discipline-1").
+		WillReturnRows(sqlmock.NewRows([]string{"posicao"}).AddRow(0))
+	mock.ExpectExec("INSERT INTO topicos").
+		WithArgs(sqlmock.AnyArg(), "discipline-1", "Pontuação", 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO topicos").
+		WithArgs(sqlmock.AnyArg(), "discipline-1", "Concordância", 2).
+		WillReturnError(errors.New("insert failed"))
+	mock.ExpectRollback()
+
+	err = NewStudyRepository(db).CreateTopics(
+		context.Background(),
+		"discipline-1",
+		[]string{"Pontuação", "Concordância"},
+	)
+
+	if err == nil {
+		t.Fatal("CreateTopics() error = nil, want insert failure")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
 func TestDeleteTopicRejectsMandatoryReviewTopic(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {

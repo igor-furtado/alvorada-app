@@ -52,13 +52,13 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   }
 
   @override
-  Future<void> createTopico({required String disciplineId, required String name}) async {
+  Future<void> createTopicos({required String disciplineId, required List<String> names}) async {
     _throwIfMutationFails();
     _replaceDisciplina(
       disciplineId,
       (disciplina) => [
         ...disciplina.topics.take(disciplina.topics.length - 1),
-        Topico(id: _id('topico'), name: name, mandatory: false),
+        ...names.map((name) => Topico(id: _id('topico'), name: name, mandatory: false)),
         disciplina.topics.last,
       ],
     );

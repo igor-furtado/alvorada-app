@@ -7,27 +7,30 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../fakes/fake_disciplinas_repository.dart';
 
 void main() {
-  test('cria um Tópico com o nome normalizado', () async {
+  test('cria vários Tópicos normalizados na ordem informada', () async {
     final useCases = DisciplinasUseCases(
       FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
     );
 
-    final createResult = await useCases.createTopico(
+    final createResult = await useCases.createTopicos(
       disciplineId: 'portugues',
-      name: '  Pontuação  ',
+      names: ['  Pontuação  ', ' Concordância ', '   '],
     );
     final catalogResult = await useCases.getDisciplinas();
 
     expect(createResult, isA<Sucesso<void>>());
-    expect(_topicos(catalogResult, 'portugues'), contains('Pontuação'));
+    expect(
+      _topicos(catalogResult, 'portugues'),
+      containsAllInOrder(['Pontuação', 'Concordância', nomeTopicoRevisaoVespera]),
+    );
   });
 
   test('rejeita a criação de Tópico com nome vazio', () async {
     final useCases = DisciplinasUseCases(FakeDisciplinasRepository());
 
-    final result = await useCases.createTopico(
+    final result = await useCases.createTopicos(
       disciplineId: 'portugues',
-      name: '   ',
+      names: const ['   '],
     );
 
     expect(

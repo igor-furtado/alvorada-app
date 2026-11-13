@@ -173,12 +173,55 @@ func (r *StudyRepository) DeleteSubject(ctx context.Context, id string) error {
 	return exec(ctx, r.db, "delete subject", "DELETE FROM disciplinas WHERE id = ?", id)
 }
 
-func (r *StudyRepository) CreateTopic(ctx context.Context, subjectID, name string) error {
-	id, err := newUUID()
-	if err != nil {
-		return err
+func (r *StudyRepository) CreateTopics(ctx context.Context, subjectID string, names []string) error {
+	if len(names) == 0 {
+		return nil
 	}
-	return exec(ctx, r.db, "insert topic", "INSERT INTO topicos (id, disciplina_id, nome) VALUES (?, ?, ?)", id, subjectID, name)
+	ids := make([]string, len(names))
+	for index := range names {
+		id, err := newUUID()
+		if err != nil {
+			return err
+		}
+		ids[index] = id
+	}
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin create topics transaction: %w", err)
+	}
+	defer tx.Rollback()
+	var lockedSubjectID string
+	if err := tx.QueryRowContext(
+		ctx,
+		"SELECT id FROM disciplinas WHERE id = ? FOR UPDATE",
+		subjectID,
+	).Scan(&lockedSubjectID); err != nil {
+		return fmt.Errorf("lock subject for topics: %w", err)
+	}
+	var lastPosition int
+	if err := tx.QueryRowContext(
+		ctx,
+		"SELECT COALESCE(MAX(posicao), 0) FROM topicos WHERE disciplina_id = ?",
+		subjectID,
+	).Scan(&lastPosition); err != nil {
+		return fmt.Errorf("query last topic position: %w", err)
+	}
+	for index, name := range names {
+		if _, err := tx.ExecContext(
+			ctx,
+			"INSERT INTO topicos (id, disciplina_id, nome, posicao) VALUES (?, ?, ?, ?)",
+			ids[index],
+			subjectID,
+			name,
+			lastPosition+index+1,
+		); err != nil {
+			return fmt.Errorf("insert topic: %w", err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit create topics transaction: %w", err)
+	}
+	return nil
 }
 
 func (r *StudyRepository) UpdateTopic(ctx context.Context, id, name string) error {

@@ -24,7 +24,7 @@ class TopicosFormView extends StatelessWidget {
     final useCases = context.read<DisciplinasUseCases>();
     return BlocProvider(
       create: (context) => TopicosFormBloc(
-        createTopico: useCases.createTopico,
+        createTopicos: useCases.createTopicos,
         updateTopico: useCases.updateTopico,
         disciplineId: disciplineId,
         topicId: topico?.id,
@@ -49,6 +49,8 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
     text: widget.topico?.name,
   );
 
+  List<String> get _names => _parseTopicNames(_nameController.text);
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -63,33 +65,47 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
     builder: (context, state) => AppForm(
       firstInvalidFocusNode: () => _nameFocus,
       onSubmit: () async {
-        final bloc = context.read<TopicosFormBloc>()..add(TopicosFormSubmitted(_nameController.text.trim()));
+        final bloc = context.read<TopicosFormBloc>()..add(TopicosFormSubmitted(_names));
         await bloc.stream.firstWhere(
           (state) => state.status == TopicosFormStatus.success || state.status == TopicosFormStatus.failure,
         );
       },
       contentBuilder: (context, submitting, submit) => [
         AppField(
-          label: AppMessages.name,
+          label: widget.topico == null ? AppMessages.topics : AppMessages.name,
+          description: widget.topico == null ? AppMessages.topicsPerLineDescription(_names.length) : null,
           errorText: state.errorMessage,
           required: true,
-          control: AppTextInput(
-            controller: _nameController,
-            focusNode: _nameFocus,
-            errorText: state.errorMessage,
-            autofocus: true,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => submit(),
-            validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
-            semanticLabel: '${AppMessages.name}, ${AppMessages.requiredSuffix}',
-          ),
+          control: widget.topico == null
+              ? AppTextarea(
+                  controller: _nameController,
+                  focusNode: _nameFocus,
+                  placeholder: AppMessages.topicsPerLineExample,
+                  errorText: state.errorMessage,
+                  autofocus: true,
+                  minLines: 6,
+                  maxLines: 12,
+                  validator: (value) => _parseTopicNames(value ?? '').isEmpty ? AppMessages.requiredField : null,
+                  onChanged: (_) => setState(() {}),
+                  semanticLabel: '${AppMessages.topics}, ${AppMessages.requiredSuffix}',
+                )
+              : AppTextInput(
+                  controller: _nameController,
+                  focusNode: _nameFocus,
+                  errorText: state.errorMessage,
+                  autofocus: true,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => submit(),
+                  validator: (value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null,
+                  semanticLabel: '${AppMessages.name}, ${AppMessages.requiredSuffix}',
+                ),
         ),
       ],
       builder: (context, submitting, submit, content) => AppDrawer(
-        title: widget.topico == null ? AppMessages.addTopic : AppMessages.editTopic,
-        description: widget.topico == null ? AppMessages.addTopicDescription : AppMessages.editTopicDescription,
+        title: widget.topico == null ? AppMessages.addTopics : AppMessages.editTopic,
+        description: widget.topico == null ? AppMessages.addTopicsDescription : AppMessages.editTopicDescription,
         dismissible: !submitting,
-        primaryLabel: widget.topico == null ? AppMessages.addTopic : AppMessages.saveChanges,
+        primaryLabel: widget.topico == null ? AppMessages.addTopicsCount(_names.length) : AppMessages.saveChanges,
         onPrimary: submit,
         loading: submitting,
         child: content,
@@ -97,3 +113,6 @@ class _TopicosFormContentState extends State<_TopicosFormContent> {
     ),
   );
 }
+
+List<String> _parseTopicNames(String value) =>
+    value.split(RegExp(r'\r?\n')).map((name) => name.trim()).where((name) => name.isNotEmpty).toList(growable: false);

@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 
 import '../../../../core/domain/resultado.dart';
-import '../../domain/use_cases/create_topico_use_case.dart';
+import '../../domain/use_cases/create_topicos_use_case.dart';
 import '../../domain/use_cases/disciplinas_resultado_codes.dart';
 import '../../domain/use_cases/update_topico_use_case.dart';
 import 'topicos_form_event.dart';
@@ -9,7 +9,7 @@ import 'topicos_form_state.dart';
 
 class TopicosFormBloc extends Bloc<TopicosFormEvent, TopicosFormState> {
   TopicosFormBloc({
-    required this.createTopico,
+    required this.createTopicos,
     required this.updateTopico,
     required this.disciplineId,
     this.topicId,
@@ -17,7 +17,7 @@ class TopicosFormBloc extends Bloc<TopicosFormEvent, TopicosFormState> {
     on<TopicosFormSubmitted>(_onSubmitted);
   }
 
-  final CreateTopicoUseCase createTopico;
+  final CreateTopicosUseCase createTopicos;
   final UpdateTopicoUseCase updateTopico;
   final String disciplineId;
   final String? topicId;
@@ -30,8 +30,11 @@ class TopicosFormBloc extends Bloc<TopicosFormEvent, TopicosFormState> {
     emit(const TopicosFormState(status: TopicosFormStatus.submitting));
     final id = topicId;
     final result = id == null
-        ? await createTopico(disciplineId: disciplineId, name: event.name)
-        : await updateTopico(topicId: id, name: event.name);
+        ? await createTopicos(disciplineId: disciplineId, names: event.names)
+        : await updateTopico(
+            topicId: id,
+            name: event.names.isEmpty ? '' : event.names.first,
+          );
     switch (result) {
       case Sucesso<void>():
         emit(const TopicosFormState(status: TopicosFormStatus.success));

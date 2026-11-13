@@ -42,6 +42,26 @@ func TestCreateTopicRejectsReservedMandatoryTopicName(t *testing.T) {
 	}
 }
 
+func TestCreateTopicsNormalizesWholeBatchBeforePersisting(t *testing.T) {
+	repository := &fakeRepository{}
+	service := NewService(repository)
+	err := service.CreateTopics(context.Background(), "subject-id", []string{"  Pontuação  ", "Concordância"})
+	if err != nil {
+		t.Fatalf("CreateTopics() error = %v", err)
+	}
+	if len(repository.createdTopics) != 2 || repository.createdTopics[0] != "Pontuação" || repository.createdTopics[1] != "Concordância" {
+		t.Fatalf("CreateTopics() persisted %#v", repository.createdTopics)
+	}
+}
+
+func TestCreateTopicsRejectsEmptyBatch(t *testing.T) {
+	service := NewService(&fakeRepository{})
+	err := service.CreateTopics(context.Background(), "subject-id", nil)
+	if !errors.Is(err, ErrTopicsRequired) {
+		t.Fatalf("CreateTopics() error = %v, want %v", err, ErrTopicsRequired)
+	}
+}
+
 func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 	service := NewService(&fakeRepository{})
 	_, err := service.CreateSubject(context.Background(), domain.CreateSubjectInput{
@@ -56,6 +76,7 @@ func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 
 type fakeRepository struct {
 	createdSubject domain.CreateSubjectInput
+	createdTopics  []string
 }
 
 func (f *fakeRepository) FindCatalog(context.Context) ([]domain.Subject, error) {
@@ -70,7 +91,10 @@ func (f *fakeRepository) CreateSubject(_ context.Context, input domain.CreateSub
 func (f *fakeRepository) UpdateSubject(context.Context, string, domain.UpdateSubjectInput) error {
 	return nil
 }
-func (f *fakeRepository) DeleteSubject(context.Context, string) error       { return nil }
-func (f *fakeRepository) CreateTopic(context.Context, string, string) error { return nil }
+func (f *fakeRepository) DeleteSubject(context.Context, string) error { return nil }
+func (f *fakeRepository) CreateTopics(_ context.Context, _ string, names []string) error {
+	f.createdTopics = names
+	return nil
+}
 func (f *fakeRepository) UpdateTopic(context.Context, string, string) error { return nil }
 func (f *fakeRepository) DeleteTopic(context.Context, string) error         { return nil }

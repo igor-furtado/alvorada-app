@@ -10,7 +10,7 @@ abstract interface class DisciplinasRepository {
 
   Future<void> deleteDisciplina(String id);
 
-  Future<void> createTopico({required String disciplineId, required String name});
+  Future<void> createTopicos({required String disciplineId, required List<String> names});
 
   Future<void> updateTopico({required String topicId, required String name});
 

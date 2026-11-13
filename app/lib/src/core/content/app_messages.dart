@@ -112,8 +112,9 @@ abstract final class AppMessages {
   static const contentCatalogSubtitle = 'Catálogo de Disciplinas e Tópicos compartilhado entre Concursos.';
   static const searchContent = 'Buscar Disciplinas e Tópicos';
   static const addDiscipline = 'Adicionar Disciplina';
-  static const addTopic = 'Adicionar Tópico';
-  static const addTopicDescription = 'Adicione um Tópico à Disciplina selecionada.';
+  static const addTopics = 'Adicionar Tópicos';
+  static const addTopicsDescription = 'Adicione um ou vários Tópicos à Disciplina selecionada.';
+  static const topicsPerLineExample = 'Ex.:\nInterpretação de textos\nPontuação\nConcordância verbal';
   static const rename = 'Renomear';
   static const editDiscipline = 'Editar Disciplina';
   static const editTopic = 'Editar Tópico';
@@ -133,7 +134,7 @@ abstract final class AppMessages {
   static const disciplineCreated = 'Disciplina adicionada.';
   static const disciplineUpdated = 'Disciplina atualizada.';
   static const disciplineDeleted = 'Disciplina excluída.';
-  static const topicCreated = 'Tópico adicionado.';
+  static const topicCreated = 'Tópicos adicionados.';
   static const topicUpdated = 'Tópico atualizado.';
   static const topicDeleted = 'Tópico excluído.';
   static const contentUpdateFailed = 'Não foi possível atualizar. Os dados exibidos foram preservados.';
@@ -156,6 +157,15 @@ abstract final class AppMessages {
   static String topicCount(int count) => _count(count, 'Tópico', 'Tópicos');
 
   static String topicCountInCatalog(int count) => '${topicCount(count)} no catálogo.';
+
+  static String topicsPerLineDescription(int count) {
+    final ready = count == 0
+        ? 'Nenhum Tópico pronto para adicionar.'
+        : '${topicCount(count)} ${count == 1 ? 'pronto' : 'prontos'} para adicionar.';
+    return 'Digite um Tópico por linha. Linhas vazias serão ignoradas. $ready';
+  }
+
+  static String addTopicsCount(int count) => count == 0 ? addTopics : 'Adicionar ${topicCount(count)}';
 
   static String disciplineDeletedImpact(String name) =>
       '$name e seus Tópicos serão excluídos do catálogo compartilhado. Esta ação não pode ser desfeita.';

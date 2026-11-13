@@ -47,7 +47,7 @@ class TopicosListHeader extends StatelessWidget {
         children: [
           AppAccessibleIconButton(
             icon: AppIcons.add,
-            label: AppMessages.addTopic,
+            label: AppMessages.addTopics,
             variant: AppIconButtonVariant.primary,
             onPressed: canAdd ? onAdd : null,
           ),

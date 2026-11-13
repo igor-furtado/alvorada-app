@@ -3,7 +3,7 @@ sealed class TopicosFormEvent {
 }
 
 final class TopicosFormSubmitted extends TopicosFormEvent {
-  const TopicosFormSubmitted(this.name);
+  const TopicosFormSubmitted(this.names);
 
-  final String name;
+  final List<String> names;
 }

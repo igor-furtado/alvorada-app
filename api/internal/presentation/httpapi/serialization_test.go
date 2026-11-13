@@ -75,6 +75,30 @@ func TestCreateDisciplineAcceptsPortugueseJSONFields(t *testing.T) {
 	}
 }
 
+func TestCreateTopicsAcceptsBatchAndPreservesOrder(t *testing.T) {
+	repository := &serializationRepository{}
+	handler := NewHandler(
+		application.NewService(repository),
+		nil,
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(
+		http.MethodPost,
+		"/api/v1/subjects/disciplina-1/topics/batch",
+		strings.NewReader(`{"nomes":["Pontuação","Concordância"]}`),
+	)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusCreated {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusCreated, response.Body.String())
+	}
+	if len(repository.createdTopics) != 2 || repository.createdTopics[0] != "Pontuação" || repository.createdTopics[1] != "Concordância" {
+		t.Fatalf("created topics = %#v", repository.createdTopics)
+	}
+}
+
 func TestErrorResponseUsesPortugueseField(t *testing.T) {
 	handler := NewHandler(
 		application.NewService(&serializationRepository{}),
@@ -134,6 +158,7 @@ func TestDeleteLinkedTopicReturnsConflict(t *testing.T) {
 type serializationRepository struct {
 	catalog          []domain.Subject
 	createdSubject   domain.CreateSubjectInput
+	createdTopics    []string
 	deleteTopicError error
 }
 
@@ -152,7 +177,10 @@ func (r *serializationRepository) UpdateSubject(context.Context, string, domain.
 
 func (r *serializationRepository) DeleteSubject(context.Context, string) error { return nil }
 
-func (r *serializationRepository) CreateTopic(context.Context, string, string) error { return nil }
+func (r *serializationRepository) CreateTopics(_ context.Context, _ string, names []string) error {
+	r.createdTopics = names
+	return nil
+}
 
 func (r *serializationRepository) UpdateTopic(context.Context, string, string) error { return nil }
 

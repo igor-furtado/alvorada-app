@@ -60,8 +60,8 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
       _mutate(() => _api.deleteDisciplina(id), 'Não foi possível excluir a Disciplina.');
 
   @override
-  Future<void> createTopico({required String disciplineId, required String name}) => _mutate(
-    () => _api.createTopico(disciplineId, name),
+  Future<void> createTopicos({required String disciplineId, required List<String> names}) => _mutate(
+    () => _api.createTopicos(disciplineId, names),
     'Não foi possível adicionar o Tópico.',
   );
 

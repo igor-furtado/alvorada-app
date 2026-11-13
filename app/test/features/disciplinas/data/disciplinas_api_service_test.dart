@@ -37,16 +37,29 @@ void main() {
     expect(id, 'discipline-2');
   });
 
+  test('envia vários Tópicos em uma única chamada', () async {
+    final client = MockClient((request) async {
+      expect(request.url.path, '/api/v1/subjects/discipline-1/topics/batch');
+      expect(jsonDecode(request.body), {
+        'nomes': ['Pontuação', 'Concordância'],
+      });
+      return http.Response('{}', 201);
+    });
+    final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));
+
+    await service.createTopicos('discipline-1', ['Pontuação', 'Concordância']);
+  });
+
   test('preserva a mensagem de validação devolvida pela API', () async {
-    final client = MockClient((_) async => http.Response(jsonEncode({'erro': 'informe um nome'}), 400));
+    final client = MockClient((_) async => http.Response(jsonEncode({'erro': 'informe ao menos um Tópico'}), 400));
     final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));
 
     expect(
-      () => service.createTopico('discipline-1', ''),
+      () => service.createTopicos('discipline-1', []),
       throwsA(
         isA<DisciplinasApiException>()
             .having((error) => error.statusCode, 'statusCode', 400)
-            .having((error) => error.message, 'message', 'informe um nome'),
+            .having((error) => error.message, 'message', 'informe ao menos um Tópico'),
       ),
     );
   });

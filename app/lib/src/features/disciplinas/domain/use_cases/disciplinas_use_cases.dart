@@ -1,6 +1,6 @@
 import '../repositories/disciplinas_repository.dart';
 import 'create_disciplina_use_case.dart';
-import 'create_topico_use_case.dart';
+import 'create_topicos_use_case.dart';
 import 'delete_disciplina_use_case.dart';
 import 'delete_topico_use_case.dart';
 import 'get_disciplinas_use_case.dart';
@@ -13,7 +13,7 @@ class DisciplinasUseCases {
       createDisciplina = CreateDisciplinaUseCase(repository),
       updateDisciplina = UpdateDisciplinaUseCase(repository),
       deleteDisciplina = DeleteDisciplinaUseCase(repository),
-      createTopico = CreateTopicoUseCase(repository),
+      createTopicos = CreateTopicosUseCase(repository),
       updateTopico = UpdateTopicoUseCase(repository),
       deleteTopico = DeleteTopicoUseCase(repository);
 
@@ -21,7 +21,7 @@ class DisciplinasUseCases {
   final CreateDisciplinaUseCase createDisciplina;
   final UpdateDisciplinaUseCase updateDisciplina;
   final DeleteDisciplinaUseCase deleteDisciplina;
-  final CreateTopicoUseCase createTopico;
+  final CreateTopicosUseCase createTopicos;
   final UpdateTopicoUseCase updateTopico;
   final DeleteTopicoUseCase deleteTopico;
 }

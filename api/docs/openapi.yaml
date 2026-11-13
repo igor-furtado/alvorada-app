@@ -280,6 +280,31 @@ paths:
           $ref: '#/components/responses/ErroValidacao'
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/subjects/{id}/topics/batch:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    post:
+      tags: [Tópicos]
+      summary: Adiciona vários tópicos a uma disciplina
+      description: Valida e cria todos os Tópicos em uma única operação, preservando a ordem informada.
+      operationId: criarTopicos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntradaNomes'
+      responses:
+        '201':
+          description: Tópicos criados
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/topics/{id}:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
@@ -580,6 +605,19 @@ components:
           minLength: 1
           maxLength: 120
           examples: [Controle de constitucionalidade]
+    EntradaNomes:
+      type: object
+      required: [nomes]
+      properties:
+        nomes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 120
+          examples:
+            - [Controle de constitucionalidade, Direitos fundamentais]
     Dificuldade:
       type: integer
       minimum: 1

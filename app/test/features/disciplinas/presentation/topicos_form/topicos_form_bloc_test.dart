@@ -11,18 +11,18 @@ import '../../fakes/fake_disciplinas_repository.dart';
 
 void main() {
   blocTest<TopicosFormBloc, TopicosFormState>(
-    'cria um Tópico e conclui o formulário',
+    'cria vários Tópicos e conclui o formulário',
     build: () {
       final useCases = DisciplinasUseCases(
         FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
       );
       return TopicosFormBloc(
-        createTopico: useCases.createTopico,
+        createTopicos: useCases.createTopicos,
         updateTopico: useCases.updateTopico,
         disciplineId: 'portugues',
       );
     },
-    act: (bloc) => bloc.add(const TopicosFormSubmitted('Pontuação')),
+    act: (bloc) => bloc.add(const TopicosFormSubmitted(['Pontuação', 'Concordância'])),
     expect: () => [
       isA<TopicosFormState>().having(
         (state) => state.status,
@@ -42,12 +42,12 @@ void main() {
     build: () {
       final useCases = DisciplinasUseCases(FakeDisciplinasRepository());
       return TopicosFormBloc(
-        createTopico: useCases.createTopico,
+        createTopicos: useCases.createTopicos,
         updateTopico: useCases.updateTopico,
         disciplineId: 'portugues',
       );
     },
-    act: (bloc) => bloc.add(const TopicosFormSubmitted('   ')),
+    act: (bloc) => bloc.add(const TopicosFormSubmitted([])),
     expect: () => [
       isA<TopicosFormState>().having(
         (state) => state.status,
@@ -63,7 +63,7 @@ void main() {
           .having(
             (state) => state.errorMessage,
             'mensagem',
-            'Informe um nome para o Tópico.',
+            'Informe ao menos um Tópico.',
           ),
     ],
   );
@@ -76,12 +76,12 @@ void main() {
       )..failSynchronization = true;
       final useCases = DisciplinasUseCases(repository);
       return TopicosFormBloc(
-        createTopico: useCases.createTopico,
+        createTopicos: useCases.createTopicos,
         updateTopico: useCases.updateTopico,
         disciplineId: 'portugues',
       );
     },
-    act: (bloc) => bloc.add(const TopicosFormSubmitted('Pontuação')),
+    act: (bloc) => bloc.add(const TopicosFormSubmitted(['Pontuação'])),
     expect: () => const [
       TopicosFormState(status: TopicosFormStatus.submitting),
       TopicosFormState(status: TopicosFormStatus.success),
@@ -93,7 +93,7 @@ void main() {
       FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
     );
     final bloc = TopicosFormBloc(
-      createTopico: useCases.createTopico,
+      createTopicos: useCases.createTopicos,
       updateTopico: useCases.updateTopico,
       disciplineId: 'portugues',
       topicId: 'interpretacao',
@@ -103,7 +103,7 @@ void main() {
     final completed = bloc.stream.firstWhere(
       (state) => state.status == TopicosFormStatus.success,
     );
-    bloc.add(const TopicosFormSubmitted('Interpretação textual'));
+    bloc.add(const TopicosFormSubmitted(['Interpretação textual']));
     await completed;
     final catalogResult = await useCases.getDisciplinas();
 

@@ -49,6 +49,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("PATCH /api/v1/subjects/{id}", h.updateSubject)
 	mux.HandleFunc("DELETE /api/v1/subjects/{id}", h.deleteSubject)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics", h.createTopic)
+	mux.HandleFunc("POST /api/v1/subjects/{id}/topics/batch", h.createTopics)
 	mux.HandleFunc("PATCH /api/v1/topics/{id}", h.updateTopic)
 	mux.HandleFunc("DELETE /api/v1/topics/{id}", h.deleteTopic)
 	return recovery(h.logger, cors(requestLogger(h.logger, mux)))
@@ -282,6 +283,10 @@ type nameRequest struct {
 	Name string `json:"nome"`
 }
 
+type namesRequest struct {
+	Names []string `json:"nomes"`
+}
+
 func (h *Handler) createSubject(w http.ResponseWriter, r *http.Request) {
 	var body subjectRequest
 	if err := decodeJSON(r, &body); err != nil {
@@ -331,6 +336,19 @@ func (h *Handler) deleteSubject(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) createTopic(w http.ResponseWriter, r *http.Request) {
 	h.runCreateName(w, r, func(name string) error { return h.studies.CreateTopic(r.Context(), r.PathValue("id"), name) })
+}
+
+func (h *Handler) createTopics(w http.ResponseWriter, r *http.Request) {
+	var body namesRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	if err := h.studies.CreateTopics(r.Context(), r.PathValue("id"), body.Names); err != nil {
+		h.serviceError(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]any{})
 }
 
 func (h *Handler) updateTopic(w http.ResponseWriter, r *http.Request) {
@@ -396,7 +414,8 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrNameTooLong) ||
+	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrTopicsRequired) ||
+		errors.Is(err, application.ErrNameTooLong) ||
 		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
 		errors.Is(err, domain.ErrMandatoryTopic) {
 		writeError(w, http.StatusBadRequest, err.Error())

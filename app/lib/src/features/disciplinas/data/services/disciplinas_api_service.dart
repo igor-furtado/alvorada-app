@@ -15,7 +15,7 @@ abstract interface class DisciplinasApi {
 
   Future<void> deleteDisciplina(String id);
 
-  Future<void> createTopico(String disciplineId, String name);
+  Future<void> createTopicos(String disciplineId, List<String> names);
 
   Future<void> updateTopico(String topicId, String name);
 
@@ -64,8 +64,10 @@ class DisciplinasApiService implements DisciplinasApi {
   Future<void> deleteDisciplina(String id) => _sendEmpty('DELETE', '/api/v1/subjects/${Uri.encodeComponent(id)}');
 
   @override
-  Future<void> createTopico(String disciplineId, String name) =>
-      _sendCreated('/api/v1/subjects/${Uri.encodeComponent(disciplineId)}/topics', name);
+  Future<void> createTopicos(String disciplineId, List<String> names) => _sendCreated(
+    '/api/v1/subjects/${Uri.encodeComponent(disciplineId)}/topics/batch',
+    {'nomes': names},
+  );
 
   @override
   Future<void> updateTopico(String topicId, String name) =>
@@ -74,8 +76,8 @@ class DisciplinasApiService implements DisciplinasApi {
   @override
   Future<void> deleteTopico(String topicId) => _sendEmpty('DELETE', '/api/v1/topics/${Uri.encodeComponent(topicId)}');
 
-  Future<void> _sendCreated(String path, String name) async {
-    final response = await _client.post(_uri(path), headers: _jsonHeaders, body: jsonEncode({'nome': name}));
+  Future<void> _sendCreated(String path, Map<String, Object?> body) async {
+    final response = await _client.post(_uri(path), headers: _jsonHeaders, body: jsonEncode(body));
     _decode(response, expectedStatus: 201);
   }
 

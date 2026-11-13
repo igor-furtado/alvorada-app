@@ -37,6 +37,7 @@ O produto organiza Concursos e Disciplinas. Ele mantém os dados dos Concursos e
 
 - A área Disciplinas preserva a ordem do catálogo.
 - Uma Disciplina contém Tópicos.
+- A criação permite informar um ou vários Tópicos, um por linha; linhas vazias são ignoradas e o lote é validado e salvo por inteiro, preservando a ordem informada.
 - Cada Tópico compartilhado entre Editais existe uma única vez no catálogo.
 - Não é permitido excluir uma Disciplina ou um Tópico usado por algum Edital.
 - Quando não houver uso em Editais, excluir uma Disciplina remove seus Tópicos.

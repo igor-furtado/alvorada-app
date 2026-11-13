@@ -26,9 +26,12 @@ void main() {
     final repository = ApiDisciplinasRepository(api);
     await repository.getDisciplinas();
 
-    await repository.createTopico(disciplineId: 'discipline-1', name: 'Pontuação');
+    await repository.createTopicos(
+      disciplineId: 'discipline-1',
+      names: const ['Pontuação', 'Concordância'],
+    );
 
-    expect(api.createdTopico, 'Pontuação');
+    expect(api.createdTopicos, ['Pontuação', 'Concordância']);
     expect(api.getCalls, 2);
   });
 
@@ -39,14 +42,14 @@ void main() {
     api.failGet = true;
 
     await expectLater(
-      repository.createTopico(
+      repository.createTopicos(
         disciplineId: 'discipline-1',
-        name: 'Pontuação',
+        names: const ['Pontuação'],
       ),
       throwsA(isA<DisciplinasSynchronizationException>()),
     );
 
-    expect(api.createdTopico, 'Pontuação');
+    expect(api.createdTopicos, ['Pontuação']);
   });
 
   test('retorna a Disciplina criada depois de sincronizar com a API', () async {
@@ -68,9 +71,9 @@ void main() {
     final repository = ApiDisciplinasRepository(api);
 
     await expectLater(
-      repository.createTopico(
+      repository.createTopicos(
         disciplineId: 'discipline-1',
-        name: 'Pontuação',
+        names: const ['Pontuação'],
       ),
       throwsA(
         isA<DisciplinasRuleViolationException>()
@@ -91,7 +94,7 @@ void main() {
 
 class _FakeApi implements DisciplinasApi {
   int getCalls = 0;
-  String? createdTopico;
+  List<String>? createdTopicos;
   Map<String, Object?>? createdDisciplina;
   bool failGet = false;
   Exception? mutationError;
@@ -110,10 +113,10 @@ class _FakeApi implements DisciplinasApi {
   }
 
   @override
-  Future<void> createTopico(String disciplineId, String name) async {
+  Future<void> createTopicos(String disciplineId, List<String> names) async {
     final error = mutationError;
     if (error != null) throw error;
-    createdTopico = name;
+    createdTopicos = names;
   }
 
   @override
