@@ -823,6 +823,7 @@ class _Information extends StatelessWidget {
           stage: 'Posse',
           title: 'Condições do cargo',
           facts: [
+            ('Regime', concurso.hiringRegime),
             ('Vencimento inicial', concurso.remuneration),
             ('Jornada', concurso.weeklyWorkload),
           ],

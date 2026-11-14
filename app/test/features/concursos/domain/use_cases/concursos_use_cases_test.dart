@@ -100,6 +100,7 @@ void main() {
         cargo: '  Analista Judiciário  ',
         banca: '  FGV  ',
         prioritario: true,
+        regimeContratacao: RegimeContratacao.estatutario,
         sigla: '  TRF5  ',
         quantidadeVagas: 25,
         vencimentoCentavos: 1234567,
@@ -121,6 +122,7 @@ void main() {
     expect(updated.banca, 'FGV');
     expect(updated.progressoEdital, 72);
     expect(updated.prioritario, isTrue);
+    expect(updated.regimeContratacao, RegimeContratacao.estatutario);
     expect(previousPriority.prioritario, isFalse);
     expect(updated.sigla, 'TRF5');
     expect(updated.quantidadeVagas, 25);

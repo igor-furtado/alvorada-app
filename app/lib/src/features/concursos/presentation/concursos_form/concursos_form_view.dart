@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/content/app_messages.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/app_ui.dart';
 import '../../domain/models/concurso.dart';
 import '../../domain/use_cases/concursos_use_cases.dart';
 import '../concurso_formatters.dart';
 import 'concursos_form_bloc.dart';
 import 'concursos_form_event.dart';
+import 'concursos_form_input_formatters.dart';
 import 'concursos_form_state.dart';
+import 'concursos_form_validators.dart';
 
 class ConcursosFormView extends StatelessWidget {
   const ConcursosFormView({this.concurso, super.key});
@@ -86,6 +89,7 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
   final _dataProvaFocus = FocusNode();
   final _horarioInicioFocus = FocusNode();
   final _horarioFimFocus = FocusNode();
+  late RegimeContratacao? _regimeContratacao = widget.concurso?.regimeContratacao;
   late var _prioritario = widget.concurso?.prioritario ?? false;
 
   @override
@@ -123,11 +127,16 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
       firstInvalidFocusNode: () {
         if (_instituicao.text.trim().isEmpty) return _instituicaoFocus;
         if (_cargo.text.trim().isEmpty) return _cargoFocus;
-        if (_validNonNegativeInteger(_quantidadeVagas.text) != null) return _quantidadeVagasFocus;
-        if (_validRemuneration(_vencimento.text) != null) return _vencimentoFocus;
-        if (_validWeeklyWorkload(_cargaHoraria.text) != null) return _cargaHorariaFocus;
-        if (_validDate(_dataProva.text) != null) return _dataProvaFocus;
-        if (_validTimeRange(_horarioInicio.text) != null) return _horarioInicioFocus;
+        if (ConcursosFormValidators.nonNegativeInteger(_quantidadeVagas.text) != null) {
+          return _quantidadeVagasFocus;
+        }
+        if (ConcursosFormValidators.remuneration(_vencimento.text) != null) return _vencimentoFocus;
+        if (ConcursosFormValidators.weeklyWorkload(_cargaHoraria.text) != null) return _cargaHorariaFocus;
+        if (ConcursosFormValidators.examDate(_dataProva.text) != null) return _dataProvaFocus;
+        if (ConcursosFormValidators.examTimeRange(_horarioInicio.text, _horarioFim.text) != null) {
+          if (!isValidTime(_horarioInicio.text.trim())) return _horarioInicioFocus;
+          return _horarioFimFocus;
+        }
         return null;
       },
       onSubmit: () async {
@@ -140,6 +149,7 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
               dataProva: parseBrazilianDate(_dataProva.text),
               prioritario: _prioritario,
               sigla: _sigla.text,
+              regimeContratacao: _regimeContratacao,
               quantidadeVagas: parseOptionalInteger(_quantidadeVagas.text),
               vencimentoCentavos: parseBrazilianCurrency(_vencimento.text),
               cargaHorariaSemanal: parseOptionalInteger(_cargaHoraria.text),
@@ -155,16 +165,21 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
         );
       },
       contentBuilder: (context, submitting, submit) => [
+        if (state.errorMessage != null)
+          AppAlert(
+            title: state.errorMessage!,
+            description: 'Tente novamente em instantes.',
+            icon: AppIcons.attention,
+            variant: AppAlertVariant.destructive,
+          ),
         AppField(
           label: AppMessages.institution,
-          errorText: state.errorMessage,
           required: true,
           control: AppTextInput(
             controller: _instituicao,
             focusNode: _instituicaoFocus,
-            errorText: state.errorMessage,
             autofocus: true,
-            validator: _required,
+            validator: ConcursosFormValidators.requiredText,
             semanticLabel: '${AppMessages.institution}, ${AppMessages.requiredSuffix}',
           ),
         ),
@@ -181,7 +196,7 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
           control: AppTextInput(
             controller: _cargo,
             focusNode: _cargoFocus,
-            validator: _required,
+            validator: ConcursosFormValidators.requiredText,
             semanticLabel: '${AppMessages.role}, ${AppMessages.requiredSuffix}',
           ),
         ),
@@ -190,12 +205,34 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
           control: AppTextInput(controller: _banca, semanticLabel: AppMessages.board),
         ),
         AppField(
+          label: AppMessages.hiringRegime,
+          control: AppCombobox<RegimeContratacao>(
+            options: const [
+              RegimeContratacao.estatutario,
+              RegimeContratacao.celetista,
+            ],
+            displayStringForOption: (option) => switch (option) {
+              RegimeContratacao.estatutario => AppMessages.statutoryHiringRegime,
+              RegimeContratacao.celetista => AppMessages.cltHiringRegime,
+            },
+            value: _regimeContratacao,
+            placeholder: AppMessages.hiringRegimePlaceholder,
+            semanticLabel: AppMessages.hiringRegime,
+            showClear: true,
+            disabled: submitting,
+            onChanged: (value) => setState(() {
+              _regimeContratacao = value;
+            }),
+          ),
+        ),
+        AppField(
           label: AppMessages.vacancies,
           control: AppTextInput(
             controller: _quantidadeVagas,
             focusNode: _quantidadeVagasFocus,
             keyboardType: TextInputType.number,
-            validator: _validNonNegativeInteger,
+            inputFormatters: [concursoIntegerInputFormatter],
+            validator: ConcursosFormValidators.nonNegativeInteger,
             semanticLabel: AppMessages.vacancies,
           ),
         ),
@@ -205,8 +242,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             controller: _vencimento,
             focusNode: _vencimentoFocus,
             placeholder: AppMessages.remunerationPlaceholder,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            validator: _validRemuneration,
+            keyboardType: TextInputType.number,
+            inputFormatters: [concursoCurrencyInputFormatter],
+            prefixIcon: const _CurrencyPrefix(),
+            validator: ConcursosFormValidators.remuneration,
             semanticLabel: AppMessages.remuneration,
           ),
         ),
@@ -217,7 +256,8 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             controller: _cargaHoraria,
             focusNode: _cargaHorariaFocus,
             keyboardType: TextInputType.number,
-            validator: _validWeeklyWorkload,
+            inputFormatters: [concursoIntegerInputFormatter],
+            validator: ConcursosFormValidators.weeklyWorkload,
             semanticLabel: AppMessages.weeklyWorkload,
           ),
         ),
@@ -227,32 +267,52 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             controller: _dataProva,
             focusNode: _dataProvaFocus,
             placeholder: AppMessages.examDatePlaceholder,
-            keyboardType: TextInputType.datetime,
-            validator: _validDate,
+            keyboardType: TextInputType.number,
+            inputFormatters: [concursoDateInputFormatter],
+            validator: ConcursosFormValidators.examDate,
             semanticLabel: AppMessages.examDate,
           ),
         ),
-        AppField(
-          label: AppMessages.examStartTime,
-          control: AppTextInput(
-            controller: _horarioInicio,
-            focusNode: _horarioInicioFocus,
-            placeholder: AppMessages.timePlaceholder,
-            keyboardType: TextInputType.datetime,
-            validator: _validTimeRange,
-            semanticLabel: AppMessages.examStartTime,
-          ),
-        ),
-        AppField(
-          label: AppMessages.examEndTime,
-          control: AppTextInput(
-            controller: _horarioFim,
-            focusNode: _horarioFimFocus,
-            placeholder: AppMessages.timePlaceholder,
-            keyboardType: TextInputType.datetime,
-            validator: _validTimeRange,
-            semanticLabel: AppMessages.examEndTime,
-          ),
+        Row(
+          key: const ValueKey('exam-time-fields'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: AppField(
+                label: AppMessages.examStartTime,
+                control: AppTextInput(
+                  controller: _horarioInicio,
+                  focusNode: _horarioInicioFocus,
+                  placeholder: AppMessages.timePlaceholder,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [concursoTimeInputFormatter],
+                  validator: (_) => ConcursosFormValidators.examTimeRange(
+                    _horarioInicio.text,
+                    _horarioFim.text,
+                  ),
+                  semanticLabel: AppMessages.examStartTime,
+                ),
+              ),
+            ),
+            SizedBox(width: context.tokens.spacing.lg),
+            Expanded(
+              child: AppField(
+                label: AppMessages.examEndTime,
+                control: AppTextInput(
+                  controller: _horarioFim,
+                  focusNode: _horarioFimFocus,
+                  placeholder: AppMessages.timePlaceholder,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [concursoTimeInputFormatter],
+                  validator: (_) => ConcursosFormValidators.examTimeRange(
+                    _horarioInicio.text,
+                    _horarioFim.text,
+                  ),
+                  semanticLabel: AppMessages.examEndTime,
+                ),
+              ),
+            ),
+          ],
         ),
         AppField(
           label: AppMessages.examLocation,
@@ -264,22 +324,22 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
         AppField(
           label: AppMessages.requirements,
           description: AppMessages.requirementsHelp,
-          control: AppTextInput(
+          control: AppTextarea(
+            key: const ValueKey('requirements-textarea'),
             controller: _requisitos,
-            minLines: 3,
-            maxLines: 6,
-            keyboardType: TextInputType.multiline,
+            minLines: 5,
+            maxLines: 8,
             semanticLabel: AppMessages.requirements,
           ),
         ),
         AppField(
           label: AppMessages.scoringCriteria,
           description: AppMessages.scoringCriteriaHelp,
-          control: AppTextInput(
+          control: AppTextarea(
+            key: const ValueKey('scoring-criteria-textarea'),
             controller: _criteriosPontuacao,
-            minLines: 3,
-            maxLines: 6,
-            keyboardType: TextInputType.multiline,
+            minLines: 5,
+            maxLines: 8,
             semanticLabel: AppMessages.scoringCriteria,
           ),
         ),
@@ -311,55 +371,20 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
       ),
     ),
   );
+}
 
-  String? _required(String? value) => value == null || value.trim().isEmpty ? AppMessages.requiredField : null;
+class _CurrencyPrefix extends StatelessWidget {
+  const _CurrencyPrefix();
 
-  String? _validDate(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    try {
-      parseBrazilianDate(value);
-      return null;
-    } on FormatException {
-      return AppMessages.invalidExamDate;
-    }
-  }
-
-  String? _validNonNegativeInteger(String? value) {
-    try {
-      final parsed = parseOptionalInteger(value ?? '');
-      return parsed != null && parsed > 1000000 ? AppMessages.invalidNonNegativeInteger : null;
-    } on FormatException {
-      return AppMessages.invalidNonNegativeInteger;
-    }
-  }
-
-  String? _validWeeklyWorkload(String? value) {
-    try {
-      final parsed = parseOptionalInteger(value ?? '');
-      return parsed != null && (parsed < 1 || parsed > 168) ? AppMessages.invalidWeeklyWorkload : null;
-    } on FormatException {
-      return AppMessages.invalidWeeklyWorkload;
-    }
-  }
-
-  String? _validRemuneration(String? value) {
-    try {
-      parseBrazilianCurrency(value ?? '');
-      return null;
-    } on FormatException {
-      return AppMessages.invalidRemuneration;
-    }
-  }
-
-  String? _validTimeRange(String? _) {
-    final start = _horarioInicio.text.trim();
-    final end = _horarioFim.text.trim();
-    if (start.isEmpty && end.isEmpty) return null;
-    if (start.isEmpty || end.isEmpty || !isValidTime(start) || !isValidTime(end)) {
-      return AppMessages.invalidExamTimeRange;
-    }
-    return end.compareTo(start) > 0 ? null : AppMessages.invalidExamTimeRange;
-  }
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(left: context.tokens.spacing.md, right: context.tokens.spacing.sm),
+    child: Align(
+      widthFactor: 1,
+      heightFactor: 1,
+      child: Text(r'R$', style: context.tokens.typography.labelLarge),
+    ),
+  );
 }
 
 String _integerText(int? value) => value?.toString() ?? '';

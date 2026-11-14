@@ -16,6 +16,7 @@ var (
 	ErrCargoTooLong        = errors.New("o cargo deve ter no máximo 160 caracteres")
 	ErrBancaTooLong        = errors.New("a banca deve ter no máximo 120 caracteres")
 	ErrSiglaTooLong        = errors.New("a sigla do órgão deve ter no máximo 24 caracteres")
+	ErrRegimeContratacao   = errors.New("o regime de contratação deve ser Estatutário ou Celetista")
 	ErrQuantidadeVagas     = errors.New("a quantidade de vagas deve estar entre 0 e 1.000.000")
 	ErrVencimento          = errors.New("o vencimento não pode ser negativo")
 	ErrCargaHoraria        = errors.New("a carga horária semanal deve estar entre 1 e 168 horas")
@@ -40,7 +41,8 @@ func (s *Service) ListActive(ctx context.Context) ([]domain.Concurso, error) {
 func (s *Service) Create(ctx context.Context, input domain.CreateConcursoInput) (string, error) {
 	fields, err := normalizeFields(rawFields{
 		instituicao: input.Instituicao, cargo: input.Cargo, banca: input.Banca, sigla: input.Sigla,
-		quantidadeVagas: input.QuantidadeVagas, vencimentoCentavos: input.VencimentoCentavos,
+		regimeContratacao: input.RegimeContratacao, quantidadeVagas: input.QuantidadeVagas,
+		vencimentoCentavos:  input.VencimentoCentavos,
 		cargaHorariaSemanal: input.CargaHorariaSemanal, localProva: input.LocalProva,
 		horarioInicioProva: input.HorarioInicioProva, horarioFimProva: input.HorarioFimProva,
 		requisitos: input.Requisitos, criteriosPontuacao: input.CriteriosPontuacao,
@@ -55,7 +57,8 @@ func (s *Service) Create(ctx context.Context, input domain.CreateConcursoInput) 
 func (s *Service) Update(ctx context.Context, id string, input domain.UpdateConcursoInput) error {
 	fields, err := normalizeFields(rawFields{
 		instituicao: input.Instituicao, cargo: input.Cargo, banca: input.Banca, sigla: input.Sigla,
-		quantidadeVagas: input.QuantidadeVagas, vencimentoCentavos: input.VencimentoCentavos,
+		regimeContratacao: input.RegimeContratacao, quantidadeVagas: input.QuantidadeVagas,
+		vencimentoCentavos:  input.VencimentoCentavos,
 		cargaHorariaSemanal: input.CargaHorariaSemanal, localProva: input.LocalProva,
 		horarioInicioProva: input.HorarioInicioProva, horarioFimProva: input.HorarioFimProva,
 		requisitos: input.Requisitos, criteriosPontuacao: input.CriteriosPontuacao,
@@ -72,6 +75,7 @@ type rawFields struct {
 	cargo               string
 	banca               *string
 	sigla               *string
+	regimeContratacao   *domain.RegimeContratacao
 	quantidadeVagas     *int
 	vencimentoCentavos  *int64
 	cargaHorariaSemanal *int
@@ -87,6 +91,7 @@ type normalizedFields struct {
 	cargo               string
 	banca               *string
 	sigla               *string
+	regimeContratacao   *domain.RegimeContratacao
 	quantidadeVagas     *int
 	vencimentoCentavos  *int64
 	cargaHorariaSemanal *int
@@ -129,6 +134,9 @@ func normalizeFields(input rawFields) (normalizedFields, error) {
 	if value := input.quantidadeVagas; value != nil && (*value < 0 || *value > 1000000) {
 		return normalizedFields{}, ErrQuantidadeVagas
 	}
+	if value := input.regimeContratacao; value != nil && *value != domain.RegimeEstatutario && *value != domain.RegimeCeletista {
+		return normalizedFields{}, ErrRegimeContratacao
+	}
 	if value := input.vencimentoCentavos; value != nil && *value < 0 {
 		return normalizedFields{}, ErrVencimento
 	}
@@ -143,7 +151,8 @@ func normalizeFields(input rawFields) (normalizedFields, error) {
 	}
 	return normalizedFields{
 		instituicao: instituicao, cargo: cargo, banca: banca, sigla: sigla,
-		quantidadeVagas: input.quantidadeVagas, vencimentoCentavos: input.vencimentoCentavos,
+		regimeContratacao: input.regimeContratacao, quantidadeVagas: input.quantidadeVagas,
+		vencimentoCentavos:  input.vencimentoCentavos,
 		cargaHorariaSemanal: input.cargaHorariaSemanal, localProva: localProva,
 		horarioInicioProva: horarioInicio, horarioFimProva: horarioFim,
 		requisitos: requisitos, criteriosPontuacao: criterios,
@@ -152,6 +161,7 @@ func normalizeFields(input rawFields) (normalizedFields, error) {
 
 func applyCreateFields(input *domain.CreateConcursoInput, fields normalizedFields) {
 	input.Instituicao, input.Cargo, input.Banca, input.Sigla = fields.instituicao, fields.cargo, fields.banca, fields.sigla
+	input.RegimeContratacao = fields.regimeContratacao
 	input.QuantidadeVagas, input.VencimentoCentavos = fields.quantidadeVagas, fields.vencimentoCentavos
 	input.CargaHorariaSemanal, input.LocalProva = fields.cargaHorariaSemanal, fields.localProva
 	input.HorarioInicioProva, input.HorarioFimProva = fields.horarioInicioProva, fields.horarioFimProva
@@ -160,6 +170,7 @@ func applyCreateFields(input *domain.CreateConcursoInput, fields normalizedField
 
 func applyUpdateFields(input *domain.UpdateConcursoInput, fields normalizedFields) {
 	input.Instituicao, input.Cargo, input.Banca, input.Sigla = fields.instituicao, fields.cargo, fields.banca, fields.sigla
+	input.RegimeContratacao = fields.regimeContratacao
 	input.QuantidadeVagas, input.VencimentoCentavos = fields.quantidadeVagas, fields.vencimentoCentavos
 	input.CargaHorariaSemanal, input.LocalProva = fields.cargaHorariaSemanal, fields.localProva
 	input.HorarioInicioProva, input.HorarioFimProva = fields.horarioInicioProva, fields.horarioFimProva

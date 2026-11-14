@@ -1,3 +1,5 @@
+enum RegimeContratacao { estatutario, celetista }
+
 class Concurso {
   Concurso({
     required this.id,
@@ -8,6 +10,7 @@ class Concurso {
     required this.prioritario,
     required this.progressoEdital,
     this.sigla,
+    this.regimeContratacao,
     this.quantidadeVagas,
     this.vencimentoCentavos,
     this.cargaHorariaSemanal,
@@ -69,6 +72,7 @@ class Concurso {
   final bool prioritario;
   final int progressoEdital;
   final String? sigla;
+  final RegimeContratacao? regimeContratacao;
   final int? quantidadeVagas;
   final int? vencimentoCentavos;
   final int? cargaHorariaSemanal;

@@ -89,6 +89,21 @@ func TestCreateRejectsIncompleteExamTime(t *testing.T) {
 	}
 }
 
+func TestCreateRejectsInvalidHiringRegime(t *testing.T) {
+	service := NewService(&fakeRepository{})
+	regime := domain.RegimeContratacao("temporario")
+
+	_, err := service.Create(context.Background(), domain.CreateConcursoInput{
+		Instituicao:       "TRF da 5ª Região",
+		Cargo:             "Técnico Judiciário",
+		RegimeContratacao: &regime,
+	})
+
+	if !errors.Is(err, ErrRegimeContratacao) {
+		t.Fatalf("Create() error = %v, want %v", err, ErrRegimeContratacao)
+	}
+}
+
 type fakeRepository struct {
 	created domain.CreateConcursoInput
 	updated domain.UpdateConcursoInput

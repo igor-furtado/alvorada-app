@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
 import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
 import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_bloc.dart';
 import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_event.dart';
@@ -24,6 +25,7 @@ void main() {
         banca: null,
         dataProva: null,
         prioritario: false,
+        regimeContratacao: RegimeContratacao.estatutario,
       ),
     ),
     expect: () => [

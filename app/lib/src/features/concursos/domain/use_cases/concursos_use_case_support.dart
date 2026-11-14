@@ -1,4 +1,5 @@
 import '../../../../core/domain/resultado.dart';
+import '../models/concurso.dart';
 import '../models/concurso_input.dart';
 import '../repositories/concursos_repository.dart';
 import 'concursos_resultado_codes.dart';
@@ -54,6 +55,7 @@ class ConcursoInputNormalizado {
     required this.dataProva,
     required this.prioritario,
     required this.sigla,
+    required this.regimeContratacao,
     required this.quantidadeVagas,
     required this.vencimentoCentavos,
     required this.cargaHorariaSemanal,
@@ -70,6 +72,7 @@ class ConcursoInputNormalizado {
   final DateTime? dataProva;
   final bool prioritario;
   final String? sigla;
+  final RegimeContratacao? regimeContratacao;
   final int? quantidadeVagas;
   final int? vencimentoCentavos;
   final int? cargaHorariaSemanal;
@@ -201,6 +204,7 @@ class ConcursoInputNormalizado {
       dataProva: input.dataProva,
       prioritario: input.prioritario,
       sigla: sigla,
+      regimeContratacao: input.regimeContratacao,
       quantidadeVagas: input.quantidadeVagas,
       vencimentoCentavos: input.vencimentoCentavos,
       cargaHorariaSemanal: input.cargaHorariaSemanal,

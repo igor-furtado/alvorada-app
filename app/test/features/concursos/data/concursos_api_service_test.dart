@@ -23,6 +23,7 @@ void main() {
     expect(concursos.single.instituicao, 'Câmara dos Deputados');
     expect(concursos.single.progressoEdital, 48);
     expect(concursos.single.sigla, 'CD');
+    expect(concursos.single.regimeContratacao, 'estatutario');
     expect(concursos.single.vencimentoCentavos, 2200000);
     expect(concursos.single.horarioInicioProva, '13:00');
     expect(concursos.single.disciplinas.single.nome, 'Direito Tributário');
@@ -121,6 +122,7 @@ const _concursoJson = <String, Object?>{
   'prioritario': true,
   'progresso_edital': 48,
   'sigla': 'CD',
+  'regime_contratacao': 'estatutario',
   'quantidade_vagas': 100,
   'vencimento_centavos': 2200000,
   'carga_horaria_semanal': 40,

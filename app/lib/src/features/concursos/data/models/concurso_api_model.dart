@@ -12,6 +12,7 @@ class ConcursoApiModel {
     required this.progressoEdital,
     required this.disciplinas,
     this.sigla,
+    this.regimeContratacao,
     this.quantidadeVagas,
     this.vencimentoCentavos,
     this.cargaHorariaSemanal,
@@ -31,6 +32,7 @@ class ConcursoApiModel {
     prioritario: readJsonBoolean(json, 'prioritario'),
     progressoEdital: readJsonInteger(json, 'progresso_edital'),
     sigla: readJsonNullableString(json, 'sigla'),
+    regimeContratacao: readJsonNullableString(json, 'regime_contratacao'),
     quantidadeVagas: readJsonNullableInteger(json, 'quantidade_vagas'),
     vencimentoCentavos: readJsonNullableInteger(json, 'vencimento_centavos'),
     cargaHorariaSemanal: readJsonNullableInteger(json, 'carga_horaria_semanal'),
@@ -50,6 +52,7 @@ class ConcursoApiModel {
   final bool prioritario;
   final int progressoEdital;
   final String? sigla;
+  final String? regimeContratacao;
   final int? quantidadeVagas;
   final int? vencimentoCentavos;
   final int? cargaHorariaSemanal;
@@ -69,6 +72,7 @@ class ConcursoApiModel {
     prioritario: prioritario,
     progressoEdital: progressoEdital,
     sigla: sigla,
+    regimeContratacao: _regimeContratacaoFromJson(regimeContratacao),
     quantidadeVagas: quantidadeVagas,
     vencimentoCentavos: vencimentoCentavos,
     cargaHorariaSemanal: cargaHorariaSemanal,
@@ -80,6 +84,13 @@ class ConcursoApiModel {
     disciplinas: disciplinas.map((item) => item.toDomain()).toList(growable: false),
   );
 }
+
+RegimeContratacao? _regimeContratacaoFromJson(String? value) => switch (value) {
+  null => null,
+  'estatutario' => RegimeContratacao.estatutario,
+  'celetista' => RegimeContratacao.celetista,
+  _ => throw FormatException('Regime de contratação inválido: $value.'),
+};
 
 class DisciplinaEditalApiModel {
   const DisciplinaEditalApiModel({

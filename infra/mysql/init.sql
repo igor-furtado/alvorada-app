@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS concursos (
   banca VARCHAR(120) NULL,
   data_prova DATE NULL,
   sigla VARCHAR(24) NULL,
+  regime_contratacao VARCHAR(12) NULL,
   quantidade_vagas INT UNSIGNED NULL,
   vencimento_centavos BIGINT UNSIGNED NULL,
   carga_horaria_semanal SMALLINT UNSIGNED NULL,
@@ -33,6 +34,9 @@ CREATE TABLE IF NOT EXISTS concursos (
   ),
   CONSTRAINT chk_concurso_quantidade_vagas CHECK (
     quantidade_vagas IS NULL OR quantidade_vagas <= 1000000
+  ),
+  CONSTRAINT chk_concurso_regime_contratacao CHECK (
+    regime_contratacao IS NULL OR regime_contratacao IN ('estatutario', 'celetista')
   ),
   CONSTRAINT chk_concurso_textos_longos CHECK (
     (requisitos IS NULL OR CHAR_LENGTH(requisitos) <= 10000)

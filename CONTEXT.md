@@ -8,6 +8,10 @@ O Prumo organiza Concursos e Disciplinas em um catálogo compartilhado. Seu voca
 O concurso-alvo que reúne órgão, cargo ou especialidade, condições de ingresso, vagas, remuneração, jornada, prova, critérios de pontuação, dados de inscrição e um Edital. Uma pessoa pode manter mais de um Concurso.
 _Evitar_: Concurso cadastrado, projeto, meta
 
+**Regime de contratação**:
+O vínculo jurídico previsto para o cargo de um Concurso, classificado como Estatutário ou Celetista.
+_Evitar_: Tipo de contrato, vínculo empregatício
+
 **Concurso prioritário**:
 O Concurso escolhido como principal. A proximidade da prova desempata Concursos com a mesma prioridade.
 _Evitar_: Concurso favorito, concurso mais importante

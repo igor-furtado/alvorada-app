@@ -14,6 +14,7 @@ class ConcursoViewData {
     required this.progress,
     required this.disciplines,
     required this.organizationAcronym,
+    required this.hiringRegime,
     required this.vacancies,
     required this.remuneration,
     required this.weeklyWorkload,
@@ -52,6 +53,11 @@ class ConcursoViewData {
         ),
     ],
     organizationAcronym: concurso.sigla,
+    hiringRegime: switch (concurso.regimeContratacao) {
+      RegimeContratacao.estatutario => AppMessages.statutoryHiringRegime,
+      RegimeContratacao.celetista => AppMessages.cltHiringRegime,
+      null => AppMessages.toBeDefined,
+    },
     vacancies: concurso.quantidadeVagas == null
         ? AppMessages.toBeDefined
         : AppMessages.vacanciesCount(concurso.quantidadeVagas!),
@@ -77,6 +83,7 @@ class ConcursoViewData {
   final List<ConcursoDisciplinaProgress> disciplines;
   final bool isPrimary;
   final String? organizationAcronym;
+  final String hiringRegime;
   final String vacancies;
   final String remuneration;
   final String weeklyWorkload;

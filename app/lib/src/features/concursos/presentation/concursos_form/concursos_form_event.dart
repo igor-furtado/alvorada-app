@@ -1,3 +1,5 @@
+import '../../domain/models/concurso.dart';
+
 sealed class ConcursosFormEvent {
   const ConcursosFormEvent();
 }
@@ -10,6 +12,7 @@ final class ConcursosFormSubmitted extends ConcursosFormEvent {
     required this.dataProva,
     required this.prioritario,
     this.sigla,
+    this.regimeContratacao,
     this.quantidadeVagas,
     this.vencimentoCentavos,
     this.cargaHorariaSemanal,
@@ -26,6 +29,7 @@ final class ConcursosFormSubmitted extends ConcursosFormEvent {
   final DateTime? dataProva;
   final bool prioritario;
   final String? sigla;
+  final RegimeContratacao? regimeContratacao;
   final int? quantidadeVagas;
   final int? vencimentoCentavos;
   final int? cargaHorariaSemanal;

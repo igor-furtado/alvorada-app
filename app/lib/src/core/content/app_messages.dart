@@ -52,6 +52,10 @@ abstract final class AppMessages {
   static const board = 'Banca';
   static const organizationAcronym = 'Sigla do órgão';
   static const vacancies = 'Quantidade de vagas';
+  static const hiringRegime = 'Regime de contratação';
+  static const hiringRegimePlaceholder = 'Selecione o regime';
+  static const statutoryHiringRegime = 'Estatutário';
+  static const cltHiringRegime = 'Celetista';
   static const remuneration = 'Vencimento (remuneração)';
   static const remunerationPlaceholder = 'Ex.: 12.345,67';
   static const weeklyWorkload = 'Carga horária semanal';

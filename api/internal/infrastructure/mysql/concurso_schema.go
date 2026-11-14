@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS concursos (
   banca VARCHAR(120) NULL,
   data_prova DATE NULL,
   sigla VARCHAR(24) NULL,
+  regime_contratacao VARCHAR(12) NULL,
   quantidade_vagas INT UNSIGNED NULL,
   vencimento_centavos BIGINT UNSIGNED NULL,
   carga_horaria_semanal SMALLINT UNSIGNED NULL,
@@ -36,6 +37,9 @@ CREATE TABLE IF NOT EXISTS concursos (
   ),
   CONSTRAINT chk_concurso_quantidade_vagas CHECK (
     quantidade_vagas IS NULL OR quantidade_vagas <= 1000000
+  ),
+  CONSTRAINT chk_concurso_regime_contratacao CHECK (
+    regime_contratacao IS NULL OR regime_contratacao IN ('estatutario', 'celetista')
   ),
   CONSTRAINT chk_concurso_textos_longos CHECK (
     (requisitos IS NULL OR CHAR_LENGTH(requisitos) <= 10000)
@@ -74,6 +78,7 @@ func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
 		definition string
 	}{
 		{"sigla", "sigla VARCHAR(24) NULL"},
+		{"regime_contratacao", "regime_contratacao VARCHAR(12) NULL"},
 		{"quantidade_vagas", "quantidade_vagas INT UNSIGNED NULL"},
 		{"vencimento_centavos", "vencimento_centavos BIGINT UNSIGNED NULL"},
 		{"carga_horaria_semanal", "carga_horaria_semanal SMALLINT UNSIGNED NULL"},
@@ -98,6 +103,10 @@ func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
 		name       string
 		definition string
 	}{
+		{
+			"chk_concurso_regime_contratacao",
+			"CHECK (regime_contratacao IS NULL OR regime_contratacao IN ('estatutario', 'celetista'))",
+		},
 		{
 			"chk_concurso_carga_horaria",
 			"CHECK (carga_horaria_semanal IS NULL OR carga_horaria_semanal BETWEEN 1 AND 168)",

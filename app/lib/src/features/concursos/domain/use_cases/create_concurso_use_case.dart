@@ -24,6 +24,7 @@ class CreateConcursoUseCase {
           dataProva: valor.dataProva,
           prioritario: valor.prioritario,
           sigla: valor.sigla,
+          regimeContratacao: valor.regimeContratacao,
           quantidadeVagas: valor.quantidadeVagas,
           vencimentoCentavos: valor.vencimentoCentavos,
           cargaHorariaSemanal: valor.cargaHorariaSemanal,

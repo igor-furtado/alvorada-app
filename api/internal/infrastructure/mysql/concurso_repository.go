@@ -19,7 +19,7 @@ func NewConcursoRepository(db *sql.DB) *ConcursoRepository {
 func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital,
-			sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal,
+			sigla, regime_contratacao, quantidade_vagas, vencimento_centavos, carga_horaria_semanal,
 			local_prova, TIME_FORMAT(horario_inicio_prova, '%H:%i'),
 			TIME_FORMAT(horario_fim_prova, '%H:%i'), requisitos, criterios_pontuacao
 		FROM concursos
@@ -35,7 +35,7 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 		var concurso domain.Concurso
 		var banca sql.NullString
 		var dataProva sql.NullTime
-		var sigla, localProva, horarioInicio, horarioFim, requisitos, criterios sql.NullString
+		var sigla, regimeContratacao, localProva, horarioInicio, horarioFim, requisitos, criterios sql.NullString
 		var quantidadeVagas, vencimentoCentavos, cargaHoraria sql.NullInt64
 		if err := rows.Scan(
 			&concurso.ID,
@@ -46,6 +46,7 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 			&concurso.Prioritario,
 			&concurso.ProgressoEdital,
 			&sigla,
+			&regimeContratacao,
 			&quantidadeVagas,
 			&vencimentoCentavos,
 			&cargaHoraria,
@@ -65,6 +66,10 @@ func (r *ConcursoRepository) FindActive(ctx context.Context) ([]domain.Concurso,
 		}
 		if sigla.Valid {
 			concurso.Sigla = &sigla.String
+		}
+		if regimeContratacao.Valid {
+			value := domain.RegimeContratacao(regimeContratacao.String)
+			concurso.RegimeContratacao = &value
 		}
 		if quantidadeVagas.Valid {
 			value := int(quantidadeVagas.Int64)
@@ -205,11 +210,11 @@ func (r *ConcursoRepository) Create(ctx context.Context, input domain.CreateConc
 	}
 	if _, err := tx.ExecContext(ctx, `
 		INSERT INTO concursos (
-			id, instituicao, cargo, banca, data_prova, prioritario, sigla,
+			id, instituicao, cargo, banca, data_prova, prioritario, sigla, regime_contratacao,
 			quantidade_vagas, vencimento_centavos, carga_horaria_semanal,
 			local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		id,
 		input.Instituicao,
 		input.Cargo,
@@ -217,6 +222,7 @@ func (r *ConcursoRepository) Create(ctx context.Context, input domain.CreateConc
 		input.DataProva,
 		input.Prioritario,
 		input.Sigla,
+		input.RegimeContratacao,
 		input.QuantidadeVagas,
 		input.VencimentoCentavos,
 		input.CargaHorariaSemanal,
@@ -249,7 +255,7 @@ func (r *ConcursoRepository) Update(ctx context.Context, id string, input domain
 	result, err := tx.ExecContext(ctx, `
 		UPDATE concursos
 		SET instituicao = ?, cargo = ?, banca = ?, data_prova = ?, prioritario = ?,
-			sigla = ?, quantidade_vagas = ?, vencimento_centavos = ?, carga_horaria_semanal = ?,
+			sigla = ?, regime_contratacao = ?, quantidade_vagas = ?, vencimento_centavos = ?, carga_horaria_semanal = ?,
 			local_prova = ?, horario_inicio_prova = ?, horario_fim_prova = ?,
 			requisitos = ?, criterios_pontuacao = ?
 		WHERE id = ? AND arquivado_em IS NULL`,
@@ -259,6 +265,7 @@ func (r *ConcursoRepository) Update(ctx context.Context, id string, input domain
 		input.DataProva,
 		input.Prioritario,
 		input.Sigla,
+		input.RegimeContratacao,
 		input.QuantidadeVagas,
 		input.VencimentoCentavos,
 		input.CargaHorariaSemanal,

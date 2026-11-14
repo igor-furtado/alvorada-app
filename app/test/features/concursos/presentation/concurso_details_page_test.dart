@@ -62,6 +62,7 @@ void main() {
       concurso.sigla,
       concurso.cargo,
       concurso.banca,
+      AppMessages.statutoryHiringRegime,
       '12',
       '12.345,67',
       '40',
@@ -73,6 +74,7 @@ void main() {
       concurso.criteriosPontuacao,
     ]);
     expect(find.text(AppMessages.saveChanges), findsOneWidget);
+    expect(find.text(AppMessages.statutoryHiringRegime), findsOneWidget);
     expect(find.text(AppMessages.cancel), findsNothing);
   });
 
@@ -104,6 +106,7 @@ Concurso _concurso() => Concurso(
   prioritario: false,
   progressoEdital: 0,
   sigla: 'TRF5',
+  regimeContratacao: RegimeContratacao.estatutario,
   quantidadeVagas: 12,
   vencimentoCentavos: 1234567,
   cargaHorariaSemanal: 40,

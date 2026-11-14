@@ -7,6 +7,13 @@ import (
 
 var ErrConcursoNotFound = errors.New("Concurso não encontrado")
 
+type RegimeContratacao string
+
+const (
+	RegimeEstatutario RegimeContratacao = "estatutario"
+	RegimeCeletista   RegimeContratacao = "celetista"
+)
+
 type Concurso struct {
 	ID                  string
 	Instituicao         string
@@ -16,6 +23,7 @@ type Concurso struct {
 	Prioritario         bool
 	ProgressoEdital     int
 	Sigla               *string
+	RegimeContratacao   *RegimeContratacao
 	QuantidadeVagas     *int
 	VencimentoCentavos  *int64
 	CargaHorariaSemanal *int
@@ -46,6 +54,7 @@ type CreateConcursoInput struct {
 	DataProva           *time.Time
 	Prioritario         bool
 	Sigla               *string
+	RegimeContratacao   *RegimeContratacao
 	QuantidadeVagas     *int
 	VencimentoCentavos  *int64
 	CargaHorariaSemanal *int
@@ -63,6 +72,7 @@ type UpdateConcursoInput struct {
 	DataProva           *time.Time
 	Prioritario         bool
 	Sigla               *string
+	RegimeContratacao   *RegimeContratacao
 	QuantidadeVagas     *int
 	VencimentoCentavos  *int64
 	CargaHorariaSemanal *int

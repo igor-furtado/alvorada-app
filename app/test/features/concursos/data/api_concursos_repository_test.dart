@@ -1,6 +1,7 @@
 import 'package:estudos_app/src/features/concursos/data/models/concurso_api_model.dart';
 import 'package:estudos_app/src/features/concursos/data/repositories/api_concursos_repository.dart';
 import 'package:estudos_app/src/features/concursos/data/services/concursos_api_service.dart';
+import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
 import 'package:estudos_app/src/features/concursos/domain/models/concurso_input.dart';
 import 'package:estudos_app/src/features/concursos/domain/repositories/concursos_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,11 +28,13 @@ void main() {
         instituicao: 'TRF da 5ª Região',
         cargo: 'Técnico Judiciário',
         dataProva: DateTime(2026, 12, 13),
+        regimeContratacao: RegimeContratacao.estatutario,
       ),
     );
 
     expect(created.id, 'concurso-1');
     expect(api.createdBody?['data_prova'], '2026-12-13');
+    expect(api.createdBody?['regime_contratacao'], 'estatutario');
   });
 
   test('atualiza os dados e renova o cache', () async {
@@ -46,11 +49,13 @@ void main() {
         cargo: 'Analista Judiciário',
         dataProva: DateTime(2027, 1, 31),
         prioritario: true,
+        regimeContratacao: RegimeContratacao.celetista,
       ),
     );
 
     expect(api.updatedBody?['data_prova'], '2027-01-31');
     expect(api.updatedBody?['prioritario'], isTrue);
+    expect(api.updatedBody?['regime_contratacao'], 'celetista');
     expect(api.getCalls, 2);
   });
 

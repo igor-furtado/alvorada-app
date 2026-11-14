@@ -383,7 +383,7 @@ components:
           format: uuid
     Concurso:
       type: object
-      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital, sigla, quantidade_vagas, vencimento_centavos, carga_horaria_semanal, local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao, disciplinas]
+      required: [id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital, sigla, regime_contratacao, quantidade_vagas, vencimento_centavos, carga_horaria_semanal, local_prova, horario_inicio_prova, horario_fim_prova, requisitos, criterios_pontuacao, disciplinas]
       properties:
         id:
           type: string
@@ -411,6 +411,9 @@ components:
         sigla:
           type: [string, 'null']
           maxLength: 24
+        regime_contratacao:
+          type: [string, 'null']
+          enum: [estatutario, celetista, null]
         quantidade_vagas:
           type: [integer, 'null']
           minimum: 0
@@ -494,6 +497,9 @@ components:
         sigla:
           type: [string, 'null']
           maxLength: 24
+        regime_contratacao:
+          type: [string, 'null']
+          enum: [estatutario, celetista, null]
         quantidade_vagas:
           type: [integer, 'null']
           minimum: 0
@@ -544,6 +550,9 @@ components:
         sigla:
           type: [string, 'null']
           maxLength: 24
+        regime_contratacao:
+          type: [string, 'null']
+          enum: [estatutario, celetista, null]
         quantidade_vagas:
           type: [integer, 'null']
           minimum: 0

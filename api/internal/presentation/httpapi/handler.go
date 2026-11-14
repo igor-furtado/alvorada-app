@@ -72,20 +72,21 @@ func (h *Handler) health(w http.ResponseWriter, _ *http.Request) {
 }
 
 type concursoRequest struct {
-	Instituicao         string  `json:"instituicao"`
-	Cargo               string  `json:"cargo"`
-	Banca               *string `json:"banca"`
-	DataProva           *string `json:"data_prova"`
-	Prioritario         bool    `json:"prioritario"`
-	Sigla               *string `json:"sigla"`
-	QuantidadeVagas     *int    `json:"quantidade_vagas"`
-	VencimentoCentavos  *int64  `json:"vencimento_centavos"`
-	CargaHorariaSemanal *int    `json:"carga_horaria_semanal"`
-	LocalProva          *string `json:"local_prova"`
-	HorarioInicioProva  *string `json:"horario_inicio_prova"`
-	HorarioFimProva     *string `json:"horario_fim_prova"`
-	Requisitos          *string `json:"requisitos"`
-	CriteriosPontuacao  *string `json:"criterios_pontuacao"`
+	Instituicao         string                             `json:"instituicao"`
+	Cargo               string                             `json:"cargo"`
+	Banca               *string                            `json:"banca"`
+	DataProva           *string                            `json:"data_prova"`
+	Prioritario         bool                               `json:"prioritario"`
+	Sigla               *string                            `json:"sigla"`
+	RegimeContratacao   *concursosDomain.RegimeContratacao `json:"regime_contratacao"`
+	QuantidadeVagas     *int                               `json:"quantidade_vagas"`
+	VencimentoCentavos  *int64                             `json:"vencimento_centavos"`
+	CargaHorariaSemanal *int                               `json:"carga_horaria_semanal"`
+	LocalProva          *string                            `json:"local_prova"`
+	HorarioInicioProva  *string                            `json:"horario_inicio_prova"`
+	HorarioFimProva     *string                            `json:"horario_fim_prova"`
+	Requisitos          *string                            `json:"requisitos"`
+	CriteriosPontuacao  *string                            `json:"criterios_pontuacao"`
 }
 
 type concursoResponse struct {
@@ -97,6 +98,7 @@ type concursoResponse struct {
 	Prioritario         bool                               `json:"prioritario"`
 	ProgressoEdital     int                                `json:"progresso_edital"`
 	Sigla               *string                            `json:"sigla"`
+	RegimeContratacao   *concursosDomain.RegimeContratacao `json:"regime_contratacao"`
 	QuantidadeVagas     *int                               `json:"quantidade_vagas"`
 	VencimentoCentavos  *int64                             `json:"vencimento_centavos"`
 	CargaHorariaSemanal *int                               `json:"carga_horaria_semanal"`
@@ -122,19 +124,24 @@ func (h *Handler) listConcursos(w http.ResponseWriter, r *http.Request) {
 			dataProva = &value
 		}
 		response = append(response, concursoResponse{
-			ID:              item.ID,
-			Instituicao:     item.Instituicao,
-			Cargo:           item.Cargo,
-			Banca:           item.Banca,
-			DataProva:       dataProva,
-			Prioritario:     item.Prioritario,
-			ProgressoEdital: item.ProgressoEdital,
-			Sigla:           item.Sigla, QuantidadeVagas: item.QuantidadeVagas,
-			VencimentoCentavos: item.VencimentoCentavos, CargaHorariaSemanal: item.CargaHorariaSemanal,
-			LocalProva: item.LocalProva, HorarioInicioProva: item.HorarioInicioProva,
-			HorarioFimProva: item.HorarioFimProva, Requisitos: item.Requisitos,
-			CriteriosPontuacao: item.CriteriosPontuacao,
-			Disciplinas:        item.Disciplinas,
+			ID:                  item.ID,
+			Instituicao:         item.Instituicao,
+			Cargo:               item.Cargo,
+			Banca:               item.Banca,
+			DataProva:           dataProva,
+			Prioritario:         item.Prioritario,
+			ProgressoEdital:     item.ProgressoEdital,
+			Sigla:               item.Sigla,
+			RegimeContratacao:   item.RegimeContratacao,
+			QuantidadeVagas:     item.QuantidadeVagas,
+			VencimentoCentavos:  item.VencimentoCentavos,
+			CargaHorariaSemanal: item.CargaHorariaSemanal,
+			LocalProva:          item.LocalProva,
+			HorarioInicioProva:  item.HorarioInicioProva,
+			HorarioFimProva:     item.HorarioFimProva,
+			Requisitos:          item.Requisitos,
+			CriteriosPontuacao:  item.CriteriosPontuacao,
+			Disciplinas:         item.Disciplinas,
 		})
 	}
 	writeJSON(w, http.StatusOK, response)
@@ -152,16 +159,21 @@ func (h *Handler) createConcurso(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, err := h.concursos.Create(r.Context(), concursosDomain.CreateConcursoInput{
-		Instituicao: body.Instituicao,
-		Cargo:       body.Cargo,
-		Banca:       body.Banca,
-		DataProva:   dataProva,
-		Prioritario: body.Prioritario,
-		Sigla:       body.Sigla, QuantidadeVagas: body.QuantidadeVagas,
-		VencimentoCentavos: body.VencimentoCentavos, CargaHorariaSemanal: body.CargaHorariaSemanal,
-		LocalProva: body.LocalProva, HorarioInicioProva: body.HorarioInicioProva,
-		HorarioFimProva: body.HorarioFimProva, Requisitos: body.Requisitos,
-		CriteriosPontuacao: body.CriteriosPontuacao,
+		Instituicao:         body.Instituicao,
+		Cargo:               body.Cargo,
+		Banca:               body.Banca,
+		DataProva:           dataProva,
+		Prioritario:         body.Prioritario,
+		Sigla:               body.Sigla,
+		RegimeContratacao:   body.RegimeContratacao,
+		QuantidadeVagas:     body.QuantidadeVagas,
+		VencimentoCentavos:  body.VencimentoCentavos,
+		CargaHorariaSemanal: body.CargaHorariaSemanal,
+		LocalProva:          body.LocalProva,
+		HorarioInicioProva:  body.HorarioInicioProva,
+		HorarioFimProva:     body.HorarioFimProva,
+		Requisitos:          body.Requisitos,
+		CriteriosPontuacao:  body.CriteriosPontuacao,
 	})
 	if err != nil {
 		h.serviceError(w, r, err)
@@ -183,16 +195,21 @@ func (h *Handler) updateConcurso(w http.ResponseWriter, r *http.Request) {
 	}
 	h.runNoContent(w, r, func() error {
 		return h.concursos.Update(r.Context(), r.PathValue("id"), concursosDomain.UpdateConcursoInput{
-			Instituicao: body.Instituicao,
-			Cargo:       body.Cargo,
-			Banca:       body.Banca,
-			DataProva:   dataProva,
-			Prioritario: body.Prioritario,
-			Sigla:       body.Sigla, QuantidadeVagas: body.QuantidadeVagas,
-			VencimentoCentavos: body.VencimentoCentavos, CargaHorariaSemanal: body.CargaHorariaSemanal,
-			LocalProva: body.LocalProva, HorarioInicioProva: body.HorarioInicioProva,
-			HorarioFimProva: body.HorarioFimProva, Requisitos: body.Requisitos,
-			CriteriosPontuacao: body.CriteriosPontuacao,
+			Instituicao:         body.Instituicao,
+			Cargo:               body.Cargo,
+			Banca:               body.Banca,
+			DataProva:           dataProva,
+			Prioritario:         body.Prioritario,
+			Sigla:               body.Sigla,
+			RegimeContratacao:   body.RegimeContratacao,
+			QuantidadeVagas:     body.QuantidadeVagas,
+			VencimentoCentavos:  body.VencimentoCentavos,
+			CargaHorariaSemanal: body.CargaHorariaSemanal,
+			LocalProva:          body.LocalProva,
+			HorarioInicioProva:  body.HorarioInicioProva,
+			HorarioFimProva:     body.HorarioFimProva,
+			Requisitos:          body.Requisitos,
+			CriteriosPontuacao:  body.CriteriosPontuacao,
 		})
 	})
 }
@@ -404,6 +421,7 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		errors.Is(err, concursosApplication.ErrCargoTooLong) ||
 		errors.Is(err, concursosApplication.ErrBancaTooLong) ||
 		errors.Is(err, concursosApplication.ErrSiglaTooLong) ||
+		errors.Is(err, concursosApplication.ErrRegimeContratacao) ||
 		errors.Is(err, concursosApplication.ErrQuantidadeVagas) ||
 		errors.Is(err, concursosApplication.ErrVencimento) ||
 		errors.Is(err, concursosApplication.ErrCargaHoraria) ||

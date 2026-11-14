@@ -1,3 +1,5 @@
+import 'concurso.dart';
+
 abstract class ConcursoInput {
   const ConcursoInput({
     required this.instituicao,
@@ -6,6 +8,7 @@ abstract class ConcursoInput {
     this.dataProva,
     this.prioritario = false,
     this.sigla,
+    this.regimeContratacao,
     this.quantidadeVagas,
     this.vencimentoCentavos,
     this.cargaHorariaSemanal,
@@ -22,6 +25,7 @@ abstract class ConcursoInput {
   final DateTime? dataProva;
   final bool prioritario;
   final String? sigla;
+  final RegimeContratacao? regimeContratacao;
   final int? quantidadeVagas;
   final int? vencimentoCentavos;
   final int? cargaHorariaSemanal;
@@ -40,6 +44,7 @@ class CreateConcursoInput extends ConcursoInput {
     super.dataProva,
     super.prioritario,
     super.sigla,
+    super.regimeContratacao,
     super.quantidadeVagas,
     super.vencimentoCentavos,
     super.cargaHorariaSemanal,
@@ -59,6 +64,7 @@ class UpdateConcursoInput extends ConcursoInput {
     super.dataProva,
     super.prioritario,
     super.sigla,
+    super.regimeContratacao,
     super.quantidadeVagas,
     super.vencimentoCentavos,
     super.cargaHorariaSemanal,

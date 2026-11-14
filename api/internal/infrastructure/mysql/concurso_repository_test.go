@@ -17,17 +17,18 @@ func TestFindActiveConcursosPreservesDatabaseOrder(t *testing.T) {
 	}
 	defer db.Close()
 	date := time.Date(2027, time.February, 21, 0, 0, 0, 0, time.UTC)
+	regime := domain.RegimeEstatutario
 	mock.ExpectQuery("SELECT id, instituicao, cargo, banca, data_prova, prioritario, progresso_edital").
 		WillReturnRows(
 			sqlmock.NewRows([]string{
 				"id", "instituicao", "cargo", "banca", "data_prova", "prioritario", "progresso_edital",
-				"sigla", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal",
+				"sigla", "regime_contratacao", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal",
 				"local_prova", "horario_inicio_prova", "horario_fim_prova", "requisitos", "criterios_pontuacao",
 			}).
 				AddRow("concurso-1", "Câmara dos Deputados", "Analista Legislativo", "Cebraspe", date, true, 48,
-					"CD", 100, int64(2200000), 40, "Brasília", "13:00", "18:00", "Nível superior", "Provas ponderadas").
+					"CD", regime, 100, int64(2200000), 40, "Brasília", "13:00", "18:00", "Nível superior", "Provas ponderadas").
 				AddRow("concurso-2", "TCE-PE", "Auditor", nil, nil, false, 0,
-					nil, nil, nil, nil, nil, nil, nil, nil, nil),
+					nil, nil, nil, nil, nil, nil, nil, nil, nil, nil),
 		)
 	mock.ExpectQuery("SELECT vinculo.concurso_id, disciplina.id, disciplina.nome").
 		WillReturnRows(sqlmock.NewRows([]string{
@@ -51,6 +52,9 @@ func TestFindActiveConcursosPreservesDatabaseOrder(t *testing.T) {
 	}
 	if items[0].Sigla == nil || *items[0].Sigla != "CD" || items[0].VencimentoCentavos == nil || *items[0].VencimentoCentavos != 2200000 {
 		t.Fatalf("new Concurso fields were not preserved: %#v", items[0])
+	}
+	if items[0].RegimeContratacao == nil || *items[0].RegimeContratacao != domain.RegimeEstatutario {
+		t.Fatalf("hiring regime was not preserved: %#v", items[0])
 	}
 	if len(items[0].Disciplinas) != 1 || len(items[0].Disciplinas[0].Topicos) != 2 ||
 		!items[0].Disciplinas[0].Topicos[1].Obrigatorio {
@@ -92,7 +96,7 @@ func TestCreatePrioritarioClearsPreviousChoice(t *testing.T) {
 	mock.ExpectExec("UPDATE concursos SET prioritario = 0").WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectExec("INSERT INTO concursos").
 		WithArgs(sqlmock.AnyArg(), "Câmara dos Deputados", "Analista Legislativo", sqlmock.AnyArg(), sqlmock.AnyArg(), true,
-			nil, nil, nil, nil, nil, nil, nil, nil, nil).
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 	banca := "Cebraspe"
@@ -125,7 +129,7 @@ func TestUpdatePrioritarioPreservesProgressAndReplacesPreviousChoice(t *testing.
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectExec("UPDATE concursos").
 		WithArgs("TRF da 5ª Região", "Analista Judiciário", nil, nil, true,
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, "concurso-1").
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, "concurso-1").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
@@ -152,7 +156,7 @@ func TestUpdateAcceptsUnchangedValuesForExistingConcurso(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectExec("UPDATE concursos").
 		WithArgs("TRF da 5ª Região", "Analista Judiciário", nil, nil, false,
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, "concurso-1").
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, "concurso-1").
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectQuery("SELECT EXISTS").
 		WithArgs("concurso-1").
@@ -204,7 +208,7 @@ func TestEnsureConcursoSchemaIsIdempotent(t *testing.T) {
 	defer db.Close()
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS concursos").WillReturnResult(sqlmock.NewResult(0, 0))
 	for _, column := range []string{
-		"sigla", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal", "local_prova",
+		"sigla", "regime_contratacao", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal", "local_prova",
 		"horario_inicio_prova", "horario_fim_prova", "requisitos", "criterios_pontuacao",
 	} {
 		mock.ExpectQuery("SELECT EXISTS").
@@ -212,7 +216,7 @@ func TestEnsureConcursoSchemaIsIdempotent(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
 	}
 	for _, constraint := range []string{
-		"chk_concurso_carga_horaria", "chk_concurso_horarios_prova",
+		"chk_concurso_regime_contratacao", "chk_concurso_carga_horaria", "chk_concurso_horarios_prova",
 		"chk_concurso_quantidade_vagas", "chk_concurso_textos_longos",
 	} {
 		mock.ExpectQuery("SELECT EXISTS").
@@ -238,7 +242,7 @@ func TestEnsureConcursoSchemaAddsComplementaryFieldsToLegacyTable(t *testing.T) 
 	defer db.Close()
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS concursos").WillReturnResult(sqlmock.NewResult(0, 0))
 	for _, column := range []string{
-		"sigla", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal", "local_prova",
+		"sigla", "regime_contratacao", "quantidade_vagas", "vencimento_centavos", "carga_horaria_semanal", "local_prova",
 		"horario_inicio_prova", "horario_fim_prova", "requisitos", "criterios_pontuacao",
 	} {
 		mock.ExpectQuery("SELECT EXISTS").
@@ -247,7 +251,7 @@ func TestEnsureConcursoSchemaAddsComplementaryFieldsToLegacyTable(t *testing.T) 
 		mock.ExpectExec("ALTER TABLE concursos ADD COLUMN").WillReturnResult(sqlmock.NewResult(0, 0))
 	}
 	for _, constraint := range []string{
-		"chk_concurso_carga_horaria", "chk_concurso_horarios_prova",
+		"chk_concurso_regime_contratacao", "chk_concurso_carga_horaria", "chk_concurso_horarios_prova",
 		"chk_concurso_quantidade_vagas", "chk_concurso_textos_longos",
 	} {
 		mock.ExpectQuery("SELECT EXISTS").
