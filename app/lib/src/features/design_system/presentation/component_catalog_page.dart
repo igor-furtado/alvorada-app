@@ -251,7 +251,7 @@ class _ComponentCatalogPageState extends State<ComponentCatalogPage> {
                 value: _dimension(tokens.layout.catalogWorkspaceHeight),
               ),
               _TokenValue(name: 'brandWidth', value: _dimension(tokens.layout.brandWidth)),
-              _TokenValue(name: 'controlHeight', value: _dimension(tokens.layout.controlHeight)),
+              _TokenValue(name: 'controlHeight', value: _dimension(tokens.layout.inputHeight)),
               _TokenValue(
                 name: 'topicSelectionIndent',
                 value: _dimension(tokens.layout.topicSelectionIndent),

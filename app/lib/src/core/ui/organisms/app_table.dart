@@ -104,7 +104,7 @@ class _TableRow<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final content = Container(
       constraints: BoxConstraints(
-        minHeight: context.tokens.layout.controlHeight + context.tokens.spacing.md,
+        minHeight: context.tokens.layout.inputHeight + context.tokens.spacing.md,
       ),
       decoration: BoxDecoration(
         color: context.tokens.colors.card,
@@ -511,7 +511,7 @@ class _ColumnSelector<T> extends StatelessWidget {
       button: true,
       label: label,
       child: Container(
-        height: context.tokens.layout.controlHeight,
+        height: context.tokens.layout.inputHeight,
         padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.md),
         decoration: BoxDecoration(
           color: context.tokens.colors.surface,
@@ -599,7 +599,7 @@ class _DataTableGrid<T> extends StatelessWidget {
               if (rows.isEmpty)
                 Container(
                   constraints: BoxConstraints(
-                    minHeight: context.tokens.layout.controlHeight * 3,
+                    minHeight: context.tokens.layout.inputHeight * 3,
                   ),
                   alignment: Alignment.center,
                   child: empty ?? Text(emptyLabel, style: context.tokens.typography.bodySmall),
@@ -668,7 +668,7 @@ class _DataTableRow<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     constraints: BoxConstraints(
-      minHeight: context.tokens.layout.controlHeight + context.tokens.spacing.md,
+      minHeight: context.tokens.layout.inputHeight + context.tokens.spacing.md,
     ),
     decoration: BoxDecoration(
       color: selected ? context.tokens.colors.surfaceSubtle : context.tokens.colors.card,
@@ -732,7 +732,7 @@ class _RowActionsMenu extends StatelessWidget {
       final entries = <PopupMenuEntry<int>>[
         PopupMenuItem<int>(
           enabled: false,
-          height: context.tokens.layout.controlHeight,
+          height: context.tokens.layout.inputHeight,
           child: Text(
             label,
             style: context.tokens.typography.labelSmall.copyWith(
@@ -759,7 +759,7 @@ class _RowActionsMenu extends StatelessWidget {
       label: label,
       excludeSemantics: true,
       child: SizedBox.square(
-        dimension: context.tokens.layout.controlHeight,
+        dimension: context.tokens.layout.inputHeight,
         child: Icon(AppIcons.more, size: context.tokens.icons.sm),
       ),
     ),

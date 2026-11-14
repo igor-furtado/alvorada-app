@@ -45,7 +45,7 @@ class _AppCheckboxState extends State<AppCheckbox> {
             overlayColor: WidgetStatePropertyAll(tokens.colors.transparent),
             splashFactory: NoSplash.splashFactory,
             child: SizedBox.square(
-              dimension: tokens.layout.controlHeight,
+              dimension: tokens.layout.inputHeight,
               child: Center(
                 child: AnimatedContainer(
                   duration: context.motionDuration(tokens.motion.fast),

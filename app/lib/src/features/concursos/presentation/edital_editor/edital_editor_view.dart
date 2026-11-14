@@ -162,15 +162,15 @@ class _EditalEditorContentState extends State<_EditalEditorContent> {
         SizedBox(height: context.tokens.spacing.lg),
         AppField(
           label: 'Disciplina',
-          control: AppSelect<String>(
+          control: AppCombobox<String>(
+            options: [for (final disciplina in vinculadas) disciplina.id],
+            displayStringForOption: (id) => vinculadas.firstWhere((item) => item.id == id).name,
             value: selecionada?.id,
             placeholder: 'Selecione uma Disciplina',
-            options: [
-              for (final disciplina in vinculadas) AppSelectOption(value: disciplina.id, label: disciplina.name),
-            ],
-            onChanged: vinculadas.isEmpty
-                ? null
-                : (value) => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaSelected(value)),
+            semanticLabel: 'Disciplina',
+            showClear: true,
+            disabled: vinculadas.isEmpty,
+            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaSelected(value)),
           ),
         ),
         SizedBox(height: context.tokens.spacing.lg),

@@ -38,7 +38,7 @@ class AppAccessibleIconButton extends StatelessWidget {
           autofocus: autofocus,
           padding: EdgeInsets.zero,
           style: IconButton.styleFrom(
-            fixedSize: Size.square(context.tokens.layout.controlHeight),
+            fixedSize: Size.square(context.tokens.layout.inputHeight),
             backgroundColor: primary
                 ? context.tokens.colors.primary
                 : selected

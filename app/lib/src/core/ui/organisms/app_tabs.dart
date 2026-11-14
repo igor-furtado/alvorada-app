@@ -211,7 +211,7 @@ class _SegmentedTab extends StatelessWidget {
       child: AnimatedContainer(
         duration: context.motionDuration(context.tokens.motion.fast),
         alignment: Alignment.center,
-        constraints: BoxConstraints(minHeight: context.tokens.layout.controlHeight),
+        constraints: BoxConstraints(minHeight: context.tokens.layout.inputHeight),
         padding: EdgeInsets.symmetric(
           horizontal: filled ? context.tokens.spacing.sm : context.tokens.spacing.lg,
         ),
@@ -263,7 +263,7 @@ class _LineTab extends StatelessWidget {
       focusNode: focusNode,
       onTap: onTap,
       child: Container(
-        constraints: BoxConstraints(minHeight: context.tokens.layout.controlHeight + context.tokens.spacing.sm),
+        constraints: BoxConstraints(minHeight: context.tokens.layout.inputHeight + context.tokens.spacing.sm),
         padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.xxxs),
         margin: EdgeInsets.only(right: context.tokens.spacing.xxl),
         alignment: Alignment.center,

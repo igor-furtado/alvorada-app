@@ -268,7 +268,7 @@ class _CalendarNavigationButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: context.tokens.borders.sm,
           child: SizedBox.square(
-            dimension: context.tokens.layout.controlHeight,
+            dimension: context.tokens.layout.inputHeight,
             child: Icon(
               icon,
               size: context.tokens.icons.sm,
@@ -404,7 +404,7 @@ class _CalendarDay extends StatelessWidget {
         child: Opacity(
           opacity: enabled ? 1 : context.tokens.opacity.half,
           child: Container(
-            height: context.tokens.layout.controlHeight,
+            height: context.tokens.layout.inputHeight,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: selected ? context.tokens.colors.primary : context.tokens.colors.transparent,

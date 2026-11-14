@@ -85,7 +85,7 @@ class _PaginationLink extends StatelessWidget {
         onTap: onPressed,
         borderRadius: context.tokens.borders.lg,
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: context.tokens.layout.controlHeight),
+          constraints: BoxConstraints(minHeight: context.tokens.layout.inputHeight),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm),
             child: Row(

@@ -49,12 +49,12 @@ class _AppRadioState<T> extends State<AppRadio<T>> {
               : null,
           borderRadius: context.tokens.borders.sm,
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: context.tokens.layout.controlHeight),
+            constraints: BoxConstraints(minHeight: context.tokens.layout.inputHeight),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox.square(
-                  dimension: context.tokens.layout.controlHeight,
+                  dimension: context.tokens.layout.inputHeight,
                   child: Center(
                     child: AnimatedContainer(
                       duration: context.motionDuration(context.tokens.motion.fast),

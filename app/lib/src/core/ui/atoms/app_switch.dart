@@ -39,8 +39,8 @@ class _AppSwitchState extends State<AppSwitch> {
             overlayColor: WidgetStatePropertyAll(tokens.colors.transparent),
             splashFactory: NoSplash.splashFactory,
             child: SizedBox(
-              width: tokens.layout.controlHeight + tokens.spacing.xs,
-              height: tokens.layout.controlHeight,
+              width: tokens.layout.inputHeight + tokens.spacing.xs,
+              height: tokens.layout.inputHeight,
               child: Center(
                 child: AnimatedContainer(
                   duration: context.motionDuration(tokens.motion.fast),

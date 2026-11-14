@@ -12,5 +12,4 @@ export 'app_metric_item.dart';
 export 'app_pagination.dart';
 export 'app_radio_group.dart';
 export 'app_search_field.dart';
-export 'app_select.dart';
 export 'app_toast.dart';

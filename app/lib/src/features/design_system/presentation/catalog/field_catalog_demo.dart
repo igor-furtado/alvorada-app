@@ -24,14 +24,14 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
   var _multiFactor = false;
 
   static const _departments = [
-    AppSelectOption(value: 'engenharia', label: 'Engenharia'),
-    AppSelectOption(value: 'design', label: 'Design'),
-    AppSelectOption(value: 'marketing', label: 'Marketing'),
-    AppSelectOption(value: 'vendas', label: 'Vendas'),
-    AppSelectOption(value: 'suporte', label: 'Suporte ao cliente'),
-    AppSelectOption(value: 'pessoas', label: 'Recursos humanos'),
-    AppSelectOption(value: 'financeiro', label: 'Financeiro'),
-    AppSelectOption(value: 'operacoes', label: 'Operações'),
+    'Engenharia',
+    'Design',
+    'Marketing',
+    'Vendas',
+    'Suporte ao cliente',
+    'Recursos humanos',
+    'Financeiro',
+    'Operações',
   ];
 
   @override
@@ -57,29 +57,23 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
                 children: [
                   AppField(
                     label: 'Mês',
-                    control: AppSelect<String>(
+                    control: AppCombobox<String>(
+                      options: const ['01', '02', '03'],
+                      displayStringForOption: (option) => option,
                       value: _month,
                       placeholder: 'MM',
                       semanticLabel: 'Mês de validade',
-                      options: const [
-                        AppSelectOption(value: '01', label: '01'),
-                        AppSelectOption(value: '02', label: '02'),
-                        AppSelectOption(value: '03', label: '03'),
-                      ],
                       onChanged: (value) => setState(() => _month = value),
                     ),
                   ),
                   AppField(
                     label: 'Ano',
-                    control: AppSelect<String>(
+                    control: AppCombobox<String>(
+                      options: const ['2026', '2027', '2028'],
+                      displayStringForOption: (option) => option,
                       value: _year,
                       placeholder: 'AAAA',
                       semanticLabel: 'Ano de validade',
-                      options: const [
-                        AppSelectOption(value: '2026', label: '2026'),
-                        AppSelectOption(value: '2027', label: '2027'),
-                        AppSelectOption(value: '2028', label: '2028'),
-                      ],
                       onChanged: (value) => setState(() => _year = value),
                     ),
                   ),
@@ -155,15 +149,17 @@ class _FieldCatalogDemoState extends State<FieldCatalogDemo> {
           ),
         ),
         _Example(
-          title: 'Select',
+          title: 'Combobox',
           child: AppField(
             label: 'Departamento',
             description: 'Selecione seu departamento ou área de atuação.',
-            control: AppSelect<String>(
+            control: AppCombobox<String>(
+              options: _departments,
+              displayStringForOption: (option) => option,
               value: _department,
               placeholder: 'Escolha um departamento',
               semanticLabel: 'Departamento',
-              options: _departments,
+              showClear: true,
               onChanged: (value) => setState(() => _department = value),
             ),
           ),

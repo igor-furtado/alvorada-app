@@ -15,8 +15,9 @@ class MoleculeCatalogShowcase extends StatefulWidget {
 
 class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
   String? _radioValue = 'mensal';
-  String? _selectValue;
   String? _comboboxValue;
+  String? _clearableComboboxValue = 'Next.js';
+  List<String> _comboboxValues = const ['Next.js'];
   var _page = 2;
 
   @override
@@ -191,22 +192,57 @@ class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
       ),
       CatalogDemoSection(
         title: 'AppCombobox',
-        description: 'Entrada com autocompletar e filtragem de sugestões.',
+        description: 'Seleção pesquisável com valor simples, múltiplos valores, limpeza e estado desabilitado.',
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text('Básico', style: context.tokens.typography.titleSmall),
+              SizedBox(height: context.tokens.spacing.sm),
               AppCombobox<String>(
-                options: const ['Direito Constitucional', 'Língua Portuguesa', 'Raciocínio Lógico'],
+                options: const ['Next.js', 'SvelteKit', 'Nuxt.js', 'Remix', 'Astro'],
                 displayStringForOption: (option) => option,
-                placeholder: 'Selecione uma Disciplina',
-                onSelected: (value) => setState(() => _comboboxValue = value),
+                value: _comboboxValue,
+                placeholder: 'Selecione um framework',
+                semanticLabel: 'Framework',
+                onChanged: (value) => setState(() => _comboboxValue = value),
               ),
-              if (_comboboxValue != null) ...[
-                SizedBox(height: context.tokens.spacing.sm),
-                Text('Selecionado: $_comboboxValue', style: context.tokens.typography.bodySmall),
-              ],
+              SizedBox(height: context.tokens.spacing.xxl),
+              Text('Múltiplo', style: context.tokens.typography.titleSmall),
+              SizedBox(height: context.tokens.spacing.sm),
+              AppCombobox<String>.multiple(
+                options: const ['Next.js', 'SvelteKit', 'Nuxt.js', 'Remix', 'Astro'],
+                displayStringForOption: (option) => option,
+                values: _comboboxValues,
+                placeholder: 'Selecione frameworks',
+                semanticLabel: 'Frameworks',
+                showClear: true,
+                onValuesChanged: (values) => setState(() => _comboboxValues = values),
+              ),
+              SizedBox(height: context.tokens.spacing.xxl),
+              Text('Botão de limpar', style: context.tokens.typography.titleSmall),
+              SizedBox(height: context.tokens.spacing.sm),
+              AppCombobox<String>(
+                options: const ['Next.js', 'SvelteKit', 'Nuxt.js', 'Remix', 'Astro'],
+                displayStringForOption: (option) => option,
+                value: _clearableComboboxValue,
+                placeholder: 'Selecione um framework',
+                semanticLabel: 'Framework com limpeza',
+                showClear: true,
+                onChanged: (value) => setState(() => _clearableComboboxValue = value),
+              ),
+              SizedBox(height: context.tokens.spacing.xxl),
+              Text('Desabilitado', style: context.tokens.typography.titleSmall),
+              SizedBox(height: context.tokens.spacing.sm),
+              AppCombobox<String>(
+                options: const ['Next.js', 'SvelteKit', 'Nuxt.js', 'Remix', 'Astro'],
+                displayStringForOption: (option) => option,
+                placeholder: 'Selecione um framework',
+                semanticLabel: 'Framework desabilitado',
+                disabled: true,
+                onChanged: (_) {},
+              ),
             ],
           ),
         ),
@@ -277,33 +313,6 @@ class _MoleculeCatalogShowcaseState extends State<MoleculeCatalogShowcase> {
                 AppRadioOption(value: 'vitalicio', label: r'Vitalício (R$ 299,99)'),
               ],
               onChanged: (value) => setState(() => _radioValue = value),
-            ),
-          ),
-        ),
-      ),
-      CatalogDemoSection(
-        title: 'AppSelect',
-        description: 'Lista de opções acionada por um controle compacto.',
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: context.tokens.sizes.dialogNarrow),
-          child: AppField(
-            label: 'Departamento',
-            description: 'Selecione seu departamento ou área de atuação.',
-            control: AppSelect<String>(
-              value: _selectValue,
-              placeholder: 'Escolha um departamento',
-              semanticLabel: 'Departamento',
-              options: const [
-                AppSelectOption(value: 'engenharia', label: 'Engenharia'),
-                AppSelectOption(value: 'design', label: 'Design'),
-                AppSelectOption(value: 'marketing', label: 'Marketing'),
-                AppSelectOption(value: 'vendas', label: 'Vendas'),
-                AppSelectOption(value: 'suporte', label: 'Suporte ao cliente'),
-                AppSelectOption(value: 'pessoas', label: 'Recursos humanos'),
-                AppSelectOption(value: 'financeiro', label: 'Financeiro'),
-                AppSelectOption(value: 'operacoes', label: 'Operações'),
-              ],
-              onChanged: (value) => setState(() => _selectValue = value),
             ),
           ),
         ),

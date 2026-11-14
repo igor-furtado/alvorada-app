@@ -83,7 +83,7 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: Size.square(tokens.layout.controlHeight),
+          minimumSize: Size.square(tokens.layout.inputHeight),
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
           textStyle: textTheme.labelLarge,
@@ -96,7 +96,7 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: Size.square(tokens.layout.controlHeight),
+          minimumSize: Size.square(tokens.layout.inputHeight),
           foregroundColor: colors.onSurface,
           side: BorderSide(color: colors.border),
           textStyle: textTheme.labelLarge,
@@ -110,13 +110,13 @@ abstract final class AppTheme {
           foregroundColor: colors.actionForeground,
           textStyle: textTheme.labelLarge,
           shape: RoundedRectangleBorder(borderRadius: radius),
-          minimumSize: Size.square(tokens.layout.controlHeight),
+          minimumSize: Size.square(tokens.layout.inputHeight),
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          minimumSize: Size.square(tokens.layout.controlHeight),
+          minimumSize: Size.square(tokens.layout.inputHeight),
           foregroundColor: colors.onSurface,
           backgroundColor: colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: radius),
@@ -131,12 +131,12 @@ abstract final class AppTheme {
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceMuted),
         prefixIconConstraints: BoxConstraints(
-          minWidth: tokens.layout.controlHeight,
-          minHeight: tokens.layout.controlHeight,
+          minWidth: tokens.layout.inputHeight,
+          minHeight: tokens.layout.inputHeight,
         ),
         suffixIconConstraints: BoxConstraints(
-          minWidth: tokens.layout.controlHeight,
-          minHeight: tokens.layout.controlHeight,
+          minWidth: tokens.layout.inputHeight,
+          minHeight: tokens.layout.inputHeight,
         ),
         border: inputBorder,
         enabledBorder: inputBorder,
@@ -162,7 +162,7 @@ abstract final class AppTheme {
           horizontal: tokens.spacing.md,
           vertical: tokens.spacing.xxs,
         ),
-        constraints: BoxConstraints(minHeight: tokens.layout.controlHeight),
+        constraints: BoxConstraints(minHeight: tokens.layout.inputHeight),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: colors.surface,
@@ -203,7 +203,7 @@ abstract final class AppTheme {
       ),
       listTileTheme: ListTileThemeData(
         dense: true,
-        minTileHeight: tokens.layout.controlHeight,
+        minTileHeight: tokens.layout.inputHeight,
         iconColor: colors.onSurfaceMuted,
         textColor: colors.onSurfaceMuted,
         selectedColor: colors.onSurface,

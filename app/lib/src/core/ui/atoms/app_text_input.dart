@@ -85,8 +85,8 @@ class AppTextInput extends StatelessWidget {
           prefixIcon: needsHeightAnchor ? const SizedBox.shrink() : prefixIcon,
           prefixIconConstraints: needsHeightAnchor
               ? BoxConstraints.tightFor(
-                  width: 0,
-                  height: tokens.layout.controlHeight,
+                  width: tokens.layout.inputHPadding,
+                  height: tokens.layout.inputHeight,
                 )
               : null,
           suffixIcon: suffixIcon,

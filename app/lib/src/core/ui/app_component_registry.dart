@@ -114,6 +114,5 @@ abstract final class AppComponentRegistry {
       interfaceName: 'AppScrollArea',
       category: AppComponentCategory.organism,
     ),
-    AppComponentDefinition(name: 'Select', interfaceName: 'AppSelect', category: AppComponentCategory.molecule),
   ];
 }

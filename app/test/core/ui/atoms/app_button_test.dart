@@ -36,7 +36,7 @@ void main() {
     final buttonHeight = tester.getSize(find.byKey(buttonKey)).height;
 
     expect(buttonHeight, inputHeight);
-    expect(buttonHeight, AppTheme.light.extension<AppTokens>()!.layout.controlHeight);
+    expect(buttonHeight, AppTheme.light.extension<AppTokens>()!.layout.inputHeight);
   });
 
   testWidgets('mantém a mesma altura interna com e sem ícone', (tester) async {
@@ -68,7 +68,7 @@ void main() {
 
     final plainInputHeight = _inputContainerHeight(tester, plainInputKey);
     final iconInputHeight = _inputContainerHeight(tester, iconInputKey);
-    final controlHeight = AppTheme.light.extension<AppTokens>()!.layout.controlHeight;
+    final controlHeight = AppTheme.light.extension<AppTokens>()!.layout.inputHeight;
     final plainField = tester.widget<TextField>(
       find.descendant(
         of: find.byKey(plainInputKey),
