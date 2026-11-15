@@ -1,0 +1,35 @@
+name: Sugerir uma melhoria
+description: Proponha uma mudança de produto ou de manutenção para o Prumo.
+title: "[Melhoria]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Necessidade
+      description: Qual problema do usuário ou do projeto precisa ser resolvido?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Resultado esperado
+      description: Descreva o comportamento observável desejado, sem prescrever a implementação.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceitação
+      description: Liste condições verificáveis para considerar a melhoria concluída.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: Inclua referências, exemplos ou restrições relevantes.

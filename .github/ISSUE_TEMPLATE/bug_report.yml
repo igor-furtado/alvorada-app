@@ -1,0 +1,46 @@
+name: Relatar um bug
+description: Informe um comportamento incorreto ou uma regressão no Prumo.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: O que aconteceu e qual era o comportamento esperado?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Como reproduzir
+      description: Liste os passos mínimos e os dados usados.
+      placeholder: |
+        1. Acesse...
+        2. Selecione...
+        3. Observe...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área afetada
+      options:
+        - Interface Flutter
+        - API Go
+        - Banco de dados
+        - Documentação
+        - Não sei
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências
+      description: Inclua mensagens de erro, logs sem segredos, capturas ou vídeos.
+  - type: input
+    id: version
+    attributes:
+      label: Versão ou commit
+      description: Informe a versão, o hash do commit ou a data em que observou o problema.
