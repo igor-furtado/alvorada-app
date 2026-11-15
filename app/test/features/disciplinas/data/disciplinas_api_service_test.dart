@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:estudos_app/src/features/disciplinas/data/services/disciplinas_api_service.dart';
+import 'package:estudos_app/features/disciplinas/data/services/disciplinas_api_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';

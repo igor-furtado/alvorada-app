@@ -12,7 +12,7 @@
 ## Regras
 
 - JSON usa português sem acentos: `nome`, `dificuldade`, `cor`, `disciplinas`, `topicos`, `obrigatorio`, `erro`.
-- Leia campos obrigatórios com `core/data/serializacao/leitor_json.dart`; leitores genéricos novos ficam ali com testes.
+- Leia campos obrigatórios com `core/json_reader.dart`; leitores genéricos novos ficam ali com testes.
 - `ApiModel` conhece JSON e conversão; `domain` conhece apenas estado válido.
 - `ApiService` centraliza JSON, headers, status e `erro`; o chamador gerencia `http.Client`.
 - `Repository` retorna domínio e coleções imutáveis, invalida/atualiza cache e preserva a causa de falhas externas.

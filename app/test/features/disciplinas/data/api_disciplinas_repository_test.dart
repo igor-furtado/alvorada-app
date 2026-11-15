@@ -1,9 +1,9 @@
-import 'package:estudos_app/src/features/disciplinas/data/models/disciplina_api_model.dart';
-import 'package:estudos_app/src/features/disciplinas/data/repositories/api_disciplinas_repository.dart';
-import 'package:estudos_app/src/features/disciplinas/data/services/disciplinas_api_service.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina_input.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/repositories/disciplinas_repository.dart';
+import 'package:estudos_app/features/disciplinas/data/models/disciplina_api_model.dart';
+import 'package:estudos_app/features/disciplinas/data/repositories/api_disciplinas_repository.dart';
+import 'package:estudos_app/features/disciplinas/data/services/disciplinas_api_service.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina_input.dart';
+import 'package:estudos_app/features/disciplinas/domain/repositories/disciplinas_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

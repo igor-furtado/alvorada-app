@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_list/concursos_list_bloc.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_list/concursos_list_event.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_list/concursos_list_state.dart';
+import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_list/concursos_list_bloc.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_list/concursos_list_event.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_list/concursos_list_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_concursos_repository.dart';

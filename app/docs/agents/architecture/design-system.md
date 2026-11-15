@@ -6,30 +6,36 @@ Use este guia ao criar ou alterar componente `App*`, token, tema, ícone, primit
 
 Consulte nesta ordem:
 
-1. `lib/src/core/ui/app_ui.dart`, API pública consumida pelas features;
-2. implementação e testes do componente em `lib/src/core/ui/`;
+1. `lib/core/design_system/design_system.dart`, única interface pública consumida pelas features;
+2. implementação e testes em `lib/core/design_system/` e `test/core/design_system/`;
 3. tokens acessíveis por `context.tokens` e `AppIcons`;
-4. `AppComponentRegistry` e o catálogo em `features/design_system`;
-5. `features/disciplinas/presentation`, referência de composição dos componentes em uma feature;
-6. shadcn/ui Base UI atual, quando existir componente equivalente.
+4. `features/disciplinas/presentation`, referência de composição dos componentes em uma feature;
+5. shadcn/ui Base UI atual, quando existir componente equivalente.
 
 O código do repositório decide APIs e tokens existentes. A referência externa decide anatomia e comportamento que ainda precisam ser modelados.
 
 Conclua o inventário quando cada requisito resultar em reutilizar, estender ou criar um `App*`, sem duplicar uma composição pública existente.
 
-## Arquitetura de componentes
+## Organização por responsabilidade
 
 ```text
-atoms → molecules → organisms → templates → feature
+design_system/
+├── controls/    ações, entradas, seleção e navegação local
+├── feedback/    estado, progresso e mensagens
+├── overlays/    superfícies temporárias
+└── layout/      composição, responsividade e superfícies estruturais
 ```
 
-- Átomos não dependem de composições superiores.
-- Moléculas combinam átomos em um controle ou unidade de conteúdo.
-- Organismos coordenam moléculas e superfícies interativas.
-- Templates organizam páginas sem conhecer regras de uma feature.
-- Features importam `core/ui/app_ui.dart`; detalhes Material ficam encapsulados em `App*`.
+- `controls` contém widgets operáveis e suas composições de formulário.
+- `feedback` comunica loading, progresso, resultado e estado remoto.
+- `overlays` coordena foco, scrim, teclado e fechamento de drawers e diálogos.
+- `layout` organiza conteúdo sem conhecer regra de feature.
+- Features importam somente `core/design_system/design_system.dart`; detalhes Material ficam encapsulados em `App*`.
+- Arquivos internos importam a implementação direta de que dependem, sem atravessar o barrel público.
 
-Um componente público usa prefixo `App`, parâmetros nomeados, construtor `const` quando possível, variantes e tamanhos tipados e callback nulo para indisponibilidade. Conceitos com efeitos diferentes mantêm APIs distintas: `AppAlertDialog` confirma uma decisão; `AppDialog` apresenta conteúdo; `AppDrawer` executa uma tarefa lateral ou inferior.
+Um componente público usa prefixo `App`, parâmetros nomeados, construtor `const` quando possível, variantes e tamanhos tipados e callback nulo para indisponibilidade. Conceitos com efeitos diferentes mantêm APIs distintas: `AppAlertDialog` confirma uma decisão e `AppDrawer` executa uma tarefa lateral.
+
+Publique somente variantes consumidas pelo produto. Estados usados apenas por testes ou exemplos não justificam ampliar a interface; o teste deve atravessar o mesmo contrato usado pelas features.
 
 Conclua quando a API expressar anatomia, conteúdo, variantes, tamanhos e estados sem exigir que a feature conheça a implementação interna.
 
@@ -47,13 +53,14 @@ Conclua quando cada estado e interação tiver representação explícita na API
 
 Use somente papéis semânticos:
 
-- `context.tokens.colors`, `typography`, `spacing`, `borders` e `shadows`;
-- `context.tokens.layout` e `sizes` para dimensões;
+- `context.tokens.colors`, `typography`, `spacing`, `borders`, `motion`, `icons` e `opacity`;
+- `context.tokens.layout` para dimensões estruturais compartilhadas;
+- `context.tokens.overlayShadow`, `overlayBackdropBlur`, `feedbackIconSize` e `listItemMediaHeight` para decisões transversais sem família própria;
 - `context.tokens.opacity` e `motion` para transparência e movimento;
 - `AppIcons` para glifos Lucide;
 - `context.motionDuration` para respeitar redução de movimento.
 
-Um token novo descreve intenção, participa de `lerp`, aparece no catálogo e recebe teste quando cria contrato visual. Valores locais continuam aceitáveis somente quando pertencem ao dado ou à geometria interna sem significado compartilhado.
+Um token novo descreve intenção, participa de `lerp` e recebe teste quando cria contrato visual. Valores locais continuam aceitáveis somente quando pertencem ao dado ou à geometria interna sem significado compartilhado.
 
 Todo texto usa a tipografia Geist por meio de estilo semântico ou herança deliberada. Componentes públicos definem sua aparência com tokens, mantendo `Theme.of(context)` apenas para estado de plataforma que o contrato de tema já controla.
 
@@ -63,13 +70,11 @@ Conclua quando temas claro e escuro usam os mesmos papéis, mudanças de estado 
 
 Para um `App*` público:
 
-1. exporte no barrel do nível;
-2. exporte em `app_ui.dart` pelo barrel público;
-3. registre em `AppComponentRegistry`;
-4. demonstre variantes, tamanhos e estados no catálogo administrativo;
-5. adicione teste da API pública e das interações relevantes.
+1. coloque a implementação na responsabilidade adequada;
+2. exporte somente em `design_system.dart`;
+3. adicione teste da interface pública e das interações relevantes.
 
-Conclua quando uma feature conseguir importar apenas `app_ui.dart` e o catálogo permitir exercitar o contrato completo.
+Conclua quando uma feature conseguir importar apenas `design_system.dart` e o teste exercitar o contrato completo.
 
 ### 4. Compare visualmente
 
@@ -86,7 +91,7 @@ Conclua quando toda divergência observada for corrigida ou registrada como deci
 | Superfície | `canvas`, `surface`, `card` e `popover` seguem o papel do conteúdo. |
 | Borda | Separador padrão de 1 px; foco usa ring perceptível. |
 | Raio | Controles usam raio discreto; cards e overlays podem usar o nível seguinte. |
-| Sombra | Apenas overlays e popovers usam `tokens.shadows.overlay`. |
+| Sombra | Apenas overlays e popovers usam `tokens.overlayShadow`. |
 | Ícone | Somente `AppIcons`; ícone decorativo fica fora da árvore semântica. |
 | Movimento | Duração semântica; redução de movimento produz duração zero. |
 | Densidade | Controles compactos preservam alvo interativo mínimo de 24×24 px. |
@@ -103,7 +108,7 @@ Conclua quando toda divergência observada for corrigida ou registrada como deci
 
 ## Responsividade
 
-Meça a janela com `MediaQuery.sizeOf` e o espaço local com `LayoutBuilder`. Use `context.windowClass`, `ResponsiveBuilder`, `ResponsiveValue<T>` e os breakpoints de `AppLayoutTokens`.
+Meça a janela com `MediaQuery.sizeOf` e o espaço local com `LayoutBuilder`. Use `context.windowClass`, `ResponsiveBuilder` e os breakpoints de `AppLayoutTokens`.
 
 | Classe | Largura |
 | --- | ---: |
@@ -113,6 +118,11 @@ Meça a janela com `MediaQuery.sizeOf` e o espaço local com `LayoutBuilder`. Us
 | large | `≥ 1200` |
 
 Reorganize antes de ocultar. Quebre texto antes de truncar. Formulários usam uma coluna no compacto e agrupamentos relacionados nas demais larguras. Safe area e `viewInsets` protegem recorte e teclado. Redimensionar preserva foco, estado e rolagem.
+
+- `AppPage` é dono do cabeçalho, das margens e do reflow entre título e ação.
+- `AppMasterDetail` decide entre empilhamento e painéis redimensionáveis.
+- `AppListItem` reposiciona seu `trailing` quando largura ou escala de texto exigirem.
+- Componentes auxiliares usados apenas por outro `App*` permanecem fora do barrel público.
 
 Aceite nas larguras 390, 720, 1024 e 1440 px, em orientação livre e com texto a 200%. Conclua quando ações essenciais permanecerem visíveis e nenhum componente declarar breakpoint literal.
 
@@ -132,7 +142,9 @@ Conclua quando testes de `Semantics` encontram nome, papel, estado e ação e o 
 
 ## Texto visível
 
-Use pt-BR, voz ativa, ação concreta e explicação curta. Botões usam verbo + objeto; títulos ocupam uma linha; descrições usam até duas frases. Placeholder mostra formato e label permanece visível. Texto funcional compartilhado vive em `AppMessages`; conteúdo demonstrativo permanece no catálogo.
+Use voz ativa, ação concreta e explicação curta. Botões usam verbo + objeto; títulos ocupam uma linha; descrições usam até duas frases. Placeholder mostra formato e label permanece visível. Texto genérico compartilhado é obtido por `context.l10n` a partir dos ARBs em `lib/l10n`; conteúdo sem consumidor real não permanece no produto.
+
+Não declare texto visível como valor padrão `const` de componente. Use parâmetro anulável e resolva o padrão localizado durante `build`. Parâmetros dinâmicos e quantidades usam placeholders e plurals ICU no ARB.
 
 | Tipo | Estrutura |
 | --- | --- |
@@ -154,4 +166,4 @@ flutter test
 flutter build web
 ```
 
-Conclua quando o catálogo, os testes, a comparação visual e os quatro comandos confirmarem o mesmo contrato.
+Conclua quando os testes, a comparação visual e os quatro comandos confirmarem o mesmo contrato.

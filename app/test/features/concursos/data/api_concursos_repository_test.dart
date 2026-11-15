@@ -1,9 +1,9 @@
-import 'package:estudos_app/src/features/concursos/data/models/concurso_api_model.dart';
-import 'package:estudos_app/src/features/concursos/data/repositories/api_concursos_repository.dart';
-import 'package:estudos_app/src/features/concursos/data/services/concursos_api_service.dart';
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/domain/models/concurso_input.dart';
-import 'package:estudos_app/src/features/concursos/domain/repositories/concursos_repository.dart';
+import 'package:estudos_app/features/concursos/data/models/concurso_api_model.dart';
+import 'package:estudos_app/features/concursos/data/repositories/api_concursos_repository.dart';
+import 'package:estudos_app/features/concursos/data/services/concursos_api_service.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso_input.dart';
+import 'package:estudos_app/features/concursos/domain/repositories/concursos_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_input_formatters.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_form/concursos_form_input_formatters.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 

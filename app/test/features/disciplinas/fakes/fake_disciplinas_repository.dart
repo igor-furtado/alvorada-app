@@ -1,6 +1,6 @@
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina_input.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/repositories/disciplinas_repository.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina_input.dart';
+import 'package:estudos_app/features/disciplinas/domain/repositories/disciplinas_repository.dart';
 
 class FakeDisciplinasRepository implements DisciplinasRepository {
   FakeDisciplinasRepository({List<Disciplina>? disciplinas}) : _disciplinas = [...?disciplinas];

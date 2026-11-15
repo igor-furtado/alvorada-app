@@ -1,4 +1,6 @@
-import 'package:estudos_app/src/app.dart';
+import 'package:estudos_app/app/app.dart';
+import 'package:estudos_app/app/app_dependencies.dart';
+import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,8 +17,11 @@ void main() {
 
     await tester.pumpWidget(
       EstudosApp(
-        concursosRepository: FakeConcursosRepository(),
-        disciplinasRepository: FakeDisciplinasRepository(),
+        locale: const Locale('pt'),
+        dependencies: AppDependencies.fromRepositories(
+          concursos: FakeConcursosRepository(),
+          disciplinas: FakeDisciplinasRepository(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -30,7 +35,8 @@ void main() {
     expect(find.bySemanticsLabel('Caderno'), findsNothing);
     expect(find.byType(EditableText), findsNothing);
     expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
-    expect(find.text('Concursos'), findsWidgets);
+    expect(find.byType(AppBreadcrumbs), findsNothing);
+    expect(find.text('Concursos'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
@@ -38,5 +44,55 @@ void main() {
     expect(find.text('Nova Disciplina'), findsOneWidget);
     expect(find.byType(EditableText), findsOneWidget);
     semantics.dispose();
+  });
+
+  testWidgets('mantém o seletor de tema no shell compacto', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(
+      EstudosApp(
+        locale: const Locale('pt'),
+        dependencies: AppDependencies.fromRepositories(
+          concursos: FakeConcursosRepository(),
+          disciplinas: FakeDisciplinasRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
+    expect(find.byType(AppBreadcrumbs), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
+    expect(find.byType(AppBreadcrumbs), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('resolve a navegação no locale em inglês', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1024, 768));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      EstudosApp(
+        locale: const Locale('en'),
+        dependencies: AppDependencies.fromRepositories(
+          concursos: FakeConcursosRepository(),
+          disciplinas: FakeDisciplinasRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Exams'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
+    await tester.pumpAndSettle();
+    expect(find.text('Subjects'), findsWidgets);
   });
 }

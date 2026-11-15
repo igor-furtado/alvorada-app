@@ -1,8 +1,8 @@
-import 'package:estudos_app/src/core/domain/resultado.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina_input.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_resultado_codes.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'package:estudos_app/core/result.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina_input.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_resultado_codes.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_disciplinas_repository.dart';

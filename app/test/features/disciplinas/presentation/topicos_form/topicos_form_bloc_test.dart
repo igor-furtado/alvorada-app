@@ -1,10 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:estudos_app/src/core/domain/resultado.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/topicos_form/topicos_form_bloc.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/topicos_form/topicos_form_event.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/topicos_form/topicos_form_state.dart';
+import 'package:estudos_app/core/result.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_resultado_codes.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'package:estudos_app/features/disciplinas/presentation/topicos_form/topicos_form_bloc.dart';
+import 'package:estudos_app/features/disciplinas/presentation/topicos_form/topicos_form_event.dart';
+import 'package:estudos_app/features/disciplinas/presentation/topicos_form/topicos_form_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_disciplinas_repository.dart';
@@ -61,9 +62,9 @@ void main() {
             TopicosFormStatus.failure,
           )
           .having(
-            (state) => state.errorMessage,
-            'mensagem',
-            'Informe ao menos um Tópico.',
+            (state) => state.errorCode,
+            'código',
+            DisciplinasResultadoCodes.topicoNomeObrigatorio,
           ),
     ],
   );

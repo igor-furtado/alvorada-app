@@ -1,6 +1,6 @@
-import 'package:estudos_app/src/core/theme/app_theme.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/topicos_form/topicos_form_view.dart';
+import 'package:estudos_app/core/design_system/design_system.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'package:estudos_app/features/disciplinas/presentation/topicos_form/topicos_form_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';

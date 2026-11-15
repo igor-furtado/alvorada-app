@@ -1,8 +1,11 @@
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concurso_view_data.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/presentation/concurso_view_data.dart';
+import 'package:estudos_app/l10n/generated/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final l10n = lookupAppLocalizations(const Locale('pt'));
   test('calcula dias até a prova ignorando horário', () {
     final concurso = _concurso(dataProva: DateTime(2026, 12, 13));
 
@@ -25,7 +28,7 @@ void main() {
   });
 
   test('preserva prazo ausente para a apresentação exibir A definir', () {
-    final viewData = ConcursoViewData.fromDomain(_concurso());
+    final viewData = ConcursoViewData.fromDomain(_concurso(), l10n);
 
     expect(viewData.days, isNull);
   });
@@ -119,7 +122,7 @@ void main() {
       ],
     );
 
-    final disciplina = ConcursoViewData.fromDomain(concurso).disciplines.single;
+    final disciplina = ConcursoViewData.fromDomain(concurso, l10n).disciplines.single;
 
     expect(disciplina.progress, isNull);
     expect(disciplina.performance, isNull);

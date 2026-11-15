@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
-import 'package:estudos_app/src/features/concursos/presentation/edital_editor/edital_editor_bloc.dart';
-import 'package:estudos_app/src/features/concursos/presentation/edital_editor/edital_editor_event.dart';
-import 'package:estudos_app/src/features/concursos/presentation/edital_editor/edital_editor_state.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_bloc.dart';
+import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_event.dart';
+import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_state.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../disciplinas/fakes/fake_disciplinas_repository.dart';

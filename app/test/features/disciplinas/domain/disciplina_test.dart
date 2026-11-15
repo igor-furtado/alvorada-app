@@ -1,4 +1,4 @@
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

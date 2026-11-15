@@ -1,9 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_bloc.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_event.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concursos_form/concursos_form_state.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_form/concursos_form_bloc.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_form/concursos_form_event.dart';
+import 'package:estudos_app/features/concursos/presentation/concursos_form/concursos_form_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_concursos_repository.dart';
@@ -88,8 +88,8 @@ void main() {
             ConcursosFormStatus.failure,
           )
           .having(
-            (state) => state.errorMessage,
-            'mensagem',
+            (state) => state.errorCode,
+            'código',
             isNotEmpty,
           ),
     ],

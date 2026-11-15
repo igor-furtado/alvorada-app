@@ -1,10 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:estudos_app/src/core/domain/resultado.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/models/disciplina.dart';
-import 'package:estudos_app/src/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/disciplinas_form/disciplinas_form_bloc.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/disciplinas_form/disciplinas_form_event.dart';
-import 'package:estudos_app/src/features/disciplinas/presentation/disciplinas_form/disciplinas_form_state.dart';
+import 'package:estudos_app/core/result.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_resultado_codes.dart';
+import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
+import 'package:estudos_app/features/disciplinas/presentation/disciplinas_form/disciplinas_form_bloc.dart';
+import 'package:estudos_app/features/disciplinas/presentation/disciplinas_form/disciplinas_form_event.dart';
+import 'package:estudos_app/features/disciplinas/presentation/disciplinas_form/disciplinas_form_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_disciplinas_repository.dart';
@@ -59,9 +60,9 @@ void main() {
             DisciplinasFormStatus.failure,
           )
           .having(
-            (state) => state.errorMessage,
-            'mensagem',
-            'Informe um nome para a Disciplina.',
+            (state) => state.errorCode,
+            'código',
+            DisciplinasResultadoCodes.disciplinaNomeObrigatorio,
           ),
     ],
   );

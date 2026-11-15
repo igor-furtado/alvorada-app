@@ -1,14 +1,15 @@
-import 'package:estudos_app/src/core/content/app_messages.dart';
-import 'package:estudos_app/src/core/theme/app_theme.dart';
-import 'package:estudos_app/src/core/ui/app_ui.dart';
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/domain/use_cases/concursos_use_cases.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concurso_details_page.dart';
+import 'package:estudos_app/core/design_system/design_system.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_cases.dart';
+import 'package:estudos_app/features/concursos/presentation/concurso_details/concurso_details_page.dart';
+import 'package:estudos_app/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../fakes/fake_concursos_repository.dart';
+
+final _pt = lookupAppLocalizations(const Locale('pt'));
 
 void main() {
   testWidgets('carrega um Concurso real ao abrir a rota diretamente', (
@@ -24,7 +25,7 @@ void main() {
 
     expect(find.text(concurso.instituicao), findsWidgets);
     expect(find.text(concurso.sigla!), findsOneWidget);
-    expect(find.text(AppMessages.concursoNaoEncontrado), findsNothing);
+    expect(find.text(_pt.concursoNaoEncontrado), findsNothing);
     expect(find.byType(AppBreadcrumbs), findsOneWidget);
     expect(find.byType(EditableText), findsOneWidget);
   });
@@ -38,9 +39,9 @@ void main() {
       child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
     );
 
-    expect(find.text(AppMessages.newDiscipline), findsNothing);
-    expect(find.text(AppMessages.seeDetails), findsNothing);
-    expect(find.text(AppMessages.noDiscipline), findsOneWidget);
+    expect(find.text(_pt.newDiscipline), findsNothing);
+    expect(find.text(_pt.seeDetails), findsNothing);
+    expect(find.text(_pt.noDiscipline), findsOneWidget);
   });
 
   testWidgets('abre a edição com os dados atuais do Concurso', (
@@ -53,7 +54,7 @@ void main() {
       child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
     );
 
-    await tester.tap(find.text(AppMessages.editarConcurso));
+    await tester.tap(find.text(_pt.editarConcurso));
     await tester.pumpAndSettle();
 
     final inputs = tester.widgetList<EditableText>(find.byType(EditableText)).toList();
@@ -62,7 +63,7 @@ void main() {
       concurso.sigla,
       concurso.cargo,
       concurso.banca,
-      AppMessages.statutoryHiringRegime,
+      _pt.statutoryHiringRegime,
       '12',
       '12.345,67',
       '40',
@@ -73,9 +74,9 @@ void main() {
       concurso.requisitos,
       concurso.criteriosPontuacao,
     ]);
-    expect(find.text(AppMessages.saveChanges), findsOneWidget);
-    expect(find.text(AppMessages.statutoryHiringRegime), findsOneWidget);
-    expect(find.text(AppMessages.cancel), findsNothing);
+    expect(find.text(_pt.saveChanges), findsOneWidget);
+    expect(find.text(_pt.statutoryHiringRegime), findsOneWidget);
+    expect(find.text(_pt.cancel), findsNothing);
   });
 
   testWidgets('mantém a estrutura por faixas sem inventar avanço por Disciplina', (tester) async {
@@ -94,6 +95,64 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Desempenho ainda não calculado'), findsOneWidget);
+  });
+
+  testWidgets('reorganiza cabeçalho e conteúdo nas larguras de referência', (tester) async {
+    final repository = FakeConcursosRepository(concursos: [_concursoComEdital()]);
+
+    for (final width in [390.0, 720.0, 1024.0, 1440.0]) {
+      await _pump(
+        tester,
+        repository: repository,
+        child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+        size: Size(width, 1200),
+        textScaleFactor: width == 390 ? 2 : 1,
+      );
+
+      expect(find.text('Receita Federal'), findsWidgets, reason: 'largura $width');
+      expect(find.text(_pt.editarConcurso), findsOneWidget, reason: 'largura $width');
+      final exception = tester.takeException();
+      expect(
+        exception,
+        isNull,
+        reason: exception is FlutterError ? 'largura $width\n${exception.toStringDeep()}' : 'largura $width',
+      );
+    }
+  });
+
+  testWidgets('distingue falha técnica e permite tentar novamente', (tester) async {
+    final repository = FakeConcursosRepository(concursos: [_concurso()])..failLoad = true;
+    await _pump(
+      tester,
+      repository: repository,
+      child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+    );
+
+    expect(find.text(_pt.genericErrorTitle), findsOneWidget);
+    expect(find.text(_pt.concursoNaoEncontrado), findsNothing);
+
+    repository.failLoad = false;
+    await tester.tap(find.text(_pt.tryAgain));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tribunal Regional Federal da 5ª Região'), findsWidgets);
+    expect(find.text(_pt.genericErrorTitle), findsNothing);
+  });
+
+  testWidgets('preserva a busca do Edital ao alternar de aba', (tester) async {
+    await _pump(
+      tester,
+      repository: FakeConcursosRepository(concursos: [_concursoComEdital()]),
+      child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
+    );
+
+    await tester.enterText(find.byType(EditableText), 'tributário');
+    await tester.tap(find.text(_pt.information));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(_pt.notice));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<EditableText>(find.byType(EditableText)).controller.text, 'tributário');
   });
 }
 
@@ -141,14 +200,23 @@ Future<void> _pump(
   WidgetTester tester, {
   required FakeConcursosRepository repository,
   required Widget child,
+  Size size = const Size(1440, 1200),
+  double textScaleFactor = 1,
 }) async {
-  await tester.binding.setSurfaceSize(const Size(1440, 1200));
+  await tester.binding.setSurfaceSize(size);
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     RepositoryProvider<ConcursosUseCases>.value(
       value: ConcursosUseCases(repository),
       child: MaterialApp(
+        locale: const Locale('pt'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScaleFactor)),
+          child: child!,
+        ),
         home: Scaffold(body: child),
       ),
     ),

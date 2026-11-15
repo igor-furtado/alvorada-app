@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:estudos_app/src/features/concursos/domain/models/concurso.dart';
-import 'package:estudos_app/src/features/concursos/domain/models/concurso_input.dart';
-import 'package:estudos_app/src/features/concursos/domain/repositories/concursos_repository.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso.dart';
+import 'package:estudos_app/features/concursos/domain/models/concurso_input.dart';
+import 'package:estudos_app/features/concursos/domain/repositories/concursos_repository.dart';
 
 class FakeConcursosRepository implements ConcursosRepository {
   FakeConcursosRepository({List<Concurso>? concursos}) : _concursos = [...?concursos];

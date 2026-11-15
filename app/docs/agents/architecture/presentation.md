@@ -1,6 +1,6 @@
 # Camada presentation
 
-Use este guia ao criar ou alterar páginas, fluxos, rotas, Bloc, estado de interface, ações ou texto visível. A implementação de referência é [`features/disciplinas/presentation`](../../../lib/src/features/disciplinas/presentation): replique suas fronteiras e seu fluxo de dados, não as regras específicas de Disciplinas.
+Use este guia ao criar ou alterar páginas, fluxos, rotas, Bloc, estado de interface, ações ou texto visível. A implementação de referência é [`features/disciplinas/presentation`](../../../lib/features/disciplinas/presentation): replique suas fronteiras e seu fluxo de dados, não as regras específicas de Disciplinas.
 
 Para componentes `App*`, tokens, tema, responsividade visual ou acessibilidade, siga [design-system.md](design-system.md).
 
@@ -17,6 +17,7 @@ widget → evento → Bloc → use case → Resultado
 - JSON, HTTP, API models, repositories concretos e cache permanecem em `data`.
 - `BuildContext`, overlays, foco, controllers e navegação permanecem nos widgets ou em classes `*Actions`.
 - Tipos usados apenas para renderização são view data imutável em `presentation`; entidades e invariantes continuam em `domain`.
+- Textos visíveis usam `context.l10n`. Códigos de resultado são traduzidos por extensões `*Localizations` dentro da presentation da feature; Bloc e domain não escolhem mensagem localizada.
 
 Conclua quando nenhum detalhe de infraestrutura atravessar a fronteira e nenhuma regra reutilizável de negócio estiver presa a um widget ou Bloc.
 
@@ -56,7 +57,7 @@ Leia a página, os use cases consumidos, os contratos do produto, a rota e os te
 - mutações concorrentes e indisponibilidades;
 - feedback, navegação e sincronizações entre recursos.
 
-Use [`disciplinas_page.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_page.dart) como traçador para fluxos com seleção mestre-detalhe, múltiplos Blocs, busca no shell e estado refletido na URL.
+Use [`disciplinas_page.dart`](../../../lib/features/disciplinas/presentation/disciplinas_page.dart) como traçador para fluxos com seleção mestre-detalhe, múltiplos Blocs, busca no cabeçalho e estado refletido na URL.
 
 Conclua quando cada intenção e cada resposta de use case tiverem um destino observável na interface.
 
@@ -70,7 +71,7 @@ Conclua quando cada intenção e cada resposta de use case tiverem um destino ob
 - Use um enum `*Feedback` para resultados transitórios. Limpe o feedback ao iniciar nova operação para que o listener anuncie cada resultado uma vez.
 - Modele seleção, expansão, busca e ordem no estado quando afetam o que a pessoa vê.
 
-Use [`disciplinas_list_state.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart) para o contrato de lista e [`topicos_list_state.dart`](../../../lib/src/features/disciplinas/presentation/topicos_list/topicos_list_state.dart) para o recorte de Tópicos da Disciplina selecionada.
+Use [`disciplinas_list_state.dart`](../../../lib/features/disciplinas/presentation/disciplinas_list/disciplinas_list_state.dart) para o contrato de lista e [`topicos_list_state.dart`](../../../lib/features/disciplinas/presentation/topicos_list/topicos_list_state.dart) para o recorte de Tópicos da Disciplina selecionada.
 
 Conclua quando toda transição puder ser descrita como `estado atual + evento → novo estado`, incluindo repetição de envio e operações simultâneas.
 
@@ -83,7 +84,7 @@ Conclua quando toda transição puder ser descrita como `estado atual + evento �
 - Traduza códigos de resultado em estados sem comparar mensagens de erro.
 - Mantenha busca, ordenação e adaptação para view data determinísticas e testáveis.
 
-Use [`disciplinas_list_bloc.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_list/disciplinas_list_bloc.dart) para listas e [`disciplinas_form_bloc.dart`](../../../lib/src/features/disciplinas/presentation/disciplinas_form/disciplinas_form_bloc.dart) para submissão de formulário.
+Use [`disciplinas_list_bloc.dart`](../../../lib/features/disciplinas/presentation/disciplinas_list/disciplinas_list_bloc.dart) para listas e [`disciplinas_form_bloc.dart`](../../../lib/features/disciplinas/presentation/disciplinas_form/disciplinas_form_bloc.dart) para submissão de formulário.
 
 Conclua quando o Bloc não usar `BuildContext`, não construir widgets e cobrir todos os resultados declarados pelo use case.
 
@@ -92,7 +93,7 @@ Conclua quando o Bloc não usar `BuildContext`, não construir widgets e cobrir 
 - A `*Page` obtém use cases do contexto, cria os Blocs e dispara a carga inicial.
 - A página coordena Blocs irmãos com `BlocListener`; cada Bloc continua dono apenas do próprio estado.
 - A `*View` escolhe loading, erro, vazio ou conteúdo e converte feedback em efeito visível.
-- `*Panel`, `*Header` e `*Item` recebem dados e callbacks; preferencialmente são widgets puros.
+- `*Panel` e `*Item` recebem dados e callbacks; preferencialmente são widgets puros. Cabeçalho e reflow da página pertencem a `AppPage`.
 - `*Actions` abre drawer ou diálogo, aguarda o resultado e então despacha o evento correspondente.
 - Formulários possuem Bloc próprio. O widget mantém `FormState`, controllers e foco; sucesso fecha a superfície retornando um valor explícito.
 
@@ -102,21 +103,32 @@ Conclua quando renderização, estado e efeitos tiverem um único dono e uma alt
 
 ### 5. Preserve rota e shell
 
+- Mantenha a criação do `GoRouter` em `app/app_router.dart` e o composition root em `app/app_dependencies.dart`; `app/app.dart` apenas conecta esses módulos ao tema.
 - Cada área principal ocupa uma branch e possui URL representativa.
 - Inicialize o Bloc com parâmetros da rota; reflita busca, filtro e ordem na query string.
 - Use `replace` para estado navegacional transitório e debounce apenas para entradas contínuas.
-- Registre busca e ações contextuais com `AppShellController`; remova o registro no `dispose`.
+- Mantenha controles globais, como navegação e tema, privados ao `AppShell`; features expõem somente seu conteúdo e suas ações contextuais.
 - Preserve seleção, foco e rolagem ao atualizar URL ou alternar largura.
 
 Conclua quando um deep link reproduzir o mesmo estado visível e voltar/avançar não criar estados impossíveis.
 
 ### 6. Renderize com o design system
 
-Features importam `core/ui/app_ui.dart` e compõem `App*`. Escolha feedback, superfícies temporárias, estados e texto conforme [design-system.md](design-system.md).
+Features importam somente `core/design_system/design_system.dart` e compõem `App*`. Escolha feedback, superfícies temporárias, estados e texto conforme [design-system.md](design-system.md).
 
 Conclua quando a feature não reconstruir localmente um componente público nem introduzir valores visuais com papel já coberto por token.
 
-### 7. Teste o contrato
+### 7. Localize o conteúdo
+
+- Adicione a chave base em `lib/l10n/app_pt.arb` e a tradução correspondente em cada ARB suportado.
+- Textos genéricos pertencem ao design system; navegação e shell pertencem a `app/`; termos específicos permanecem consumidos somente pela presentation da feature dona.
+- Use ICU para plural, select e placeholders. Formatação de data, número e moeda recebe o locale ativo.
+- Estados e Blocs expõem códigos estáveis, nunca mensagens traduzidas.
+- Execute `flutter gen-l10n` depois de alterar ARBs.
+
+Conclua quando trocar o locale alterar texto, plurais e formatação sem mudar estado ou regras de domínio.
+
+### 8. Teste o contrato
 
 Teste Blocs com fakes de repository por meio dos use cases, seguindo [`disciplinas_list_bloc_test.dart`](../../../test/features/disciplinas/presentation/disciplinas_list/disciplinas_list_bloc_test.dart).
 
@@ -132,12 +144,13 @@ Cubra, conforme o fluxo:
 
 Conclua quando remover uma transição, um efeito ou um parâmetro de rota relevante fizer pelo menos um teste falhar.
 
-### 8. Verifique
+### 9. Verifique
 
 Em `app/`, execute:
 
 ```bash
 dart format lib test
+flutter gen-l10n
 flutter analyze
 flutter test
 flutter build web

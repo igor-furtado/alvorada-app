@@ -1,5 +1,5 @@
-import 'package:estudos_app/src/core/theme/app_theme.dart';
-import 'package:estudos_app/src/features/concursos/presentation/concurso_details/edital_metrics_card.dart';
+import 'package:estudos_app/core/design_system/design_system.dart';
+import 'package:estudos_app/features/concursos/presentation/concurso_details/edital_metrics_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
