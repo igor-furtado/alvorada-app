@@ -1,4 +1,5 @@
 import 'package:estudos_app/core/json_reader.dart';
+
 import '../../domain/models/disciplina.dart';
 
 class DisciplinaApiModel {

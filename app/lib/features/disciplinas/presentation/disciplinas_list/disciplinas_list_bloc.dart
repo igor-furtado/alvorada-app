@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 
 import 'package:estudos_app/core/result.dart';
+
 import '../../domain/models/disciplina.dart';
 import '../../domain/use_cases/delete_disciplina_use_case.dart';
 import '../../domain/use_cases/disciplinas_resultado_codes.dart';

@@ -1,4 +1,5 @@
 import 'package:estudos_app/l10n/generated/app_localizations.dart';
+
 import '../domain/use_cases/concursos_resultado_codes.dart';
 
 extension ConcursosLocalizations on AppLocalizations {

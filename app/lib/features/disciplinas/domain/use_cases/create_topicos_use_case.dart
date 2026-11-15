@@ -1,4 +1,5 @@
 import 'package:estudos_app/core/result.dart';
+
 import '../repositories/disciplinas_repository.dart';
 import 'disciplinas_resultado_codes.dart';
 import 'disciplinas_use_case_support.dart';

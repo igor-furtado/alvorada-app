@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 
 import 'package:estudos_app/core/result.dart';
+
 import '../../domain/models/concurso_input.dart';
 import '../../domain/use_cases/concursos_resultado_codes.dart';
 import '../../domain/use_cases/create_concurso_use_case.dart';

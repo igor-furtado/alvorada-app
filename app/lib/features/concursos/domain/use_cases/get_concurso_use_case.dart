@@ -1,4 +1,5 @@
 import 'package:estudos_app/core/result.dart';
+
 import '../models/concurso.dart';
 import '../repositories/concursos_repository.dart';
 import 'concursos_resultado_codes.dart';

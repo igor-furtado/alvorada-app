@@ -1,4 +1,5 @@
 import 'package:estudos_app/l10n/generated/app_localizations.dart';
+
 import '../concurso_formatters.dart';
 
 abstract final class ConcursosFormValidators {
