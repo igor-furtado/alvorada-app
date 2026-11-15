@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AppScrollArea extends StatefulWidget {
   const AppScrollArea({required this.child, this.axis = Axis.vertical, this.controller, super.key});

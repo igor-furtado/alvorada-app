@@ -1,5 +1,5 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 @immutable
 class EditalMetricDistribution {

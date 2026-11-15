@@ -1,8 +1,8 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:estudos_app/core/design_system/layout/app_resizable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   testWidgets('desenha divisor contínuo, alça e redimensiona na horizontal', (tester) async {

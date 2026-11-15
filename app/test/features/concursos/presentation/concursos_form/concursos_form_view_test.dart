@@ -1,10 +1,11 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_cases.dart';
 import 'package:estudos_app/features/concursos/presentation/concursos_form/concursos_form_view.dart';
+import 'package:estudos_app/l10n/app_localization_delegates.dart';
 import 'package:estudos_app/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../fakes/fake_concursos_repository.dart';
 
@@ -84,7 +85,7 @@ void main() {
           value: ConcursosUseCases(FakeConcursosRepository()),
           child: MaterialApp(
             locale: const Locale('pt'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: appLocalizationDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: AppTheme.light,
             home: const Scaffold(body: ConcursosFormView()),
