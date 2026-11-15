@@ -1,9 +1,9 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'package:estudos_app/features/disciplinas/presentation/topicos_form/topicos_form_view.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../fakes/fake_disciplinas_repository.dart';
 

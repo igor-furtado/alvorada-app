@@ -1,8 +1,8 @@
 import 'package:estudos_app/app/app.dart';
 import 'package:estudos_app/app/app_dependencies.dart';
 import 'package:estudos_app/core/design_system/design_system.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'features/concursos/fakes/fake_concursos_repository.dart';
 import 'features/disciplinas/fakes/fake_disciplinas_repository.dart';

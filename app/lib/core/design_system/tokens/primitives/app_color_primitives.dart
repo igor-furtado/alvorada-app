@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Valores cromáticos brutos do sistema. Widgets não devem acessar esta classe.
 abstract final class AppColorPrimitives {

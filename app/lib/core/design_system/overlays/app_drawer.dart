@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../app_icons.dart';
 import '../app_tokens.dart';
@@ -48,7 +48,7 @@ class AppDrawer extends StatelessWidget {
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          if (dismissible) unawaited(Navigator.maybePop(context));
+          if (dismissible) Navigator.maybePop(context);
         },
       },
       child: Focus(

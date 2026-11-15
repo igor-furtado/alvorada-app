@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../accessibility/app_accessibility.dart';
 import '../app_tokens.dart';

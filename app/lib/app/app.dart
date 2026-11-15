@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../core/design_system/design_system.dart';
+import '../l10n/app_localization_delegates.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'app_brand.dart';
 import 'app_dependencies.dart';
@@ -55,7 +56,7 @@ class _EstudosAppState extends State<EstudosApp> {
           darkTheme: AppTheme.dark,
           themeMode: themeMode,
           locale: widget.locale,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           restorationScopeId: 'application',
           routerConfig: _router,

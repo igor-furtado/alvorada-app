@@ -3,3 +3,4 @@ template-arb-file: app_pt.arb
 output-localization-file: app_localizations.dart
 output-dir: lib/l10n/generated
 use-escaping: true
+header: "// ignore_for_file: deprecated_member_use\n"

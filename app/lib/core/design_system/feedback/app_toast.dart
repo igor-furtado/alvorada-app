@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../accessibility/app_accessibility.dart';
 import '../app_icons.dart';
@@ -167,7 +167,7 @@ class _AppToastState extends State<AppToast> with SingleTickerProviderStateMixin
       ..duration = context.motionDuration(tokens.motion.medium)
       ..reverseDuration = context.motionDuration(tokens.motion.fast);
     if (!_controller.isAnimating && _controller.value == 0) {
-      unawaited(_controller.forward());
+      _controller.forward();
       _resumeTimer();
     }
   }

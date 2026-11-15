@@ -1,7 +1,7 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../disciplinas_list/disciplinas_list_state.dart';
 import 'topicos_list_bloc.dart';
