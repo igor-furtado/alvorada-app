@@ -136,6 +136,30 @@ abstract class AppLocalizations {
   /// **'Usar tema escuro'**
   String get useDarkTheme;
 
+  /// No description provided for @appearance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparência'**
+  String get appearance;
+
+  /// No description provided for @followSystemTheme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seguir o sistema'**
+  String get followSystemTheme;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tema claro'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tema escuro'**
+  String get darkTheme;
+
   /// No description provided for @loading.
   ///
   /// In pt, this message translates to:
@@ -718,6 +742,84 @@ abstract class AppLocalizations {
   /// **'Peso no Edital'**
   String get disciplineWeight;
 
+  /// No description provided for @syllabusContentButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo do Edital'**
+  String get syllabusContentButton;
+
+  /// No description provided for @editExamData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar dados da prova'**
+  String get editExamData;
+
+  /// No description provided for @sortAscending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordenar do menor para o maior'**
+  String get sortAscending;
+
+  /// No description provided for @sortDescending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordenar do maior para o menor'**
+  String get sortDescending;
+
+  /// No description provided for @syllabusCoverage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cobertura do Edital'**
+  String get syllabusCoverage;
+
+  /// No description provided for @completed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluídos'**
+  String get completed;
+
+  /// No description provided for @remaining.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faltam'**
+  String get remaining;
+
+  /// No description provided for @correctAnswers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acertos'**
+  String get correctAnswers;
+
+  /// No description provided for @wrongAnswers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erros'**
+  String get wrongAnswers;
+
+  /// No description provided for @daysRemaining.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 dia restante} other{{count} dias restantes}}'**
+  String daysRemaining(int count);
+
+  /// No description provided for @topicsInSyllabusCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 Tópico no Edital} other{{count} Tópicos no Edital}}'**
+  String topicsInSyllabusCount(int count);
+
+  /// No description provided for @weightUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Peso da Disciplina atualizado.'**
+  String get weightUpdated;
+
+  /// No description provided for @weightUpdateFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível atualizar o peso da Disciplina.'**
+  String get weightUpdateFailed;
+
   /// No description provided for @noDiscipline.
   ///
   /// In pt, this message translates to:
@@ -733,20 +835,68 @@ abstract class AppLocalizations {
   /// No description provided for @contentCatalog.
   ///
   /// In pt, this message translates to:
-  /// **'Disciplinas'**
+  /// **'Catálogo de Disciplinas'**
   String get contentCatalog;
 
   /// No description provided for @contentCatalogSubtitle.
   ///
   /// In pt, this message translates to:
-  /// **'Catálogo de Disciplinas e Tópicos compartilhado entre Concursos.'**
+  /// **'Organize a base de conteúdo usada nos seus editais e planos de estudo.'**
   String get contentCatalogSubtitle;
 
   /// No description provided for @searchContent.
   ///
   /// In pt, this message translates to:
-  /// **'Buscar Disciplinas e Tópicos'**
+  /// **'Buscar disciplina ou tópico'**
   String get searchContent;
+
+  /// No description provided for @newTopic.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo Tópico'**
+  String get newTopic;
+
+  /// No description provided for @difficultyVeryEasy.
+  ///
+  /// In pt, this message translates to:
+  /// **'muito fácil'**
+  String get difficultyVeryEasy;
+
+  /// No description provided for @difficultyEasy.
+  ///
+  /// In pt, this message translates to:
+  /// **'fácil'**
+  String get difficultyEasy;
+
+  /// No description provided for @difficultyMedium.
+  ///
+  /// In pt, this message translates to:
+  /// **'média'**
+  String get difficultyMedium;
+
+  /// No description provided for @difficultyHard.
+  ///
+  /// In pt, this message translates to:
+  /// **'difícil'**
+  String get difficultyHard;
+
+  /// No description provided for @difficultyVeryHard.
+  ///
+  /// In pt, this message translates to:
+  /// **'muito difícil'**
+  String get difficultyVeryHard;
+
+  /// Resumo de uma Disciplina no catálogo.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 Tópico} other{{count} Tópicos}} · Dificuldade {difficulty}'**
+  String catalogDisciplineSummary(int count, String difficulty);
+
+  /// Quantidade curta de Tópicos.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 Tópico} other{{count} Tópicos}}'**
+  String topicCountShort(int count);
 
   /// No description provided for @addDiscipline.
   ///
@@ -765,6 +915,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Adicione um ou vários Tópicos à Disciplina selecionada.'**
   String get addTopicsDescription;
+
+  /// No description provided for @addTopicsQuickDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite ou cole um Tópico por linha. A lista será criada na ordem informada.'**
+  String get addTopicsQuickDescription;
 
   /// No description provided for @topicsPerLineExample.
   ///
@@ -801,6 +957,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Salvar alterações'**
   String get saveChanges;
+
+  /// No description provided for @unsavedChangesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar alterações?'**
+  String get unsavedChangesTitle;
+
+  /// No description provided for @unsavedChangesDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'As alterações feitas neste formulário ainda não foram salvas.'**
+  String get unsavedChangesDescription;
+
+  /// No description provided for @keepEditing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar editando'**
+  String get keepEditing;
+
+  /// No description provided for @discardChanges.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar alterações'**
+  String get discardChanges;
+
+  /// No description provided for @concursoIdentificationSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Identificação'**
+  String get concursoIdentificationSection;
+
+  /// No description provided for @concursoIdentificationSectionDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Órgão, cargo e banca responsáveis pelo Concurso.'**
+  String get concursoIdentificationSectionDescription;
+
+  /// No description provided for @concursoConditionsSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Condições do cargo'**
+  String get concursoConditionsSection;
+
+  /// No description provided for @concursoConditionsSectionDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regime, vagas, remuneração e jornada de trabalho.'**
+  String get concursoConditionsSectionDescription;
+
+  /// No description provided for @concursoExamSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prova'**
+  String get concursoExamSection;
+
+  /// No description provided for @concursoExamSectionDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data, horários e local previstos para a prova.'**
+  String get concursoExamSectionDescription;
+
+  /// No description provided for @concursoAdditionalSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informações complementares'**
+  String get concursoAdditionalSection;
+
+  /// No description provided for @concursoAdditionalSectionDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Requisitos, pontuação e prioridade do Concurso.'**
+  String get concursoAdditionalSectionDescription;
 
   /// No description provided for @deleteDiscipline.
   ///
@@ -904,6 +1132,18 @@ abstract class AppLocalizations {
   /// **'Tópico excluído.'**
   String get topicDeleted;
 
+  /// No description provided for @topicsReordered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordem dos Tópicos atualizada.'**
+  String get topicsReordered;
+
+  /// No description provided for @reorderTopic.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste para reordenar'**
+  String get reorderTopic;
+
   /// No description provided for @contentUpdateFailed.
   ///
   /// In pt, this message translates to:
@@ -964,6 +1204,24 @@ abstract class AppLocalizations {
   /// **'Digite um Tópico por linha. Linhas vazias serão ignoradas. {count, plural, =0{Nenhum Tópico pronto para adicionar.} =1{1 Tópico pronto para adicionar.} other{{count} Tópicos prontos para adicionar.}}'**
   String topicsPerLineDescription(int count);
 
+  /// No description provided for @preview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get preview;
+
+  /// Quantidade genérica de itens.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 itens} =1{1 item} other{{count} itens}}'**
+  String itemsCount(int count);
+
+  /// No description provided for @topicsPreviewEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os Tópicos aparecerão aqui conforme você digitar.'**
+  String get topicsPreviewEmpty;
+
   /// Rótulo da ação de adicionar Tópicos.
   ///
   /// In pt, this message translates to:
@@ -979,7 +1237,7 @@ abstract class AppLocalizations {
   /// Impacto da exclusão de um Tópico.
   ///
   /// In pt, this message translates to:
-  /// **'{name} será excluído do catálogo compartilhado. Esta ação não pode ser desfeita.'**
+  /// **'{name} será excluído do catálogo compartilhado e removido de todos os Editais. Esta ação não pode ser desfeita.'**
   String topicDeletedImpact(String name);
 
   /// Confirmação de arquivamento de Concurso.
@@ -1407,6 +1665,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Não foi possível atualizar o Edital. Tente novamente.'**
   String get syllabusUpdateFailed;
+
+  /// No description provided for @syllabusTriageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo Programático do Edital'**
+  String get syllabusTriageTitle;
+
+  /// Identificação do Concurso no editor do Edital.
+  ///
+  /// In pt, this message translates to:
+  /// **'{institution} · {role}'**
+  String syllabusTriageDescription(String institution, String role);
+
+  /// Progresso de seleção de uma Disciplina no editor do Edital.
+  ///
+  /// In pt, this message translates to:
+  /// **'{selected}/{total} Tópicos'**
+  String syllabusTriageDisciplineProgress(int selected, int total);
+
+  /// No description provided for @clear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get clear;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecionar todos'**
+  String get selectAll;
+
+  /// No description provided for @filterDisciplineTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtrar Tópicos desta Disciplina'**
+  String get filterDisciplineTopics;
+
+  /// No description provided for @inSyllabus.
+  ///
+  /// In pt, this message translates to:
+  /// **'No Edital'**
+  String get inSyllabus;
+
+  /// Ação de salvar a seleção de Tópicos no Edital.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Salvar} =1{Salvar 1 Tópico} other{Salvar {count} Tópicos}}'**
+  String saveSelectedTopics(int count);
+
+  /// No description provided for @syllabusSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo do Edital atualizado.'**
+  String get syllabusSaved;
+
+  /// No description provided for @noTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum Tópico encontrado'**
+  String get noTopics;
+
+  /// No description provided for @noTopicsMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tente buscar por outro nome.'**
+  String get noTopicsMessage;
+
+  /// No description provided for @noDisciplineMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastre uma Disciplina no catálogo para começar.'**
+  String get noDisciplineMessage;
 
   /// No description provided for @advance.
   ///

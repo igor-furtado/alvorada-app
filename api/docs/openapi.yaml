@@ -160,6 +160,42 @@ paths:
           description: Tópicos ausentes vinculados
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}/peso:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+      - name: disciplinaId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Concursos]
+      summary: Atualiza o peso de uma Disciplina no Edital
+      operationId: atualizarPesoDisciplinaEdital
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [peso]
+              properties:
+                peso:
+                  type: number
+                  format: double
+                  minimum: 0.01
+                  maximum: 999999.99
+                  multipleOf: 0.01
+      responses:
+        '204':
+          description: Peso atualizado
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/RecursoNaoEncontrado'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/concursos/{id}/edital/topicos/{topicoId}:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
@@ -305,6 +341,27 @@ paths:
           $ref: '#/components/responses/ErroValidacao'
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/subjects/{id}/topics/order:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    put:
+      tags: [Tópicos]
+      summary: Reordena os tópicos editáveis de uma disciplina
+      description: Persiste a ordem completa dos Tópicos editáveis. O Tópico Revisão de Véspera permanece automaticamente na última posição.
+      operationId: reordenarTopicos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdemTopicos'
+      responses:
+        '204':
+          description: Tópicos reordenados
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/topics/{id}:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
@@ -328,7 +385,7 @@ paths:
     delete:
       tags: [Tópicos]
       summary: Exclui um tópico
-      description: A exclusão é bloqueada enquanto o Tópico estiver vinculado a um Edital.
+      description: Exclui o Tópico do catálogo e remove seus vínculos de todos os Editais. O Tópico Revisão de Véspera permanece protegido.
       operationId: excluirTopico
       responses:
         '204':
@@ -448,13 +505,19 @@ components:
             $ref: '#/components/schemas/DisciplinaEdital'
     DisciplinaEdital:
       type: object
-      required: [id, nome, topicos]
+      required: [id, nome, peso, topicos]
       properties:
         id:
           type: string
           format: uuid
         nome:
           type: string
+        peso:
+          type: [number, 'null']
+          format: double
+          minimum: 0.01
+          maximum: 999999.99
+          multipleOf: 0.01
         topicos:
           type: array
           items:
@@ -627,6 +690,18 @@ components:
             maxLength: 120
           examples:
             - [Controle de constitucionalidade, Direitos fundamentais]
+    OrdemTopicos:
+      type: object
+      required: [topico_ids]
+      properties:
+        topico_ids:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: Todos os identificadores dos Tópicos editáveis da Disciplina na ordem desejada.
+          items:
+            type: string
+            format: uuid
     Dificuldade:
       type: integer
       minimum: 1

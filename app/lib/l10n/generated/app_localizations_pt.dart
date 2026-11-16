@@ -33,6 +33,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get useDarkTheme => 'Usar tema escuro';
 
   @override
+  String get appearance => 'Aparência';
+
+  @override
+  String get followSystemTheme => 'Seguir o sistema';
+
+  @override
+  String get lightTheme => 'Tema claro';
+
+  @override
+  String get darkTheme => 'Tema escuro';
+
+  @override
   String get loading => 'Carregando';
 
   @override
@@ -324,19 +336,114 @@ class AppLocalizationsPt extends AppLocalizations {
   String get disciplineWeight => 'Peso no Edital';
 
   @override
+  String get syllabusContentButton => 'Conteúdo do Edital';
+
+  @override
+  String get editExamData => 'Editar dados da prova';
+
+  @override
+  String get sortAscending => 'Ordenar do menor para o maior';
+
+  @override
+  String get sortDescending => 'Ordenar do maior para o menor';
+
+  @override
+  String get syllabusCoverage => 'Cobertura do Edital';
+
+  @override
+  String get completed => 'Concluídos';
+
+  @override
+  String get remaining => 'Faltam';
+
+  @override
+  String get correctAnswers => 'Acertos';
+
+  @override
+  String get wrongAnswers => 'Erros';
+
+  @override
+  String daysRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dias restantes',
+      one: '1 dia restante',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicsInSyllabusCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tópicos no Edital',
+      one: '1 Tópico no Edital',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get weightUpdated => 'Peso da Disciplina atualizado.';
+
+  @override
+  String get weightUpdateFailed => 'Não foi possível atualizar o peso da Disciplina.';
+
+  @override
   String get noDiscipline => 'Nenhuma Disciplina vinculada a este Edital.';
 
   @override
   String get concursoNaoEncontrado => 'Concurso não encontrado';
 
   @override
-  String get contentCatalog => 'Disciplinas';
+  String get contentCatalog => 'Catálogo de Disciplinas';
 
   @override
-  String get contentCatalogSubtitle => 'Catálogo de Disciplinas e Tópicos compartilhado entre Concursos.';
+  String get contentCatalogSubtitle => 'Organize a base de conteúdo usada nos seus editais e planos de estudo.';
 
   @override
-  String get searchContent => 'Buscar Disciplinas e Tópicos';
+  String get searchContent => 'Buscar disciplina ou tópico';
+
+  @override
+  String get newTopic => 'Novo Tópico';
+
+  @override
+  String get difficultyVeryEasy => 'muito fácil';
+
+  @override
+  String get difficultyEasy => 'fácil';
+
+  @override
+  String get difficultyMedium => 'média';
+
+  @override
+  String get difficultyHard => 'difícil';
+
+  @override
+  String get difficultyVeryHard => 'muito difícil';
+
+  @override
+  String catalogDisciplineSummary(int count, String difficulty) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tópicos',
+      one: '1 Tópico',
+    );
+    return '$_temp0 · Dificuldade $difficulty';
+  }
+
+  @override
+  String topicCountShort(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tópicos',
+      one: '1 Tópico',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get addDiscipline => 'Adicionar Disciplina';
@@ -346,6 +453,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get addTopicsDescription => 'Adicione um ou vários Tópicos à Disciplina selecionada.';
+
+  @override
+  String get addTopicsQuickDescription => 'Digite ou cole um Tópico por linha. A lista será criada na ordem informada.';
 
   @override
   String get topicsPerLineExample => 'Ex.:\nInterpretação de textos\nPontuação\nConcordância verbal';
@@ -364,6 +474,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get saveChanges => 'Salvar alterações';
+
+  @override
+  String get unsavedChangesTitle => 'Descartar alterações?';
+
+  @override
+  String get unsavedChangesDescription => 'As alterações feitas neste formulário ainda não foram salvas.';
+
+  @override
+  String get keepEditing => 'Continuar editando';
+
+  @override
+  String get discardChanges => 'Descartar alterações';
+
+  @override
+  String get concursoIdentificationSection => 'Identificação';
+
+  @override
+  String get concursoIdentificationSectionDescription => 'Órgão, cargo e banca responsáveis pelo Concurso.';
+
+  @override
+  String get concursoConditionsSection => 'Condições do cargo';
+
+  @override
+  String get concursoConditionsSectionDescription => 'Regime, vagas, remuneração e jornada de trabalho.';
+
+  @override
+  String get concursoExamSection => 'Prova';
+
+  @override
+  String get concursoExamSectionDescription => 'Data, horários e local previstos para a prova.';
+
+  @override
+  String get concursoAdditionalSection => 'Informações complementares';
+
+  @override
+  String get concursoAdditionalSectionDescription => 'Requisitos, pontuação e prioridade do Concurso.';
 
   @override
   String get deleteDiscipline => 'Excluir Disciplina';
@@ -415,6 +561,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get topicDeleted => 'Tópico excluído.';
+
+  @override
+  String get topicsReordered => 'Ordem dos Tópicos atualizada.';
+
+  @override
+  String get reorderTopic => 'Arraste para reordenar';
 
   @override
   String get contentUpdateFailed => 'Não foi possível atualizar. Os dados exibidos foram preservados.';
@@ -502,6 +654,24 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get preview => 'Prévia';
+
+  @override
+  String itemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens',
+      one: '1 item',
+      zero: '0 itens',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicsPreviewEmpty => 'Os Tópicos aparecerão aqui conforme você digitar.';
+
+  @override
   String addTopicsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -520,7 +690,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String topicDeletedImpact(String name) {
-    return '$name será excluído do catálogo compartilhado. Esta ação não pode ser desfeita.';
+    return '$name será excluído do catálogo compartilhado e removido de todos os Editais. Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -767,6 +937,55 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get syllabusUpdateFailed => 'Não foi possível atualizar o Edital. Tente novamente.';
+
+  @override
+  String get syllabusTriageTitle => 'Conteúdo Programático do Edital';
+
+  @override
+  String syllabusTriageDescription(String institution, String role) {
+    return '$institution · $role';
+  }
+
+  @override
+  String syllabusTriageDisciplineProgress(int selected, int total) {
+    return '$selected/$total Tópicos';
+  }
+
+  @override
+  String get clear => 'Limpar';
+
+  @override
+  String get selectAll => 'Selecionar todos';
+
+  @override
+  String get filterDisciplineTopics => 'Filtrar Tópicos desta Disciplina';
+
+  @override
+  String get inSyllabus => 'No Edital';
+
+  @override
+  String saveSelectedTopics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Salvar $count Tópicos',
+      one: 'Salvar 1 Tópico',
+      zero: 'Salvar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syllabusSaved => 'Conteúdo do Edital atualizado.';
+
+  @override
+  String get noTopics => 'Nenhum Tópico encontrado';
+
+  @override
+  String get noTopicsMessage => 'Tente buscar por outro nome.';
+
+  @override
+  String get noDisciplineMessage => 'Cadastre uma Disciplina no catálogo para começar.';
 
   @override
   String get advance => 'Avanço';

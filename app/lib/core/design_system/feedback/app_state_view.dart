@@ -118,16 +118,14 @@ class _AppStateHeader extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: tokens.typography.titleLarge.copyWith(fontWeight: FontWeight.w500),
+            style: tokens.typography.stateTitle,
           ),
           if (message.isNotEmpty) ...[
             SizedBox(height: tokens.spacing.sm),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: tokens.typography.bodySmall.copyWith(
-                color: tokens.colors.onSurfaceMuted,
-              ),
+              style: tokens.typography.supportingText,
             ),
           ],
         ],

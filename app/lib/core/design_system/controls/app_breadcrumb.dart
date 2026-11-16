@@ -54,9 +54,7 @@ class AppBreadcrumbs extends StatelessWidget {
                     child: Center(
                       child: Text(
                         items[index].label,
-                        style: context.tokens.typography.bodySmall.copyWith(
-                          color: context.tokens.colors.onSurfaceMuted,
-                        ),
+                        style: context.tokens.typography.supportingText,
                       ),
                     ),
                   ),
@@ -70,9 +68,7 @@ class AppBreadcrumbs extends StatelessWidget {
                   child: Center(
                     child: Text(
                       items[index].label,
-                      style: context.tokens.typography.bodySmall.copyWith(
-                        color: context.tokens.colors.onSurface,
-                      ),
+                      style: context.tokens.typography.supportingTextStrong,
                     ),
                   ),
                 ),

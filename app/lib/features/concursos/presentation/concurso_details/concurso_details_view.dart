@@ -1,8 +1,10 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
+import 'package:estudos_app/core/result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../domain/models/concurso.dart';
+import '../../domain/use_cases/concursos_use_cases.dart';
 import '../concurso_view_data.dart';
 import '../concursos_form/concursos_form_view.dart';
 import '../edital_editor/edital_editor_view.dart';
@@ -10,7 +12,6 @@ import 'concurso_details_bloc.dart';
 import 'concurso_details_event.dart';
 import 'concurso_details_header.dart';
 import 'concurso_details_state.dart';
-import 'concurso_information.dart';
 import 'edital_overview.dart';
 
 const _overviewPlaceholderHeight = 240.0;
@@ -33,12 +34,17 @@ class ConcursoDetailsView extends StatelessWidget {
   }
 
   Future<void> _editEdital(BuildContext context, Concurso concurso) async {
-    await showAppDrawerBuilder<void>(
+    final saved = await showAppDrawerBuilder<bool>(
       context,
       builder: (_) => EditalEditorView(concurso: concurso),
     );
-    if (!context.mounted) return;
+    if (saved != true || !context.mounted) return;
     context.read<ConcursoDetailsBloc>().add(const ConcursoDetailsLoadRequested(forceRefresh: true));
+    AppToast.show(
+      context,
+      title: context.l10n.syllabusSaved,
+      variant: AppToastVariant.success,
+    );
   }
 
   Future<void> _openDisciplina(BuildContext context, DisciplinaEdital disciplina) => showAppDrawerBuilder<void>(
@@ -60,6 +66,41 @@ class ConcursoDetailsView extends StatelessWidget {
       ),
     ),
   );
+
+  Future<bool> _updateWeight(
+    BuildContext context,
+    Concurso concurso,
+    DisciplinaEdital disciplina,
+    double peso,
+  ) async {
+    final result = await context.read<ConcursosUseCases>().edital.updateDisciplinaPeso(
+      concursoId: concurso.id,
+      disciplinaId: disciplina.id,
+      peso: peso,
+    );
+    if (!context.mounted) return false;
+    return switch (result) {
+      Sucesso<void>() => () {
+        context.read<ConcursoDetailsBloc>().add(
+          const ConcursoDetailsLoadRequested(forceRefresh: true),
+        );
+        AppToast.show(
+          context,
+          title: context.l10n.weightUpdated,
+          variant: AppToastVariant.success,
+        );
+        return true;
+      }(),
+      ViolacaoRegra<void>() || FalhaTecnica<void>() => () {
+        AppToast.show(
+          context,
+          title: context.l10n.weightUpdateFailed,
+          variant: AppToastVariant.error,
+        );
+        return false;
+      }(),
+    };
+  }
 
   @override
   Widget build(BuildContext context) => BlocBuilder<ConcursoDetailsBloc, ConcursoDetailsState>(
@@ -101,6 +142,7 @@ class ConcursoDetailsView extends StatelessWidget {
           onEditConcurso: (concurso) => _editConcurso(context, concurso),
           onEditEdital: (concurso) => _editEdital(context, concurso),
           onOpenDisciplina: (disciplina) => _openDisciplina(context, disciplina),
+          onWeightChanged: (concurso, disciplina, peso) => _updateWeight(context, concurso, disciplina, peso),
         ),
       },
     ),
@@ -113,80 +155,77 @@ class _SuccessView extends StatelessWidget {
     required this.onEditConcurso,
     required this.onEditEdital,
     required this.onOpenDisciplina,
+    required this.onWeightChanged,
   });
 
   final ConcursoDetailsState state;
   final ValueChanged<Concurso> onEditConcurso;
   final ValueChanged<Concurso> onEditEdital;
   final ValueChanged<DisciplinaEdital> onOpenDisciplina;
+  final Future<bool> Function(Concurso concurso, DisciplinaEdital disciplina, double peso) onWeightChanged;
 
   @override
   Widget build(BuildContext context) {
     final concurso = state.concurso!;
     final view = ConcursoViewData.fromDomain(concurso, context.l10n);
     final bloc = context.read<ConcursoDetailsBloc>();
-    return AppPage.scroll(
-      key: PageStorageKey<String>('concurso-${concurso.id}'),
-      headerLeading: ConcursoDetailsHeader(concurso: view),
-      title: view.institution,
-      description: view.organizationAcronym ?? view.role,
-      headerAction: AppButton(
-        label: context.l10n.editarConcurso,
-        icon: AppIcons.edit,
-        variant: AppButtonVariant.outline,
-        onPressed: () => onEditConcurso(concurso),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (state.refreshFailed) ...[
-            AppAlert(
-              title: context.l10n.genericErrorTitle,
-              description: context.l10n.genericErrorMessage,
-              icon: AppIcons.attention,
+    return SafeArea(
+      child: ResponsiveBuilder(
+        builder: (context, windowClass) {
+          final padding = windowClass.isExpanded ? context.tokens.spacing.page : context.tokens.spacing.xl;
+          return SingleChildScrollView(
+            key: PageStorageKey<String>('concurso-${concurso.id}'),
+            padding: EdgeInsets.fromLTRB(
+              padding,
+              padding,
+              padding,
+              context.tokens.spacing.huge,
             ),
-            SizedBox(height: context.tokens.spacing.sm),
-            Align(
-              alignment: Alignment.centerRight,
-              child: AppButton(
-                label: context.l10n.tryAgain,
-                variant: AppButtonVariant.outline,
-                onPressed: () => bloc.add(
-                  const ConcursoDetailsLoadRequested(forceRefresh: true),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: context.tokens.layout.contentMaxWidth,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ConcursoDetailsHeader(concurso: view),
+                    SizedBox(height: context.tokens.spacing.xl),
+                    if (state.refreshFailed) ...[
+                      AppAlert(
+                        title: context.l10n.genericErrorTitle,
+                        description: context.l10n.genericErrorMessage,
+                        icon: AppIcons.attention,
+                      ),
+                      SizedBox(height: context.tokens.spacing.sm),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: AppButton(
+                          label: context.l10n.tryAgain,
+                          variant: AppButtonVariant.outline,
+                          onPressed: () => bloc.add(
+                            const ConcursoDetailsLoadRequested(forceRefresh: true),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: context.tokens.spacing.xl),
+                    ],
+                    EditalOverview(
+                      concurso: concurso,
+                      view: view,
+                      query: state.query,
+                      onQueryChanged: (query) => bloc.add(ConcursoDetailsQueryChanged(query)),
+                      onEditConcurso: () => onEditConcurso(concurso),
+                      onEditEdital: () => onEditEdital(concurso),
+                      onOpenDisciplina: onOpenDisciplina,
+                      onWeightChanged: (disciplina, peso) => onWeightChanged(concurso, disciplina, peso),
+                    ),
+                  ],
                 ),
               ),
             ),
-            SizedBox(height: context.tokens.spacing.xl),
-          ],
-          AppTabs<ConcursoDetailsTab>(
-            initialValue: ConcursoDetailsTab.edital,
-            value: state.tab,
-            onChanged: (tab) => bloc.add(ConcursoDetailsTabChanged(tab)),
-            variant: AppTabsVariant.line,
-            trailing: ConcursoDetailsFacts(concurso: view),
-            items: [
-              AppTabItem(
-                value: ConcursoDetailsTab.edital,
-                label: context.l10n.notice,
-                content: EditalOverview(
-                  concurso: concurso,
-                  query: state.query,
-                  onQueryChanged: (query) => bloc.add(ConcursoDetailsQueryChanged(query)),
-                  onEdit: () => onEditEdital(concurso),
-                  onSeeRole: () => bloc.add(
-                    const ConcursoDetailsTabChanged(ConcursoDetailsTab.informacoes),
-                  ),
-                  onOpenDisciplina: onOpenDisciplina,
-                ),
-              ),
-              AppTabItem(
-                value: ConcursoDetailsTab.informacoes,
-                label: context.l10n.information,
-                content: ConcursoInformation(concurso: view),
-              ),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

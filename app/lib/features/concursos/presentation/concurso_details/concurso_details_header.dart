@@ -52,12 +52,12 @@ class _InlineFact extends StatelessWidget {
       children: [
         TextSpan(
           text: value,
-          style: context.tokens.typography.labelLarge.copyWith(color: context.tokens.colors.onSurface),
+          style: context.tokens.typography.controlLabel,
         ),
       ],
     ),
     maxLines: 1,
-    style: context.tokens.typography.bodySmall.copyWith(color: context.tokens.colors.onSurfaceMuted),
+    style: context.tokens.typography.supportingText,
   );
 }
 

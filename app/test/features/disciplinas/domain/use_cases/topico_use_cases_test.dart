@@ -61,6 +61,24 @@ void main() {
     );
   });
 
+  test('reordena os Tópicos e preserva Revisão de Véspera no final', () async {
+    final useCases = DisciplinasUseCases(
+      FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
+    );
+
+    final result = await useCases.reorderTopicos(
+      disciplineId: 'portugues',
+      topicIds: const ['morfossintaxe', 'interpretacao'],
+    );
+    final catalogResult = await useCases.getDisciplinas();
+
+    expect(result, isA<Sucesso<void>>());
+    expect(
+      _topicos(catalogResult, 'portugues'),
+      ['Domínio da estrutura morfossintática', 'Compreensão e interpretação de textos', nomeTopicoRevisaoVespera],
+    );
+  });
+
   test('exclui o Tópico e mantém os demais no catálogo', () async {
     final useCases = DisciplinasUseCases(
       FakeDisciplinasRepository(disciplinas: disciplinasFixture()),

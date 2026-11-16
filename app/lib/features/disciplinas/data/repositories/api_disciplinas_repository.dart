@@ -70,6 +70,12 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
       _mutate(() => _api.updateTopico(topicId, name), 'Não foi possível atualizar o Tópico.');
 
   @override
+  Future<void> reorderTopicos({required String disciplineId, required List<String> topicIds}) => _mutate(
+    () => _api.reorderTopicos(disciplineId, topicIds),
+    'Não foi possível reordenar os Tópicos.',
+  );
+
+  @override
   Future<void> deleteTopico(String topicId) =>
       _mutate(() => _api.deleteTopico(topicId), 'Não foi possível excluir o Tópico.');
 

@@ -36,7 +36,7 @@ void main() {
     expect(find.byType(EditableText), findsNothing);
     expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
     expect(find.byType(AppBreadcrumbs), findsNothing);
-    expect(find.text('Concursos'), findsOneWidget);
+    expect(find.text('Concursos'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
@@ -90,7 +90,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Exams'), findsOneWidget);
+    expect(find.text('Exams'), findsWidgets);
     await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
     expect(find.text('Subjects'), findsWidgets);

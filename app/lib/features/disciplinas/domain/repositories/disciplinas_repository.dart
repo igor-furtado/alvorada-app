@@ -14,6 +14,8 @@ abstract interface class DisciplinasRepository {
 
   Future<void> updateTopico({required String topicId, required String name});
 
+  Future<void> reorderTopicos({required String disciplineId, required List<String> topicIds});
+
   Future<void> deleteTopico(String topicId);
 }
 

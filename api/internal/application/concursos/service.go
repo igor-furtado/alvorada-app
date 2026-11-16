@@ -3,6 +3,7 @@ package concursos
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ var (
 	ErrHorariosProva       = errors.New("informe início e término válidos, com o término posterior ao início")
 	ErrRequisitosTooLong   = errors.New("os requisitos devem ter no máximo 10.000 caracteres")
 	ErrPontuacaoTooLong    = errors.New("as informações de pontuação devem ter no máximo 10.000 caracteres")
+	ErrPesoDisciplina      = errors.New("o peso da Disciplina deve estar entre 0,01 e 999.999,99, com no máximo duas casas decimais")
 )
 
 type Service struct {
@@ -211,6 +213,14 @@ func (s *Service) Delete(ctx context.Context, id string) error {
 
 func (s *Service) AddDisciplinaToEdital(ctx context.Context, concursoID, disciplinaID string) error {
 	return s.repository.AddDisciplinaToEdital(ctx, concursoID, disciplinaID)
+}
+
+func (s *Service) UpdateDisciplinaPeso(ctx context.Context, concursoID, disciplinaID string, peso float64) error {
+	if peso < 0.01 || peso > 999999.99 || math.IsNaN(peso) || math.IsInf(peso, 0) ||
+		math.Abs(peso-math.Round(peso*100)/100) > 1e-9 {
+		return ErrPesoDisciplina
+	}
+	return s.repository.UpdateDisciplinaPeso(ctx, concursoID, disciplinaID, peso)
 }
 
 func (s *Service) AddTopicoToEdital(ctx context.Context, concursoID, topicoID string) error {

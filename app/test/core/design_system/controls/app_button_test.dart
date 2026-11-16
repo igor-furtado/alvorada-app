@@ -36,6 +36,59 @@ void main() {
 
     expect(buttonHeight, inputHeight);
     expect(buttonHeight, AppTheme.light.extension<AppTokens>()!.layout.inputHeight);
+    expect(buttonHeight, 48);
+  });
+
+  testWidgets('responde no toque para baixo com escala sutil', (tester) async {
+    const buttonKey = ValueKey('press-button');
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: Center(
+            child: AppButton(
+              key: buttonKey,
+              label: 'Continuar',
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(tester.getCenter(find.byKey(buttonKey)));
+    await tester.pump();
+
+    final scale = tester.widget<AnimatedScale>(
+      find.descendant(of: find.byKey(buttonKey), matching: find.byType(AnimatedScale)),
+    );
+    expect(scale.scale, .98);
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('diferencia ações de textos de conteúdo pela tipografia', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: Center(
+            child: AppButton(
+              label: 'Salvar Tópicos',
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('Salvar Tópicos'));
+
+    expect(label.style?.fontSize, 13);
+    expect(label.style?.fontWeight, FontWeight.w600);
+    expect(label.style?.height, 1.15);
+    expect(label.style?.letterSpacing, .3);
   });
 
   testWidgets('mantém a mesma altura dos campos com e sem ícone', (tester) async {

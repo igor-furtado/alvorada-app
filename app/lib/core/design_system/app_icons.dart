@@ -20,6 +20,7 @@ abstract final class AppIcons {
   static const sortAscending = LucideIcons.arrowUpAZ;
   static const sortDescending = LucideIcons.arrowDownAZ;
   static const arrowsDownUp = LucideIcons.arrowDownUp;
+  static const reorder = LucideIcons.gripVertical;
   static const search = LucideIcons.search;
   static const cloud = LucideIcons.cloud;
   static const folderDashed = LucideIcons.folderOpen;

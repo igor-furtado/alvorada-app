@@ -97,17 +97,28 @@ class _DisciplinasViewState extends State<DisciplinasView> {
     child: AppPage.workspace(
       title: context.l10n.contentCatalog,
       description: context.l10n.contentCatalogSubtitle,
-      headerAction: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 480),
-        child: AppSearchField(
-          controller: _searchController,
-          placeholder: context.l10n.searchContent,
-          onChanged: (value) => context.read<DisciplinasListBloc>().add(
-            DisciplinasListSearchChanged(value),
-          ),
+      headerAction: BlocBuilder<DisciplinasListBloc, DisciplinasListState>(
+        buildWhen: (previous, current) => previous.canMutate != current.canMutate,
+        builder: (context, state) => AppButton(
+          label: context.l10n.newDiscipline,
+          icon: AppIcons.add,
+          onPressed: state.canMutate ? () => DisciplinasListActions.add(context) : null,
         ),
       ),
-      child: const _DisciplinasWorkspace(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppSearchField(
+            controller: _searchController,
+            placeholder: context.l10n.searchContent,
+            onChanged: (value) => context.read<DisciplinasListBloc>().add(
+              DisciplinasListSearchChanged(value),
+            ),
+          ),
+          SizedBox(height: context.tokens.spacing.xl),
+          const Expanded(child: _DisciplinasWorkspace()),
+        ],
+      ),
     ),
   );
 }
@@ -131,7 +142,39 @@ class _DisciplinasWorkspace extends StatelessWidget {
         onRenameDiscipline: selected == null ? null : () => DisciplinasListActions.rename(context, selected),
         onDeleteDiscipline: selected == null ? null : () => DisciplinasListActions.delete(context, selected),
       );
-      return AppMasterDetail(master: const DisciplinasListView(), detail: detail);
+      return AppCard(
+        padding: EdgeInsets.zero,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < context.tokens.layout.contentSplit) {
+              return Column(
+                children: [
+                  const SizedBox(
+                    height: 190,
+                    child: AppScrollArea(child: DisciplinasListView()),
+                  ),
+                  const AppDivider(margin: EdgeInsets.zero),
+                  Expanded(child: AppScrollArea(child: detail)),
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(
+                  width: 310,
+                  child: AppScrollArea(child: DisciplinasListView()),
+                ),
+                const AppDivider(
+                  vertical: true,
+                  margin: EdgeInsets.zero,
+                ),
+                Expanded(child: AppScrollArea(child: detail)),
+              ],
+            );
+          },
+        ),
+      );
     },
   );
 }

@@ -42,6 +42,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/arquivamento", h.archiveConcurso)
 	mux.HandleFunc("DELETE /api/v1/concursos/{id}/arquivamento", h.restoreConcurso)
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}", h.addDisciplinaToEdital)
+	mux.HandleFunc("PATCH /api/v1/concursos/{id}/edital/disciplinas/{disciplinaId}/peso", h.updateDisciplinaPeso)
 	mux.HandleFunc("PUT /api/v1/concursos/{id}/edital/topicos/{topicoId}", h.addTopicoToEdital)
 	mux.HandleFunc("DELETE /api/v1/concursos/{id}/edital/topicos/{topicoId}", h.removeTopicoFromEdital)
 	mux.HandleFunc("GET /api/v1/subjects", h.catalog)
@@ -50,6 +51,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("DELETE /api/v1/subjects/{id}", h.deleteSubject)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics", h.createTopic)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics/batch", h.createTopics)
+	mux.HandleFunc("PUT /api/v1/subjects/{id}/topics/order", h.reorderTopics)
 	mux.HandleFunc("PATCH /api/v1/topics/{id}", h.updateTopic)
 	mux.HandleFunc("DELETE /api/v1/topics/{id}", h.deleteTopic)
 	return recovery(h.logger, cors(requestLogger(h.logger, mux)))
@@ -244,6 +246,26 @@ func (h *Handler) addDisciplinaToEdital(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+type disciplinaPesoRequest struct {
+	Peso float64 `json:"peso"`
+}
+
+func (h *Handler) updateDisciplinaPeso(w http.ResponseWriter, r *http.Request) {
+	var body disciplinaPesoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.concursos.UpdateDisciplinaPeso(
+			r.Context(),
+			r.PathValue("id"),
+			r.PathValue("disciplinaId"),
+			body.Peso,
+		)
+	})
+}
+
 func (h *Handler) addTopicoToEdital(w http.ResponseWriter, r *http.Request) {
 	h.runNoContent(w, r, func() error {
 		return h.concursos.AddTopicoToEdital(r.Context(), r.PathValue("id"), r.PathValue("topicoId"))
@@ -302,6 +324,10 @@ type nameRequest struct {
 
 type namesRequest struct {
 	Names []string `json:"nomes"`
+}
+
+type topicOrderRequest struct {
+	TopicIDs []string `json:"topico_ids"`
 }
 
 func (h *Handler) createSubject(w http.ResponseWriter, r *http.Request) {
@@ -368,6 +394,17 @@ func (h *Handler) createTopics(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, map[string]any{})
 }
 
+func (h *Handler) reorderTopics(w http.ResponseWriter, r *http.Request) {
+	var body topicOrderRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.studies.ReorderTopics(r.Context(), r.PathValue("id"), body.TopicIDs)
+	})
+}
+
 func (h *Handler) updateTopic(w http.ResponseWriter, r *http.Request) {
 	h.runUpdateName(w, r, func(name string) error { return h.studies.UpdateTopic(r.Context(), r.PathValue("id"), name) })
 }
@@ -429,13 +466,18 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		errors.Is(err, concursosApplication.ErrHorariosProva) ||
 		errors.Is(err, concursosApplication.ErrRequisitosTooLong) ||
 		errors.Is(err, concursosApplication.ErrPontuacaoTooLong) {
+		// validation errors are reported as a stable client error
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if errors.Is(err, concursosApplication.ErrPesoDisciplina) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrTopicsRequired) ||
 		errors.Is(err, application.ErrNameTooLong) ||
 		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
-		errors.Is(err, domain.ErrMandatoryTopic) {
+		errors.Is(err, domain.ErrMandatoryTopic) || errors.Is(err, domain.ErrInvalidTopicOrder) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}

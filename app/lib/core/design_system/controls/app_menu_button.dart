@@ -75,9 +75,9 @@ class AppMenuButton<T> extends StatelessWidget {
                   ],
                   Text(
                     item.label,
-                    style: context.tokens.typography.labelMedium.copyWith(
-                      color: item.destructive ? context.tokens.colors.errorForeground : context.tokens.colors.onSurface,
-                    ),
+                    style: item.destructive
+                        ? context.tokens.typography.destructiveLabel
+                        : context.tokens.typography.compactLabel,
                   ),
                 ],
               ),

@@ -20,27 +20,30 @@ class AppShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => ResponsiveBuilder(
-    builder: (context, windowClass) => FocusTraversalGroup(
-      child: Scaffold(
-        bottomNavigationBar: windowClass.isCompact
-            ? _CompactNavigation(
-                selectedIndex: navigationShell.currentIndex,
-                onSelected: _select,
-              )
-            : null,
-        body: Row(
-          children: [
-            if (!windowClass.isCompact)
-              _IconRail(
-                selectedIndex: navigationShell.currentIndex,
-                onSelected: _select,
-              ),
-            Expanded(child: navigationShell),
-          ],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final compact = constraints.maxWidth < context.tokens.layout.compact;
+      return FocusTraversalGroup(
+        child: Scaffold(
+          bottomNavigationBar: compact
+              ? _CompactNavigation(
+                  selectedIndex: navigationShell.currentIndex,
+                  onSelected: _select,
+                )
+              : null,
+          body: Row(
+            children: [
+              if (!compact)
+                _IconRail(
+                  selectedIndex: navigationShell.currentIndex,
+                  onSelected: _select,
+                ),
+              Expanded(child: navigationShell),
+            ],
+          ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
 
@@ -82,23 +85,22 @@ class _IconRail extends StatelessWidget {
             SizedBox(height: context.tokens.spacing.md),
             for (var index = 0; index < destinations.length; index++)
               Padding(
-                padding: EdgeInsets.only(bottom: context.tokens.spacing.xxs),
-                child: Semantics(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.tokens.spacing.sm,
+                  vertical: context.tokens.spacing.xxxs,
+                ),
+                child: _RailDestination(
+                  key: ValueKey('shell-destination-$index'),
+                  destination: destinations[index],
                   selected: selectedIndex == index,
-                  child: AppAccessibleIconButton(
-                    key: ValueKey('shell-destination-$index'),
-                    icon: selectedIndex == index ? destinations[index].selectedIcon : destinations[index].icon,
-                    label: destinations[index].label,
-                    selected: selectedIndex == index,
-                    onPressed: () => onSelected(index),
-                  ),
+                  onPressed: () => onSelected(index),
                 ),
               ),
             const Spacer(),
             const AppDivider(margin: EdgeInsets.zero),
             Padding(
               padding: EdgeInsets.symmetric(vertical: context.tokens.spacing.md),
-              child: const _ThemeModeButton(),
+              child: const _AppearanceMenuButton(showLabel: true),
             ),
           ],
         ),
@@ -151,7 +153,7 @@ class _CompactNavigation extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.sm),
-                child: const _ThemeModeButton(),
+                child: const _AppearanceMenuButton(),
               ),
             ],
           ),
@@ -173,18 +175,116 @@ class _BrandMark extends StatelessWidget {
   );
 }
 
-class _ThemeModeButton extends StatelessWidget {
-  const _ThemeModeButton();
+class _RailDestination extends StatefulWidget {
+  const _RailDestination({
+    required this.destination,
+    required this.selected,
+    required this.onPressed,
+    super.key,
+  });
+
+  final _AppDestination destination;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  @override
+  State<_RailDestination> createState() => _RailDestinationState();
+}
+
+class _RailDestinationState extends State<_RailDestination> {
+  var _pressed = false;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    selected: widget.selected,
+    button: true,
+    label: widget.destination.label,
+    onTap: widget.onPressed,
+    excludeSemantics: true,
+    child: Material(
+      color: context.tokens.colors.transparent,
+      child: InkWell(
+        onTap: widget.onPressed,
+        onHighlightChanged: (value) => setState(() => _pressed = value),
+        borderRadius: context.tokens.borders.lg,
+        overlayColor: WidgetStatePropertyAll(context.tokens.colors.transparent),
+        child: AnimatedScale(
+          scale: _pressed && !context.reduceMotion ? .98 : 1,
+          duration: context.motionDuration(context.tokens.motion.fast),
+          child: AnimatedContainer(
+            duration: context.motionDuration(context.tokens.motion.fast),
+            constraints: BoxConstraints(minHeight: context.tokens.layout.inputHeight),
+            padding: EdgeInsets.symmetric(horizontal: context.tokens.spacing.md),
+            decoration: BoxDecoration(
+              color: widget.selected ? context.tokens.colors.surfaceSubtle : context.tokens.colors.transparent,
+              borderRadius: context.tokens.borders.lg,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  widget.selected ? widget.destination.selectedIcon : widget.destination.icon,
+                  size: context.tokens.icons.md,
+                  color: widget.selected ? context.tokens.colors.onSurface : context.tokens.colors.onSurfaceMuted,
+                ),
+                SizedBox(width: context.tokens.spacing.md),
+                Expanded(
+                  child: Text(
+                    widget.destination.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: widget.selected
+                        ? context.tokens.typography.controlLabel
+                        : context.tokens.typography.controlLabelMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+enum _AppearanceChoice { system, light, dark }
+
+class _AppearanceMenuButton extends StatelessWidget {
+  const _AppearanceMenuButton({this.showLabel = false});
+
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final dark = brightness == Brightness.dark;
-    return AppAccessibleIconButton(
+    final controller = AppThemeScope.of(context);
+    return AppMenuButton<_AppearanceChoice>(
       key: const ValueKey('theme-toggle'),
-      icon: dark ? AppIcons.sun : AppIcons.moon,
-      label: dark ? context.l10n.useLightTheme : context.l10n.useDarkTheme,
-      onPressed: () => AppThemeScope.of(context).toggle(brightness),
+      icon: AppIcons.settings,
+      label: context.l10n.appearance,
+      triggerLabel: showLabel ? context.l10n.appearance : null,
+      onSelected: (choice) {
+        controller.mode = switch (choice) {
+          _AppearanceChoice.system => ThemeMode.system,
+          _AppearanceChoice.light => ThemeMode.light,
+          _AppearanceChoice.dark => ThemeMode.dark,
+        };
+      },
+      items: [
+        AppMenuItem(
+          value: _AppearanceChoice.system,
+          label: context.l10n.followSystemTheme,
+          icon: controller.value == ThemeMode.system ? AppIcons.check : null,
+        ),
+        AppMenuItem(
+          value: _AppearanceChoice.light,
+          label: context.l10n.lightTheme,
+          icon: controller.value == ThemeMode.light ? AppIcons.check : AppIcons.sun,
+        ),
+        AppMenuItem(
+          value: _AppearanceChoice.dark,
+          label: context.l10n.darkTheme,
+          icon: controller.value == ThemeMode.dark ? AppIcons.check : AppIcons.moon,
+        ),
+      ],
     );
   }
 }

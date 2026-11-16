@@ -17,13 +17,18 @@ void main() {
         value: useCases,
         child: MaterialApp(
           theme: AppTheme.light,
-          home: const TopicosFormView(disciplineId: 'portugues'),
+          home: const TopicosFormView(
+            disciplineId: 'portugues',
+            disciplineName: 'Língua Portuguesa',
+          ),
         ),
       ),
     );
 
     expect(find.text('Adicionar Tópicos'), findsWidgets);
-    expect(find.textContaining('Digite um Tópico por linha.'), findsOneWidget);
+    expect(find.text('LÍNGUA PORTUGUESA'), findsOneWidget);
+    expect(find.textContaining('Digite ou cole um Tópico por linha.'), findsOneWidget);
+    expect(find.text('0 itens'), findsOneWidget);
 
     await tester.enterText(
       find.byType(TextFormField),
@@ -31,7 +36,12 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.textContaining('2 Tópicos prontos para adicionar.'), findsOneWidget);
+    expect(find.textContaining('Tópicos prontos para adicionar.'), findsNothing);
+    expect(find.text('2 itens'), findsOneWidget);
     expect(find.text('Adicionar 2 Tópicos'), findsOneWidget);
+    expect(find.text('01'), findsOneWidget);
+    expect(find.text('02'), findsOneWidget);
+    expect(find.text('Pontuação'), findsOneWidget);
+    expect(find.text('Concordância'), findsOneWidget);
   });
 }

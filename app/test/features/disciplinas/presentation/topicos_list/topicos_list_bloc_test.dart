@@ -73,6 +73,48 @@ void main() {
       contains('interpretacao'),
     );
   });
+
+  test('reordena de forma otimista e persiste a nova ordem', () async {
+    final repository = FakeDisciplinasRepository(
+      disciplinas: disciplinasFixture(),
+    );
+    final bloc = _bloc(repository);
+    addTearDown(bloc.close);
+    await _load(bloc);
+
+    final reordered = bloc.stream.firstWhere(
+      (state) => state.feedback == TopicosListFeedback.reordered,
+    );
+    bloc.add(const TopicosListReorderRequested(oldIndex: 0, newIndex: 1));
+    final state = await reordered;
+
+    expect(
+      state.items.map((topico) => topico.id),
+      ['morfossintaxe', 'interpretacao', 'revisao-portugues'],
+    );
+    expect(state.items.last.mandatory, isTrue);
+  });
+
+  test('restaura a ordem anterior quando a persistência falha', () async {
+    final repository = FakeDisciplinasRepository(
+      disciplinas: disciplinasFixture(),
+    );
+    final bloc = _bloc(repository);
+    addTearDown(bloc.close);
+    await _load(bloc);
+    repository.failMutation = true;
+
+    final failed = bloc.stream.firstWhere(
+      (state) => state.feedback == TopicosListFeedback.operationFailed,
+    );
+    bloc.add(const TopicosListReorderRequested(oldIndex: 0, newIndex: 1));
+    final state = await failed;
+
+    expect(
+      state.items.map((topico) => topico.id),
+      ['interpretacao', 'morfossintaxe', 'revisao-portugues'],
+    );
+  });
 }
 
 TopicosListBloc _bloc(FakeDisciplinasRepository repository) {
@@ -80,6 +122,7 @@ TopicosListBloc _bloc(FakeDisciplinasRepository repository) {
   return TopicosListBloc(
     getDisciplinas: useCases.getDisciplinas,
     deleteTopico: useCases.deleteTopico,
+    reorderTopicos: useCases.reorderTopicos,
   );
 }
 

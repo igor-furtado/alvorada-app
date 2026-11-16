@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -90,9 +92,66 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
   final _horarioFimFocus = FocusNode();
   late RegimeContratacao? _regimeContratacao = widget.concurso?.regimeContratacao;
   late var _prioritario = widget.concurso?.prioritario ?? false;
+  var _dirty = false;
+  var _allowPop = false;
+  var _confirmingDiscard = false;
+
+  List<TextEditingController> get _controllers => [
+    _instituicao,
+    _sigla,
+    _cargo,
+    _banca,
+    _dataProva,
+    _quantidadeVagas,
+    _vencimento,
+    _cargaHoraria,
+    _localProva,
+    _horarioInicio,
+    _horarioFim,
+    _requisitos,
+    _criteriosPontuacao,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    for (final controller in _controllers) {
+      controller.addListener(_markDirty);
+    }
+  }
+
+  void _markDirty() {
+    if (_dirty) return;
+    setState(() => _dirty = true);
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_dirty || _allowPop) return true;
+    if (_confirmingDiscard || !mounted) return false;
+    _confirmingDiscard = true;
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AppAlertDialog(
+        title: context.l10n.unsavedChangesTitle,
+        description: context.l10n.unsavedChangesDescription,
+        cancelLabel: context.l10n.keepEditing,
+        actionLabel: context.l10n.discardChanges,
+        destructive: true,
+        onCancel: () => Navigator.pop(dialogContext, false),
+        onAction: () => Navigator.pop(dialogContext, true),
+      ),
+    );
+    _confirmingDiscard = false;
+    if (discard != true || !mounted) return false;
+    setState(() => _allowPop = true);
+    return true;
+  }
 
   @override
   void dispose() {
+    for (final controller in _controllers) {
+      controller.removeListener(_markDirty);
+    }
     _instituicao.dispose();
     _sigla.dispose();
     _cargo.dispose();
@@ -121,7 +180,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
   Widget build(BuildContext context) => BlocConsumer<ConcursosFormBloc, ConcursosFormState>(
     listenWhen: (previous, current) =>
         previous.status != current.status && current.status == ConcursosFormStatus.success,
-    listener: (context, state) => Navigator.pop(context, true),
+    listener: (context, state) {
+      _allowPop = true;
+      Navigator.pop(context, true);
+    },
     builder: (context, state) => AppForm(
       firstInvalidFocusNode: () {
         if (_instituicao.text.trim().isEmpty) return _instituicaoFocus;
@@ -174,6 +236,11 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             description: context.l10n.tryAgainLater,
             icon: AppIcons.attention,
           ),
+        _FormSectionHeader(
+          title: context.l10n.concursoIdentificationSection,
+          description: context.l10n.concursoIdentificationSectionDescription,
+          first: true,
+        ),
         AppField(
           label: context.l10n.institution,
           required: true,
@@ -206,6 +273,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
           label: context.l10n.board,
           control: AppTextInput(controller: _banca, semanticLabel: context.l10n.board),
         ),
+        _FormSectionHeader(
+          title: context.l10n.concursoConditionsSection,
+          description: context.l10n.concursoConditionsSectionDescription,
+        ),
         AppField(
           label: context.l10n.hiringRegime,
           control: AppCombobox<RegimeContratacao>(
@@ -223,6 +294,7 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             showClear: true,
             disabled: submitting,
             onChanged: (value) => setState(() {
+              _dirty = true;
               _regimeContratacao = value;
             }),
           ),
@@ -262,6 +334,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             validator: (value) => ConcursosFormValidators.weeklyWorkload(value, context.l10n),
             semanticLabel: context.l10n.weeklyWorkload,
           ),
+        ),
+        _FormSectionHeader(
+          title: context.l10n.concursoExamSection,
+          description: context.l10n.concursoExamSectionDescription,
         ),
         AppField(
           label: context.l10n.examDate,
@@ -325,6 +401,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             semanticLabel: context.l10n.examLocation,
           ),
         ),
+        _FormSectionHeader(
+          title: context.l10n.concursoAdditionalSection,
+          description: context.l10n.concursoAdditionalSectionDescription,
+        ),
         AppField(
           label: context.l10n.requirements,
           description: context.l10n.requirementsHelp,
@@ -357,7 +437,10 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             onChanged: submitting
                 ? null
                 : (value) => setState(
-                    () => _prioritario = value ?? false,
+                    () {
+                      _dirty = true;
+                      _prioritario = value ?? false;
+                    },
                   ),
           ),
         ),
@@ -368,12 +451,42 @@ class _ConcursosFormContentState extends State<_ConcursosFormContent> {
             ? context.l10n.novoConcursoDescription
             : context.l10n.editarConcursoDescription,
         dismissible: !submitting,
+        onDismissRequested: _confirmDiscard,
         primaryLabel: widget.concurso == null ? context.l10n.criarConcurso : context.l10n.saveChanges,
         onPrimary: submit,
         loading: submitting,
         child: content,
       ),
     ),
+  );
+}
+
+class _FormSectionHeader extends StatelessWidget {
+  const _FormSectionHeader({
+    required this.title,
+    required this.description,
+    this.first = false,
+  });
+
+  final String title;
+  final String description;
+  final bool first;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (!first) ...[
+        const AppDivider(margin: EdgeInsets.zero),
+        SizedBox(height: context.tokens.spacing.sm),
+      ],
+      Text(title, style: context.tokens.typography.titleSmall),
+      SizedBox(height: context.tokens.spacing.xxs),
+      Text(
+        description,
+        style: context.tokens.typography.supportingText,
+      ),
+    ],
   );
 }
 

@@ -6,6 +6,7 @@ const MandatoryReviewTopicName = "Revisão de Véspera"
 
 var ErrMandatoryTopic = errors.New("o Tópico Revisão de Véspera é obrigatório e não pode ser alterado ou excluído")
 var ErrContentLinked = errors.New("o conteúdo está vinculado a um Edital e não pode ser excluído")
+var ErrInvalidTopicOrder = errors.New("a ordem deve conter todos os Tópicos editáveis da Disciplina uma única vez")
 
 type Difficulty int
 

@@ -1,8 +1,11 @@
 import 'package:estudos_app/core/design_system/design_system.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../disciplinas_list/disciplinas_list_state.dart';
 import 'topicos_list_actions.dart';
+import 'topicos_list_bloc.dart';
+import 'topicos_list_event.dart';
 import 'topicos_list_header.dart';
 import 'topicos_list_item.dart';
 import 'topicos_list_state.dart';
@@ -30,9 +33,12 @@ class TopicosListPanel extends StatelessWidget {
     final disciplineId = state.disciplineId!;
     final normalizedQuery = query.trim().toLowerCase();
     final disciplineMatches = disciplina.name.toLowerCase().contains(normalizedQuery);
-    final items = normalizedQuery.isEmpty || disciplineMatches
+    final visibleItems = normalizedQuery.isEmpty || disciplineMatches
         ? state.items
         : state.items.where((item) => item.name.toLowerCase().contains(normalizedQuery)).toList(growable: false);
+    final regularItems = visibleItems.where((item) => !item.mandatory).toList(growable: false);
+    final mandatoryItems = visibleItems.where((item) => item.mandatory).toList(growable: false);
+    final canReorder = state.canMutate && normalizedQuery.isEmpty && regularItems.length > 1;
     return Padding(
       padding: EdgeInsets.all(context.tokens.spacing.xxl),
       child: Column(
@@ -42,25 +48,57 @@ class TopicosListPanel extends StatelessWidget {
             disciplina: disciplina,
             canAdd: state.canMutate,
             canMutateDiscipline: canMutateDiscipline,
-            onAdd: () => TopicosListActions.add(context, disciplineId),
+            onAdd: () => TopicosListActions.add(
+              context,
+              disciplineId,
+              disciplina.name,
+            ),
             onRenameDiscipline: onRenameDiscipline,
             onDeleteDiscipline: onDeleteDiscipline,
           ),
           SizedBox(height: context.tokens.spacing.lg),
           const AppDivider(margin: EdgeInsets.zero),
-          for (var index = 0; index < items.length; index++) ...[
-            TopicoListItem(
-              index: index + 1,
-              topico: items[index],
-              canMutate: state.canMutate && !items[index].mandatory,
-              onRename: () => TopicosListActions.rename(
-                context,
-                disciplineId,
-                items[index],
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            buildDefaultDragHandles: false,
+            itemCount: regularItems.length,
+            onReorderItem: (oldIndex, newIndex) => context.read<TopicosListBloc>().add(
+              TopicosListReorderRequested(
+                oldIndex: oldIndex,
+                newIndex: newIndex,
               ),
-              onDelete: () => TopicosListActions.delete(context, items[index]),
             ),
-            if (index < items.length - 1) const AppDivider(margin: EdgeInsets.zero),
+            itemBuilder: (context, index) => Column(
+              key: ValueKey('topic-${regularItems[index].id}'),
+              children: [
+                TopicoListItem(
+                  index: index + 1,
+                  reorderIndex: canReorder ? index : null,
+                  topico: regularItems[index],
+                  canMutate: state.canMutate,
+                  onRename: () => TopicosListActions.rename(
+                    context,
+                    disciplineId,
+                    disciplina.name,
+                    regularItems[index],
+                  ),
+                  onDelete: () => TopicosListActions.delete(context, regularItems[index]),
+                ),
+                const AppDivider(margin: EdgeInsets.zero),
+              ],
+            ),
+          ),
+          for (var index = 0; index < mandatoryItems.length; index++) ...[
+            TopicoListItem(
+              key: ValueKey('topic-${mandatoryItems[index].id}'),
+              index: regularItems.length + index + 1,
+              topico: mandatoryItems[index],
+              canMutate: false,
+              onRename: () {},
+              onDelete: () {},
+            ),
+            if (index < mandatoryItems.length - 1) const AppDivider(margin: EdgeInsets.zero),
           ],
         ],
       ),

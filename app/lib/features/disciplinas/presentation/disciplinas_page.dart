@@ -31,6 +31,7 @@ class DisciplinasPage extends StatelessWidget {
           create: (_) => TopicosListBloc(
             getDisciplinas: useCases.getDisciplinas,
             deleteTopico: useCases.deleteTopico,
+            reorderTopicos: useCases.reorderTopicos,
           ),
         ),
       ],

@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../app_tokens.dart';
 import '../controls/app_button.dart';
+import '../layout/app_responsive.dart';
 
 class AppAlertDialog extends StatelessWidget {
   const AppAlertDialog({
@@ -35,18 +36,20 @@ class AppAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final compactViewport = MediaQuery.sizeOf(context).width < tokens.layout.toolbar;
+    final stackedActions = compactViewport || cancelLabel.length + actionLabel.length > 28;
     final centered = compactViewport;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: tokens.overlayBackdropBlur,
-            sigmaY: tokens.overlayBackdropBlur,
+        if (!context.reduceTransparency)
+          BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: tokens.overlayBackdropBlur,
+              sigmaY: tokens.overlayBackdropBlur,
+            ),
+            child: ColoredBox(color: tokens.colors.transparent),
           ),
-          child: ColoredBox(color: tokens.colors.transparent),
-        ),
         Dialog(
           backgroundColor: tokens.colors.transparent,
           surfaceTintColor: tokens.colors.transparent,
@@ -70,8 +73,8 @@ class AppAlertDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: tokens.colors.popover,
                     border: Border.all(
-                      color: tokens.colors.border,
-                      width: tokens.borders.widthHairline,
+                      color: context.highContrast ? tokens.colors.onSurface : tokens.colors.border,
+                      width: context.highContrast ? tokens.borders.widthStrong : tokens.borders.widthHairline,
                     ),
                     borderRadius: tokens.borders.xl,
                   ),
@@ -101,7 +104,7 @@ class AppAlertDialog extends StatelessWidget {
                         actionLabel: actionLabel,
                         onCancel: onCancel,
                         onAction: onAction,
-                        stacked: compactViewport,
+                        stacked: stackedActions,
                         destructive: destructive,
                         loading: loading,
                       ),
@@ -201,10 +204,7 @@ class _AppAlertDialogText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final descriptionStyle = tokens.typography.bodySmall.copyWith(
-      color: tokens.colors.onSurfaceMuted,
-      letterSpacing: 0,
-    );
+    final descriptionStyle = tokens.typography.dialogDescription;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

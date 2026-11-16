@@ -15,6 +15,7 @@ class FakeConcursosRepository implements ConcursosRepository {
   bool failSynchronization = false;
   int loadCalls = 0;
   int addDisciplinaCalls = 0;
+  int updateDisciplinaPesoCalls = 0;
   int addTopicoCalls = 0;
   int removeTopicoCalls = 0;
   Completer<void>? editalMutationGate;
@@ -127,6 +128,32 @@ class FakeConcursosRepository implements ConcursosRepository {
   }
 
   @override
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  }) async {
+    updateDisciplinaPesoCalls++;
+    await editalMutationGate?.future;
+    _throwIfMutationFails();
+    _replace(
+      concursoId,
+      (item) => _copy(
+        item,
+        disciplinas: [
+          for (final disciplina in item.disciplinas)
+            DisciplinaEdital(
+              id: disciplina.id,
+              nome: disciplina.nome,
+              peso: disciplina.id == disciplinaId ? peso : disciplina.peso,
+              topicos: disciplina.topicos,
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) async {
     removeTopicoCalls++;
     await editalMutationGate?.future;
@@ -158,7 +185,7 @@ class FakeConcursosRepository implements ConcursosRepository {
   }
 }
 
-Concurso _copy(Concurso source, {bool? prioritario}) => Concurso(
+Concurso _copy(Concurso source, {bool? prioritario, List<DisciplinaEdital>? disciplinas}) => Concurso(
   id: source.id,
   instituicao: source.instituicao,
   cargo: source.cargo,
@@ -176,7 +203,7 @@ Concurso _copy(Concurso source, {bool? prioritario}) => Concurso(
   horarioFimProva: source.horarioFimProva,
   requisitos: source.requisitos,
   criteriosPontuacao: source.criteriosPontuacao,
-  disciplinas: source.disciplinas,
+  disciplinas: disciplinas ?? source.disciplinas,
 );
 
 List<Concurso> concursosFixture() => [

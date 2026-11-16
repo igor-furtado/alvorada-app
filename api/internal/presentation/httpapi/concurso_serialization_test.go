@@ -101,10 +101,35 @@ func TestUpdateConcursoAcceptsPortugueseFields(t *testing.T) {
 	}
 }
 
+func TestUpdateDisciplinaPesoAcceptsDecimalValue(t *testing.T) {
+	repository := &concursoSerializationRepository{}
+	handler := NewHandler(
+		nil,
+		application.NewService(repository),
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(
+		http.MethodPatch,
+		"/api/v1/concursos/concurso-1/edital/disciplinas/disciplina-1/peso",
+		strings.NewReader(`{"peso":2.5}`),
+	)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusNoContent, response.Body.String())
+	}
+	if repository.peso != 2.5 {
+		t.Fatalf("peso = %v, want 2.5", repository.peso)
+	}
+}
+
 type concursoSerializationRepository struct {
 	items   []domain.Concurso
 	created domain.CreateConcursoInput
 	updated domain.UpdateConcursoInput
+	peso    float64
 }
 
 func (r *concursoSerializationRepository) FindActive(context.Context) ([]domain.Concurso, error) {
@@ -123,6 +148,10 @@ func (r *concursoSerializationRepository) Archive(context.Context, string) error
 func (r *concursoSerializationRepository) Restore(context.Context, string) error        { return nil }
 func (r *concursoSerializationRepository) Delete(context.Context, string) error         { return nil }
 func (r *concursoSerializationRepository) AddDisciplinaToEdital(context.Context, string, string) error {
+	return nil
+}
+func (r *concursoSerializationRepository) UpdateDisciplinaPeso(_ context.Context, _, _ string, peso float64) error {
+	r.peso = peso
 	return nil
 }
 func (r *concursoSerializationRepository) AddTopicoToEdital(context.Context, string, string) error {

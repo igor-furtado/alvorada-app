@@ -5,20 +5,18 @@ import '../../accessibility/app_accessibility.dart';
 import '../app_tokens.dart';
 import '../design_system_localizations.dart';
 
-typedef AppFormBuilder =
-    Widget Function(
-      BuildContext context,
-      bool submitting,
-      VoidCallback submit,
-      Widget content,
-    );
+typedef AppFormBuilder = Widget Function(
+  BuildContext context,
+  bool submitting,
+  VoidCallback submit,
+  Widget content,
+);
 
-typedef AppFormContentBuilder =
-    List<Widget> Function(
-      BuildContext context,
-      bool submitting,
-      VoidCallback submit,
-    );
+typedef AppFormContentBuilder = List<Widget> Function(
+  BuildContext context,
+  bool submitting,
+  VoidCallback submit,
+);
 
 class AppForm extends StatefulWidget {
   const AppForm({
@@ -78,7 +76,7 @@ class _AppFormState extends State<AppForm> {
           if (widget.title != null) SizedBox(height: tokens.spacing.xxs),
           Text(
             widget.description!,
-            style: tokens.typography.bodySmall.copyWith(color: tokens.colors.onSurfaceMuted),
+            style: tokens.typography.supportingText,
           ),
         ],
         if (widget.title != null || widget.description != null) SizedBox(height: spacing),

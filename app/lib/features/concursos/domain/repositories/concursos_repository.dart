@@ -18,6 +18,12 @@ abstract interface class ConcursosRepository {
 
   Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId});
 
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  });
+
   Future<void> addTopicoToEdital({required String concursoId, required String topicoId});
 
   Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId});

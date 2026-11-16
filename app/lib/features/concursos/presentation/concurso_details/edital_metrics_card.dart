@@ -109,7 +109,7 @@ class _MetricPanel extends StatelessWidget {
           SizedBox(height: context.tokens.spacing.sm),
           Text(
             description,
-            style: context.tokens.typography.bodyMedium.copyWith(color: context.tokens.colors.onSurfaceMuted),
+            style: context.tokens.typography.description,
           ),
           SizedBox(height: context.tokens.spacing.xl),
           const AppDivider(margin: EdgeInsets.zero),
@@ -137,7 +137,7 @@ class _MetricRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: context.tokens.typography.bodyMedium.copyWith(color: context.tokens.colors.onSurfaceMuted),
+            style: context.tokens.typography.description,
           ),
         ),
         Text(value?.toString() ?? '—', style: context.tokens.typography.titleMedium),

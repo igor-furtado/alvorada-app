@@ -99,6 +99,30 @@ func TestCreateTopicsAcceptsBatchAndPreservesOrder(t *testing.T) {
 	}
 }
 
+func TestReorderTopicsAcceptsPortugueseJSONFields(t *testing.T) {
+	repository := &serializationRepository{}
+	handler := NewHandler(
+		application.NewService(repository),
+		nil,
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(
+		http.MethodPut,
+		"/api/v1/subjects/disciplina-1/topics/order",
+		strings.NewReader(`{"topico_ids":["topico-2","topico-1"]}`),
+	)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusNoContent, response.Body.String())
+	}
+	if len(repository.reorderedTopics) != 2 || repository.reorderedTopics[0] != "topico-2" {
+		t.Fatalf("reordered topics = %#v", repository.reorderedTopics)
+	}
+}
+
 func TestErrorResponseUsesPortugueseField(t *testing.T) {
 	handler := NewHandler(
 		application.NewService(&serializationRepository{}),
@@ -159,6 +183,7 @@ type serializationRepository struct {
 	catalog          []domain.Subject
 	createdSubject   domain.CreateSubjectInput
 	createdTopics    []string
+	reorderedTopics  []string
 	deleteTopicError error
 }
 
@@ -179,6 +204,11 @@ func (r *serializationRepository) DeleteSubject(context.Context, string) error {
 
 func (r *serializationRepository) CreateTopics(_ context.Context, _ string, names []string) error {
 	r.createdTopics = names
+	return nil
+}
+
+func (r *serializationRepository) ReorderTopics(_ context.Context, _ string, topicIDs []string) error {
+	r.reorderedTopics = topicIDs
 	return nil
 }
 

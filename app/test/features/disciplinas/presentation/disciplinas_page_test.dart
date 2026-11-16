@@ -25,8 +25,15 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
       await tester.pumpAndSettle();
 
+      expect(find.text('Catálogo de Disciplinas'), findsOneWidget, reason: 'largura $width');
+      expect(find.text('Nova Disciplina'), findsOneWidget, reason: 'largura $width');
       expect(find.text('Direito Tributário'), findsWidgets, reason: 'largura $width');
+      if (width == 390) {
+        expect(find.byType(NavigationBar), findsOneWidget);
+        expect(find.byKey(const ValueKey('compact-master-detail-back')), findsNothing);
+      }
       expect(find.text('Obrigação tributária'), findsOneWidget, reason: 'largura $width');
+      expect(find.byTooltip('Arraste para reordenar'), findsNWidgets(2), reason: 'largura $width');
       expect(find.text('Revisão de Véspera'), findsOneWidget, reason: 'largura $width');
       expect(tester.takeException(), isNull, reason: 'largura $width');
     }
@@ -40,6 +47,7 @@ Disciplina _disciplina() => Disciplina(
   color: '#2563EB',
   topics: [
     Topico(id: 'obrigacao', name: 'Obrigação tributária', mandatory: false),
+    Topico(id: 'credito', name: 'Crédito tributário', mandatory: false),
     Topico(id: 'revisao', name: nomeTopicoRevisaoVespera, mandatory: true),
   ],
 );

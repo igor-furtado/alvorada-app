@@ -12,12 +12,6 @@ final class EditalEditorRetried extends EditalEditorEvent {
   const EditalEditorRetried();
 }
 
-final class EditalEditorDisciplinaAdded extends EditalEditorEvent {
-  const EditalEditorDisciplinaAdded(this.disciplina);
-
-  final Disciplina disciplina;
-}
-
 final class EditalEditorTopicoToggled extends EditalEditorEvent {
   const EditalEditorTopicoToggled(this.topico);
 
@@ -27,17 +21,22 @@ final class EditalEditorTopicoToggled extends EditalEditorEvent {
 final class EditalEditorDisciplinaSelected extends EditalEditorEvent {
   const EditalEditorDisciplinaSelected(this.disciplinaId);
 
-  final String? disciplinaId;
+  final String disciplinaId;
 }
 
-final class EditalEditorDisciplinaSearched extends EditalEditorEvent {
-  const EditalEditorDisciplinaSearched(this.query);
+final class EditalEditorDisciplinaSelectionChanged extends EditalEditorEvent {
+  const EditalEditorDisciplinaSelectionChanged({required this.disciplina, required this.selected});
 
-  final String query;
+  final Disciplina disciplina;
+  final bool selected;
 }
 
 final class EditalEditorTopicoSearched extends EditalEditorEvent {
   const EditalEditorTopicoSearched(this.query);
 
   final String query;
+}
+
+final class EditalEditorSaved extends EditalEditorEvent {
+  const EditalEditorSaved();
 }

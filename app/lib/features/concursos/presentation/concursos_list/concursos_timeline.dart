@@ -74,9 +74,7 @@ class ConcursosTimeline extends StatelessWidget {
               Expanded(
                 child: Text(
                   nearestDays == null ? context.l10n.nextExamDateUndefined : context.l10n.nextExamIn(nearestDays),
-                  style: context.tokens.typography.bodySmall.copyWith(
-                    color: context.tokens.colors.onSurfaceMuted,
-                  ),
+                  style: context.tokens.typography.supportingText,
                 ),
               ),
             ],

@@ -26,6 +26,13 @@ extension AppResponsiveContext on BuildContext {
 
   bool get reduceMotion => MediaQuery.disableAnimationsOf(this);
 
+  bool get highContrast => MediaQuery.highContrastOf(this);
+
+  /// Flutter ainda não expõe `prefers-reduced-transparency` em todas as
+  /// plataformas. Alto contraste é a preferência do sistema mais próxima e
+  /// recebe uma superfície sólida, sem blur.
+  bool get reduceTransparency => highContrast;
+
   Duration motionDuration(Duration duration) => reduceMotion ? Duration.zero : duration;
 }
 

@@ -1,11 +1,6 @@
-import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 abstract final class AppTypography {
-  static const displayFamily = 'Geist';
-  static const bodyFamily = 'Geist';
-  static const labelFamily = 'Geist';
-
   static const trackingTightest = -1.0;
   static const trackingTighter = -0.7;
   static const trackingTight = -0.4;
@@ -17,111 +12,95 @@ abstract final class AppTypography {
   static const trackingWider = 0.3;
   static const trackingWidest = 0.4;
 
-  static const leadingCompact = 1.2;
-
   static TextTheme textTheme(Color primary, Color secondary) => TextTheme(
-    displayLarge: GoogleFonts.getFont(
-      displayFamily,
+    displayLarge: TextStyle(
       fontSize: 48,
       fontWeight: FontWeight.w600,
       height: 1.08,
       letterSpacing: trackingTightest,
       color: primary,
     ),
-    displayMedium: GoogleFonts.getFont(
-      displayFamily,
+    displayMedium: TextStyle(
       fontSize: 36,
       fontWeight: FontWeight.w600,
       height: 1.1,
       letterSpacing: trackingTighter,
       color: primary,
     ),
-    headlineLarge: GoogleFonts.getFont(
-      displayFamily,
+    headlineLarge: TextStyle(
       fontSize: 30,
       fontWeight: FontWeight.w600,
       height: 1.15,
       letterSpacing: trackingTight,
       color: primary,
     ),
-    headlineMedium: GoogleFonts.getFont(
-      displayFamily,
+    headlineMedium: TextStyle(
       fontSize: 24,
       fontWeight: FontWeight.w600,
       height: 1.18,
       letterSpacing: trackingSlight,
       color: primary,
     ),
-    headlineSmall: GoogleFonts.getFont(
-      displayFamily,
+    headlineSmall: TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w600,
       height: 1.2,
       color: primary,
     ),
-    titleLarge: GoogleFonts.getFont(
-      labelFamily,
+    titleLarge: TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w600,
       height: 1.25,
       letterSpacing: trackingSubtle,
       color: primary,
     ),
-    titleMedium: GoogleFonts.getFont(
-      labelFamily,
+    titleMedium: TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w600,
       height: 1.3,
       color: primary,
     ),
-    titleSmall: GoogleFonts.getFont(
-      labelFamily,
+    titleSmall: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w600,
       height: 1.35,
       letterSpacing: trackingRelaxed,
       color: primary,
     ),
-    bodyLarge: GoogleFonts.getFont(
-      bodyFamily,
+    bodyLarge: TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w400,
       height: 1.55,
       color: primary,
     ),
-    bodyMedium: GoogleFonts.getFont(
-      bodyFamily,
+    bodyMedium: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       height: 1.5,
       color: primary,
     ),
-    bodySmall: GoogleFonts.getFont(
-      bodyFamily,
+    bodySmall: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       height: 1.45,
       letterSpacing: trackingRelaxed,
       color: secondary,
     ),
-    labelLarge: GoogleFonts.getFont(
-      labelFamily,
+    labelLarge: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
       height: 1.2,
       letterSpacing: trackingWide,
       color: primary,
     ),
-    labelMedium: GoogleFonts.getFont(
-      labelFamily,
+    labelMedium: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w500,
       height: 1.2,
       letterSpacing: trackingWider,
       color: secondary,
     ),
-    labelSmall: GoogleFonts.getFont(
-      labelFamily,
+    labelSmall: TextStyle(
       fontSize: 11,
       fontWeight: FontWeight.w500,
       height: 1.25,

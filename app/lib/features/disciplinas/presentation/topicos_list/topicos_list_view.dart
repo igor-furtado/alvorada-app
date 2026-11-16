@@ -33,7 +33,8 @@ class TopicosListView extends StatelessWidget {
         previous.status != current.status ||
         previous.disciplineId != current.disciplineId ||
         !listEquals(previous.items, current.items) ||
-        previous.isDeleting != current.isDeleting,
+        previous.isDeleting != current.isDeleting ||
+        previous.isReordering != current.isReordering,
     builder: (context, state) => switch (state.status) {
       TopicosListStatus.initial => _empty(context),
       TopicosListStatus.loading => AppSkeleton(
@@ -76,6 +77,7 @@ void _showFeedback(BuildContext context, TopicosListFeedback feedback) {
     TopicosListFeedback.created => (context.l10n.topicCreated, AppToastVariant.success),
     TopicosListFeedback.renamed => (context.l10n.topicUpdated, AppToastVariant.success),
     TopicosListFeedback.deleted => (context.l10n.topicDeleted, AppToastVariant.success),
+    TopicosListFeedback.reordered => (context.l10n.topicsReordered, AppToastVariant.success),
     TopicosListFeedback.synchronizationPending => (
       context.l10n.contentSavedSyncPending,
       AppToastVariant.info,

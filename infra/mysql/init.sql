@@ -91,6 +91,21 @@ CREATE TABLE IF NOT EXISTS concursos_topicos (
   INDEX idx_concursos_topicos_topico (topico_id, concurso_id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS concursos_disciplinas (
+  concurso_id CHAR(36) NOT NULL,
+  disciplina_id CHAR(36) NOT NULL,
+  peso DECIMAL(8,2) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (concurso_id, disciplina_id),
+  CONSTRAINT fk_concurso_disciplina_concurso FOREIGN KEY (concurso_id)
+    REFERENCES concursos(id) ON DELETE CASCADE,
+  CONSTRAINT fk_concurso_disciplina_disciplina FOREIGN KEY (disciplina_id)
+    REFERENCES disciplinas(id) ON DELETE RESTRICT,
+  CONSTRAINT chk_concurso_disciplina_peso CHECK (peso IS NULL OR peso > 0),
+  INDEX idx_concursos_disciplinas_disciplina (disciplina_id, concurso_id)
+) ENGINE=InnoDB;
+
 -- Mantém bancos locais criados antes da invariável de produto coerentes ao
 -- reaplicar este esquema manualmente.
 INSERT INTO topicos (id, disciplina_id, nome)

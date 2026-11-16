@@ -56,6 +56,12 @@ class _AppButtonState extends State<AppButton> {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final palette = _AppButtonPalette.resolve(context, widget.variant);
+    final labelStyle = switch (widget.variant) {
+      AppButtonVariant.primary => tokens.typography.buttonPrimary,
+      AppButtonVariant.secondary || AppButtonVariant.outline => tokens.typography.button,
+      AppButtonVariant.text => tokens.typography.buttonAction,
+      AppButtonVariant.destructive => tokens.typography.buttonDestructive,
+    };
     final background = _pressed || _hovered ? palette.interactiveBackground : palette.background;
     final horizontalPadding = (tokens.spacing.sm + tokens.spacing.md) / 2;
     final leading = widget.loading
@@ -91,9 +97,7 @@ class _AppButtonState extends State<AppButton> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: tokens.typography.button.copyWith(
-                color: palette.foreground,
-              ),
+              style: labelStyle,
             ),
           ),
         ],
@@ -124,25 +128,30 @@ class _AppButtonState extends State<AppButton> {
           mouseCursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
           overlayColor: WidgetStatePropertyAll(tokens.colors.transparent),
           splashFactory: NoSplash.splashFactory,
-          child: Opacity(
-            opacity: _enabled ? 1 : tokens.opacity.disabled,
-            child: AnimatedContainer(
-              duration: context.motionDuration(tokens.motion.fast),
-              curve: tokens.motion.standard,
-              constraints: BoxConstraints(minHeight: tokens.layout.inputHeight),
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: tokens.spacing.xxs,
-              ),
-              decoration: BoxDecoration(
-                color: background,
-                border: Border.all(
-                  color: _focused ? tokens.colors.focusRing : palette.border,
-                  width: _focused ? tokens.borders.widthStrong : tokens.borders.widthHairline,
+          child: AnimatedScale(
+            scale: _pressed && _enabled && !context.reduceMotion ? .98 : 1,
+            duration: context.motionDuration(tokens.motion.fast),
+            curve: tokens.motion.enter,
+            child: Opacity(
+              opacity: _enabled ? 1 : tokens.opacity.disabled,
+              child: AnimatedContainer(
+                duration: context.motionDuration(tokens.motion.fast),
+                curve: tokens.motion.standard,
+                constraints: BoxConstraints(minHeight: tokens.layout.inputHeight),
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: tokens.spacing.xxs,
                 ),
-                borderRadius: tokens.borders.lg,
+                decoration: BoxDecoration(
+                  color: background,
+                  border: Border.all(
+                    color: _focused ? tokens.colors.focusRing : palette.border,
+                    width: _focused ? tokens.borders.widthStrong : tokens.borders.widthHairline,
+                  ),
+                  borderRadius: tokens.borders.lg,
+                ),
+                child: content,
               ),
-              child: content,
             ),
           ),
         ),

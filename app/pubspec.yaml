@@ -39,7 +39,6 @@ dependencies:
   flutter_svg: ^2.3.2
 
   go_router: ^18.1.3
-  google_fonts: ^8.2.1
   http: ^1.6.0
   intl: any
   lucide_icons_flutter: ^4.0.3

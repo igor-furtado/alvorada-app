@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -21,6 +22,11 @@ class AppDrawer extends StatelessWidget {
     this.onPrimary,
     this.loading = false,
     this.dismissible = true,
+    this.onDismissRequested,
+    this.width,
+    this.scrollable = true,
+    this.bodyPadding,
+    this.footer,
     super.key,
   });
 
@@ -32,6 +38,17 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onPrimary;
   final bool loading;
   final bool dismissible;
+  final Future<bool> Function()? onDismissRequested;
+  final double? width;
+  final bool scrollable;
+  final EdgeInsetsGeometry? bodyPadding;
+  final Widget? footer;
+
+  Future<void> _requestDismiss(BuildContext context) async {
+    if (!dismissible) return;
+    final allowed = await onDismissRequested?.call() ?? true;
+    if (allowed && context.mounted) Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,19 +65,22 @@ class AppDrawer extends StatelessWidget {
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          if (dismissible) Navigator.maybePop(context);
+          if (dismissible) unawaited(_requestDismiss(context));
         },
       },
       child: Focus(
         autofocus: true,
         child: PopScope(
-          canPop: dismissible,
+          canPop: dismissible && onDismissRequested == null,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop && dismissible) unawaited(_requestDismiss(context));
+          },
           child: LayoutBuilder(
             builder: (context, constraints) {
               final viewport = MediaQuery.sizeOf(context);
               final width = constraints.hasBoundedWidth ? constraints.maxWidth : viewport.width;
               final height = constraints.hasBoundedHeight ? constraints.maxHeight : viewport.height;
-              final panelWidth = math.min(width, tokens.layout.drawerWidth);
+              final panelWidth = math.min(width, this.width ?? tokens.layout.drawerWidth);
               final panel = Semantics(
                 scopesRoute: true,
                 namesRoute: true,
@@ -74,20 +94,33 @@ class AppDrawer extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
                       color: tokens.colors.popover,
-                      border: Border(left: BorderSide(color: tokens.colors.border)),
+                      border: Border(
+                        left: BorderSide(
+                          color: context.highContrast ? tokens.colors.onSurface : tokens.colors.border,
+                          width: context.highContrast ? tokens.borders.widthStrong : tokens.borders.widthHairline,
+                        ),
+                      ),
                       boxShadow: tokens.overlayShadow,
                     ),
                     child: Material(
                       color: tokens.colors.transparent,
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
-                        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                        onTap: () {
+                          final drawerFocus = Focus.of(context);
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          drawerFocus.requestFocus();
+                        },
                         child: _AppDrawerPanel(
                           eyebrow: eyebrow,
                           title: title,
                           description: description,
                           footerActions: footerActions,
+                          footer: footer,
                           dismissible: dismissible,
+                          onDismiss: () => _requestDismiss(context),
+                          scrollable: scrollable,
+                          bodyPadding: bodyPadding,
                           child: child,
                         ),
                       ),
@@ -96,23 +129,29 @@ class AppDrawer extends StatelessWidget {
                 ),
               );
               final dismissiblePanel = dismissible
-                  ? Dismissible(
+                  ? _AppDrawerGestureSurface(
                       key: ValueKey('app-drawer-$title'),
-                      direction: _dismissDirection(context),
-                      resizeDuration: Duration.zero,
-                      confirmDismiss: (_) async {
-                        await Navigator.maybePop(context);
-                        return false;
-                      },
+                      width: panelWidth,
+                      onDismiss: () => _requestDismiss(context),
                       child: panel,
                     )
                   : panel;
 
-              return SafeArea(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: dismissiblePanel,
-                ),
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (dismissible)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => unawaited(_requestDismiss(context)),
+                    ),
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: dismissiblePanel,
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -128,7 +167,11 @@ class _AppDrawerPanel extends StatelessWidget {
     required this.title,
     required this.description,
     required this.footerActions,
+    required this.footer,
     required this.dismissible,
+    required this.onDismiss,
+    required this.scrollable,
+    required this.bodyPadding,
     required this.child,
   });
 
@@ -136,7 +179,11 @@ class _AppDrawerPanel extends StatelessWidget {
   final String title;
   final String description;
   final List<Widget> footerActions;
+  final Widget? footer;
   final bool dismissible;
+  final VoidCallback onDismiss;
+  final bool scrollable;
+  final EdgeInsetsGeometry? bodyPadding;
   final Widget child;
 
   @override
@@ -150,9 +197,16 @@ class _AppDrawerPanel extends StatelessWidget {
           title: title,
           description: description,
           dismissible: dismissible,
+          onDismiss: onDismiss,
         ),
-        Expanded(child: _AppDrawerBody(child: child)),
-        if (footerActions.isNotEmpty) _AppDrawerFooter(actions: footerActions),
+        Expanded(
+          child: _AppDrawerBody(
+            scrollable: scrollable,
+            padding: bodyPadding,
+            child: child,
+          ),
+        ),
+        if (footer != null) footer! else if (footerActions.isNotEmpty) _AppDrawerFooter(actions: footerActions),
       ],
     );
   }
@@ -164,22 +218,28 @@ class _AppDrawerHeader extends StatelessWidget {
     required this.title,
     required this.description,
     required this.dismissible,
+    required this.onDismiss,
   });
 
   final String? eyebrow;
   final String title;
   final String description;
   final bool dismissible;
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    return Padding(
+    return Container(
+      key: const ValueKey('app-drawer-header'),
       padding: EdgeInsets.fromLTRB(
         tokens.spacing.xxl,
         tokens.spacing.xxl,
         tokens.spacing.xxl,
-        tokens.spacing.none,
+        tokens.spacing.xl,
+      ),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: tokens.colors.border)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +251,7 @@ class _AppDrawerHeader extends StatelessWidget {
                 if (eyebrow != null) ...[
                   Text(
                     eyebrow!,
-                    style: tokens.typography.bodySmall.copyWith(color: tokens.colors.onSurfaceMuted),
+                    style: tokens.typography.supportingText,
                   ),
                   SizedBox(height: tokens.spacing.xs),
                 ],
@@ -199,23 +259,17 @@ class _AppDrawerHeader extends StatelessWidget {
                 SizedBox(height: tokens.spacing.xs),
                 Text(
                   description,
-                  style: tokens.typography.bodyMedium.copyWith(color: tokens.colors.onSurfaceMuted),
+                  style: tokens.typography.description,
                 ),
               ],
             ),
           ),
           if (dismissible) ...[
             SizedBox(width: tokens.spacing.lg),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: tokens.colors.border),
-                borderRadius: tokens.borders.lg,
-              ),
-              child: IconButton(
-                tooltip: context.l10n.close,
-                onPressed: () => Navigator.maybePop(context),
-                icon: const Icon(AppIcons.close),
-              ),
+            IconButton(
+              tooltip: context.l10n.close,
+              onPressed: onDismiss,
+              icon: const Icon(AppIcons.close),
             ),
           ],
         ],
@@ -225,15 +279,24 @@ class _AppDrawerHeader extends StatelessWidget {
 }
 
 class _AppDrawerBody extends StatelessWidget {
-  const _AppDrawerBody({required this.child});
+  const _AppDrawerBody({
+    required this.scrollable,
+    required this.padding,
+    required this.child,
+  });
 
+  final bool scrollable;
+  final EdgeInsetsGeometry? padding;
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    padding: EdgeInsets.all(context.tokens.spacing.xxl),
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final padded = Padding(
+      padding: padding ?? EdgeInsets.all(context.tokens.spacing.xxl),
+      child: child,
+    );
+    return scrollable ? SingleChildScrollView(child: padded) : padded;
+  }
 }
 
 class _AppDrawerFooter extends StatelessWidget {
@@ -286,7 +349,7 @@ Future<T?> _showAppDrawerRoute<T>(
   return showGeneralDialog<T>(
     context: context,
     useRootNavigator: useRootNavigator,
-    barrierDismissible: dismissible,
+    barrierDismissible: false,
     barrierLabel: context.l10n.close,
     barrierColor: tokens.colors.scrim.withValues(alpha: tokens.opacity.drawerBarrier),
     transitionDuration: context.motionDuration(tokens.motion.drawer),
@@ -300,15 +363,16 @@ Future<T?> _showAppDrawerRoute<T>(
       return Stack(
         fit: StackFit.expand,
         children: [
-          IgnorePointer(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: tokens.overlayBackdropBlur,
-                sigmaY: tokens.overlayBackdropBlur,
+          if (!context.reduceTransparency)
+            IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: tokens.overlayBackdropBlur,
+                  sigmaY: tokens.overlayBackdropBlur,
+                ),
+                child: ColoredBox(color: tokens.colors.transparent),
               ),
-              child: ColoredBox(color: tokens.colors.transparent),
             ),
-          ),
           SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(1, 0),
@@ -322,7 +386,88 @@ Future<T?> _showAppDrawerRoute<T>(
   );
 }
 
-DismissDirection _dismissDirection(BuildContext context) {
-  final leftToRight = Directionality.of(context) == TextDirection.ltr;
-  return leftToRight ? DismissDirection.startToEnd : DismissDirection.endToStart;
+class _AppDrawerGestureSurface extends StatefulWidget {
+  const _AppDrawerGestureSurface({
+    required this.width,
+    required this.onDismiss,
+    required this.child,
+    super.key,
+  });
+
+  final double width;
+  final VoidCallback onDismiss;
+  final Widget child;
+
+  @override
+  State<_AppDrawerGestureSurface> createState() => _AppDrawerGestureSurfaceState();
 }
+
+class _AppDrawerGestureSurfaceState extends State<_AppDrawerGestureSurface> with SingleTickerProviderStateMixin {
+  late final AnimationController _offset = AnimationController.unbounded(vsync: this);
+  var _settleGeneration = 0;
+
+  double get _direction => Directionality.of(context) == TextDirection.ltr ? 1 : -1;
+
+  @override
+  void dispose() {
+    _offset.dispose();
+    super.dispose();
+  }
+
+  void _start(DragStartDetails details) {
+    _settleGeneration++;
+    _offset.stop();
+  }
+
+  void _update(DragUpdateDetails details) {
+    final delta = (details.primaryDelta ?? 0) * _direction;
+    final next = _offset.value + delta;
+    _offset.value = next < 0 ? _rubberBand(next, widget.width) : math.min(next, widget.width);
+  }
+
+  Future<void> _end(DragEndDetails details) async {
+    final velocity = details.primaryVelocity == null ? 0.0 : details.primaryVelocity! * _direction;
+    final projected = _offset.value + _project(velocity);
+    final shouldClose = projected > widget.width * .5;
+    final generation = ++_settleGeneration;
+    if (context.reduceMotion) {
+      _offset.value = shouldClose ? widget.width : 0;
+    } else {
+      final simulation = SpringSimulation(
+        SpringDescription.withDampingRatio(
+          mass: 1,
+          stiffness: shouldClose ? 440 : 360,
+          ratio: shouldClose ? .82 : 1,
+        ),
+        _offset.value,
+        shouldClose ? widget.width : 0,
+        velocity,
+      );
+      await _offset.animateWith(simulation);
+    }
+    if (!mounted || generation != _settleGeneration || !shouldClose) return;
+    widget.onDismiss();
+  }
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onHorizontalDragStart: _start,
+    onHorizontalDragUpdate: _update,
+    onHorizontalDragEnd: _end,
+    child: AnimatedBuilder(
+      animation: _offset,
+      child: widget.child,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(_offset.value * _direction, 0),
+        child: child,
+      ),
+    ),
+  );
+}
+
+double _project(double velocity, [double decelerationRate = .998]) =>
+    (velocity / 1000) * decelerationRate / (1 - decelerationRate);
+
+double _rubberBand(double overshoot, double dimension, [double constant = .55]) =>
+    (overshoot * dimension * constant) / (dimension + constant * overshoot.abs());

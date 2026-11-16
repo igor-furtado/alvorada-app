@@ -1,98 +1,93 @@
 import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:flutter/foundation.dart';
 
 enum EditalEditorStatus { initial, loading, ready, failure }
 
-enum EditalEditorMutationType { disciplina, topico }
-
-enum EditalEditorFeedback {
-  disciplinaAdicionada,
-  topicoAdicionado,
-  topicoRemovido,
-  violacaoRegra,
-  falhaTecnica,
-}
-
-class EditalEditorMutation {
-  const EditalEditorMutation({required this.type, required this.id});
-
-  final EditalEditorMutationType type;
-  final String id;
-
-  bool matches(EditalEditorMutationType candidateType, String candidateId) =>
-      type == candidateType && id == candidateId;
-}
+enum EditalEditorFeedback { editalSalvo, violacaoRegra, falhaTecnica }
 
 class EditalEditorState {
   factory EditalEditorState({
     EditalEditorStatus status = EditalEditorStatus.initial,
     List<Disciplina> catalogo = const [],
+    Set<String> topicosOriginais = const {},
     Set<String> topicosVinculados = const {},
     String? disciplinaSelecionada,
-    EditalEditorMutation? mutation,
+    bool saving = false,
     EditalEditorFeedback? feedback,
-    String buscaDisciplina = '',
     String buscaTopico = '',
   }) => EditalEditorState._(
     status: status,
     catalogo: List.unmodifiable(catalogo),
+    topicosOriginais: Set.unmodifiable(topicosOriginais),
     topicosVinculados: Set.unmodifiable(topicosVinculados),
     disciplinaSelecionada: disciplinaSelecionada,
-    mutation: mutation,
+    saving: saving,
     feedback: feedback,
-    buscaDisciplina: buscaDisciplina,
     buscaTopico: buscaTopico,
   );
 
   const EditalEditorState._({
     required this.status,
     required this.catalogo,
+    required this.topicosOriginais,
     required this.topicosVinculados,
     required this.disciplinaSelecionada,
-    required this.mutation,
+    required this.saving,
     required this.feedback,
-    required this.buscaDisciplina,
     required this.buscaTopico,
   });
 
   final EditalEditorStatus status;
   final List<Disciplina> catalogo;
+  final Set<String> topicosOriginais;
   final Set<String> topicosVinculados;
   final String? disciplinaSelecionada;
-  final EditalEditorMutation? mutation;
+  final bool saving;
   final EditalEditorFeedback? feedback;
-  final String buscaDisciplina;
   final String buscaTopico;
 
-  List<Disciplina> get disciplinasFiltradas {
-    final query = buscaDisciplina.trim().toLowerCase();
+  Disciplina? get disciplinaAtiva {
+    for (final disciplina in catalogo) {
+      if (disciplina.id == disciplinaSelecionada) return disciplina;
+    }
+    return null;
+  }
+
+  List<Topico> get topicosAtivos {
+    final query = buscaTopico.trim().toLowerCase();
     return List.unmodifiable(
-      catalogo.where((item) => query.isEmpty || item.name.toLowerCase().contains(query)),
+      (disciplinaAtiva?.topics ?? const <Topico>[]).where(
+        (topico) => query.isEmpty || topico.name.toLowerCase().contains(query),
+      ),
     );
   }
 
-  bool disciplinaEstaVinculada(Disciplina disciplina) => disciplina.topics.any(
-    (topico) => !topico.mandatory && topicosVinculados.contains(topico.id),
-  );
+  int quantidadeSelecionada(Disciplina disciplina) =>
+      disciplina.topics.where((topico) => !topico.mandatory && topicosVinculados.contains(topico.id)).length;
+
+  int get totalSelecionado => topicosVinculados.length;
+
+  bool get temAlteracoes => !setEquals(topicosOriginais, topicosVinculados);
 
   EditalEditorState copyWith({
     EditalEditorStatus? status,
     List<Disciplina>? catalogo,
+    Set<String>? topicosOriginais,
     Set<String>? topicosVinculados,
     Object? disciplinaSelecionada = _unset,
-    Object? mutation = _unset,
+    bool? saving,
     Object? feedback = _unset,
-    String? buscaDisciplina,
     String? buscaTopico,
   }) => EditalEditorState(
     status: status ?? this.status,
     catalogo: catalogo ?? this.catalogo,
+    topicosOriginais: topicosOriginais ?? this.topicosOriginais,
     topicosVinculados: topicosVinculados ?? this.topicosVinculados,
     disciplinaSelecionada: disciplinaSelecionada == _unset
         ? this.disciplinaSelecionada
         : disciplinaSelecionada as String?,
-    mutation: mutation == _unset ? this.mutation : mutation as EditalEditorMutation?,
+    saving: saving ?? this.saving,
     feedback: feedback == _unset ? this.feedback : feedback as EditalEditorFeedback?,
-    buscaDisciplina: buscaDisciplina ?? this.buscaDisciplina,
     buscaTopico: buscaTopico ?? this.buscaTopico,
   );
 }

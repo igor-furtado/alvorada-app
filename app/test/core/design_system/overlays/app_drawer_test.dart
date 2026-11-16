@@ -22,12 +22,15 @@ void main() {
     final surfaceRect = tester.getRect(surface);
     final container = tester.widget<Container>(surface);
     final decoration = container.decoration! as BoxDecoration;
+    final header = tester.widget<Container>(find.byKey(const ValueKey('app-drawer-header')));
+    final headerDecoration = header.decoration! as BoxDecoration;
 
     expect(surfaceRect.left, 0);
     expect(surfaceRect.right, 390);
     expect(surfaceRect.top, 0);
     expect(surfaceRect.bottom, 844);
     expect(decoration.borderRadius, isNull);
+    expect((headerDecoration.border! as Border).bottom.color, AppTheme.light.extension<AppTokens>()!.colors.border);
     expect(find.byKey(const ValueKey('app-drawer-swipe-handle')), findsNothing);
     expect(find.byIcon(AppIcons.close), findsOneWidget);
     expect(find.text('Escolha um filtro'), findsOneWidget);
@@ -49,6 +52,20 @@ void main() {
     expect(surfaceRect.right, 1440);
     expect(surfaceRect.bottom, 900);
     expect(find.byKey(const ValueKey('app-drawer-swipe-handle')), findsNothing);
+  });
+
+  testWidgets('aceita largura, corpo fixo e rodapé próprios para fluxos mestres-detalhe', (tester) async {
+    await _pumpWideDrawerLauncher(tester, width: 1440, height: 900);
+
+    await tester.tap(find.text('Abrir editor'));
+    await tester.pumpAndSettle();
+
+    final surfaceRect = tester.getRect(find.byKey(const ValueKey('app-drawer-surface')));
+    final bodyRect = tester.getRect(find.byKey(const ValueKey('wide-drawer-body')));
+    expect(surfaceRect.width, 980);
+    expect(bodyRect.left, surfaceRect.left + 1);
+    expect(bodyRect.right, surfaceRect.right);
+    expect(find.byKey(const ValueKey('wide-drawer-footer')), findsOneWidget);
   });
 
   testWidgets('cobre a janela inteira quando aberto a partir de navegação aninhada', (tester) async {
@@ -75,6 +92,20 @@ void main() {
 
     expect(find.text('Aplicar filtros'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('remove transparência e blur em alto contraste', (tester) async {
+    await _pumpDrawerLauncher(
+      tester,
+      width: 390,
+      height: 844,
+      highContrast: true,
+    );
+
+    await tester.tap(find.text('Abrir drawer'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BackdropFilter), findsNothing);
   });
 
   testWidgets('fecha com gesto na direção de saída', (tester) async {
@@ -152,6 +183,7 @@ Future<void> _pumpDrawerLauncher(
   required double width,
   required double height,
   TextScaler textScaler = TextScaler.noScaling,
+  bool highContrast = false,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = Size(width, height);
@@ -162,7 +194,10 @@ Future<void> _pumpDrawerLauncher(
     MaterialApp(
       theme: AppTheme.light,
       builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+        data: MediaQuery.of(context).copyWith(
+          textScaler: textScaler,
+          highContrast: highContrast,
+        ),
         child: child!,
       ),
       home: Scaffold(
@@ -218,6 +253,44 @@ Future<void> _pumpNestedDrawerLauncher(
                     description: 'Refine os resultados exibidos.',
                     child: Text('Conteúdo'),
                   ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _pumpWideDrawerLauncher(
+  WidgetTester tester, {
+  required double width,
+  required double height,
+}) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = Size(width, height);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => Center(
+            child: AppButton(
+              label: 'Abrir editor',
+              onPressed: () => showAppDrawerBuilder<void>(
+                context,
+                builder: (_) => const AppDrawer(
+                  title: 'Editor amplo',
+                  description: 'Conteúdo mestre-detalhe.',
+                  width: 980,
+                  scrollable: false,
+                  bodyPadding: EdgeInsets.zero,
+                  footer: SizedBox(key: ValueKey('wide-drawer-footer'), height: 72),
+                  child: SizedBox.expand(key: ValueKey('wide-drawer-body')),
                 ),
               ),
             ),

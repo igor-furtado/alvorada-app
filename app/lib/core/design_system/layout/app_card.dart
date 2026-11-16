@@ -1,8 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../app_tokens.dart';
+import 'app_responsive.dart';
 
-class AppCard extends StatelessWidget {
+class AppCard extends StatefulWidget {
   const AppCard({
     required this.child,
     this.onTap,
@@ -17,20 +18,31 @@ class AppCard extends StatelessWidget {
   final Color? backgroundColor;
 
   @override
+  State<AppCard> createState() => _AppCardState();
+}
+
+class _AppCardState extends State<AppCard> {
+  var _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? EdgeInsets.all(context.tokens.spacing.lg);
-    final content = Padding(padding: effectivePadding, child: child);
+    final effectivePadding = widget.padding ?? EdgeInsets.all(context.tokens.spacing.lg);
+    final content = Padding(padding: effectivePadding, child: widget.child);
     final card = Material(
-      color: backgroundColor ?? context.tokens.colors.card,
+      color: widget.backgroundColor ?? context.tokens.colors.card,
       shape: RoundedRectangleBorder(
         borderRadius: context.tokens.borders.xl,
-        side: BorderSide(color: context.tokens.colors.border),
+        side: BorderSide(
+          color: context.highContrast ? context.tokens.colors.onSurface : context.tokens.colors.border,
+          width: context.highContrast ? context.tokens.borders.widthStrong : context.tokens.borders.widthHairline,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: onTap == null
+      child: widget.onTap == null
           ? content
           : InkWell(
-              onTap: onTap,
+              onTap: widget.onTap,
+              onHighlightChanged: (value) => setState(() => _pressed = value),
               excludeFromSemantics: true,
               hoverColor: context.tokens.colors.surfaceSubtle,
               child: content,
@@ -39,7 +51,14 @@ class AppCard extends StatelessWidget {
     return Semantics(
       container: true,
       explicitChildNodes: true,
-      child: card,
+      button: widget.onTap != null,
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _pressed && !context.reduceMotion ? .995 : 1,
+        duration: context.motionDuration(context.tokens.motion.fast),
+        curve: context.tokens.motion.enter,
+        child: card,
+      ),
     );
   }
 }

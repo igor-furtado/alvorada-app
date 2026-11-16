@@ -87,6 +87,20 @@ class ApiConcursosRepository implements ConcursosRepository {
   );
 
   @override
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  }) => _mutate(
+    () => _api.updateDisciplinaPeso(
+      concursoId: concursoId,
+      disciplinaId: disciplinaId,
+      peso: peso,
+    ),
+    'Não foi possível atualizar o peso da Disciplina.',
+  );
+
+  @override
   Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId}) => _mutate(
     () => _api.removeTopicoFromEdital(concursoId: concursoId, topicoId: topicoId),
     'Não foi possível remover o Tópico do Edital.',

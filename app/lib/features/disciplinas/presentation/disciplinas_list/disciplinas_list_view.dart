@@ -2,14 +2,15 @@ import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'disciplinas_list_actions.dart';
 import 'disciplinas_list_bloc.dart';
 import 'disciplinas_list_event.dart';
 import 'disciplinas_list_panel.dart';
 import 'disciplinas_list_state.dart';
 
 class DisciplinasListView extends StatelessWidget {
-  const DisciplinasListView({super.key});
+  const DisciplinasListView({this.onSelected, super.key});
+
+  final VoidCallback? onSelected;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<DisciplinasListBloc, DisciplinasListState>(
@@ -34,8 +35,10 @@ class DisciplinasListView extends StatelessWidget {
       ),
       _ => DisciplinasListPanel(
         state: state,
-        onAdd: () => DisciplinasListActions.add(context),
-        onSelect: (item) => context.read<DisciplinasListBloc>().add(DisciplinasListSelectionChanged(item.id)),
+        onSelect: (item) {
+          context.read<DisciplinasListBloc>().add(DisciplinasListSelectionChanged(item.id));
+          onSelected?.call();
+        },
       ),
     },
   );

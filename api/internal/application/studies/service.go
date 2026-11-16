@@ -99,6 +99,26 @@ func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {
 	return s.repository.UpdateTopic(ctx, id, value)
 }
 
+func (s *Service) ReorderTopics(ctx context.Context, subjectID string, topicIDs []string) error {
+	if len(topicIDs) == 0 {
+		return domain.ErrInvalidTopicOrder
+	}
+	seen := make(map[string]struct{}, len(topicIDs))
+	values := make([]string, 0, len(topicIDs))
+	for _, id := range topicIDs {
+		value := strings.TrimSpace(id)
+		if value == "" {
+			return domain.ErrInvalidTopicOrder
+		}
+		if _, exists := seen[value]; exists {
+			return domain.ErrInvalidTopicOrder
+		}
+		seen[value] = struct{}{}
+		values = append(values, value)
+	}
+	return s.repository.ReorderTopics(ctx, subjectID, values)
+}
+
 func (s *Service) DeleteTopic(ctx context.Context, id string) error {
 	return s.repository.DeleteTopic(ctx, id)
 }

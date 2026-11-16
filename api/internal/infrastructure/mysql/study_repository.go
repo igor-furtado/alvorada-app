@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -237,24 +238,109 @@ func (r *StudyRepository) UpdateTopic(ctx context.Context, id, name string) erro
 	)
 }
 
+func (r *StudyRepository) ReorderTopics(ctx context.Context, subjectID string, topicIDs []string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin reorder topics transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.QueryContext(ctx, `
+		SELECT id
+		FROM topicos
+		WHERE disciplina_id = ? AND BINARY nome <> BINARY ?
+		ORDER BY posicao, criado_em
+		FOR UPDATE`, subjectID, domain.MandatoryReviewTopicName)
+	if err != nil {
+		return fmt.Errorf("lock topics for reorder: %w", err)
+	}
+	currentIDs := make(map[string]struct{})
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			rows.Close()
+			return fmt.Errorf("scan topic for reorder: %w", err)
+		}
+		currentIDs[id] = struct{}{}
+	}
+	if err := rows.Close(); err != nil {
+		return fmt.Errorf("close reordered topics: %w", err)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate topics for reorder: %w", err)
+	}
+	if len(currentIDs) != len(topicIDs) {
+		return domain.ErrInvalidTopicOrder
+	}
+	for _, id := range topicIDs {
+		if _, exists := currentIDs[id]; !exists {
+			return domain.ErrInvalidTopicOrder
+		}
+	}
+	for index, id := range topicIDs {
+		if _, err := tx.ExecContext(
+			ctx,
+			"UPDATE topicos SET posicao = ? WHERE id = ? AND disciplina_id = ?",
+			index+1,
+			id,
+			subjectID,
+		); err != nil {
+			return fmt.Errorf("update topic position: %w", err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit reorder topics transaction: %w", err)
+	}
+	return nil
+}
+
 func (r *StudyRepository) DeleteTopic(ctx context.Context, id string) error {
-	var linked bool
-	if err := r.db.QueryRowContext(ctx, `
-		SELECT EXISTS(SELECT 1 FROM concursos_topicos WHERE topico_id = ?)`, id).Scan(&linked); err != nil {
-		return fmt.Errorf("check linked topic: %w", err)
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin delete topic transaction: %w", err)
 	}
-	if linked {
-		return domain.ErrContentLinked
+	defer tx.Rollback()
+
+	var topicName, subjectID string
+	err = tx.QueryRowContext(ctx, "SELECT nome, disciplina_id FROM topicos WHERE id = ? FOR UPDATE", id).
+		Scan(&topicName, &subjectID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil
 	}
-	return execMutableTopic(
+	if err != nil {
+		return fmt.Errorf("check mandatory topic: %w", err)
+	}
+	if topicName == domain.MandatoryReviewTopicName {
+		return domain.ErrMandatoryTopic
+	}
+	if _, err := tx.ExecContext(ctx, "DELETE FROM concursos_topicos WHERE topico_id = ?", id); err != nil {
+		return fmt.Errorf("unlink topic from editais: %w", err)
+	}
+	if _, err := tx.ExecContext(
 		ctx,
-		r.db,
-		"delete topic",
 		"DELETE FROM topicos WHERE id = ? AND BINARY nome <> BINARY ?",
 		id,
-		id,
 		domain.MandatoryReviewTopicName,
-	)
+	); err != nil {
+		return fmt.Errorf("delete topic: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `
+		DELETE relacao
+		FROM concursos_disciplinas AS relacao
+		WHERE relacao.disciplina_id = ?
+			AND NOT EXISTS (
+				SELECT 1
+				FROM concursos_topicos AS vinculo
+				INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id
+				WHERE vinculo.concurso_id = relacao.concurso_id
+					AND topico.disciplina_id = relacao.disciplina_id
+			)`, subjectID); err != nil {
+		return fmt.Errorf("delete empty edital discipline metadata: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit delete topic transaction: %w", err)
+	}
+	return nil
 }
 
 func exec(ctx context.Context, db *sql.DB, operation, query string, args ...any) error {

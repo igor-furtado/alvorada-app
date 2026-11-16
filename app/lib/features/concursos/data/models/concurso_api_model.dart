@@ -98,21 +98,25 @@ class DisciplinaEditalApiModel {
     required this.id,
     required this.nome,
     required this.topicos,
+    required this.peso,
   });
 
   factory DisciplinaEditalApiModel.fromJson(Map<String, Object?> json) => DisciplinaEditalApiModel(
     id: readJsonString(json, 'id'),
     nome: readJsonString(json, 'nome'),
+    peso: readJsonNullableNumber(json, 'peso'),
     topicos: readJsonList(json, 'topicos').map(TopicoEditalApiModel.fromJson).toList(growable: false),
   );
 
   final String id;
   final String nome;
+  final double? peso;
   final List<TopicoEditalApiModel> topicos;
 
   DisciplinaEdital toDomain() => DisciplinaEdital(
     id: id,
     nome: nome,
+    peso: peso,
     topicos: topicos.map((item) => item.toDomain()).toList(growable: false),
   );
 }

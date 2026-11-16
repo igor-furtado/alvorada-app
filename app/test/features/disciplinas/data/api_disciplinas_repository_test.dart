@@ -130,6 +130,9 @@ class _FakeApi implements DisciplinasApi {
 
   @override
   Future<void> updateTopico(String topicId, String name) async {}
+
+  @override
+  Future<void> reorderTopicos(String disciplineId, List<String> topicIds) async {}
 }
 
 const _discipline = DisciplinaApiModel(

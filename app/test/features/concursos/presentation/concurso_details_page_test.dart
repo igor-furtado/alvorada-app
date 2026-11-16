@@ -25,10 +25,11 @@ void main() {
     );
 
     expect(find.text(concurso.instituicao), findsWidgets);
-    expect(find.text(concurso.sigla!), findsOneWidget);
+    expect(find.text(_pt.syllabusContentButton), findsWidgets);
+    expect(find.byKey(const ValueKey('edit-exam-button')), findsOneWidget);
     expect(find.text(_pt.concursoNaoEncontrado), findsNothing);
     expect(find.byType(AppBreadcrumbs), findsOneWidget);
-    expect(find.byType(EditableText), findsOneWidget);
+    expect(find.byKey(const ValueKey('discipline-search')), findsOneWidget);
   });
 
   testWidgets('não oferece edição local sem persistência do Edital', (
@@ -55,7 +56,7 @@ void main() {
       child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
     );
 
-    await tester.tap(find.text(_pt.editarConcurso));
+    await tester.tap(find.byKey(const ValueKey('edit-exam-button')));
     await tester.pumpAndSettle();
 
     final inputs = tester.widgetList<EditableText>(find.byType(EditableText)).toList();
@@ -80,22 +81,25 @@ void main() {
     expect(find.text(_pt.cancel), findsNothing);
   });
 
-  testWidgets('mantém a estrutura por faixas sem inventar avanço por Disciplina', (tester) async {
+  testWidgets('alterna métricas sem inventar avanço ou desempenho por Disciplina', (tester) async {
     await _pump(
       tester,
       repository: FakeConcursosRepository(concursos: [_concursoComEdital()]),
       child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
     );
 
-    expect(find.text('Avanço ainda não calculado'), findsOneWidget);
-    expect(find.text('A estrutura está pronta para receber esta métrica'), findsOneWidget);
     expect(find.text('Direito Tributário'), findsOneWidget);
-    expect(find.text('—'), findsWidgets);
+    expect(find.byKey(const ValueKey('discipline-weight-tributario')), findsOneWidget);
 
-    await tester.tap(find.text('Desempenho'));
+    await tester.tap(find.text(_pt.advance));
     await tester.pumpAndSettle();
 
-    expect(find.text('Desempenho ainda não calculado'), findsOneWidget);
+    expect(find.byKey(const ValueKey('discipline-weight-tributario')), findsNothing);
+    expect(find.text('—'), findsWidgets);
+
+    await tester.tap(find.text(_pt.performance).first);
+    await tester.pumpAndSettle();
+    expect(find.text('—'), findsWidgets);
   });
 
   testWidgets('reorganiza cabeçalho e conteúdo nas larguras de referência', (tester) async {
@@ -111,7 +115,8 @@ void main() {
       );
 
       expect(find.text('Receita Federal'), findsWidgets, reason: 'largura $width');
-      expect(find.text(_pt.editarConcurso), findsOneWidget, reason: 'largura $width');
+      expect(find.text(_pt.syllabusContentButton), findsOneWidget, reason: 'largura $width');
+      expect(find.byKey(const ValueKey('edit-exam-button')), findsOneWidget, reason: 'largura $width');
       final exception = tester.takeException();
       expect(
         exception,
@@ -140,20 +145,25 @@ void main() {
     expect(find.text(_pt.genericErrorTitle), findsNothing);
   });
 
-  testWidgets('preserva a busca do Edital ao alternar de aba', (tester) async {
+  testWidgets('filtra Disciplinas e persiste peso decimal inline', (tester) async {
+    final repository = FakeConcursosRepository(concursos: [_concursoComEdital()]);
     await _pump(
       tester,
-      repository: FakeConcursosRepository(concursos: [_concursoComEdital()]),
+      repository: repository,
       child: const ConcursoDetailsPage(concursoId: 'concurso-real'),
     );
 
-    await tester.enterText(find.byType(EditableText), 'tributário');
-    await tester.tap(find.text(_pt.information));
+    await tester.enterText(find.byKey(const ValueKey('discipline-search')), 'tributário');
     await tester.pumpAndSettle();
-    await tester.tap(find.text(_pt.notice));
+    expect(find.text('Direito Tributário'), findsOneWidget);
+
+    final weight = find.byKey(const ValueKey('discipline-weight-tributario'));
+    await tester.enterText(weight, '2,5');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<EditableText>(find.byType(EditableText)).controller.text, 'tributário');
+    expect(repository.updateDisciplinaPesoCalls, 1);
+    expect(tester.widget<AppTextInput>(weight).controller?.text, '2.5');
   });
 }
 
@@ -189,6 +199,7 @@ Concurso _concursoComEdital() => Concurso(
     DisciplinaEdital(
       id: 'tributario',
       nome: 'Direito Tributário',
+      peso: 2,
       topicos: [
         TopicoEdital(id: 'obrigacao', nome: 'Obrigação tributária', obrigatorio: false),
         TopicoEdital(id: 'revisao', nome: 'Revisão de Véspera', obrigatorio: true),

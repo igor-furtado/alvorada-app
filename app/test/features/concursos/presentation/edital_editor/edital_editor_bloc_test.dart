@@ -5,7 +5,6 @@ import 'package:estudos_app/features/concursos/domain/use_cases/concursos_use_ca
 import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_bloc.dart';
 import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_event.dart';
 import 'package:estudos_app/features/concursos/presentation/edital_editor/edital_editor_state.dart';
-import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
 import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,19 +14,27 @@ import '../../fakes/fake_concursos_repository.dart';
 void main() {
   test('protege as coleções do estado contra mutação externa', () {
     final catalogo = disciplinasFixture();
-    final vinculados = <String>{'interpretacao'};
-    final state = EditalEditorState(catalogo: catalogo, topicosVinculados: vinculados);
+    final originais = <String>{'interpretacao'};
+    final vinculados = <String>{'interpretacao', 'direitos'};
+    final state = EditalEditorState(
+      catalogo: catalogo,
+      topicosOriginais: originais,
+      topicosVinculados: vinculados,
+    );
 
     catalogo.clear();
+    originais.clear();
     vinculados.clear();
 
     expect(state.catalogo, isNotEmpty);
-    expect(state.topicosVinculados, contains('interpretacao'));
+    expect(state.topicosOriginais, contains('interpretacao'));
+    expect(state.topicosVinculados, containsAll(['interpretacao', 'direitos']));
     expect(state.catalogo.clear, throwsUnsupportedError);
+    expect(state.topicosOriginais.clear, throwsUnsupportedError);
     expect(state.topicosVinculados.clear, throwsUnsupportedError);
   });
 
-  test('carrega o catálogo e permite tentar novamente após falha', () async {
+  test('carrega o catálogo, seleciona a primeira Disciplina e permite tentar novamente', () async {
     final disciplinasRepository = FakeDisciplinasRepository(disciplinas: disciplinasFixture())..failLoad = true;
     final bloc = _bloc(disciplinasRepository: disciplinasRepository);
     addTearDown(bloc.close);
@@ -40,70 +47,66 @@ void main() {
     final ready = await bloc.stream.firstWhere((state) => state.status == EditalEditorStatus.ready);
 
     expect(ready.catalogo, hasLength(3));
+    expect(ready.disciplinaSelecionada, 'portugues');
   });
 
-  test('busca e seleção são refletidas no estado renderizável', () async {
+  test('mantém busca e troca de Disciplina somente no rascunho', () async {
     final bloc = _bloc(
       disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
     );
     addTearDown(bloc.close);
-    bloc.add(const EditalEditorLoaded());
-    await bloc.stream.firstWhere((state) => state.status == EditalEditorStatus.ready);
+    await _load(bloc);
 
-    bloc.add(const EditalEditorDisciplinaSearched('constitucional'));
-    final searched = await bloc.stream.firstWhere((state) => state.buscaDisciplina.isNotEmpty);
-    expect(searched.disciplinasFiltradas.single.name, 'Direito Constitucional');
-
-    bloc.add(const EditalEditorTopicoSearched('direitos'));
-    expect((await bloc.stream.firstWhere((state) => state.buscaTopico.isNotEmpty)).buscaTopico, 'direitos');
+    bloc.add(const EditalEditorTopicoSearched('interpretação'));
+    final searched = await bloc.stream.firstWhere((state) => state.buscaTopico.isNotEmpty);
+    expect(searched.topicosAtivos.single.id, 'interpretacao');
 
     bloc.add(const EditalEditorDisciplinaSelected('constitucional'));
-    expect(
-      (await bloc.stream.firstWhere((state) => state.disciplinaSelecionada != null)).disciplinaSelecionada,
-      'constitucional',
-    );
+    final selected = await bloc.stream.firstWhere((state) => state.disciplinaSelecionada == 'constitucional');
+    expect(selected.buscaTopico, isEmpty);
   });
 
-  test('adiciona todos os Tópicos comuns de uma Disciplina', () async {
-    final disciplinasRepository = FakeDisciplinasRepository(disciplinas: disciplinasFixture());
-    final concursosRepository = FakeConcursosRepository();
-    final bloc = _bloc(
-      disciplinasRepository: disciplinasRepository,
-      concursosRepository: concursosRepository,
-    );
-    addTearDown(bloc.close);
-    final disciplina = await _loadFirstDisciplina(bloc);
-
-    bloc.add(EditalEditorDisciplinaAdded(disciplina));
-    final updated = await bloc.stream.firstWhere(
-      (state) => state.feedback == EditalEditorFeedback.disciplinaAdicionada,
-    );
-
-    expect(updated.topicosVinculados, containsAll(['interpretacao', 'morfossintaxe']));
-    expect(updated.disciplinaSelecionada, disciplina.id);
-    expect(concursosRepository.addDisciplinaCalls, 1);
-  });
-
-  test('adiciona um Tópico e seleciona sua Disciplina derivada', () async {
+  test('altera um Tópico localmente e persiste somente ao salvar', () async {
     final repository = FakeConcursosRepository();
     final bloc = _bloc(
       disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
       concursosRepository: repository,
     );
     addTearDown(bloc.close);
-    final disciplina = await _loadFirstDisciplina(bloc);
+    final ready = await _load(bloc);
 
-    bloc.add(EditalEditorTopicoToggled(disciplina.topics.first));
-    final updated = await bloc.stream.firstWhere(
-      (state) => state.feedback == EditalEditorFeedback.topicoAdicionado,
-    );
+    bloc.add(EditalEditorTopicoToggled(ready.catalogo.first.topics.first));
+    final draft = await bloc.stream.firstWhere((state) => state.temAlteracoes);
 
-    expect(updated.topicosVinculados, contains('interpretacao'));
-    expect(updated.disciplinaSelecionada, 'portugues');
+    expect(draft.topicosVinculados, contains('interpretacao'));
+    expect(repository.addTopicoCalls, 0);
+
+    bloc.add(const EditalEditorSaved());
+    final saved = await bloc.stream.firstWhere((state) => state.feedback == EditalEditorFeedback.editalSalvo);
+
     expect(repository.addTopicoCalls, 1);
+    expect(saved.topicosOriginais, contains('interpretacao'));
+    expect(saved.temAlteracoes, isFalse);
   });
 
-  test('remove o último Tópico comum e normaliza a seleção', () async {
+  test('seleciona e limpa todos os Tópicos comuns da Disciplina', () async {
+    final bloc = _bloc(
+      disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
+    );
+    addTearDown(bloc.close);
+    final ready = await _load(bloc);
+    final disciplina = ready.catalogo.first;
+
+    bloc.add(EditalEditorDisciplinaSelectionChanged(disciplina: disciplina, selected: true));
+    final selected = await bloc.stream.firstWhere((state) => state.quantidadeSelecionada(disciplina) == 2);
+    expect(selected.topicosVinculados, isNot(contains('revisao-portugues')));
+
+    bloc.add(EditalEditorDisciplinaSelectionChanged(disciplina: disciplina, selected: false));
+    final cleared = await bloc.stream.firstWhere((state) => state.quantidadeSelecionada(disciplina) == 0);
+    expect(cleared.topicosVinculados, isEmpty);
+  });
+
+  test('salva remoções e adições como uma única confirmação', () async {
     final repository = FakeConcursosRepository();
     final bloc = _bloc(
       concurso: _concursoComTopico(),
@@ -111,23 +114,26 @@ void main() {
       concursosRepository: repository,
     );
     addTearDown(bloc.close);
-    final disciplina = await _loadFirstDisciplina(bloc);
+    final ready = await _load(bloc);
 
-    bloc.add(EditalEditorTopicoToggled(disciplina.topics.first));
-    final updated = await bloc.stream.firstWhere(
-      (state) => state.feedback == EditalEditorFeedback.topicoRemovido,
+    bloc
+      ..add(EditalEditorTopicoToggled(ready.catalogo.first.topics.first))
+      ..add(EditalEditorTopicoToggled(ready.catalogo[1].topics.first));
+    await bloc.stream.firstWhere(
+      (state) => !state.topicosVinculados.contains('interpretacao') && state.topicosVinculados.contains('direitos'),
     );
+    bloc.add(const EditalEditorSaved());
+    await bloc.stream.firstWhere((state) => state.feedback == EditalEditorFeedback.editalSalvo);
 
-    expect(updated.topicosVinculados, isEmpty);
-    expect(updated.disciplinaSelecionada, isNull);
     expect(repository.removeTopicoCalls, 1);
+    expect(repository.addTopicoCalls, 1);
   });
 
   for (final failure in [
     (label: 'violação de regra', rule: true, feedback: EditalEditorFeedback.violacaoRegra),
     (label: 'falha técnica', rule: false, feedback: EditalEditorFeedback.falhaTecnica),
   ]) {
-    test('expõe ${failure.label} ao adicionar Disciplina', () async {
+    test('mantém o rascunho após ${failure.label} ao salvar', () async {
       final repository = FakeConcursosRepository()
         ..failRuleViolation = failure.rule
         ..failMutation = !failure.rule;
@@ -136,81 +142,46 @@ void main() {
         concursosRepository: repository,
       );
       addTearDown(bloc.close);
-      final disciplina = await _loadFirstDisciplina(bloc);
+      final ready = await _load(bloc);
 
-      bloc.add(EditalEditorDisciplinaAdded(disciplina));
+      bloc.add(EditalEditorTopicoToggled(ready.catalogo.first.topics.first));
+      await bloc.stream.firstWhere((state) => state.temAlteracoes);
+      bloc.add(const EditalEditorSaved());
       final failed = await bloc.stream.firstWhere((state) => state.feedback == failure.feedback);
 
-      expect(failed.mutation, isNull);
-      expect(failed.topicosVinculados, isEmpty);
-    });
-
-    test('expõe ${failure.label} ao alternar Tópico', () async {
-      final repository = FakeConcursosRepository()
-        ..failRuleViolation = failure.rule
-        ..failMutation = !failure.rule;
-      final bloc = _bloc(
-        disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
-        concursosRepository: repository,
-      );
-      addTearDown(bloc.close);
-      final disciplina = await _loadFirstDisciplina(bloc);
-
-      bloc.add(EditalEditorTopicoToggled(disciplina.topics.first));
-      final failed = await bloc.stream.firstWhere((state) => state.feedback == failure.feedback);
-
-      expect(failed.mutation, isNull);
-      expect(failed.topicosVinculados, isEmpty);
+      expect(failed.saving, isFalse);
+      expect(failed.temAlteracoes, isTrue);
+      expect(failed.topicosVinculados, contains('interpretacao'));
     });
   }
 
-  test('limpa o feedback ao iniciar uma nova operação', () async {
-    final repository = FakeConcursosRepository()..failMutation = true;
-    final bloc = _bloc(
-      disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
-      concursosRepository: repository,
-    );
-    addTearDown(bloc.close);
-    final disciplina = await _loadFirstDisciplina(bloc);
-    bloc.add(EditalEditorDisciplinaAdded(disciplina));
-    await bloc.stream.firstWhere((state) => state.feedback == EditalEditorFeedback.falhaTecnica);
-
-    repository
-      ..failMutation = false
-      ..editalMutationGate = Completer<void>();
-    bloc.add(EditalEditorDisciplinaAdded(disciplina));
-    final pending = await bloc.stream.firstWhere((state) => state.mutation != null);
-
-    expect(pending.feedback, isNull);
-    repository.editalMutationGate!.complete();
-  });
-
-  test('ignora uma segunda mutação enquanto a primeira está em andamento', () async {
+  test('ignora alterações enquanto o salvamento está em andamento', () async {
     final repository = FakeConcursosRepository()..editalMutationGate = Completer<void>();
     final bloc = _bloc(
       disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
       concursosRepository: repository,
     );
     addTearDown(bloc.close);
-    final disciplina = await _loadFirstDisciplina(bloc);
+    final ready = await _load(bloc);
+    final first = ready.catalogo.first.topics.first;
+    final second = ready.catalogo.first.topics[1];
 
-    bloc
-      ..add(EditalEditorDisciplinaAdded(disciplina))
-      ..add(EditalEditorDisciplinaAdded(disciplina));
-    await bloc.stream.firstWhere((state) => state.mutation != null);
+    bloc.add(EditalEditorTopicoToggled(first));
+    await bloc.stream.firstWhere((state) => state.temAlteracoes);
+    bloc.add(const EditalEditorSaved());
+    await bloc.stream.firstWhere((state) => state.saving);
+    bloc.add(EditalEditorTopicoToggled(second));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(bloc.state.topicosVinculados, isNot(contains(second.id)));
     repository.editalMutationGate!.complete();
-    await bloc.stream.firstWhere(
-      (state) => state.feedback == EditalEditorFeedback.disciplinaAdicionada,
-    );
-
-    expect(repository.addDisciplinaCalls, 1);
+    await bloc.stream.firstWhere((state) => state.feedback == EditalEditorFeedback.editalSalvo);
   });
 }
 
-Future<Disciplina> _loadFirstDisciplina(EditalEditorBloc bloc) async {
+Future<EditalEditorState> _load(EditalEditorBloc bloc) async {
   bloc.add(const EditalEditorLoaded());
-  final ready = await bloc.stream.firstWhere((state) => state.status == EditalEditorStatus.ready);
-  return ready.catalogo.first;
+  return bloc.stream.firstWhere((state) => state.status == EditalEditorStatus.ready);
 }
 
 EditalEditorBloc _bloc({

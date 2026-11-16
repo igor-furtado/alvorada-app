@@ -73,6 +73,51 @@ void main() {
     );
   });
 
+  testWidgets('confirma antes de descartar alterações não salvas', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1024, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      RepositoryProvider<ConcursosUseCases>.value(
+        value: ConcursosUseCases(FakeConcursosRepository()),
+        child: MaterialApp(
+          locale: const Locale('pt'),
+          localizationsDelegates: appLocalizationDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => AppButton(
+                label: 'Abrir formulário',
+                onPressed: () => showAppDrawerBuilder<void>(
+                  context,
+                  builder: (_) => const ConcursosFormView(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Abrir formulário'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(EditableText).first, 'Secretaria da Fazenda');
+    await tester.tap(find.byIcon(AppIcons.close));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+    expect(find.text(_pt.unsavedChangesTitle), findsOneWidget);
+    await tester.tap(find.text(_pt.keepEditing));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsOneWidget);
+
+    await tester.tap(find.byIcon(AppIcons.close));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(_pt.discardChanges));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('app-drawer-surface')), findsNothing);
+  });
+
   testWidgets('reorganiza o formulário nas larguras de referência', (tester) async {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);

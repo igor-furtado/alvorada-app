@@ -44,6 +44,7 @@ class ConcursoViewData {
         ConcursoDisciplinaProgress(
           id: disciplina.id,
           name: disciplina.nome,
+          weight: disciplina.peso,
           topics: [
             for (final topico in disciplina.topicos)
               ConcursoTopicoViewData(
@@ -108,7 +109,7 @@ class ConcursoDisciplinaProgress {
   final List<ConcursoTopicoViewData> topics;
   final double? progress;
   final double? performance;
-  final int? weight;
+  final double? weight;
 }
 
 class ConcursoTopicoViewData {

@@ -2,6 +2,9 @@ import 'package:estudos_app/core/design_system/design_system.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../disciplinas_list/disciplinas_list_state.dart';
+import '../disciplinas_localizations.dart';
+
+enum _DisciplineAction { edit, delete }
 
 class TopicosListHeader extends StatelessWidget {
   const TopicosListHeader({
@@ -24,52 +27,88 @@ class TopicosListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final heading = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      final tokens = context.tokens;
+      final disciplineColor = _parseHexColor(
+        disciplina.color,
+        tokens.colors.onSurfaceMuted,
+      );
+      final heading = Row(
         children: [
-          Text(
-            disciplina.name,
-            style: context.tokens.typography.titleLarge,
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: disciplineColor.withValues(alpha: .12),
+              borderRadius: tokens.borders.lg,
+            ),
+            child: Icon(AppIcons.bookText, color: disciplineColor, size: 21),
           ),
-          SizedBox(height: context.tokens.spacing.xxs),
-          Text(
-            context.l10n.topicCountInCatalog(disciplina.topicCount),
-            style: context.tokens.typography.bodySmall.copyWith(
-              color: context.tokens.colors.onSurfaceMuted,
+          SizedBox(width: tokens.spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  disciplina.name,
+                  style: tokens.typography.headlineSmall,
+                ),
+                SizedBox(height: tokens.spacing.xxxs),
+                Text(
+                  context.l10n.catalogDisciplineSummary(
+                    disciplina.topicCount,
+                    context.l10n.disciplineDifficulty(disciplina.difficulty),
+                  ),
+                  style: tokens.typography.supportingText,
+                ),
+              ],
             ),
           ),
         ],
       );
-      final actions = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppAccessibleIconButton(
-            icon: AppIcons.add,
-            label: context.l10n.addTopics,
-            variant: AppIconButtonVariant.primary,
-            onPressed: canAdd ? onAdd : null,
-          ),
-          SizedBox(width: context.tokens.spacing.xs),
-          AppAccessibleIconButton(
-            icon: AppIcons.edit,
+      final editMenu = AppMenuButton<_DisciplineAction>(
+        icon: AppIcons.edit,
+        label: context.l10n.editDiscipline,
+        enabled: canMutateDiscipline,
+        onSelected: (action) {
+          switch (action) {
+            case _DisciplineAction.edit:
+              onRenameDiscipline?.call();
+            case _DisciplineAction.delete:
+              onDeleteDiscipline?.call();
+          }
+        },
+        items: [
+          AppMenuItem(
+            value: _DisciplineAction.edit,
             label: context.l10n.editDiscipline,
-            onPressed: canMutateDiscipline ? onRenameDiscipline : null,
+            icon: AppIcons.edit,
           ),
-          SizedBox(width: context.tokens.spacing.xs),
-          AppAccessibleIconButton(
-            icon: AppIcons.delete,
+          AppMenuItem(
+            value: _DisciplineAction.delete,
             label: context.l10n.deleteDiscipline,
-            onPressed: canMutateDiscipline ? onDeleteDiscipline : null,
+            icon: AppIcons.delete,
+            destructive: true,
           ),
         ],
       );
-      if (constraints.maxWidth < context.tokens.layout.toolbar) {
+      final addButton = AppButton(
+        label: context.l10n.newTopic,
+        icon: AppIcons.add,
+        onPressed: canAdd ? onAdd : null,
+      );
+      if (constraints.maxWidth < tokens.layout.toolbar) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             heading,
-            SizedBox(height: context.tokens.spacing.sm),
-            Align(alignment: Alignment.centerRight, child: actions),
+            SizedBox(height: tokens.spacing.md),
+            Row(
+              children: [
+                editMenu,
+                SizedBox(width: tokens.spacing.xs),
+                Expanded(child: addButton),
+              ],
+            ),
           ],
         );
       }
@@ -77,10 +116,19 @@ class TopicosListHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: heading),
-          SizedBox(width: context.tokens.spacing.lg),
-          actions,
+          SizedBox(width: tokens.spacing.lg),
+          editMenu,
+          SizedBox(width: tokens.spacing.xs),
+          addButton,
         ],
       );
     },
   );
+}
+
+Color _parseHexColor(String value, Color fallback) {
+  final normalized = value.replaceFirst('#', '');
+  final parsed = int.tryParse(normalized, radix: 16);
+  if (parsed == null || (normalized.length != 6 && normalized.length != 8)) return fallback;
+  return Color(normalized.length == 6 ? 0xff000000 | parsed : parsed);
 }

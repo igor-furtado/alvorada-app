@@ -441,7 +441,7 @@ class _AppComboboxState<T extends Object> extends State<AppCombobox<T>> {
             padding: EdgeInsets.only(left: tokens.spacing.md, top: tokens.spacing.xs),
             child: Text(
               widget.errorText!,
-              style: tokens.typography.bodySmall.copyWith(color: tokens.colors.error),
+              style: tokens.typography.errorText,
             ),
           ),
       ],
@@ -488,7 +488,7 @@ class _AppComboboxState<T extends Object> extends State<AppCombobox<T>> {
                     child: Text(
                       widget.emptyMessage ?? context.l10n.comboboxEmpty,
                       textAlign: TextAlign.center,
-                      style: tokens.typography.bodySmall.copyWith(color: tokens.colors.onSurfaceMuted),
+                      style: tokens.typography.supportingText,
                     ),
                   )
                 : ListView.builder(

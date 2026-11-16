@@ -104,6 +104,38 @@ func TestCreateRejectsInvalidHiringRegime(t *testing.T) {
 	}
 }
 
+func TestUpdateDisciplinaPesoRejectsNonPositiveValue(t *testing.T) {
+	service := NewService(&fakeRepository{})
+
+	err := service.UpdateDisciplinaPeso(context.Background(), "concurso-1", "disciplina-1", 0)
+
+	if !errors.Is(err, ErrPesoDisciplina) {
+		t.Fatalf("UpdateDisciplinaPeso() error = %v, want %v", err, ErrPesoDisciplina)
+	}
+}
+
+func TestUpdateDisciplinaPesoRejectsValueOutsideDatabasePrecision(t *testing.T) {
+	service := NewService(&fakeRepository{})
+
+	for _, peso := range []float64{0.001, 1000000, 1.234} {
+		err := service.UpdateDisciplinaPeso(context.Background(), "concurso-1", "disciplina-1", peso)
+		if !errors.Is(err, ErrPesoDisciplina) {
+			t.Errorf("UpdateDisciplinaPeso(%v) error = %v, want %v", peso, err, ErrPesoDisciplina)
+		}
+	}
+}
+
+func TestUpdateDisciplinaPesoAcceptsDatabaseBoundaries(t *testing.T) {
+	repository := &fakeRepository{}
+	service := NewService(repository)
+
+	for _, peso := range []float64{0.01, 999999.99} {
+		if err := service.UpdateDisciplinaPeso(context.Background(), "concurso-1", "disciplina-1", peso); err != nil {
+			t.Errorf("UpdateDisciplinaPeso(%v) error = %v", peso, err)
+		}
+	}
+}
+
 type fakeRepository struct {
 	created domain.CreateConcursoInput
 	updated domain.UpdateConcursoInput
@@ -123,6 +155,9 @@ func (f *fakeRepository) Archive(context.Context, string) error        { return 
 func (f *fakeRepository) Restore(context.Context, string) error        { return nil }
 func (f *fakeRepository) Delete(context.Context, string) error         { return nil }
 func (f *fakeRepository) AddDisciplinaToEdital(context.Context, string, string) error {
+	return nil
+}
+func (f *fakeRepository) UpdateDisciplinaPeso(context.Context, string, string, float64) error {
 	return nil
 }
 func (f *fakeRepository) AddTopicoToEdital(context.Context, string, string) error { return nil }

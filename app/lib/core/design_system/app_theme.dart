@@ -83,7 +83,7 @@ abstract final class AppTheme {
           minimumSize: Size.square(tokens.layout.inputHeight),
           backgroundColor: colors.primary,
           foregroundColor: colors.onPrimary,
-          textStyle: textTheme.labelLarge,
+          textStyle: tokens.typography.buttonPrimary,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
           elevation: 0,
@@ -96,7 +96,7 @@ abstract final class AppTheme {
           minimumSize: Size.square(tokens.layout.inputHeight),
           foregroundColor: colors.onSurface,
           side: BorderSide(color: colors.border),
-          textStyle: textTheme.labelLarge,
+          textStyle: tokens.typography.button,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
           backgroundColor: colors.surface,
@@ -105,7 +105,7 @@ abstract final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.actionForeground,
-          textStyle: textTheme.labelLarge,
+          textStyle: tokens.typography.buttonAction,
           shape: RoundedRectangleBorder(borderRadius: radius),
           minimumSize: Size.square(tokens.layout.inputHeight),
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
@@ -123,10 +123,8 @@ abstract final class AppTheme {
         isDense: true,
         filled: true,
         fillColor: colors.surface,
-        labelStyle: textTheme.bodySmall?.copyWith(
-          color: colors.onSurfaceMuted,
-        ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceMuted),
+        labelStyle: tokens.typography.supportingText,
+        hintStyle: tokens.typography.description,
         prefixIconConstraints: BoxConstraints(
           minWidth: tokens.layout.inputHeight,
           minHeight: tokens.layout.inputHeight,
@@ -193,9 +191,8 @@ abstract final class AppTheme {
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => textTheme.labelSmall?.copyWith(
-            color: states.contains(WidgetState.selected) ? colors.onSurface : colors.onSurfaceMuted,
-          ),
+          (states) =>
+              states.contains(WidgetState.selected) ? tokens.typography.overlineStrong : tokens.typography.overline,
         ),
       ),
       listTileTheme: ListTileThemeData(
@@ -231,7 +228,7 @@ abstract final class AppTheme {
           color: colors.onSurface,
           borderRadius: tokens.borders.sm,
         ),
-        textStyle: textTheme.labelMedium?.copyWith(color: colors.canvas),
+        textStyle: tokens.typography.tooltipLabel,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colors.primary,

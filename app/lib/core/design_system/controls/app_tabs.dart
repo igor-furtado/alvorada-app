@@ -238,13 +238,11 @@ class _SegmentedTab extends StatelessWidget {
           maxLines: 1,
           softWrap: false,
           overflow: TextOverflow.fade,
-          style: context.tokens.typography.labelLarge.copyWith(
-            color: selected
-                ? filled
-                      ? context.tokens.colors.onPrimary
-                      : context.tokens.colors.onSurface
-                : context.tokens.colors.onSurfaceMuted,
-          ),
+          style: selected
+              ? filled
+                    ? context.tokens.typography.controlLabelOnPrimary
+                    : context.tokens.typography.controlLabel
+              : context.tokens.typography.controlLabelMuted,
         ),
       ),
     ),
@@ -286,9 +284,7 @@ class _LineTab extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: context.tokens.typography.labelLarge.copyWith(
-            color: selected ? context.tokens.colors.onSurface : context.tokens.colors.onSurfaceMuted,
-          ),
+          style: selected ? context.tokens.typography.controlLabel : context.tokens.typography.controlLabelMuted,
         ),
       ),
     ),

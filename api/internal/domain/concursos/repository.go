@@ -11,6 +11,7 @@ type Repository interface {
 	Restore(ctx context.Context, id string) error
 	Delete(ctx context.Context, id string) error
 	AddDisciplinaToEdital(ctx context.Context, concursoID, disciplinaID string) error
+	UpdateDisciplinaPeso(ctx context.Context, concursoID, disciplinaID string, peso float64) error
 	AddTopicoToEdital(ctx context.Context, concursoID, topicoID string) error
 	RemoveTopicoFromEdital(ctx context.Context, concursoID, topicoID string) error
 }

@@ -7,13 +7,11 @@ import 'disciplinas_list_state.dart';
 class DisciplinasListPanel extends StatelessWidget {
   const DisciplinasListPanel({
     required this.state,
-    required this.onAdd,
     required this.onSelect,
     super.key,
   });
 
   final DisciplinasListState state;
-  final VoidCallback onAdd;
   final ValueChanged<DisciplinaListItemData> onSelect;
 
   @override
@@ -31,16 +29,18 @@ class DisciplinasListPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: AppButton(
-              label: context.l10n.newDiscipline,
-              icon: AppIcons.add,
-              variant: AppButtonVariant.secondary,
-              onPressed: state.canMutate ? onAdd : null,
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.tokens.spacing.md,
+              context.tokens.spacing.xs,
+              context.tokens.spacing.md,
+              context.tokens.spacing.sm,
+            ),
+            child: Text(
+              context.l10n.navigationDisciplines.toUpperCase(),
+              style: context.tokens.typography.catalogOverline,
             ),
           ),
-          SizedBox(height: context.tokens.spacing.sm),
           AppListItemGroup(
             spacing: context.tokens.spacing.xxs,
             children: items,

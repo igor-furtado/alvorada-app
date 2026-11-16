@@ -98,6 +98,7 @@ class DisciplinaEdital {
     required this.id,
     required this.nome,
     required List<TopicoEdital> topicos,
+    this.peso,
   }) : topicos = List.unmodifiable(topicos) {
     if (id.trim().isEmpty || nome.trim().isEmpty) {
       throw const FormatException('A Disciplina do Edital deve ter identificador e nome.');
@@ -119,10 +120,14 @@ class DisciplinaEdital {
         'A Disciplina do Edital deve ser derivada de ao menos um Tópico comum.',
       );
     }
+    if (peso != null && (peso! <= 0 || !peso!.isFinite)) {
+      throw const FormatException('O peso da Disciplina no Edital deve ser maior que zero.');
+    }
   }
 
   final String id;
   final String nome;
+  final double? peso;
   final List<TopicoEdital> topicos;
 }
 

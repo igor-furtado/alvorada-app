@@ -22,6 +22,13 @@ int? readJsonNullableInteger(Map<String, Object?> json, String key) {
   throw FormatException('O campo "$key" da API deve ser um número inteiro ou nulo.');
 }
 
+double? readJsonNullableNumber(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  throw FormatException('O campo "$key" da API deve ser um número ou nulo.');
+}
+
 bool readJsonBoolean(Map<String, Object?> json, String key) {
   final value = json[key];
   if (value is bool) return value;

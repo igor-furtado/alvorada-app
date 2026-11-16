@@ -23,6 +23,12 @@ abstract interface class ConcursosApi {
 
   Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId});
 
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  });
+
   Future<void> addTopicoToEdital({required String concursoId, required String topicoId});
 
   Future<void> removeTopicoFromEdital({required String concursoId, required String topicoId});
@@ -94,6 +100,17 @@ class ConcursosApiService implements ConcursosApi {
   Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) => _sendEmpty(
     'PUT',
     '/api/v1/concursos/${Uri.encodeComponent(concursoId)}/edital/topicos/${Uri.encodeComponent(topicoId)}',
+  );
+
+  @override
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  }) => _sendEmpty(
+    'PATCH',
+    '/api/v1/concursos/${Uri.encodeComponent(concursoId)}/edital/disciplinas/${Uri.encodeComponent(disciplinaId)}/peso',
+    body: {'peso': peso},
   );
 
   @override

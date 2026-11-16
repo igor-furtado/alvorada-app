@@ -7,6 +7,7 @@ abstract final class DisciplinasResultadoCodes {
   static const topicoCriacaoFalhou = 'topico.criacao_falhou';
   static const topicoAtualizacaoFalhou = 'topico.atualizacao_falhou';
   static const topicoExclusaoFalhou = 'topico.exclusao_falhou';
+  static const topicoReordenacaoFalhou = 'topico.reordenacao_falhou';
   static const disciplinaNomeObrigatorio = 'disciplina.nome_obrigatorio';
   static const disciplinaNomeMuitoLongo = 'disciplina.nome_muito_longo';
   static const disciplinaCorInvalida = 'disciplina.cor_invalida';

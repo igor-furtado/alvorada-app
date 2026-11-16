@@ -30,19 +30,23 @@ class AppTokens extends ThemeExtension<AppTokens> {
 
   factory AppTokens.light() {
     const colors = AppColorTokens.light();
+    const opacity = AppOpacityTokens();
     return AppTokens(
       colors: colors,
       overlayShadow: _overlayShadow(colors.scrim),
-      typography: AppTypographyTokens.fromColors(colors.onSurface, colors.onSurfaceMuted),
+      typography: AppTypographyTokens.fromTokens(colors, opacity),
+      opacity: opacity,
     );
   }
 
   factory AppTokens.dark() {
     const colors = AppColorTokens.dark();
+    const opacity = AppOpacityTokens();
     return AppTokens(
       colors: colors,
       overlayShadow: _overlayShadow(colors.scrim),
-      typography: AppTypographyTokens.fromColors(colors.onSurface, colors.onSurfaceMuted),
+      typography: AppTypographyTokens.fromTokens(colors, opacity),
+      opacity: opacity,
     );
   }
 

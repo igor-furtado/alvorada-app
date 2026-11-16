@@ -38,6 +38,7 @@ type Concurso struct {
 type EditalDisciplina struct {
 	ID      string         `json:"id"`
 	Nome    string         `json:"nome"`
+	Peso    *float64       `json:"peso"`
 	Topicos []EditalTopico `json:"topicos"`
 }
 

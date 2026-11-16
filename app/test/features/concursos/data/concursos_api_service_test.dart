@@ -27,6 +27,7 @@ void main() {
     expect(concursos.single.vencimentoCentavos, 2200000);
     expect(concursos.single.horarioInicioProva, '13:00');
     expect(concursos.single.disciplinas.single.nome, 'Direito Tributário');
+    expect(concursos.single.disciplinas.single.peso, 2.5);
     expect(concursos.single.disciplinas.single.topicos.last.obrigatorio, isTrue);
   });
 
@@ -111,6 +112,25 @@ void main() {
       'DELETE /api/v1/concursos/concurso-1/edital/topicos/topico-1',
     ]);
   });
+
+  test('atualiza peso decimal da Disciplina no Edital', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PATCH');
+      expect(
+        request.url.path,
+        '/api/v1/concursos/concurso-1/edital/disciplinas/disciplina-1/peso',
+      );
+      expect(jsonDecode(request.body), {'peso': 2.5});
+      return http.Response('', 204);
+    });
+    final service = ConcursosApiService(client, baseUri: Uri.parse('http://api.test'));
+
+    await service.updateDisciplinaPeso(
+      concursoId: 'concurso-1',
+      disciplinaId: 'disciplina-1',
+      peso: 2.5,
+    );
+  });
 }
 
 const _concursoJson = <String, Object?>{
@@ -135,6 +155,7 @@ const _concursoJson = <String, Object?>{
     {
       'id': 'disciplina-1',
       'nome': 'Direito Tributário',
+      'peso': 2.5,
       'topicos': <Object?>[
         {'id': 'topico-1', 'nome': 'Obrigação tributária', 'obrigatorio': false},
         {'id': 'topico-revisao', 'nome': 'Revisão de Véspera', 'obrigatorio': true},

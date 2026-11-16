@@ -27,5 +27,6 @@ export 'layout/app_divider.dart';
 export 'layout/app_master_detail.dart';
 export 'layout/app_page.dart';
 export 'layout/app_responsive.dart';
+export 'layout/app_scroll_area.dart';
 export 'overlays/app_alert_dialog.dart';
 export 'overlays/app_drawer.dart';

@@ -50,6 +50,20 @@ void main() {
     await service.createTopicos('discipline-1', ['Pontuação', 'Concordância']);
   });
 
+  test('envia a ordem completa dos Tópicos editáveis', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/api/v1/subjects/discipline-1/topics/order');
+      expect(jsonDecode(request.body), {
+        'topico_ids': ['topic-2', 'topic-1'],
+      });
+      return http.Response('', 204);
+    });
+    final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));
+
+    await service.reorderTopicos('discipline-1', ['topic-2', 'topic-1']);
+  });
+
   test('preserva a mensagem de validação devolvida pela API', () async {
     final client = MockClient((_) async => http.Response(jsonEncode({'erro': 'informe ao menos um Tópico'}), 400));
     final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));

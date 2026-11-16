@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../domain/models/disciplina.dart';
+
 enum DisciplinasListStatus { initial, loading, success, failure }
 
 enum DisciplinasListFeedback {
@@ -18,19 +20,28 @@ class DisciplinaListItemData {
     required this.id,
     required this.name,
     required this.topicCount,
+    required this.difficulty,
+    required this.color,
   });
 
   final String id;
   final String name;
   final int topicCount;
+  final DificuldadeDisciplina difficulty;
+  final String color;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DisciplinaListItemData && id == other.id && name == other.name && topicCount == other.topicCount;
+      other is DisciplinaListItemData &&
+          id == other.id &&
+          name == other.name &&
+          topicCount == other.topicCount &&
+          difficulty == other.difficulty &&
+          color == other.color;
 
   @override
-  int get hashCode => Object.hash(id, name, topicCount);
+  int get hashCode => Object.hash(id, name, topicCount, difficulty, color);
 }
 
 @immutable

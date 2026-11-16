@@ -13,9 +13,17 @@ class AppBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.tokens.colors;
-    final (background, foreground, border) = switch (variant) {
-      AppBadgeVariant.primary => (colors.primary, colors.onPrimary, colors.transparent),
-      AppBadgeVariant.secondary => (colors.surfaceSubtle, colors.onSurface, colors.transparent),
+    final (background, border, textStyle) = switch (variant) {
+      AppBadgeVariant.primary => (
+        colors.primary,
+        colors.transparent,
+        context.tokens.typography.compactLabelOnPrimary,
+      ),
+      AppBadgeVariant.secondary => (
+        colors.surfaceSubtle,
+        colors.transparent,
+        context.tokens.typography.compactLabel,
+      ),
     };
     return Semantics(
       label: label,
@@ -30,7 +38,7 @@ class AppBadge extends StatelessWidget {
           border: Border.all(color: border),
           borderRadius: context.tokens.borders.full,
         ),
-        child: Text(label, style: context.tokens.typography.labelMedium.copyWith(color: foreground)),
+        child: Text(label, style: textStyle),
       ),
     );
   }

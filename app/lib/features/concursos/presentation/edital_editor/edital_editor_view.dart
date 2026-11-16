@@ -10,6 +10,10 @@ import 'edital_editor_bloc.dart';
 import 'edital_editor_event.dart';
 import 'edital_editor_state.dart';
 
+const _editorWidth = 980.0;
+const _desktopSplit = 720.0;
+const _disciplineRailWidth = 310.0;
+
 class EditalEditorView extends StatelessWidget {
   const EditalEditorView({required this.concurso, super.key});
 
@@ -22,209 +26,454 @@ class EditalEditorView extends StatelessWidget {
       getDisciplinas: context.read<DisciplinasUseCases>().getDisciplinas,
       edital: context.read<ConcursosUseCases>().edital,
     )..add(const EditalEditorLoaded()),
-    child: const _EditalEditorContent(),
+    child: _EditalEditorContent(
+      institution: concurso.instituicao,
+      role: concurso.cargo,
+    ),
   );
 }
 
-class _EditalEditorContent extends StatefulWidget {
-  const _EditalEditorContent();
+class _EditalEditorContent extends StatelessWidget {
+  const _EditalEditorContent({required this.institution, required this.role});
 
-  @override
-  State<_EditalEditorContent> createState() => _EditalEditorContentState();
-}
+  final String institution;
+  final String role;
 
-class _EditalEditorContentState extends State<_EditalEditorContent> {
   @override
   Widget build(BuildContext context) => BlocConsumer<EditalEditorBloc, EditalEditorState>(
     listenWhen: (previous, current) => current.feedback != null && previous.feedback != current.feedback,
     listener: (context, state) {
-      final feedback = state.feedback;
-      if (feedback == null) return;
-      final (message, variant) = switch (feedback) {
-        EditalEditorFeedback.disciplinaAdicionada => (
-          context.l10n.disciplineAddedToSyllabus,
-          AppToastVariant.success,
-        ),
-        EditalEditorFeedback.topicoAdicionado => (
-          context.l10n.topicAddedToSyllabus,
-          AppToastVariant.success,
-        ),
-        EditalEditorFeedback.topicoRemovido => (
-          context.l10n.topicRemovedFromSyllabus,
-          AppToastVariant.success,
-        ),
-        EditalEditorFeedback.violacaoRegra => (
-          context.l10n.syllabusRuleViolation,
-          AppToastVariant.error,
-        ),
-        EditalEditorFeedback.falhaTecnica => (
-          context.l10n.syllabusUpdateFailed,
-          AppToastVariant.error,
-        ),
-      };
-      AppToast.show(
-        context,
-        title: message,
-        variant: variant,
-      );
+      switch (state.feedback) {
+        case EditalEditorFeedback.editalSalvo:
+          Navigator.of(context).pop(true);
+        case EditalEditorFeedback.violacaoRegra:
+          AppToast.show(
+            context,
+            title: context.l10n.syllabusRuleViolation,
+            variant: AppToastVariant.error,
+          );
+        case EditalEditorFeedback.falhaTecnica:
+          AppToast.show(
+            context,
+            title: context.l10n.syllabusUpdateFailed,
+            variant: AppToastVariant.error,
+          );
+        case null:
+          break;
+      }
     },
     builder: (context, state) => AppDrawer(
-      title: context.l10n.addToSyllabus,
-      description: context.l10n.linkCatalogContent,
-      child: _conteudo(state),
+      title: context.l10n.syllabusTriageTitle,
+      description: context.l10n.syllabusTriageDescription(institution, role),
+      width: _editorWidth,
+      scrollable: false,
+      bodyPadding: EdgeInsets.zero,
+      dismissible: !state.saving,
+      footer: state.status == EditalEditorStatus.ready ? _EditorFooter(state: state) : null,
+      child: _body(context, state),
     ),
   );
 
-  Widget _conteudo(EditalEditorState state) {
-    if (state.status case EditalEditorStatus.initial || EditalEditorStatus.loading) {
-      return AppSkeleton(height: 320, semanticLabel: context.l10n.loadingCatalog);
-    }
-    if (state.status == EditalEditorStatus.failure) {
-      return AppStateView(
+  Widget _body(BuildContext context, EditalEditorState state) => switch (state.status) {
+    EditalEditorStatus.initial || EditalEditorStatus.loading => Padding(
+      padding: EdgeInsets.all(context.tokens.spacing.xxl),
+      child: AppSkeleton(height: 420, semanticLabel: context.l10n.loadingCatalog),
+    ),
+    EditalEditorStatus.failure => Padding(
+      padding: EdgeInsets.all(context.tokens.spacing.xxl),
+      child: AppStateView(
         variant: AppStateVariant.error,
         actionLabel: context.l10n.tryAgain,
         onAction: () => context.read<EditalEditorBloc>().add(const EditalEditorRetried()),
-      );
-    }
-    return AppTabs<_EditorTab>(
-      initialValue: _EditorTab.disciplina,
-      expanded: true,
-      items: [
-        AppTabItem(
-          value: _EditorTab.disciplina,
-          label: context.l10n.discipline,
-          content: _disciplinas(state),
-        ),
-        AppTabItem(
-          value: _EditorTab.topico,
-          label: context.l10n.topic,
-          content: _topicos(state),
-        ),
-      ],
-    );
-  }
+      ),
+    ),
+    EditalEditorStatus.ready => _TriageWorkspace(state: state),
+  };
+}
 
-  Widget _disciplinas(EditalEditorState state) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _nota(context.l10n.linkDisciplineNote),
-        SizedBox(height: context.tokens.spacing.lg),
-        AppField(
-          label: context.l10n.searchDiscipline,
-          control: AppSearchField(
-            placeholder: context.l10n.disciplineSearchExample,
-            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaSearched(value)),
-          ),
-        ),
-        SizedBox(height: context.tokens.spacing.lg),
-        AppListItemGroup(
+class _TriageWorkspace extends StatelessWidget {
+  const _TriageWorkspace({required this.state});
+
+  final EditalEditorState state;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      if (constraints.maxWidth >= _desktopSplit) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final disciplina in state.disciplinasFiltradas) _disciplinaItem(state, disciplina),
+            SizedBox(
+              width: _disciplineRailWidth,
+              child: _DisciplineRail(state: state),
+            ),
+            Expanded(child: _TopicPane(state: state)),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _disciplinaItem(EditalEditorState state, Disciplina disciplina) {
-    final comuns = disciplina.topics.where((item) => !item.mandatory).toList(growable: false);
-    final completa = comuns.isNotEmpty && comuns.every((item) => state.topicosVinculados.contains(item.id));
-    return AppListItem(
-      title: disciplina.name,
-      subtitle: context.l10n.topicsInCatalog(comuns.length),
-      trailing: AppButton(
-        label: completa ? context.l10n.added : context.l10n.add,
-        variant: AppButtonVariant.outline,
-        loading: state.mutation?.matches(EditalEditorMutationType.disciplina, disciplina.id) ?? false,
-        onPressed: comuns.isEmpty || completa || state.mutation != null
-            ? null
-            : () => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaAdded(disciplina)),
-      ),
-    );
-  }
-
-  Widget _topicos(EditalEditorState state) {
-    final vinculadas = state.catalogo.where(state.disciplinaEstaVinculada).toList(growable: false);
-    final selecionada = vinculadas.cast<Disciplina?>().firstWhere(
-      (item) => item?.id == state.disciplinaSelecionada,
-      orElse: () => null,
-    );
-    final query = state.buscaTopico.trim().toLowerCase();
-    final topicos = (selecionada?.topics ?? const <Topico>[])
-        .where((item) => !item.mandatory && (query.isEmpty || item.name.toLowerCase().contains(query)))
-        .toList(growable: false);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _nota(context.l10n.chooseDisciplineNote),
-        SizedBox(height: context.tokens.spacing.lg),
-        AppField(
-          label: context.l10n.discipline,
-          control: AppCombobox<String>(
-            options: [for (final disciplina in vinculadas) disciplina.id],
-            displayStringForOption: (id) => vinculadas.firstWhere((item) => item.id == id).name,
-            value: selecionada?.id,
-            placeholder: context.l10n.selectDiscipline,
-            semanticLabel: context.l10n.discipline,
-            showClear: true,
-            disabled: vinculadas.isEmpty,
-            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaSelected(value)),
-          ),
-        ),
-        SizedBox(height: context.tokens.spacing.lg),
-        AppField(
-          label: context.l10n.searchTopic,
-          control: AppSearchField(
-            placeholder: context.l10n.topicSearchExample,
-            enabled: selecionada != null,
-            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorTopicoSearched(value)),
-          ),
-        ),
-        SizedBox(height: context.tokens.spacing.lg),
-        if (selecionada == null)
-          AppStateView(
-            variant: AppStateVariant.empty,
-            title: context.l10n.noSyllabusDiscipline,
-            message: context.l10n.noSyllabusDisciplineMessage,
-          )
-        else
-          AppListItemGroup(
-            children: [for (final topico in topicos) _topicoItem(state, topico)],
-          ),
-      ],
-    );
-  }
-
-  Widget _topicoItem(EditalEditorState state, Topico topico) {
-    final vinculado = state.topicosVinculados.contains(topico.id);
-    return AppListItem(
-      title: topico.name,
-      subtitle: context.l10n.sharedCatalog,
-      trailing: AppButton(
-        label: vinculado ? context.l10n.removeFromSyllabus : context.l10n.add,
-        variant: vinculado ? AppButtonVariant.text : AppButtonVariant.outline,
-        loading: state.mutation?.matches(EditalEditorMutationType.topico, topico.id) ?? false,
-        onPressed: state.mutation == null
-            ? () => context.read<EditalEditorBloc>().add(EditalEditorTopicoToggled(topico))
-            : null,
-      ),
-    );
-  }
-
-  Widget _nota(String texto) => Container(
-    padding: EdgeInsets.all(context.tokens.spacing.md),
-    decoration: BoxDecoration(
-      color: context.tokens.colors.primaryContainer,
-      borderRadius: context.tokens.borders.md,
-    ),
-    child: Text(
-      texto,
-      style: context.tokens.typography.bodyMedium.copyWith(
-        color: context.tokens.colors.actionForeground,
-      ),
-    ),
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: 208, child: _DisciplineRail(state: state, compact: true)),
+          Expanded(child: _TopicPane(state: state, compact: true)),
+        ],
+      );
+    },
   );
 }
 
-enum _EditorTab { disciplina, topico }
+class _DisciplineRail extends StatelessWidget {
+  const _DisciplineRail({required this.state, this.compact = false});
+
+  final EditalEditorState state;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          right: compact ? BorderSide.none : BorderSide(color: tokens.colors.border),
+          bottom: compact ? BorderSide(color: tokens.colors.border) : BorderSide.none,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              tokens.spacing.xxl,
+              tokens.spacing.sm,
+              tokens.spacing.xl,
+              tokens.spacing.md,
+            ),
+            child: Text(
+              context.l10n.navigationDisciplines.toUpperCase(),
+              style: tokens.typography.catalogOverline,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              scrollDirection: compact ? Axis.horizontal : Axis.vertical,
+              padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
+              itemCount: state.catalogo.length,
+              itemBuilder: (context, index) {
+                final disciplina = state.catalogo[index];
+                return SizedBox(
+                  width: compact ? 248 : null,
+                  child: _DisciplineItem(
+                    disciplina: disciplina,
+                    selectedCount: state.quantidadeSelecionada(disciplina),
+                    active: disciplina.id == state.disciplinaSelecionada,
+                    disabled: state.saving,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DisciplineItem extends StatelessWidget {
+  const _DisciplineItem({
+    required this.disciplina,
+    required this.selectedCount,
+    required this.active,
+    required this.disabled,
+  });
+
+  final Disciplina disciplina;
+  final int selectedCount;
+  final bool active;
+  final bool disabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final topicCount = disciplina.topics.where((item) => !item.mandatory).length;
+    final complete = topicCount > 0 && selectedCount == topicCount;
+    return Padding(
+      padding: EdgeInsets.only(bottom: tokens.spacing.xxs, right: tokens.spacing.xxs),
+      child: Material(
+        color: active ? tokens.colors.surfaceSubtle : tokens.colors.transparent,
+        borderRadius: tokens.borders.lg,
+        child: InkWell(
+          onTap: disabled
+              ? null
+              : () => context.read<EditalEditorBloc>().add(EditalEditorDisciplinaSelected(disciplina.id)),
+          borderRadius: tokens.borders.lg,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md, vertical: tokens.spacing.sm),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        disciplina.name,
+                        key: ValueKey('discipline-name-${disciplina.id}'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: active ? tokens.typography.disciplineSelected : tokens.typography.disciplineUnselected,
+                      ),
+                      SizedBox(height: tokens.spacing.xxxs),
+                      Text(
+                        context.l10n.syllabusTriageDisciplineProgress(selectedCount, topicCount),
+                        style: tokens.typography.supportingText,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: tokens.spacing.sm),
+                Icon(
+                  complete ? AppIcons.checkCircle : AppIcons.chevronRight,
+                  size: tokens.icons.sm,
+                  color: complete
+                      ? tokens.colors.success
+                      : active
+                      ? tokens.colors.onSurface
+                      : tokens.colors.onSurfaceMuted,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopicPane extends StatelessWidget {
+  const _TopicPane({required this.state, this.compact = false});
+
+  final EditalEditorState state;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final disciplina = state.disciplinaAtiva;
+    if (disciplina == null) {
+      return AppStateView(
+        variant: AppStateVariant.empty,
+        title: context.l10n.noDiscipline,
+        message: context.l10n.noDisciplineMessage,
+      );
+    }
+    final tokens = context.tokens;
+    final topicCount = disciplina.topics.length;
+    final header = _header(context, disciplina, topicCount);
+    if (compact) {
+      return ListView(
+        padding: EdgeInsets.only(bottom: tokens.spacing.xxl),
+        children: [
+          header,
+          if (state.topicosAtivos.isEmpty)
+            AppStateView(
+              variant: AppStateVariant.empty,
+              title: context.l10n.noTopics,
+              message: context.l10n.noTopicsMessage,
+            )
+          else
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: tokens.spacing.xxl),
+              child: Column(
+                children: [
+                  for (var index = 0; index < state.topicosAtivos.length; index++) ...[
+                    if (index > 0) const AppDivider(margin: EdgeInsets.zero),
+                    _TopicItem(
+                      topico: state.topicosAtivos[index],
+                      selected:
+                          state.topicosAtivos[index].mandatory ||
+                          state.topicosVinculados.contains(state.topicosAtivos[index].id),
+                      disabled: state.saving || state.topicosAtivos[index].mandatory,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        header,
+        Expanded(
+          child: state.topicosAtivos.isEmpty
+              ? AppStateView(
+                  variant: AppStateVariant.empty,
+                  title: context.l10n.noTopics,
+                  message: context.l10n.noTopicsMessage,
+                )
+              : ListView.separated(
+                  padding: EdgeInsets.fromLTRB(
+                    tokens.spacing.xxl,
+                    tokens.spacing.none,
+                    tokens.spacing.xxl,
+                    tokens.spacing.xxl,
+                  ),
+                  itemCount: state.topicosAtivos.length,
+                  separatorBuilder: (context, index) => const AppDivider(margin: EdgeInsets.zero),
+                  itemBuilder: (context, index) => _TopicItem(
+                    topico: state.topicosAtivos[index],
+                    selected:
+                        state.topicosAtivos[index].mandatory ||
+                        state.topicosVinculados.contains(state.topicosAtivos[index].id),
+                    disabled: state.saving || state.topicosAtivos[index].mandatory,
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _header(BuildContext context, Disciplina disciplina, int topicCount) {
+    final tokens = context.tokens;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        tokens.spacing.xxl,
+        compact ? tokens.spacing.lg : tokens.spacing.sm,
+        tokens.spacing.xxl,
+        tokens.spacing.lg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.end,
+            spacing: tokens.spacing.md,
+            runSpacing: tokens.spacing.sm,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(disciplina.name, style: tokens.typography.titleLarge),
+                  SizedBox(height: tokens.spacing.xxs),
+                  Text(
+                    context.l10n.topicsInCatalog(topicCount),
+                    style: tokens.typography.supportingText,
+                  ),
+                ],
+              ),
+              Wrap(
+                spacing: tokens.spacing.xs,
+                runSpacing: tokens.spacing.xs,
+                children: [
+                  AppButton(
+                    label: context.l10n.clear,
+                    variant: AppButtonVariant.text,
+                    onPressed: state.saving ? null : () => _changeAll(context, disciplina, selected: false),
+                  ),
+                  AppButton(
+                    label: context.l10n.selectAll,
+                    variant: AppButtonVariant.outline,
+                    onPressed: state.saving ? null : () => _changeAll(context, disciplina, selected: true),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: tokens.spacing.lg),
+          AppSearchField(
+            key: ValueKey('topic-search-${disciplina.id}'),
+            placeholder: context.l10n.filterDisciplineTopics,
+            enabled: !state.saving,
+            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorTopicoSearched(value)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _changeAll(BuildContext context, Disciplina disciplina, {required bool selected}) {
+    context.read<EditalEditorBloc>().add(
+      EditalEditorDisciplinaSelectionChanged(disciplina: disciplina, selected: selected),
+    );
+  }
+}
+
+class _TopicItem extends StatelessWidget {
+  const _TopicItem({required this.topico, required this.selected, required this.disabled});
+
+  final Topico topico;
+  final bool selected;
+  final bool disabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    void toggle() => context.read<EditalEditorBloc>().add(EditalEditorTopicoToggled(topico));
+    return Material(
+      color: tokens.colors.transparent,
+      child: InkWell(
+        onTap: disabled ? null : toggle,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
+          child: Row(
+            children: [
+              AppCheckbox(
+                value: selected,
+                semanticLabel: topico.name,
+                onChanged: disabled ? null : (_) => toggle(),
+              ),
+              SizedBox(width: tokens.spacing.sm),
+              Expanded(
+                child: Text(
+                  topico.name,
+                  key: ValueKey('topic-name-${topico.id}'),
+                  style: tokens.typography.contentTitle,
+                ),
+              ),
+              if (selected && !topico.mandatory) ...[
+                SizedBox(width: tokens.spacing.md),
+                Text(
+                  context.l10n.inSyllabus,
+                  style: tokens.typography.successLabel,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EditorFooter extends StatelessWidget {
+  const _EditorFooter({required this.state});
+
+  final EditalEditorState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        tokens.spacing.xxl,
+        tokens.spacing.md,
+        tokens.spacing.xxl,
+        tokens.spacing.lg,
+      ),
+      decoration: BoxDecoration(
+        color: tokens.colors.surface,
+        border: Border(top: BorderSide(color: tokens.colors.border)),
+      ),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: AppButton(
+          label: context.l10n.saveSelectedTopics(state.totalSelecionado),
+          loading: state.saving,
+          onPressed: state.temAlteracoes && !state.saving
+              ? () => context.read<EditalEditorBloc>().add(const EditalEditorSaved())
+              : null,
+        ),
+      ),
+    );
+  }
+}

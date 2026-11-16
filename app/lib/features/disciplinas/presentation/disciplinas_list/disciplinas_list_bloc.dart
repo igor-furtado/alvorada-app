@@ -168,6 +168,8 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
             id: disciplina.id,
             name: disciplina.name,
             topicCount: disciplina.topics.length,
+            difficulty: disciplina.difficulty,
+            color: disciplina.color,
           ),
     ];
     return items;

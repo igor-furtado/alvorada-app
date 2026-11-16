@@ -67,6 +67,22 @@ CREATE TABLE IF NOT EXISTS concursos_topicos (
   INDEX idx_concursos_topicos_topico (topico_id, concurso_id)
 ) ENGINE=InnoDB`
 
+const editalDisciplinasSchema = `
+CREATE TABLE IF NOT EXISTS concursos_disciplinas (
+  concurso_id CHAR(36) NOT NULL,
+  disciplina_id CHAR(36) NOT NULL,
+  peso DECIMAL(8,2) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (concurso_id, disciplina_id),
+  CONSTRAINT fk_concurso_disciplina_concurso FOREIGN KEY (concurso_id)
+    REFERENCES concursos(id) ON DELETE CASCADE,
+  CONSTRAINT fk_concurso_disciplina_disciplina FOREIGN KEY (disciplina_id)
+    REFERENCES disciplinas(id) ON DELETE RESTRICT,
+  CONSTRAINT chk_concurso_disciplina_peso CHECK (peso IS NULL OR peso > 0),
+  INDEX idx_concursos_disciplinas_disciplina (disciplina_id, concurso_id)
+) ENGINE=InnoDB`
+
 // EnsureConcursoSchema creates the new aggregate storage without changing
 // existing rows. CREATE TABLE IF NOT EXISTS makes interrupted runs resumable.
 func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
@@ -140,6 +156,16 @@ func EnsureConcursoSchema(ctx context.Context, db *sql.DB) error {
 	}
 	if _, err := db.ExecContext(ctx, editalTopicosSchema); err != nil {
 		return fmt.Errorf("ensure edital topics schema: %w", err)
+	}
+	if _, err := db.ExecContext(ctx, editalDisciplinasSchema); err != nil {
+		return fmt.Errorf("ensure edital disciplines schema: %w", err)
+	}
+	if _, err := db.ExecContext(ctx, `
+		INSERT IGNORE INTO concursos_disciplinas (concurso_id, disciplina_id)
+		SELECT DISTINCT vinculo.concurso_id, topico.disciplina_id
+		FROM concursos_topicos AS vinculo
+		INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id`); err != nil {
+		return fmt.Errorf("backfill edital disciplines: %w", err)
 	}
 	return nil
 }

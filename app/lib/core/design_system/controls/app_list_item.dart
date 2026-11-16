@@ -133,19 +133,15 @@ class _AppListItemState extends State<AppListItem> {
       AppListItemSize.standard => tokens.spacing.md,
       AppListItemSize.sm => tokens.spacing.sm,
     };
-    final titleStyle = switch (widget.size) {
-      AppListItemSize.standard => tokens.typography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
-      AppListItemSize.sm => tokens.typography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
-    }.copyWith(color: foreground);
-    final subtitleStyle =
-        switch (widget.size) {
-          AppListItemSize.standard => tokens.typography.bodyMedium,
-          AppListItemSize.sm => tokens.typography.bodySmall,
-        }.copyWith(
-          color: style == _AppListItemStyle.primary
-              ? tokens.colors.onPrimary.withValues(alpha: tokens.opacity.hint)
-              : tokens.colors.onSurfaceMuted,
-        );
+    final titleStyle = style == _AppListItemStyle.primary
+        ? tokens.typography.listItemTitleOnPrimary
+        : tokens.typography.listItemTitle;
+    final subtitleStyle = switch ((widget.size, style)) {
+      (AppListItemSize.standard, _AppListItemStyle.primary) => tokens.typography.listItemDescriptionOnPrimary,
+      (AppListItemSize.sm, _AppListItemStyle.primary) => tokens.typography.listItemDescriptionCompactOnPrimary,
+      (AppListItemSize.standard, _) => tokens.typography.listItemDescription,
+      (AppListItemSize.sm, _) => tokens.typography.listItemDescriptionCompact,
+    };
     final effectiveMedia =
         widget.media ??
         (widget.leadingIcon == null

@@ -19,14 +19,14 @@ class ConcursoInformation extends StatelessWidget {
       children: [
         Text(
           context.l10n.examJourneyEyebrow,
-          style: context.tokens.typography.labelSmall.copyWith(color: context.tokens.colors.info),
+          style: context.tokens.typography.overlineInfo,
         ),
         SizedBox(height: context.tokens.spacing.sm),
         Text(context.l10n.examJourneyTitle, style: context.tokens.typography.headlineLarge),
         SizedBox(height: context.tokens.spacing.sm),
         Text(
           context.l10n.examJourneyDescription,
-          style: context.tokens.typography.bodyLarge.copyWith(color: context.tokens.colors.onSurfaceMuted),
+          style: context.tokens.typography.leadDescription,
         ),
         SizedBox(height: context.tokens.spacing.xxxl),
         _JourneyStep(
@@ -105,7 +105,7 @@ class _JourneyStep extends StatelessWidget {
               SizedBox(height: context.tokens.spacing.sm),
               Text(
                 description!,
-                style: context.tokens.typography.bodyMedium.copyWith(color: context.tokens.colors.onSurfaceMuted),
+                style: context.tokens.typography.description,
               ),
             ],
             if (facts.isNotEmpty) ...[
@@ -177,7 +177,7 @@ class _JourneyFact extends StatelessWidget {
     children: [
       Text(
         label,
-        style: context.tokens.typography.labelSmall.copyWith(color: context.tokens.colors.onSurfaceMuted),
+        style: context.tokens.typography.overline,
       ),
       SizedBox(height: context.tokens.spacing.xxxs),
       Text(value, style: context.tokens.typography.titleMedium),

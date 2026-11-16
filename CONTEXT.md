@@ -18,20 +18,29 @@ _Evitar_: Concurso favorito, concurso mais importante
 
 **Edital**:
 O recorte estudável vigente do edital de abertura de um Concurso, organizado em Disciplinas e Tópicos e atualizado quando uma retificação altera o conteúdo cobrado. Cada Concurso possui um único Edital; datas e dados de inscrição pertencem ao Concurso.
-_Evitar_: Pauta, mapa, conteúdo programático, grade, lista de matérias
+_Evitar_: Pauta, mapa, grade, lista de matérias
+
+**Conteúdo Programático do Edital**:
+O título da tela usada para selecionar, no catálogo compartilhado, os Tópicos cobrados no Edital de um Concurso.
 
 **Vínculo do Edital**:
 A associação entre um Edital e um Tópico do catálogo. A presença da Disciplina é derivada dos Tópicos vinculados.
+No editor do Edital, a pessoa percorre as Disciplinas, prepara uma seleção de Tópicos e salva o conjunto de alterações de uma vez.
 _Evitar_: Vínculo de Disciplina
 
 ## Disciplinas
+
+**Catálogo de Disciplinas**:
+A tela compartilhada em que a pessoa organiza Disciplinas e seus Tópicos para reutilizá-los nos Editais e planos de estudo.
 
 **Disciplina**:
 Uma área de conhecimento presente em um ou mais Editais e que contém, obrigatoriamente, o Tópico Revisão de Véspera.
 _Evitar_: Matéria, curso, módulo
 
 **Tópico**:
-A unidade de conteúdo compartilhável entre Editais. Um Tópico é mantido uma única vez no catálogo.
+A unidade de conteúdo compartilhável entre Editais. Um Tópico é mantido uma única vez no catálogo. Excluí-lo do catálogo também remove seus vínculos de todos os Editais.
+Ao adicionar Tópicos a uma Disciplina, a pessoa pode digitar ou colar um Tópico por linha e revisar a lista resultante antes de salvar todos de uma vez.
+A ordem dos Tópicos editáveis pode ser reorganizada no catálogo por arrastar e soltar; Revisão de Véspera permanece sempre na última posição.
 _Evitar_: Capítulo, assunto duplicado, unidade por edital
 
 **Revisão de Véspera**:
@@ -41,3 +50,7 @@ _Evitar_: Menu Véspera, lista de gatilhos no app, conteúdo de revisão no app
 **Peso combinado**:
 A prioridade de uma Disciplina ou Tópico calculada pela relevância em cada Edital e pela proximidade de seus Concursos.
 _Evitar_: Dificuldade, importância absoluta
+
+**Peso no Edital**:
+O valor decimal positivo atribuído a uma Disciplina dentro de um Edital. Ele expressa a relevância relativa informada para aquele Concurso e pode variar entre Editais.
+_Evitar_: Peso global da Disciplina, dificuldade

@@ -31,6 +31,19 @@ class EditalUseCases {
     codigoFalha: ConcursosResultadoCodes.editalAtualizacaoFalhou,
   );
 
+  Future<Resultado<void>> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  }) => executarConcursosUseCase(
+    operacao: () => _repository.updateDisciplinaPeso(
+      concursoId: concursoId,
+      disciplinaId: disciplinaId,
+      peso: peso,
+    ),
+    codigoFalha: ConcursosResultadoCodes.editalAtualizacaoFalhou,
+  );
+
   Future<Resultado<void>> removeTopico({
     required String concursoId,
     required String topicoId,

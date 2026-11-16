@@ -28,17 +28,13 @@ class AppField extends StatelessWidget {
     final effectiveDescription = errorText ?? description;
     final label = Text(
       required ? '${this.label} *' : this.label,
-      style: tokens.typography.labelLarge.copyWith(
-        color: errorText == null ? tokens.colors.onSurface : tokens.colors.error,
-      ),
+      style: errorText == null ? tokens.typography.controlLabel : tokens.typography.controlLabelError,
     );
     final descriptionText = effectiveDescription == null
         ? null
         : Text(
             effectiveDescription,
-            style: tokens.typography.bodySmall.copyWith(
-              color: errorText == null ? tokens.colors.onSurfaceMuted : tokens.colors.error,
-            ),
+            style: errorText == null ? tokens.typography.supportingText : tokens.typography.errorText,
           );
 
     if (orientation == AppFieldOrientation.horizontal) {

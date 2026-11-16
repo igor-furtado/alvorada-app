@@ -8,10 +8,17 @@ import 'topicos_list_event.dart';
 import 'topicos_list_state.dart';
 
 abstract final class TopicosListActions {
-  static Future<void> add(BuildContext context, String disciplineId) async {
+  static Future<void> add(
+    BuildContext context,
+    String disciplineId,
+    String disciplineName,
+  ) async {
     final saved = await showAppDrawerBuilder<bool>(
       context,
-      builder: (_) => TopicosFormView(disciplineId: disciplineId),
+      builder: (_) => TopicosFormView(
+        disciplineId: disciplineId,
+        disciplineName: disciplineName,
+      ),
     );
     if (saved == true && context.mounted) {
       context.read<TopicosListBloc>().add(
@@ -25,12 +32,14 @@ abstract final class TopicosListActions {
   static Future<void> rename(
     BuildContext context,
     String disciplineId,
+    String disciplineName,
     TopicoListItemData topico,
   ) async {
     final saved = await showAppDrawerBuilder<bool>(
       context,
       builder: (_) => TopicosFormView(
         disciplineId: disciplineId,
+        disciplineName: disciplineName,
         topico: topico,
       ),
     );

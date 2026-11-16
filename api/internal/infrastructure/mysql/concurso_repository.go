@@ -124,11 +124,13 @@ func (r *ConcursoRepository) loadEditais(ctx context.Context, concursos []domain
 	}
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT vinculo.concurso_id, disciplina.id, disciplina.nome,
-			topico.id, topico.nome, 0 AS obrigatorio
+			relacao.peso, topico.id, topico.nome, 0 AS obrigatorio
 		FROM concursos_topicos AS vinculo
 		INNER JOIN concursos AS concurso ON concurso.id = vinculo.concurso_id AND concurso.arquivado_em IS NULL
 		INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id
 		INNER JOIN disciplinas AS disciplina ON disciplina.id = topico.disciplina_id
+		LEFT JOIN concursos_disciplinas AS relacao
+			ON relacao.concurso_id = vinculo.concurso_id AND relacao.disciplina_id = disciplina.id
 		WHERE BINARY topico.nome <> BINARY 'Revisão de Véspera'
 		ORDER BY disciplina.posicao, disciplina.criado_em, disciplina.id,
 			topico.posicao, topico.criado_em, topico.id`)
@@ -138,11 +140,13 @@ func (r *ConcursoRepository) loadEditais(ctx context.Context, concursos []domain
 	defer rows.Close()
 	for rows.Next() {
 		var concursoID, disciplinaID, disciplinaNome string
+		var peso sql.NullFloat64
 		var topico domain.EditalTopico
 		if err := rows.Scan(
 			&concursoID,
 			&disciplinaID,
 			&disciplinaNome,
+			&peso,
 			&topico.ID,
 			&topico.Nome,
 			&topico.Obrigatorio,
@@ -159,8 +163,14 @@ func (r *ConcursoRepository) loadEditais(ctx context.Context, concursos []domain
 			disciplinaIndexes[concursoID][disciplinaID] = disciplinaIndex
 			concursos[concursoIndex].Disciplinas = append(
 				concursos[concursoIndex].Disciplinas,
-				domain.EditalDisciplina{ID: disciplinaID, Nome: disciplinaNome, Topicos: make([]domain.EditalTopico, 0)},
+				domain.EditalDisciplina{
+					ID: disciplinaID, Nome: disciplinaNome, Topicos: make([]domain.EditalTopico, 0),
+				},
 			)
+			if peso.Valid {
+				value := peso.Float64
+				concursos[concursoIndex].Disciplinas[disciplinaIndex].Peso = &value
+			}
 		}
 		disciplina := &concursos[concursoIndex].Disciplinas[disciplinaIndex]
 		disciplina.Topicos = append(disciplina.Topicos, topico)
@@ -370,7 +380,12 @@ func (r *ConcursoRepository) Delete(ctx context.Context, id string) error {
 }
 
 func (r *ConcursoRepository) AddDisciplinaToEdital(ctx context.Context, concursoID, disciplinaID string) error {
-	_, err := r.db.ExecContext(ctx, `
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin add disciplina to edital transaction: %w", err)
+	}
+	defer tx.Rollback()
+	_, err = tx.ExecContext(ctx, `
 		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
 		SELECT concurso.id, topico.id
 		FROM concursos AS concurso
@@ -381,11 +396,61 @@ func (r *ConcursoRepository) AddDisciplinaToEdital(ctx context.Context, concurso
 	if err != nil {
 		return fmt.Errorf("add disciplina to edital: %w", err)
 	}
+	if _, err := tx.ExecContext(ctx, `
+		INSERT IGNORE INTO concursos_disciplinas (concurso_id, disciplina_id)
+		SELECT concurso.id, disciplina.id
+		FROM concursos AS concurso
+		INNER JOIN disciplinas AS disciplina ON disciplina.id = ?
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, disciplinaID, concursoID); err != nil {
+		return fmt.Errorf("add edital discipline metadata: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit add disciplina to edital transaction: %w", err)
+	}
+	return nil
+}
+
+func (r *ConcursoRepository) UpdateDisciplinaPeso(
+	ctx context.Context,
+	concursoID string,
+	disciplinaID string,
+	peso float64,
+) error {
+	result, err := r.db.ExecContext(ctx, `
+		UPDATE concursos_disciplinas
+		SET peso = ?
+		WHERE concurso_id = ? AND disciplina_id = ?`, peso, concursoID, disciplinaID)
+	if err != nil {
+		return fmt.Errorf("update edital discipline weight: %w", err)
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("read edital discipline weight rows affected: %w", err)
+	}
+	if affected > 0 {
+		return nil
+	}
+	var exists bool
+	if err := r.db.QueryRowContext(ctx, `
+		SELECT EXISTS(
+			SELECT 1 FROM concursos_disciplinas
+			WHERE concurso_id = ? AND disciplina_id = ?
+		)`, concursoID, disciplinaID).Scan(&exists); err != nil {
+		return fmt.Errorf("check edital discipline weight: %w", err)
+	}
+	if !exists {
+		return domain.ErrConcursoNotFound
+	}
 	return nil
 }
 
 func (r *ConcursoRepository) AddTopicoToEdital(ctx context.Context, concursoID, topicoID string) error {
-	_, err := r.db.ExecContext(ctx, `
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin add topic to edital transaction: %w", err)
+	}
+	defer tx.Rollback()
+	_, err = tx.ExecContext(ctx, `
 		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
 		SELECT concurso.id, topico.id
 		FROM concursos AS concurso
@@ -395,6 +460,17 @@ func (r *ConcursoRepository) AddTopicoToEdital(ctx context.Context, concursoID, 
 		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, topicoID, concursoID)
 	if err != nil {
 		return fmt.Errorf("add topic to edital: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `
+		INSERT IGNORE INTO concursos_disciplinas (concurso_id, disciplina_id)
+		SELECT concurso.id, topico.disciplina_id
+		FROM concursos AS concurso
+		INNER JOIN topicos AS topico ON topico.id = ?
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, topicoID, concursoID); err != nil {
+		return fmt.Errorf("add topic edital discipline metadata: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit add topic to edital transaction: %w", err)
 	}
 	return nil
 }

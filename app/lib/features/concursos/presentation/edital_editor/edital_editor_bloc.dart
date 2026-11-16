@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
-
 import 'package:estudos_app/core/result.dart';
 import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
 import 'package:estudos_app/features/disciplinas/domain/use_cases/get_disciplinas_use_case.dart';
+
 import '../../domain/models/concurso.dart';
 import '../../domain/use_cases/edital_use_cases.dart';
 import 'edital_editor_event.dart';
@@ -17,27 +17,31 @@ class EditalEditorBloc extends Bloc<EditalEditorEvent, EditalEditorState> {
 
   EditalEditorBloc._(Concurso concurso, this._getDisciplinas, this._edital)
     : _concursoId = concurso.id,
-      super(
-        EditalEditorState(
-          topicosVinculados: {
-            for (final disciplina in concurso.disciplinas)
-              for (final topico in disciplina.topicos)
-                if (!topico.obrigatorio) topico.id,
-          },
-        ),
-      ) {
+      super(_initialState(concurso)) {
     on<EditalEditorLoaded>(_onLoad);
     on<EditalEditorRetried>(_onRetry);
-    on<EditalEditorDisciplinaAdded>(_onAddDisciplina);
     on<EditalEditorTopicoToggled>(_onToggleTopico);
     on<EditalEditorDisciplinaSelected>(_onSelectDisciplina);
-    on<EditalEditorDisciplinaSearched>(_onSearchDisciplina);
+    on<EditalEditorDisciplinaSelectionChanged>(_onChangeDisciplinaSelection);
     on<EditalEditorTopicoSearched>(_onSearchTopico);
+    on<EditalEditorSaved>(_onSave);
   }
 
   final String _concursoId;
   final GetDisciplinasUseCase _getDisciplinas;
   final EditalUseCases _edital;
+
+  static EditalEditorState _initialState(Concurso concurso) {
+    final vinculados = {
+      for (final disciplina in concurso.disciplinas)
+        for (final topico in disciplina.topicos)
+          if (!topico.obrigatorio) topico.id,
+    };
+    return EditalEditorState(
+      topicosOriginais: vinculados,
+      topicosVinculados: vinculados,
+    );
+  }
 
   Future<void> _onLoad(EditalEditorLoaded event, Emitter<EditalEditorState> emit) => _load(emit);
 
@@ -48,12 +52,12 @@ class EditalEditorBloc extends Bloc<EditalEditorEvent, EditalEditorState> {
     final result = await _getDisciplinas(forceRefresh: true);
     switch (result) {
       case Sucesso<List<Disciplina>>(:final valor):
-        final vinculadas = valor.where(state.disciplinaEstaVinculada).toList(growable: false);
+        final selectionExists = valor.any((item) => item.id == state.disciplinaSelecionada);
         emit(
           state.copyWith(
             status: EditalEditorStatus.ready,
             catalogo: valor,
-            disciplinaSelecionada: vinculadas.firstOrNull?.id,
+            disciplinaSelecionada: selectionExists ? state.disciplinaSelecionada : valor.firstOrNull?.id,
           ),
         );
       case ViolacaoRegra<List<Disciplina>>() || FalhaTecnica<List<Disciplina>>():
@@ -61,111 +65,92 @@ class EditalEditorBloc extends Bloc<EditalEditorEvent, EditalEditorState> {
     }
   }
 
-  Future<void> _onAddDisciplina(
-    EditalEditorDisciplinaAdded event,
-    Emitter<EditalEditorState> emit,
-  ) async {
-    final comuns = event.disciplina.topics.where((topico) => !topico.mandatory).toList(growable: false);
-    if (comuns.isEmpty || state.mutation != null) return;
+  void _onToggleTopico(EditalEditorTopicoToggled event, Emitter<EditalEditorState> emit) {
+    if (state.saving || event.topico.mandatory) return;
+    final vinculados = {...state.topicosVinculados};
+    vinculados.contains(event.topico.id) ? vinculados.remove(event.topico.id) : vinculados.add(event.topico.id);
+    emit(state.copyWith(topicosVinculados: vinculados, feedback: null));
+  }
+
+  void _onSelectDisciplina(EditalEditorDisciplinaSelected event, Emitter<EditalEditorState> emit) {
+    if (state.saving) return;
     emit(
       state.copyWith(
-        feedback: null,
-        mutation: EditalEditorMutation(
-          type: EditalEditorMutationType.disciplina,
-          id: event.disciplina.id,
-        ),
+        disciplinaSelecionada: event.disciplinaId,
+        buscaTopico: '',
       ),
     );
-    final result = await _edital.addDisciplina(
-      concursoId: _concursoId,
-      disciplinaId: event.disciplina.id,
-    );
-    switch (result) {
-      case Sucesso<void>():
-        emit(
-          state.copyWith(
-            topicosVinculados: {...state.topicosVinculados, ...comuns.map((item) => item.id)},
-            disciplinaSelecionada: state.disciplinaSelecionada ?? event.disciplina.id,
-            mutation: null,
-            feedback: EditalEditorFeedback.disciplinaAdicionada,
-          ),
-        );
-      case ViolacaoRegra<void>():
-        _emitMutationFailure(emit, EditalEditorFeedback.violacaoRegra);
-      case FalhaTecnica<void>():
-        _emitMutationFailure(emit, EditalEditorFeedback.falhaTecnica);
-    }
   }
 
-  Future<void> _onToggleTopico(
-    EditalEditorTopicoToggled event,
+  void _onChangeDisciplinaSelection(
+    EditalEditorDisciplinaSelectionChanged event,
     Emitter<EditalEditorState> emit,
-  ) async {
-    if (state.mutation != null || event.topico.mandatory) return;
-    final vinculado = state.topicosVinculados.contains(event.topico.id);
+  ) {
+    if (state.saving) return;
+    final ids = event.disciplina.topics.where((item) => !item.mandatory).map((item) => item.id);
+    final vinculados = {...state.topicosVinculados};
+    event.selected ? vinculados.addAll(ids) : vinculados.removeAll(ids);
+    emit(state.copyWith(topicosVinculados: vinculados, feedback: null));
+  }
+
+  void _onSearchTopico(EditalEditorTopicoSearched event, Emitter<EditalEditorState> emit) {
+    if (state.saving) return;
+    emit(state.copyWith(buscaTopico: event.query));
+  }
+
+  Future<void> _onSave(EditalEditorSaved event, Emitter<EditalEditorState> emit) async {
+    if (state.saving || !state.temAlteracoes) return;
+    emit(state.copyWith(saving: true, feedback: null));
+
+    final persisted = {...state.topicosOriginais};
+    final desired = {...state.topicosVinculados};
+    final ordered = [
+      for (final disciplina in state.catalogo)
+        for (final topico in disciplina.topics)
+          if (!topico.mandatory) topico.id,
+    ];
+
+    for (final id in ordered.where((id) => persisted.contains(id) && !desired.contains(id))) {
+      final result = await _edital.removeTopico(concursoId: _concursoId, topicoId: id);
+      switch (result) {
+        case Sucesso<void>():
+          persisted.remove(id);
+        case ViolacaoRegra<void>():
+          return _emitSaveFailure(emit, persisted, EditalEditorFeedback.violacaoRegra);
+        case FalhaTecnica<void>():
+          return _emitSaveFailure(emit, persisted, EditalEditorFeedback.falhaTecnica);
+      }
+    }
+
+    for (final id in ordered.where((id) => desired.contains(id) && !persisted.contains(id))) {
+      final result = await _edital.addTopico(concursoId: _concursoId, topicoId: id);
+      switch (result) {
+        case Sucesso<void>():
+          persisted.add(id);
+        case ViolacaoRegra<void>():
+          return _emitSaveFailure(emit, persisted, EditalEditorFeedback.violacaoRegra);
+        case FalhaTecnica<void>():
+          return _emitSaveFailure(emit, persisted, EditalEditorFeedback.falhaTecnica);
+      }
+    }
+
     emit(
       state.copyWith(
-        feedback: null,
-        mutation: EditalEditorMutation(
-          type: EditalEditorMutationType.topico,
-          id: event.topico.id,
-        ),
+        topicosOriginais: persisted,
+        saving: false,
+        feedback: EditalEditorFeedback.editalSalvo,
       ),
     );
-    final result = vinculado
-        ? await _edital.removeTopico(concursoId: _concursoId, topicoId: event.topico.id)
-        : await _edital.addTopico(concursoId: _concursoId, topicoId: event.topico.id);
-    switch (result) {
-      case Sucesso<void>():
-        final vinculados = {...state.topicosVinculados};
-        vinculado ? vinculados.remove(event.topico.id) : vinculados.add(event.topico.id);
-        emit(
-          state.copyWith(
-            topicosVinculados: vinculados,
-            disciplinaSelecionada: _normalizedSelection(vinculados),
-            mutation: null,
-            feedback: vinculado ? EditalEditorFeedback.topicoRemovido : EditalEditorFeedback.topicoAdicionado,
-          ),
-        );
-      case ViolacaoRegra<void>():
-        _emitMutationFailure(emit, EditalEditorFeedback.violacaoRegra);
-      case FalhaTecnica<void>():
-        _emitMutationFailure(emit, EditalEditorFeedback.falhaTecnica);
-    }
   }
 
-  void _onSelectDisciplina(
-    EditalEditorDisciplinaSelected event,
+  void _emitSaveFailure(
     Emitter<EditalEditorState> emit,
-  ) => emit(state.copyWith(disciplinaSelecionada: event.disciplinaId));
-
-  void _onSearchDisciplina(
-    EditalEditorDisciplinaSearched event,
-    Emitter<EditalEditorState> emit,
-  ) => emit(state.copyWith(buscaDisciplina: event.query));
-
-  void _onSearchTopico(
-    EditalEditorTopicoSearched event,
-    Emitter<EditalEditorState> emit,
-  ) => emit(state.copyWith(buscaTopico: event.query));
-
-  String? _normalizedSelection(Set<String> vinculados) {
-    bool linked(Disciplina disciplina) => disciplina.topics.any(
-      (topico) => !topico.mandatory && vinculados.contains(topico.id),
-    );
-    final disciplinas = state.catalogo.where(linked).toList(growable: false);
-    if (disciplinas.any((item) => item.id == state.disciplinaSelecionada)) {
-      return state.disciplinaSelecionada;
-    }
-    return disciplinas.firstOrNull?.id;
-  }
-
-  void _emitMutationFailure(
-    Emitter<EditalEditorState> emit,
+    Set<String> persisted,
     EditalEditorFeedback feedback,
   ) => emit(
     state.copyWith(
-      mutation: null,
+      topicosOriginais: persisted,
+      saving: false,
       feedback: feedback,
     ),
   );

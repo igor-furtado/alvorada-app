@@ -47,9 +47,7 @@ class ConcursoListItem extends StatelessWidget {
                   if (concurso.prioritario) ...[
                     Text(
                       context.l10n.concursoPrioritario,
-                      style: context.tokens.typography.labelSmall.copyWith(
-                        color: context.tokens.colors.onSurfaceMuted,
-                      ),
+                      style: context.tokens.typography.overline,
                     ),
                     SizedBox(height: context.tokens.spacing.xs),
                   ],

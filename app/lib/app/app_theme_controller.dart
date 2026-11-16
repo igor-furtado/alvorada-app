@@ -3,9 +3,13 @@ import 'package:material_ui/material_ui.dart';
 class AppThemeController extends ValueNotifier<ThemeMode> {
   AppThemeController() : super(ThemeMode.system);
 
+  ThemeMode get mode => value;
+
   void toggle(Brightness currentBrightness) {
     value = currentBrightness == Brightness.dark ? ThemeMode.light : ThemeMode.dark;
   }
+
+  set mode(ThemeMode mode) => value = mode;
 }
 
 class AppThemeScope extends InheritedNotifier<AppThemeController> {

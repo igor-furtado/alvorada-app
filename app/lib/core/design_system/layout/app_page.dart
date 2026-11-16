@@ -44,7 +44,6 @@ class AppPage extends StatelessWidget {
       child: child,
     );
     return SafeArea(
-      top: false,
       child: ResponsiveBuilder(
         builder: (context, windowClass) {
           final spacing = context.tokens.spacing;
@@ -52,7 +51,7 @@ class AppPage extends StatelessWidget {
           final constrained = Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: maxWidth ?? context.tokens.layout.contentMaxWidth),
-              child: content,
+              child: SizedBox(width: double.infinity, child: content),
             ),
           );
           if (_fillsViewport) {
@@ -102,7 +101,7 @@ class _PageContent extends StatelessWidget {
         SizedBox(height: context.tokens.spacing.xs),
         Text(
           description,
-          style: context.tokens.typography.bodyLarge.copyWith(color: context.tokens.colors.onSurfaceMuted),
+          style: context.tokens.typography.leadDescription,
         ),
       ],
     );
@@ -136,7 +135,15 @@ class _PageContent extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ...headerChildren,
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: constraints.maxHeight * .45),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: headerChildren,
+                  ),
+                ),
+              ),
               Expanded(child: child),
             ],
           );

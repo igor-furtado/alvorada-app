@@ -6,6 +6,7 @@ enum TopicosListFeedback {
   created,
   renamed,
   deleted,
+  reordered,
   synchronizationPending,
   operationFailed,
 }
@@ -38,6 +39,7 @@ class TopicosListState {
     this.disciplineId,
     List<TopicoListItemData> items = const [],
     this.isDeleting = false,
+    this.isReordering = false,
     this.feedback,
   }) : items = List.unmodifiable(items);
 
@@ -45,9 +47,10 @@ class TopicosListState {
   final String? disciplineId;
   final List<TopicoListItemData> items;
   final bool isDeleting;
+  final bool isReordering;
   final TopicosListFeedback? feedback;
 
-  bool get canMutate => status == TopicosListStatus.success && !isDeleting;
+  bool get canMutate => status == TopicosListStatus.success && !isDeleting && !isReordering;
 
   List<TopicoListItemData> get regularItems => items.where((item) => !item.mandatory).toList(growable: false);
 

@@ -33,6 +33,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get useDarkTheme => 'Use dark theme';
 
   @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get followSystemTheme => 'Follow system';
+
+  @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
   String get loading => 'Loading';
 
   @override
@@ -324,19 +336,114 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disciplineWeight => 'Syllabus weight';
 
   @override
+  String get syllabusContentButton => 'Syllabus content';
+
+  @override
+  String get editExamData => 'Edit exam details';
+
+  @override
+  String get sortAscending => 'Sort lowest to highest';
+
+  @override
+  String get sortDescending => 'Sort highest to lowest';
+
+  @override
+  String get syllabusCoverage => 'Syllabus coverage';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get correctAnswers => 'Correct';
+
+  @override
+  String get wrongAnswers => 'Incorrect';
+
+  @override
+  String daysRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days remaining',
+      one: '1 day remaining',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String topicsInSyllabusCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Topics in the Syllabus',
+      one: '1 Topic in the Syllabus',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get weightUpdated => 'Subject weight updated.';
+
+  @override
+  String get weightUpdateFailed => 'The Subject weight could not be updated.';
+
+  @override
   String get noDiscipline => 'No Subject linked to this Syllabus.';
 
   @override
   String get concursoNaoEncontrado => 'Exam not found';
 
   @override
-  String get contentCatalog => 'Subjects';
+  String get contentCatalog => 'Subject Catalog';
 
   @override
-  String get contentCatalogSubtitle => 'Catalog of Subjects and Topics shared across Exams.';
+  String get contentCatalogSubtitle => 'Organize the content base used in your exam syllabi and study plans.';
 
   @override
-  String get searchContent => 'Search Subjects and Topics';
+  String get searchContent => 'Search subject or topic';
+
+  @override
+  String get newTopic => 'New Topic';
+
+  @override
+  String get difficultyVeryEasy => 'very easy';
+
+  @override
+  String get difficultyEasy => 'easy';
+
+  @override
+  String get difficultyMedium => 'medium';
+
+  @override
+  String get difficultyHard => 'hard';
+
+  @override
+  String get difficultyVeryHard => 'very hard';
+
+  @override
+  String catalogDisciplineSummary(int count, String difficulty) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Topics',
+      one: '1 Topic',
+    );
+    return '$_temp0 · $difficulty difficulty';
+  }
+
+  @override
+  String topicCountShort(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Topics',
+      one: '1 Topic',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get addDiscipline => 'Add Subject';
@@ -346,6 +453,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addTopicsDescription => 'Add one or more Topics to the selected Subject.';
+
+  @override
+  String get addTopicsQuickDescription =>
+      'Type or paste one Topic per line. The list will be created in the provided order.';
 
   @override
   String get topicsPerLineExample => 'E.g.\nReading comprehension\nPunctuation\nGrammar';
@@ -364,6 +475,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveChanges => 'Save changes';
+
+  @override
+  String get unsavedChangesTitle => 'Discard changes?';
+
+  @override
+  String get unsavedChangesDescription => 'The changes made in this form have not been saved yet.';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
+  String get discardChanges => 'Discard changes';
+
+  @override
+  String get concursoIdentificationSection => 'Identification';
+
+  @override
+  String get concursoIdentificationSectionDescription => 'Institution, position, and board responsible for the Exam.';
+
+  @override
+  String get concursoConditionsSection => 'Position conditions';
+
+  @override
+  String get concursoConditionsSectionDescription => 'Employment type, openings, salary, and workload.';
+
+  @override
+  String get concursoExamSection => 'Exam';
+
+  @override
+  String get concursoExamSectionDescription => 'Expected date, times, and location of the exam.';
+
+  @override
+  String get concursoAdditionalSection => 'Additional information';
+
+  @override
+  String get concursoAdditionalSectionDescription => 'Requirements, scoring, and Exam priority.';
 
   @override
   String get deleteDiscipline => 'Delete Subject';
@@ -415,6 +562,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get topicDeleted => 'Topic deleted.';
+
+  @override
+  String get topicsReordered => 'Topic order updated.';
+
+  @override
+  String get reorderTopic => 'Drag to reorder';
 
   @override
   String get contentUpdateFailed => 'Unable to refresh. The displayed data has been preserved.';
@@ -502,6 +655,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get preview => 'Preview';
+
+  @override
+  String itemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+      zero: '0 items',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get topicsPreviewEmpty => 'Topics will appear here as you type.';
+
+  @override
   String addTopicsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -520,7 +691,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String topicDeletedImpact(String name) {
-    return '$name will be deleted from the shared catalog. This action cannot be undone.';
+    return '$name will be deleted from the shared catalog and removed from every Syllabus. This action cannot be undone.';
   }
 
   @override
@@ -767,6 +938,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syllabusUpdateFailed => 'Unable to update the Syllabus. Try again.';
+
+  @override
+  String get syllabusTriageTitle => 'Syllabus Content';
+
+  @override
+  String syllabusTriageDescription(String institution, String role) {
+    return '$institution · $role';
+  }
+
+  @override
+  String syllabusTriageDisciplineProgress(int selected, int total) {
+    return '$selected/$total Topics';
+  }
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get filterDisciplineTopics => 'Filter Topics in this Subject';
+
+  @override
+  String get inSyllabus => 'In Syllabus';
+
+  @override
+  String saveSelectedTopics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Save $count Topics',
+      one: 'Save 1 Topic',
+      zero: 'Save',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syllabusSaved => 'Syllabus content updated.';
+
+  @override
+  String get noTopics => 'No Topic found';
+
+  @override
+  String get noTopicsMessage => 'Try searching for another name.';
+
+  @override
+  String get noDisciplineMessage => 'Add a Subject to the catalog to get started.';
 
   @override
   String get advance => 'Progress';

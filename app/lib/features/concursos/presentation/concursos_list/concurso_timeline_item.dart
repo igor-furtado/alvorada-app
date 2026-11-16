@@ -99,7 +99,7 @@ class _Deadline extends StatelessWidget {
       return Text(
         context.l10n.toBeDefined,
         textAlign: TextAlign.end,
-        style: context.tokens.typography.bodySmall.copyWith(color: context.tokens.colors.onSurfaceMuted),
+        style: context.tokens.typography.supportingText,
       );
     }
     return Column(

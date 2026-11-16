@@ -45,12 +45,12 @@ class AppAlert extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: context.tokens.typography.titleSmall.copyWith(color: colors.errorForeground),
+                    style: context.tokens.typography.alertTitle,
                   ),
                   SizedBox(height: context.tokens.spacing.xxs),
                   Text(
                     description,
-                    style: context.tokens.typography.bodySmall.copyWith(color: colors.errorForeground),
+                    style: context.tokens.typography.alertDescription,
                   ),
                 ],
               ),

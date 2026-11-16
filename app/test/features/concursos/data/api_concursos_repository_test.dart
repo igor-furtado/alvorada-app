@@ -109,6 +109,13 @@ class _FakeApi implements ConcursosApi {
   Future<void> addDisciplinaToEdital({required String concursoId, required String disciplinaId}) async {}
 
   @override
+  Future<void> updateDisciplinaPeso({
+    required String concursoId,
+    required String disciplinaId,
+    required double peso,
+  }) async {}
+
+  @override
   Future<void> addTopicoToEdital({required String concursoId, required String topicoId}) async {
     if (ruleViolation) {
       throw const ConcursosApiException(statusCode: 409, message: 'Tópico incompatível.');

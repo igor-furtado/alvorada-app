@@ -21,3 +21,13 @@ final class TopicosListDeleteRequested extends TopicosListEvent {
 
   final String topicId;
 }
+
+final class TopicosListReorderRequested extends TopicosListEvent {
+  const TopicosListReorderRequested({
+    required this.oldIndex,
+    required this.newIndex,
+  });
+
+  final int oldIndex;
+  final int newIndex;
+}
