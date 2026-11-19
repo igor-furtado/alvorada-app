@@ -18,8 +18,10 @@ func TestCreateSubjectPersistsMandatoryReviewTopicInSameTransaction(t *testing.T
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO disciplinas (id, nome, dificuldade, cor)\n\t\tVALUES (?, ?, ?, ?)")).
-		WithArgs(sqlmock.AnyArg(), "Português", domain.DifficultyMedium, "#E8742A").
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT COALESCE(MAX(posicao), 0) FROM disciplinas")).
+		WillReturnRows(sqlmock.NewRows([]string{"posicao"}).AddRow(3))
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO disciplinas (id, nome, dificuldade, cor, posicao)\n\t\tVALUES (?, ?, ?, ?, ?)")).
+		WithArgs(sqlmock.AnyArg(), "Português", domain.DifficultyMedium, "#E8742A", 4).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO topicos (id, disciplina_id, nome)\n\t\tVALUES (?, ?, ?)")).
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), domain.MandatoryReviewTopicName).
@@ -52,7 +54,7 @@ func TestFindCatalogReturnsMandatoryReviewTopicLast(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectQuery("SELECT id, nome, dificuldade, cor").WillReturnRows(
+	mock.ExpectQuery("SELECT id, nome, dificuldade, cor\\s+FROM disciplinas\\s+ORDER BY posicao, criado_em, id").WillReturnRows(
 		sqlmock.NewRows([]string{"id", "nome", "dificuldade", "cor"}).
 			AddRow("discipline-1", "Português", 3, "#E8742A"),
 	)
@@ -76,6 +78,70 @@ func TestFindCatalogReturnsMandatoryReviewTopicLast(t *testing.T) {
 	}
 	if !catalog[0].Topics[1].Mandatory {
 		t.Fatal("mandatory review topic was not returned last")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
+func TestReorderSubjectsPersistsEveryPositionInSameTransaction(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT id\\s+FROM disciplinas").
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id"}).
+				AddRow("subject-1").
+				AddRow("subject-2"),
+		)
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE disciplinas SET posicao = ? WHERE id = ?")).
+		WithArgs(1, "subject-2").
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE disciplinas SET posicao = ? WHERE id = ?")).
+		WithArgs(2, "subject-1").
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	err = NewStudyRepository(db).ReorderSubjects(
+		context.Background(),
+		[]string{"subject-2", "subject-1"},
+	)
+
+	if err != nil {
+		t.Fatalf("ReorderSubjects() error = %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
+func TestReorderSubjectsRejectsIncompleteOrder(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT id\\s+FROM disciplinas").
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id"}).
+				AddRow("subject-1").
+				AddRow("subject-2"),
+		)
+	mock.ExpectRollback()
+
+	err = NewStudyRepository(db).ReorderSubjects(
+		context.Background(),
+		[]string{"subject-1"},
+	)
+
+	if !errors.Is(err, domain.ErrInvalidSubjectOrder) {
+		t.Fatalf("ReorderSubjects() error = %v, want %v", err, domain.ErrInvalidSubjectOrder)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("database expectations: %v", err)
@@ -256,6 +322,9 @@ func TestDeleteTopicUnlinksTopicFromEditaisBeforeDeletingIt(t *testing.T) {
 	mock.ExpectQuery("SELECT nome, disciplina_id FROM topicos").
 		WithArgs("topic-1").
 		WillReturnRows(sqlmock.NewRows([]string{"nome", "disciplina_id"}).AddRow("Pontuação", "discipline-1"))
+	mock.ExpectQuery("SELECT EXISTS").
+		WithArgs("topic-1").
+		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 	mock.ExpectExec("DELETE FROM concursos_topicos").
 		WithArgs("topic-1").
 		WillReturnResult(sqlmock.NewResult(0, 2))
@@ -288,6 +357,9 @@ func TestDeleteTopicRollsBackUnlinkWhenTopicDeletionFails(t *testing.T) {
 	mock.ExpectQuery("SELECT nome, disciplina_id FROM topicos").
 		WithArgs("topic-1").
 		WillReturnRows(sqlmock.NewRows([]string{"nome", "disciplina_id"}).AddRow("Pontuação", "discipline-1"))
+	mock.ExpectQuery("SELECT EXISTS").
+		WithArgs("topic-1").
+		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 	mock.ExpectExec("DELETE FROM concursos_topicos").
 		WithArgs("topic-1").
 		WillReturnResult(sqlmock.NewResult(0, 1))
@@ -300,6 +372,31 @@ func TestDeleteTopicRollsBackUnlinkWhenTopicDeletionFails(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("DeleteTopic() error = nil, want delete failure")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("database expectations: %v", err)
+	}
+}
+
+func TestDeleteTopicPreservesStudyProgress(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New() error = %v", err)
+	}
+	defer db.Close()
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT nome, disciplina_id FROM topicos").
+		WithArgs("topic-1").
+		WillReturnRows(sqlmock.NewRows([]string{"nome", "disciplina_id"}).AddRow("Pontuação", "discipline-1"))
+	mock.ExpectQuery("SELECT EXISTS").
+		WithArgs("topic-1").
+		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
+	mock.ExpectRollback()
+
+	err = NewStudyRepository(db).DeleteTopic(context.Background(), "topic-1")
+
+	if !errors.Is(err, domain.ErrContentLinked) {
+		t.Fatalf("DeleteTopic() error = %v, want %v", err, domain.ErrContentLinked)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("database expectations: %v", err)

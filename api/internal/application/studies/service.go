@@ -66,6 +66,14 @@ func (s *Service) DeleteSubject(ctx context.Context, id string) error {
 	return s.repository.DeleteSubject(ctx, id)
 }
 
+func (s *Service) ReorderSubjects(ctx context.Context, subjectIDs []string) error {
+	values, err := validateOrder(subjectIDs, domain.ErrInvalidSubjectOrder)
+	if err != nil {
+		return err
+	}
+	return s.repository.ReorderSubjects(ctx, values)
+}
+
 func (s *Service) CreateTopic(ctx context.Context, subjectID, name string) error {
 	return s.CreateTopics(ctx, subjectID, []string{name})
 }
@@ -100,21 +108,9 @@ func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {
 }
 
 func (s *Service) ReorderTopics(ctx context.Context, subjectID string, topicIDs []string) error {
-	if len(topicIDs) == 0 {
-		return domain.ErrInvalidTopicOrder
-	}
-	seen := make(map[string]struct{}, len(topicIDs))
-	values := make([]string, 0, len(topicIDs))
-	for _, id := range topicIDs {
-		value := strings.TrimSpace(id)
-		if value == "" {
-			return domain.ErrInvalidTopicOrder
-		}
-		if _, exists := seen[value]; exists {
-			return domain.ErrInvalidTopicOrder
-		}
-		seen[value] = struct{}{}
-		values = append(values, value)
+	values, err := validateOrder(topicIDs, domain.ErrInvalidTopicOrder)
+	if err != nil {
+		return err
 	}
 	return s.repository.ReorderTopics(ctx, subjectID, values)
 }
@@ -132,4 +128,24 @@ func validateName(name string) (string, error) {
 		return "", ErrNameTooLong
 	}
 	return value, nil
+}
+
+func validateOrder(ids []string, invalidOrder error) ([]string, error) {
+	if len(ids) == 0 {
+		return nil, invalidOrder
+	}
+	seen := make(map[string]struct{}, len(ids))
+	values := make([]string, 0, len(ids))
+	for _, id := range ids {
+		value := strings.TrimSpace(id)
+		if value == "" {
+			return nil, invalidOrder
+		}
+		if _, exists := seen[value]; exists {
+			return nil, invalidOrder
+		}
+		seen[value] = struct{}{}
+		values = append(values, value)
+	}
+	return values, nil
 }

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	concursosApplication "concursosapp/api/internal/application/concursos"
+	semanaApplication "concursosapp/api/internal/application/semana"
 	application "concursosapp/api/internal/application/studies"
 	"concursosapp/api/internal/config"
 	mysqlrepo "concursosapp/api/internal/infrastructure/mysql"
@@ -51,12 +52,18 @@ func main() {
 		logger.Error("concurso schema migration failed", "error", err)
 		os.Exit(1)
 	}
+	if err := mysqlrepo.EnsureSemanaSchema(rootCtx, db); err != nil {
+		logger.Error("semana schema migration failed", "error", err)
+		os.Exit(1)
+	}
 
 	repository := mysqlrepo.NewStudyRepository(db)
 	service := application.NewService(repository)
 	concursosRepository := mysqlrepo.NewConcursoRepository(db)
 	concursosService := concursosApplication.NewService(concursosRepository)
-	handler := httpapi.NewHandler(service, concursosService, logger)
+	semanaRepository := mysqlrepo.NewSemanaRepository(db)
+	semanaService := semanaApplication.NewService(semanaRepository)
+	handler := httpapi.NewHandler(service, concursosService, logger, semanaService)
 	server := &http.Server{
 		Addr:              cfg.Address(),
 		Handler:           handler.Router(),

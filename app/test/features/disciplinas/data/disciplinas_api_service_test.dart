@@ -64,6 +64,20 @@ void main() {
     await service.reorderTopicos('discipline-1', ['topic-2', 'topic-1']);
   });
 
+  test('envia a ordem completa das Disciplinas', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/api/v1/subjects/order');
+      expect(jsonDecode(request.body), {
+        'disciplina_ids': ['discipline-2', 'discipline-1'],
+      });
+      return http.Response('', 204);
+    });
+    final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));
+
+    await service.reorderDisciplinas(['discipline-2', 'discipline-1']);
+  });
+
   test('preserva a mensagem de validação devolvida pela API', () async {
     final client = MockClient((_) async => http.Response(jsonEncode({'erro': 'informe ao menos um Tópico'}), 400));
     final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));

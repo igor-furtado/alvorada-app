@@ -123,6 +123,30 @@ func TestReorderTopicsAcceptsPortugueseJSONFields(t *testing.T) {
 	}
 }
 
+func TestReorderSubjectsAcceptsPortugueseJSONFields(t *testing.T) {
+	repository := &serializationRepository{}
+	handler := NewHandler(
+		application.NewService(repository),
+		nil,
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(
+		http.MethodPut,
+		"/api/v1/subjects/order",
+		strings.NewReader(`{"disciplina_ids":["disciplina-2","disciplina-1"]}`),
+	)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusNoContent, response.Body.String())
+	}
+	if len(repository.reorderedSubjects) != 2 || repository.reorderedSubjects[0] != "disciplina-2" {
+		t.Fatalf("reordered subjects = %#v", repository.reorderedSubjects)
+	}
+}
+
 func TestErrorResponseUsesPortugueseField(t *testing.T) {
 	handler := NewHandler(
 		application.NewService(&serializationRepository{}),
@@ -180,11 +204,12 @@ func TestDeleteLinkedTopicReturnsConflict(t *testing.T) {
 }
 
 type serializationRepository struct {
-	catalog          []domain.Subject
-	createdSubject   domain.CreateSubjectInput
-	createdTopics    []string
-	reorderedTopics  []string
-	deleteTopicError error
+	catalog           []domain.Subject
+	createdSubject    domain.CreateSubjectInput
+	createdTopics     []string
+	reorderedSubjects []string
+	reorderedTopics   []string
+	deleteTopicError  error
 }
 
 func (r *serializationRepository) FindCatalog(context.Context) ([]domain.Subject, error) {
@@ -201,6 +226,11 @@ func (r *serializationRepository) UpdateSubject(context.Context, string, domain.
 }
 
 func (r *serializationRepository) DeleteSubject(context.Context, string) error { return nil }
+
+func (r *serializationRepository) ReorderSubjects(_ context.Context, subjectIDs []string) error {
+	r.reorderedSubjects = subjectIDs
+	return nil
+}
 
 func (r *serializationRepository) CreateTopics(_ context.Context, _ string, names []string) error {
 	r.createdTopics = names

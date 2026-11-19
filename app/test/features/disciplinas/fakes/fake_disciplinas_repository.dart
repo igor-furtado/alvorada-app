@@ -52,6 +52,15 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   }
 
   @override
+  Future<void> reorderDisciplinas(List<String> disciplinaIds) async {
+    _throwIfMutationFails();
+    final byId = {for (final disciplina in _disciplinas) disciplina.id: disciplina};
+    _disciplinas
+      ..clear()
+      ..addAll(disciplinaIds.map((id) => byId[id]!));
+  }
+
+  @override
   Future<void> createTopicos({required String disciplineId, required List<String> names}) async {
     _throwIfMutationFails();
     _replaceDisciplina(

@@ -70,6 +70,26 @@ func TestReorderTopicsRejectsDuplicateIDs(t *testing.T) {
 	}
 }
 
+func TestReorderSubjectsRejectsDuplicateIDs(t *testing.T) {
+	service := NewService(&fakeRepository{})
+	err := service.ReorderSubjects(context.Background(), []string{"subject-1", "subject-1"})
+	if !errors.Is(err, domain.ErrInvalidSubjectOrder) {
+		t.Fatalf("ReorderSubjects() error = %v, want %v", err, domain.ErrInvalidSubjectOrder)
+	}
+}
+
+func TestReorderSubjectsPreservesRequestedOrder(t *testing.T) {
+	repository := &fakeRepository{}
+	service := NewService(repository)
+	err := service.ReorderSubjects(context.Background(), []string{"subject-2", "subject-1"})
+	if err != nil {
+		t.Fatalf("ReorderSubjects() error = %v", err)
+	}
+	if len(repository.reorderedSubjects) != 2 || repository.reorderedSubjects[0] != "subject-2" {
+		t.Fatalf("ReorderSubjects() persisted %#v", repository.reorderedSubjects)
+	}
+}
+
 func TestReorderTopicsPreservesRequestedOrder(t *testing.T) {
 	repository := &fakeRepository{}
 	service := NewService(repository)
@@ -95,9 +115,10 @@ func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 }
 
 type fakeRepository struct {
-	createdSubject  domain.CreateSubjectInput
-	createdTopics   []string
-	reorderedTopics []string
+	createdSubject    domain.CreateSubjectInput
+	createdTopics     []string
+	reorderedSubjects []string
+	reorderedTopics   []string
 }
 
 func (f *fakeRepository) FindCatalog(context.Context) ([]domain.Subject, error) {
@@ -113,6 +134,10 @@ func (f *fakeRepository) UpdateSubject(context.Context, string, domain.UpdateSub
 	return nil
 }
 func (f *fakeRepository) DeleteSubject(context.Context, string) error { return nil }
+func (f *fakeRepository) ReorderSubjects(_ context.Context, subjectIDs []string) error {
+	f.reorderedSubjects = subjectIDs
+	return nil
+}
 func (f *fakeRepository) CreateTopics(_ context.Context, _ string, names []string) error {
 	f.createdTopics = names
 	return nil

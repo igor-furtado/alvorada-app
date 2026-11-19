@@ -8,22 +8,17 @@ class DisciplinasListPanel extends StatelessWidget {
   const DisciplinasListPanel({
     required this.state,
     required this.onSelect,
+    required this.onReorder,
     super.key,
   });
 
   final DisciplinasListState state;
   final ValueChanged<DisciplinaListItemData> onSelect;
+  final void Function(int oldIndex, int newIndex) onReorder;
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      for (final disciplina in state.items)
-        DisciplinaListItem(
-          disciplina: disciplina,
-          selected: state.selectedDisciplineId == disciplina.id,
-          onSelect: () => onSelect(disciplina),
-        ),
-    ];
+    final canReorder = state.canMutate && state.query.trim().isEmpty && state.items.length > 1;
     return Padding(
       padding: EdgeInsets.all(context.tokens.spacing.sm),
       child: Column(
@@ -41,9 +36,27 @@ class DisciplinasListPanel extends StatelessWidget {
               style: context.tokens.typography.catalogOverline,
             ),
           ),
-          AppListItemGroup(
-            spacing: context.tokens.spacing.xxs,
-            children: items,
+          Expanded(
+            child: ReorderableListView.builder(
+              buildDefaultDragHandles: false,
+              itemCount: state.items.length,
+              onReorderItem: onReorder,
+              itemBuilder: (context, index) {
+                final disciplina = state.items[index];
+                return Padding(
+                  key: ValueKey('discipline-${disciplina.id}'),
+                  padding: EdgeInsets.only(
+                    bottom: index == state.items.length - 1 ? 0 : context.tokens.spacing.xxs,
+                  ),
+                  child: DisciplinaListItem(
+                    disciplina: disciplina,
+                    selected: state.selectedDisciplineId == disciplina.id,
+                    reorderIndex: canReorder ? index : null,
+                    onSelect: () => onSelect(disciplina),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

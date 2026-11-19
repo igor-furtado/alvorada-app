@@ -43,7 +43,7 @@ func querySubjects(ctx context.Context, tx *sql.Tx) ([]domain.Subject, map[strin
 	rows, err := tx.QueryContext(ctx, `
 		SELECT id, nome, dificuldade, cor
 		FROM disciplinas
-		ORDER BY posicao, criado_em`)
+		ORDER BY posicao, criado_em, id`)
 	if err != nil {
 		return nil, nil, fmt.Errorf("query subjects: %w", err)
 	}
@@ -113,9 +113,16 @@ func (r *StudyRepository) CreateSubject(ctx context.Context, input domain.Create
 		return "", fmt.Errorf("begin create subject transaction: %w", err)
 	}
 	defer tx.Rollback()
+	var lastPosition int
+	if err := tx.QueryRowContext(
+		ctx,
+		"SELECT COALESCE(MAX(posicao), 0) FROM disciplinas",
+	).Scan(&lastPosition); err != nil {
+		return "", fmt.Errorf("query last subject position: %w", err)
+	}
 	_, err = tx.ExecContext(ctx, `
-		INSERT INTO disciplinas (id, nome, dificuldade, cor)
-		VALUES (?, ?, ?, ?)`, subjectID, input.Name, input.Difficulty, input.Color)
+		INSERT INTO disciplinas (id, nome, dificuldade, cor, posicao)
+		VALUES (?, ?, ?, ?, ?)`, subjectID, input.Name, input.Difficulty, input.Color, lastPosition+1)
 	if err != nil {
 		return "", fmt.Errorf("insert subject: %w", err)
 	}
@@ -172,6 +179,60 @@ func (r *StudyRepository) DeleteSubject(ctx context.Context, id string) error {
 		return domain.ErrContentLinked
 	}
 	return exec(ctx, r.db, "delete subject", "DELETE FROM disciplinas WHERE id = ?", id)
+}
+
+func (r *StudyRepository) ReorderSubjects(ctx context.Context, subjectIDs []string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin reorder subjects transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.QueryContext(ctx, `
+		SELECT id
+		FROM disciplinas
+		ORDER BY posicao, criado_em, id
+		FOR UPDATE`)
+	if err != nil {
+		return fmt.Errorf("lock subjects for reorder: %w", err)
+	}
+	currentIDs := make(map[string]struct{})
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			rows.Close()
+			return fmt.Errorf("scan subject for reorder: %w", err)
+		}
+		currentIDs[id] = struct{}{}
+	}
+	if err := rows.Close(); err != nil {
+		return fmt.Errorf("close reordered subjects: %w", err)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate subjects for reorder: %w", err)
+	}
+	if len(currentIDs) != len(subjectIDs) {
+		return domain.ErrInvalidSubjectOrder
+	}
+	for _, id := range subjectIDs {
+		if _, exists := currentIDs[id]; !exists {
+			return domain.ErrInvalidSubjectOrder
+		}
+	}
+	for index, id := range subjectIDs {
+		if _, err := tx.ExecContext(
+			ctx,
+			"UPDATE disciplinas SET posicao = ? WHERE id = ?",
+			index+1,
+			id,
+		); err != nil {
+			return fmt.Errorf("update subject position: %w", err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit reorder subjects transaction: %w", err)
+	}
+	return nil
 }
 
 func (r *StudyRepository) CreateTopics(ctx context.Context, subjectID string, names []string) error {
@@ -313,6 +374,22 @@ func (r *StudyRepository) DeleteTopic(ctx context.Context, id string) error {
 	if topicName == domain.MandatoryReviewTopicName {
 		return domain.ErrMandatoryTopic
 	}
+	var hasProgress bool
+	if err := tx.QueryRowContext(ctx, `
+		SELECT EXISTS(
+			SELECT 1
+			FROM concursos_topicos
+			WHERE topico_id = ?
+				AND (
+					teoria_concluida = 1 OR memoria_concluida = 1 OR conferencia_concluida = 1
+					OR acertos > 0 OR erros > 0 OR concluido_em IS NOT NULL
+				)
+		)`, id).Scan(&hasProgress); err != nil {
+		return fmt.Errorf("check topic study progress: %w", err)
+	}
+	if hasProgress {
+		return domain.ErrContentLinked
+	}
 	if _, err := tx.ExecContext(ctx, "DELETE FROM concursos_topicos WHERE topico_id = ?", id); err != nil {
 		return fmt.Errorf("unlink topic from editais: %w", err)
 	}
@@ -333,6 +410,7 @@ func (r *StudyRepository) DeleteTopic(ctx context.Context, id string) error {
 				FROM concursos_topicos AS vinculo
 				INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id
 				WHERE vinculo.concurso_id = relacao.concurso_id
+					AND vinculo.removido_em IS NULL
 					AND topico.disciplina_id = relacao.disciplina_id
 			)`, subjectID); err != nil {
 		return fmt.Errorf("delete empty edital discipline metadata: %w", err)

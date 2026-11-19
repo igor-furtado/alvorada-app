@@ -9,6 +9,7 @@ enum DisciplinasListFeedback {
   created,
   renamed,
   deleted,
+  reordered,
   refreshFailed,
   synchronizationPending,
   operationFailed,
@@ -53,6 +54,7 @@ class DisciplinasListState {
     this.selectedDisciplineId,
     this.isRefreshing = false,
     this.isDeleting = false,
+    this.isReordering = false,
     this.feedback,
   }) : items = List.unmodifiable(items);
 
@@ -62,9 +64,10 @@ class DisciplinasListState {
   final String? selectedDisciplineId;
   final bool isRefreshing;
   final bool isDeleting;
+  final bool isReordering;
   final DisciplinasListFeedback? feedback;
 
-  bool get canMutate => status == DisciplinasListStatus.success && !isRefreshing && !isDeleting;
+  bool get canMutate => status == DisciplinasListStatus.success && !isRefreshing && !isDeleting && !isReordering;
 
   @override
   bool operator ==(Object other) =>
@@ -76,6 +79,7 @@ class DisciplinasListState {
           selectedDisciplineId == other.selectedDisciplineId &&
           isRefreshing == other.isRefreshing &&
           isDeleting == other.isDeleting &&
+          isReordering == other.isReordering &&
           feedback == other.feedback;
 
   @override
@@ -86,6 +90,7 @@ class DisciplinasListState {
     selectedDisciplineId,
     isRefreshing,
     isDeleting,
+    isReordering,
     feedback,
   );
 }

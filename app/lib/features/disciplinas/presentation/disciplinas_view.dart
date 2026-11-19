@@ -151,7 +151,7 @@ class _DisciplinasWorkspace extends StatelessWidget {
                 children: [
                   const SizedBox(
                     height: 190,
-                    child: AppScrollArea(child: DisciplinasListView()),
+                    child: DisciplinasListView(),
                   ),
                   const AppDivider(margin: EdgeInsets.zero),
                   Expanded(child: AppScrollArea(child: detail)),
@@ -163,7 +163,7 @@ class _DisciplinasWorkspace extends StatelessWidget {
               children: [
                 const SizedBox(
                   width: 310,
-                  child: AppScrollArea(child: DisciplinasListView()),
+                  child: DisciplinasListView(),
                 ),
                 const AppDivider(
                   vertical: true,

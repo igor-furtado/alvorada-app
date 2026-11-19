@@ -24,6 +24,7 @@ class DisciplinasPage extends StatelessWidget {
           create: (_) => DisciplinasListBloc(
             getDisciplinas: useCases.getDisciplinas,
             deleteDisciplina: useCases.deleteDisciplina,
+            reorderDisciplinas: useCases.reorderDisciplinas,
             initialQuery: initialQuery,
           )..add(const DisciplinasListLoadRequested()),
         ),

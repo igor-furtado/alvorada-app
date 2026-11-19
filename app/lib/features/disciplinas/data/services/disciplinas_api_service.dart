@@ -15,6 +15,8 @@ abstract interface class DisciplinasApi {
 
   Future<void> deleteDisciplina(String id);
 
+  Future<void> reorderDisciplinas(List<String> disciplinaIds);
+
   Future<void> createTopicos(String disciplineId, List<String> names);
 
   Future<void> updateTopico(String topicId, String name);
@@ -64,6 +66,13 @@ class DisciplinasApiService implements DisciplinasApi {
 
   @override
   Future<void> deleteDisciplina(String id) => _sendEmpty('DELETE', '/api/v1/subjects/${Uri.encodeComponent(id)}');
+
+  @override
+  Future<void> reorderDisciplinas(List<String> disciplinaIds) => _sendEmpty(
+    'PUT',
+    '/api/v1/subjects/order',
+    body: {'disciplina_ids': disciplinaIds},
+  );
 
   @override
   Future<void> createTopicos(String disciplineId, List<String> names) => _sendCreated(

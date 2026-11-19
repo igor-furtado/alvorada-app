@@ -18,6 +18,8 @@ tags:
     description: Concursos que orientam o Plano
   - name: Tópicos
     description: Conteúdo pertencente a uma disciplina
+  - name: Semana
+    description: Planejamento semanal, progresso de estudo e revisões
 paths:
   /health:
     get:
@@ -217,17 +219,156 @@ paths:
     delete:
       tags: [Concursos]
       summary: Remove o vínculo de um Tópico com o Edital
+      description: Desativa o vínculo sem apagar eventual progresso de estudo.
       operationId: removerTopicoDoEdital
       responses:
         '204':
           description: Vínculo removido
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/semana:
+    get:
+      tags: [Semana]
+      summary: Lista estudos e revisões de um período
+      operationId: obterPlanejamentoSemanal
+      parameters:
+        - name: inicio
+          in: query
+          required: true
+          schema: {type: string, format: date}
+        - name: fim
+          in: query
+          required: true
+          schema: {type: string, format: date}
+      responses:
+        '200':
+          description: Planejamento e Tópicos ainda não planejados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanejamentoSemanal'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
+  /api/v1/concursos/{concursoId}/topicos/{topicoId}/planejamento:
+    parameters:
+      - $ref: '#/components/parameters/ConcursoId'
+      - $ref: '#/components/parameters/TopicoId'
+    put:
+      tags: [Semana]
+      summary: Planeja ou move o estudo inicial de um Tópico
+      operationId: planejarEstudoTopico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanejamentoItem'
+      responses:
+        '204': {description: Planejamento atualizado}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
+  /api/v1/concursos/{concursoId}/topicos/{topicoId}/progresso:
+    parameters:
+      - $ref: '#/components/parameters/ConcursoId'
+      - $ref: '#/components/parameters/TopicoId'
+    patch:
+      tags: [Semana]
+      summary: Atualiza teoria, memória ou conferência
+      operationId: atualizarProgressoEstudo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarProgressoTopico'
+      responses:
+        '204': {description: Progresso atualizado}
+        '400': {$ref: '#/components/responses/ErroValidacao'}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
+  /api/v1/concursos/{concursoId}/topicos/{topicoId}/questoes:
+    parameters:
+      - $ref: '#/components/parameters/ConcursoId'
+      - $ref: '#/components/parameters/TopicoId'
+    post:
+      tags: [Semana]
+      summary: Incrementa acertos ou erros do Tópico
+      operationId: registrarResultadoQuestao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resultado]
+              properties:
+                resultado: {type: string, enum: [certa, errada]}
+      responses:
+        '204': {description: Resultado contabilizado}
+        '400': {$ref: '#/components/responses/ErroValidacao'}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
+  /api/v1/concursos/{concursoId}/topicos/{topicoId}/revisoes:
+    parameters:
+      - $ref: '#/components/parameters/ConcursoId'
+      - $ref: '#/components/parameters/TopicoId'
+    put:
+      tags: [Semana]
+      summary: Substitui a seleção opcional de revisões
+      operationId: substituirRevisoesTopico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [intervalos_dias]
+              properties:
+                intervalos_dias:
+                  type: array
+                  uniqueItems: true
+                  maxItems: 3
+                  items: {type: integer, enum: [1, 7, 30]}
+      responses:
+        '204': {description: Revisões atualizadas, inclusive quando a lista está vazia}
+        '400': {$ref: '#/components/responses/ErroValidacao'}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
+  /api/v1/revisoes/{id}/planejamento:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    patch:
+      tags: [Semana]
+      summary: Move uma Revisão programada
+      operationId: moverRevisaoProgramada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanejamentoItem'
+      responses:
+        '204': {description: Revisão movida}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
+  /api/v1/revisoes/{id}/conclusao:
+    parameters:
+      - $ref: '#/components/parameters/IdRecurso'
+    put:
+      tags: [Semana]
+      summary: Conclui uma Revisão programada
+      operationId: concluirRevisaoProgramada
+      responses:
+        '204': {description: Revisão concluída}
+        '404': {$ref: '#/components/responses/RecursoNaoEncontrado'}
+        '500': {$ref: '#/components/responses/ErroInterno'}
   /api/v1/subjects:
     get:
       tags: [Disciplinas]
       summary: Lista o catálogo completo de estudos
-      description: Retorna disciplinas com seus tópicos aninhados.
+      description: Retorna as Disciplinas na ordem persistida, com seus Tópicos aninhados.
       operationId: listarDisciplinas
       responses:
         '200':
@@ -262,6 +403,25 @@ paths:
           $ref: '#/components/responses/ErroValidacao'
         '500':
           $ref: '#/components/responses/ErroInterno'
+  /api/v1/subjects/order:
+    put:
+      tags: [Disciplinas]
+      summary: Reordena as disciplinas do catálogo
+      description: Persiste a ordem completa das Disciplinas compartilhada por Editais e planos de estudo.
+      operationId: reordenarDisciplinas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdemDisciplinas'
+      responses:
+        '204':
+          description: Disciplinas reordenadas
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects/{id}:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
@@ -290,6 +450,8 @@ paths:
       responses:
         '204':
           description: Disciplina excluída
+        '409':
+          $ref: '#/components/responses/Conflito'
         '500':
           $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects/{id}/topics:
@@ -385,13 +547,15 @@ paths:
     delete:
       tags: [Tópicos]
       summary: Exclui um tópico
-      description: Exclui o Tópico do catálogo e remove seus vínculos de todos os Editais. O Tópico Revisão de Véspera permanece protegido.
+      description: Exclui o Tópico do catálogo quando não existir progresso de estudo. O Tópico Revisão de Véspera permanece protegido.
       operationId: excluirTopico
       responses:
         '204':
           description: Tópico excluído
         '400':
           $ref: '#/components/responses/ErroValidacao'
+        '409':
+          $ref: '#/components/responses/Conflito'
         '500':
           $ref: '#/components/responses/ErroInterno'
 components:
@@ -404,6 +568,16 @@ components:
       schema:
         type: string
         format: uuid
+    ConcursoId:
+      name: concursoId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    TopicoId:
+      name: topicoId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
   responses:
     ErroValidacao:
       description: Dados inválidos
@@ -419,6 +593,12 @@ components:
             $ref: '#/components/schemas/Erro'
     RecursoNaoEncontrado:
       description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    Conflito:
+      description: A operação conflita com vínculos ou progresso já existentes
       content:
         application/json:
           schema:
@@ -702,6 +882,18 @@ components:
           items:
             type: string
             format: uuid
+    OrdemDisciplinas:
+      type: object
+      required: [disciplina_ids]
+      properties:
+        disciplina_ids:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: Todos os identificadores das Disciplinas do catálogo na ordem desejada.
+          items:
+            type: string
+            format: uuid
     Dificuldade:
       type: integer
       minimum: 1
@@ -742,6 +934,63 @@ components:
         obrigatorio:
           type: boolean
           description: Indica o Tópico estrutural Revisão de Véspera, que não pode ser alterado nem excluído.
+    PlanejamentoSemanal:
+      type: object
+      required: [inicio, fim, itens, disponiveis]
+      properties:
+        inicio: {type: string, format: date}
+        fim: {type: string, format: date}
+        itens:
+          type: array
+          items: {$ref: '#/components/schemas/ItemSemana'}
+        disponiveis:
+          type: array
+          items: {$ref: '#/components/schemas/TopicoDisponivelSemana'}
+    ItemSemana:
+      type: object
+      required: [id, tipo, concurso_id, concurso_nome, concurso_sigla, topico_id, topico_nome, disciplina_nome, data_planejada, posicao_dia, teoria_concluida, memoria_concluida, conferencia_concluida, acertos, erros, versao_metodologia, concluido, intervalo_revisao_dias]
+      properties:
+        id: {type: string}
+        tipo: {type: string, enum: [estudo_inicial, revisao]}
+        concurso_id: {type: string, format: uuid}
+        concurso_nome: {type: string}
+        concurso_sigla: {type: [string, 'null']}
+        topico_id: {type: string, format: uuid}
+        topico_nome: {type: string}
+        disciplina_nome: {type: string}
+        data_planejada: {type: string, format: date}
+        posicao_dia: {type: integer, minimum: 0}
+        teoria_concluida: {type: boolean}
+        memoria_concluida: {type: boolean}
+        conferencia_concluida: {type: boolean}
+        acertos: {type: integer, minimum: 0}
+        erros: {type: integer, minimum: 0}
+        versao_metodologia: {type: [integer, 'null'], minimum: 1}
+        concluido: {type: boolean}
+        intervalo_revisao_dias: {type: [integer, 'null'], enum: [1, 7, 30, null]}
+    TopicoDisponivelSemana:
+      type: object
+      required: [concurso_id, concurso_nome, concurso_sigla, topico_id, topico_nome, disciplina_nome]
+      properties:
+        concurso_id: {type: string, format: uuid}
+        concurso_nome: {type: string}
+        concurso_sigla: {type: [string, 'null']}
+        topico_id: {type: string, format: uuid}
+        topico_nome: {type: string}
+        disciplina_nome: {type: string}
+    PlanejamentoItem:
+      type: object
+      required: [data_planejada, posicao_dia]
+      properties:
+        data_planejada: {type: string, format: date}
+        posicao_dia: {type: integer, minimum: 0}
+    AtualizarProgressoTopico:
+      type: object
+      minProperties: 1
+      properties:
+        teoria_concluida: {type: boolean}
+        memoria_concluida: {type: boolean}
+        conferencia_concluida: {type: boolean}
     Erro:
       type: object
       required: [erro]

@@ -8,12 +8,14 @@ class DisciplinaListItem extends StatelessWidget {
     required this.disciplina,
     required this.selected,
     required this.onSelect,
+    this.reorderIndex,
     super.key,
   });
 
   final DisciplinaListItemData disciplina;
   final bool selected;
   final VoidCallback onSelect;
+  final int? reorderIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,22 @@ class DisciplinaListItem extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: tokens.spacing.sm),
+                if (reorderIndex case final index?) ...[
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: Tooltip(
+                      message: context.l10n.reorderDiscipline,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.grab,
+                        child: Padding(
+                          padding: EdgeInsets.all(tokens.spacing.sm),
+                          child: const Icon(AppIcons.reorder, size: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: tokens.spacing.xxs),
+                ],
                 const Icon(AppIcons.chevronRight, size: 17),
               ],
             ),

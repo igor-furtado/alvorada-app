@@ -126,6 +126,9 @@ class _FakeApi implements DisciplinasApi {
   Future<void> deleteTopico(String topicId) async {}
 
   @override
+  Future<void> reorderDisciplinas(List<String> disciplinaIds) async {}
+
+  @override
   Future<void> updateDisciplina(String id, Map<String, Object?> body) async {}
 
   @override

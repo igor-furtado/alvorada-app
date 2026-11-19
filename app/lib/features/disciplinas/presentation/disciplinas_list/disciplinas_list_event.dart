@@ -32,3 +32,13 @@ final class DisciplinasListDeleteRequested extends DisciplinasListEvent {
 
   final String disciplineId;
 }
+
+final class DisciplinasListReorderRequested extends DisciplinasListEvent {
+  const DisciplinasListReorderRequested({
+    required this.oldIndex,
+    required this.newIndex,
+  });
+
+  final int oldIndex;
+  final int newIndex;
+}

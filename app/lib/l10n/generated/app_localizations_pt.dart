@@ -554,6 +554,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get disciplineDeleted => 'Disciplina excluída.';
 
   @override
+  String get disciplinesReordered => 'Ordem das Disciplinas atualizada.';
+
+  @override
   String get topicCreated => 'Tópicos adicionados.';
 
   @override
@@ -567,6 +570,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reorderTopic => 'Arraste para reordenar';
+
+  @override
+  String get reorderDiscipline => 'Arraste para reordenar a Disciplina';
 
   @override
   String get contentUpdateFailed => 'Não foi possível atualizar. Os dados exibidos foram preservados.';
@@ -1101,4 +1107,214 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get disciplineColorInvalid => 'A cor da Disciplina deve estar no formato hexadecimal #RRGGBB.';
+
+  @override
+  String get navigationWeek => 'Semana';
+
+  @override
+  String get weekTitle => 'Semana em trilhos';
+
+  @override
+  String get weekSubtitle => 'Inicie um Tópico para entrar no modo de estudo.';
+
+  @override
+  String get addStudy => 'Adicionar estudo';
+
+  @override
+  String get weekLoadFailed => 'Não foi possível carregar a semana';
+
+  @override
+  String get weekOperationFailed => 'Não foi possível salvar a alteração na semana.';
+
+  @override
+  String get all => 'Todos';
+
+  @override
+  String get hideCompleted => 'Ocultar concluídos';
+
+  @override
+  String get showCompleted => 'Mostrar concluídos';
+
+  @override
+  String topicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tópicos',
+      one: '1 Tópico',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String contestStudyProgress(int count, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tópicos',
+      one: '1 Tópico',
+    );
+    return '$_temp0 · $percent%';
+  }
+
+  @override
+  String contestStudyDurationProgress(int minutes, int percent) {
+    return '$minutes min · $percent%';
+  }
+
+  @override
+  String get previousWeek => 'Semana anterior';
+
+  @override
+  String get nextWeek => 'Próxima semana';
+
+  @override
+  String get noInitialStudy => 'Sem estudo inicial';
+
+  @override
+  String studyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count estudos',
+      one: '1 estudo',
+      zero: '0 estudos',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String minutesCount(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get noTopicsForDay => 'Sem Tópicos';
+
+  @override
+  String get completeReview => 'Concluir revisão';
+
+  @override
+  String get chooseTopicToStudy => 'Escolha um Tópico do Edital para iniciar o modo foco.';
+
+  @override
+  String get saveAndExit => 'Salvar e sair';
+
+  @override
+  String get studyMethodFooter => '100 minutos de atividade · 4 blocos fixos · revisões opcionais';
+
+  @override
+  String studyStep(int current, int total) {
+    return 'ETAPA $current DE $total';
+  }
+
+  @override
+  String get optional => 'opcional';
+
+  @override
+  String get theory => 'Teoria';
+
+  @override
+  String get memory => 'Memória';
+
+  @override
+  String get conference => 'Conferência';
+
+  @override
+  String get questions => 'Questões';
+
+  @override
+  String get reviews => 'Revisões';
+
+  @override
+  String get theoryStudy => 'Estudo da teoria';
+
+  @override
+  String get memoryWriting => 'Escrita de memória';
+
+  @override
+  String get conferenceAndConsolidation => 'Conferência e consolidação';
+
+  @override
+  String get theoryInstruction => 'Estude o conteúdo teórico do Tópico usando o material disponível.';
+
+  @override
+  String get memoryInstruction => 'Escreva o que aprendeu sem consultar o material.';
+
+  @override
+  String get conferenceInstruction =>
+      'Volte ao material, confira o que lembrou, faça anotações e destaque o que for importante.';
+
+  @override
+  String get timerRunning => 'Cronômetro em andamento';
+
+  @override
+  String get timerReady => 'Pronto para começar';
+
+  @override
+  String get pause => 'Pausar';
+
+  @override
+  String get completeStage => 'Concluir etapa';
+
+  @override
+  String get questionsAndErrors => 'Questões e Caderno de Erros';
+
+  @override
+  String get questionsInstruction => 'Resolva questões de bancas variadas e marque cada resposta como certa ou errada.';
+
+  @override
+  String get answeredQuestions => 'QUESTÕES RESPONDIDAS';
+
+  @override
+  String get answersEnabled => 'Registre cada resposta enquanto o cronômetro estiver em andamento.';
+
+  @override
+  String get startTimerToAnswer => 'Inicie o cronômetro para registrar acertos e erros.';
+
+  @override
+  String get chooseReviews => 'Escolher revisões';
+
+  @override
+  String get chooseReviewsDescription => 'Selecione qualquer combinação ou conclua sem agendar nenhuma revisão.';
+
+  @override
+  String get completeCoreStagesFirst => 'Conclua teoria, memória e conferência para agendar revisões.';
+
+  @override
+  String reviewAfterDays(int days) {
+    return 'Revisar depois de $days dias';
+  }
+
+  @override
+  String get reviewsSaved => 'Revisões atualizadas.';
+
+  @override
+  String get finishStudyCycle => 'Concluir ciclo';
+
+  @override
+  String get cycleCompleted => 'CICLO CONCLUÍDO';
+
+  @override
+  String get noReviewsScheduled => 'Nenhuma revisão agendada';
+
+  @override
+  String scheduledReviewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count revisões agendadas',
+      one: '1 revisão agendada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get noReviewsScheduledDescription => 'Você pode agendar revisões depois, se desejar.';
+
+  @override
+  String get scheduledReviewsDescription => 'O Tópico voltará para sua semana nas datas escolhidas.';
+
+  @override
+  String get backToWeek => 'Voltar para a semana';
 }

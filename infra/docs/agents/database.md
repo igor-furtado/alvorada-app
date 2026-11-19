@@ -22,7 +22,13 @@ Inglês aparece apenas no mapeamento da migração legada. Esquema ativo, SQL do
 
 - Defina `ON DELETE` explicitamente e ordene consultas com desempate estável.
 - O peso de uma Disciplina é específico de cada Edital e vive em `concursos_disciplinas.peso` como decimal positivo e anulável.
+- A ordem das Disciplinas vive em `disciplinas.posicao`; reordenações atualizam a lista completa em uma única transação e novas Disciplinas entram no final.
 - A ordem dos Tópicos editáveis de uma Disciplina vive em `topicos.posicao`; reordenações atualizam a lista completa em uma única transação. Revisão de Véspera é ordenada separadamente e permanece por último.
+- `concursos_topicos` preserva o estado do estudo específico daquele Concurso: teoria, memória, conferência, acertos, erros, versão da metodologia e planejamento inicial. Remover um Tópico do Edital preenche `removido_em`; não apaga o progresso.
+- `concursos_topicos.concluido` é derivado de teoria, memória e conferência. Questões calculam desempenho e não bloqueiam a conclusão.
+- O cronômetro do modo foco é exclusivamente visual e não possui persistência.
+- Revisões opcionais vivem em `revisoes_programadas`, com intervalos limitados a D+1, D+7 e D+30. A unicidade por Concurso–Tópico–intervalo torna a gravação idempotente.
+- O planejamento semanal combina `concursos_topicos.data_planejada` com `revisoes_programadas.data_planejada`; não existe uma tabela materializada da semana.
 - Em renomes, detecte o esquema, aplique DDL incremental e execute backfills idempotentes antes de servir requisições.
 - Teste esquema legado, atual e colisão; valide em MySQL real quando disponível.
 

@@ -6,6 +6,7 @@ import '../../domain/models/disciplina.dart';
 import '../../domain/use_cases/delete_disciplina_use_case.dart';
 import '../../domain/use_cases/disciplinas_resultado_codes.dart';
 import '../../domain/use_cases/get_disciplinas_use_case.dart';
+import '../../domain/use_cases/reorder_disciplinas_use_case.dart';
 import 'disciplinas_list_event.dart';
 import 'disciplinas_list_state.dart';
 
@@ -13,6 +14,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
   DisciplinasListBloc({
     required this.getDisciplinas,
     required this.deleteDisciplina,
+    required this.reorderDisciplinas,
     String initialQuery = '',
   }) : super(
          DisciplinasListState(
@@ -24,10 +26,12 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     on<DisciplinasListSearchChanged>(_onSearchChanged);
     on<DisciplinasListSelectionChanged>(_onSelectionChanged);
     on<DisciplinasListDeleteRequested>(_onDelete);
+    on<DisciplinasListReorderRequested>(_onReorder);
   }
 
   final GetDisciplinasUseCase getDisciplinas;
   final DeleteDisciplinaUseCase deleteDisciplina;
+  final ReorderDisciplinasUseCase reorderDisciplinas;
   List<Disciplina> _catalog = const [];
   String? _preferredDisciplineId;
 
@@ -50,7 +54,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     DisciplinasListRefreshRequested event,
     Emitter<DisciplinasListState> emit,
   ) async {
-    if (state.isRefreshing || state.isDeleting) return;
+    if (state.isRefreshing || state.isDeleting || state.isReordering) return;
     emit(_state(isRefreshing: true, feedback: null));
     final result = await getDisciplinas(forceRefresh: event.forceRefresh);
     switch (result) {
@@ -90,7 +94,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     DisciplinasListDeleteRequested event,
     Emitter<DisciplinasListState> emit,
   ) async {
-    if (state.isDeleting || state.isRefreshing) return;
+    if (state.isDeleting || state.isRefreshing || state.isReordering) return;
     emit(_state(isDeleting: true, feedback: null));
     final result = await deleteDisciplina(event.disciplineId);
     switch (result) {
@@ -132,11 +136,62 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
     }
   }
 
+  Future<void> _onReorder(
+    DisciplinasListReorderRequested event,
+    Emitter<DisciplinasListState> emit,
+  ) async {
+    if (!state.canMutate || state.query.trim().isNotEmpty || _catalog.length < 2) return;
+    if (event.oldIndex < 0 ||
+        event.oldIndex >= _catalog.length ||
+        event.newIndex < 0 ||
+        event.newIndex >= _catalog.length ||
+        event.oldIndex == event.newIndex) {
+      return;
+    }
+    final originalCatalog = _catalog;
+    final reorderedCatalog = [..._catalog];
+    final moved = reorderedCatalog.removeAt(event.oldIndex);
+    reorderedCatalog.insert(event.newIndex, moved);
+    _catalog = reorderedCatalog;
+    emit(_state(isReordering: true, feedback: null));
+
+    final result = await reorderDisciplinas(
+      reorderedCatalog.map((disciplina) => disciplina.id).toList(growable: false),
+    );
+    switch (result) {
+      case Sucesso<void>():
+        emit(
+          _state(
+            isReordering: false,
+            feedback: DisciplinasListFeedback.reordered,
+          ),
+        );
+      case FalhaTecnica<void>(
+        codigo: DisciplinasResultadoCodes.sincronizacaoPendente,
+      ):
+        emit(
+          _state(
+            isReordering: false,
+            feedback: DisciplinasListFeedback.synchronizationPending,
+          ),
+        );
+      case ViolacaoRegra<void>() || FalhaTecnica<void>():
+        _catalog = originalCatalog;
+        emit(
+          _state(
+            isReordering: false,
+            feedback: DisciplinasListFeedback.operationFailed,
+          ),
+        );
+    }
+  }
+
   DisciplinasListState _state({
     DisciplinasListStatus? status,
     String? query,
     bool? isRefreshing,
     bool? isDeleting,
+    bool? isReordering,
     Object? feedback = _unchanged,
   }) {
     final effectiveQuery = query ?? state.query;
@@ -155,6 +210,7 @@ class DisciplinasListBloc extends Bloc<DisciplinasListEvent, DisciplinasListStat
       selectedDisciplineId: selectedId,
       isRefreshing: isRefreshing ?? state.isRefreshing,
       isDeleting: isDeleting ?? state.isDeleting,
+      isReordering: isReordering ?? state.isReordering,
       feedback: identical(feedback, _unchanged) ? state.feedback : feedback as DisciplinasListFeedback?,
     );
   }

@@ -555,6 +555,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disciplineDeleted => 'Subject deleted.';
 
   @override
+  String get disciplinesReordered => 'Subject order updated.';
+
+  @override
   String get topicCreated => 'Topics added.';
 
   @override
@@ -568,6 +571,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reorderTopic => 'Drag to reorder';
+
+  @override
+  String get reorderDiscipline => 'Drag to reorder Subject';
 
   @override
   String get contentUpdateFailed => 'Unable to refresh. The displayed data has been preserved.';
@@ -1102,4 +1108,215 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disciplineColorInvalid => 'The Subject color must use the #RRGGBB hexadecimal format.';
+
+  @override
+  String get navigationWeek => 'Week';
+
+  @override
+  String get weekTitle => 'Week on track';
+
+  @override
+  String get weekSubtitle => 'Start a Topic to enter focus mode.';
+
+  @override
+  String get addStudy => 'Add study';
+
+  @override
+  String get weekLoadFailed => 'The week could not be loaded';
+
+  @override
+  String get weekOperationFailed => 'The weekly change could not be saved.';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get hideCompleted => 'Hide completed';
+
+  @override
+  String get showCompleted => 'Show completed';
+
+  @override
+  String topicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Topics',
+      one: '1 Topic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String contestStudyProgress(int count, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Topics',
+      one: '1 Topic',
+    );
+    return '$_temp0 · $percent%';
+  }
+
+  @override
+  String contestStudyDurationProgress(int minutes, int percent) {
+    return '$minutes min · $percent%';
+  }
+
+  @override
+  String get previousWeek => 'Previous week';
+
+  @override
+  String get nextWeek => 'Next week';
+
+  @override
+  String get noInitialStudy => 'No initial study';
+
+  @override
+  String studyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count studies',
+      one: '1 study',
+      zero: '0 studies',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String minutesCount(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get noTopicsForDay => 'No Topics';
+
+  @override
+  String get completeReview => 'Complete review';
+
+  @override
+  String get chooseTopicToStudy => 'Choose a Syllabus Topic to start focus mode.';
+
+  @override
+  String get saveAndExit => 'Save and exit';
+
+  @override
+  String get studyMethodFooter => '100 minutes of activity · 4 fixed blocks · optional reviews';
+
+  @override
+  String studyStep(int current, int total) {
+    return 'STEP $current OF $total';
+  }
+
+  @override
+  String get optional => 'optional';
+
+  @override
+  String get theory => 'Theory';
+
+  @override
+  String get memory => 'Memory';
+
+  @override
+  String get conference => 'Review';
+
+  @override
+  String get questions => 'Questions';
+
+  @override
+  String get reviews => 'Reviews';
+
+  @override
+  String get theoryStudy => 'Theory study';
+
+  @override
+  String get memoryWriting => 'Memory writing';
+
+  @override
+  String get conferenceAndConsolidation => 'Review and consolidation';
+
+  @override
+  String get theoryInstruction => 'Study the Topic theory using the available material.';
+
+  @override
+  String get memoryInstruction => 'Write what you learned without consulting the material.';
+
+  @override
+  String get conferenceInstruction =>
+      'Return to the material, check what you remembered, take notes, and highlight important parts.';
+
+  @override
+  String get timerRunning => 'Timer running';
+
+  @override
+  String get timerReady => 'Ready to start';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get completeStage => 'Complete stage';
+
+  @override
+  String get questionsAndErrors => 'Questions and Error Notebook';
+
+  @override
+  String get questionsInstruction =>
+      'Answer questions from varied exam boards and mark each answer as correct or incorrect.';
+
+  @override
+  String get answeredQuestions => 'QUESTIONS ANSWERED';
+
+  @override
+  String get answersEnabled => 'Record each answer while the timer is running.';
+
+  @override
+  String get startTimerToAnswer => 'Start the timer to record correct and incorrect answers.';
+
+  @override
+  String get chooseReviews => 'Choose reviews';
+
+  @override
+  String get chooseReviewsDescription => 'Select any combination or finish without scheduling a review.';
+
+  @override
+  String get completeCoreStagesFirst => 'Complete theory, memory, and review before scheduling revisions.';
+
+  @override
+  String reviewAfterDays(int days) {
+    return 'Review after $days days';
+  }
+
+  @override
+  String get reviewsSaved => 'Reviews updated.';
+
+  @override
+  String get finishStudyCycle => 'Complete cycle';
+
+  @override
+  String get cycleCompleted => 'CYCLE COMPLETED';
+
+  @override
+  String get noReviewsScheduled => 'No reviews scheduled';
+
+  @override
+  String scheduledReviewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews scheduled',
+      one: '1 review scheduled',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get noReviewsScheduledDescription => 'You can schedule reviews later if you wish.';
+
+  @override
+  String get scheduledReviewsDescription => 'The Topic will return to your week on the selected dates.';
+
+  @override
+  String get backToWeek => 'Back to week';
 }

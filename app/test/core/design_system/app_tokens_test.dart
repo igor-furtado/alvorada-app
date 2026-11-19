@@ -44,6 +44,11 @@ void main() {
     expect(tokens.typography.successLabel.color, tokens.colors.success);
     expect(tokens.typography.disciplineSelected.fontWeight, FontWeight.w700);
     expect(tokens.typography.disciplineUnselected.color, tokens.colors.onSurfaceMuted);
+    expect(tokens.typography.contentTitleCompleted.decoration, TextDecoration.lineThrough);
+    expect(tokens.typography.navigationBrand.fontWeight, FontWeight.w700);
+    expect(tokens.typography.weekPageTitle.fontSize, 34);
+    expect(tokens.typography.weekPrimaryAction.fontWeight, FontWeight.w700);
+    expect(tokens.typography.weekCardTitleCompleted.decoration, TextDecoration.lineThrough);
   });
 
   test('widgets não derivam variantes tipográficas localmente', () {

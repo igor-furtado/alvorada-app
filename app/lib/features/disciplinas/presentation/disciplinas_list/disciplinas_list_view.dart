@@ -22,7 +22,8 @@ class DisciplinasListView extends StatelessWidget {
         previous.query != current.query ||
         previous.selectedDisciplineId != current.selectedDisciplineId ||
         previous.isRefreshing != current.isRefreshing ||
-        previous.isDeleting != current.isDeleting,
+        previous.isDeleting != current.isDeleting ||
+        previous.isReordering != current.isReordering,
     builder: (context, state) => switch (state.status) {
       DisciplinasListStatus.loading => AppSkeleton(
         height: context.tokens.listItemMediaHeight,
@@ -39,6 +40,12 @@ class DisciplinasListView extends StatelessWidget {
           context.read<DisciplinasListBloc>().add(DisciplinasListSelectionChanged(item.id));
           onSelected?.call();
         },
+        onReorder: (oldIndex, newIndex) => context.read<DisciplinasListBloc>().add(
+          DisciplinasListReorderRequested(
+            oldIndex: oldIndex,
+            newIndex: newIndex,
+          ),
+        ),
       ),
     },
   );
@@ -50,6 +57,7 @@ void _showFeedback(BuildContext context, DisciplinasListFeedback feedback) {
     DisciplinasListFeedback.created => (context.l10n.disciplineCreated, AppToastVariant.success),
     DisciplinasListFeedback.renamed => (context.l10n.disciplineUpdated, AppToastVariant.success),
     DisciplinasListFeedback.deleted => (context.l10n.disciplineDeleted, AppToastVariant.success),
+    DisciplinasListFeedback.reordered => (context.l10n.disciplinesReordered, AppToastVariant.success),
     DisciplinasListFeedback.refreshFailed => (context.l10n.contentUpdateFailed, AppToastVariant.error),
     DisciplinasListFeedback.synchronizationPending => (context.l10n.contentSavedSyncPending, AppToastVariant.info),
     DisciplinasListFeedback.operationFailed => (context.l10n.contentOperationFailed, AppToastVariant.error),

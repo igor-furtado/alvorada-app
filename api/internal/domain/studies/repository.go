@@ -7,6 +7,7 @@ type Repository interface {
 	CreateSubject(ctx context.Context, input CreateSubjectInput) (string, error)
 	UpdateSubject(ctx context.Context, id string, input UpdateSubjectInput) error
 	DeleteSubject(ctx context.Context, id string) error
+	ReorderSubjects(ctx context.Context, subjectIDs []string) error
 	CreateTopics(ctx context.Context, subjectID string, names []string) error
 	ReorderTopics(ctx context.Context, subjectID string, topicIDs []string) error
 	UpdateTopic(ctx context.Context, id, name string) error

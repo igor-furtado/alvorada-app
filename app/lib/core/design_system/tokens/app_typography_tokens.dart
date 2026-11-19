@@ -60,6 +60,10 @@ class AppTypographyTokens {
   TextStyle get overlineInfo => labelSmall.copyWith(color: _colors.info);
   TextStyle get catalogOverline => labelSmall.copyWith(letterSpacing: .8);
   TextStyle get contentTitle => titleMedium.copyWith(fontWeight: FontWeight.w500);
+  TextStyle get contentTitleCompleted => contentTitle.copyWith(
+    decoration: TextDecoration.lineThrough,
+    decorationColor: _colors.onSurfaceMuted,
+  );
   TextStyle get stateTitle => titleLarge.copyWith(fontWeight: FontWeight.w500);
   TextStyle get dialogDescription => bodySmall.copyWith(letterSpacing: 0);
 
@@ -86,6 +90,103 @@ class AppTypographyTokens {
   );
   TextStyle get disciplineSelected => titleSmall.copyWith(fontWeight: FontWeight.w700);
   TextStyle get disciplineUnselected => titleSmall.copyWith(color: _colors.onSurfaceMuted);
+
+  // Navegação principal
+  TextStyle get navigationBrand => titleSmall.copyWith(
+    fontWeight: FontWeight.w700,
+    letterSpacing: -.2,
+  );
+  TextStyle get navigationLabel => controlLabel.copyWith(fontWeight: FontWeight.w600);
+  TextStyle get navigationLabelMuted => controlLabelMuted.copyWith(fontWeight: FontWeight.w600);
+  TextStyle get navigationCompactLabel => labelSmall.copyWith(
+    color: _colors.onSurface,
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get navigationCompactLabelMuted => navigationCompactLabel.copyWith(
+    color: _colors.onSurfaceMuted,
+  );
+
+  // Semana em trilhos
+  TextStyle get weekPageTitle => headlineLarge.copyWith(
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    height: 1.12,
+    letterSpacing: -1.2,
+  );
+  TextStyle get weekPageTitleCompact => weekPageTitle.copyWith(fontSize: 26);
+  TextStyle get weekPageDescription => bodyLarge.copyWith(
+    color: _colors.onSurfaceMuted,
+    height: 1.5,
+  );
+  TextStyle get weekPrimaryAction => buttonPrimary.copyWith(fontWeight: FontWeight.w700);
+  TextStyle get weekFilterLabel => labelMedium.copyWith(
+    color: _colors.onSurface,
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get weekFilterLabelSelected => weekFilterLabel.copyWith(color: _colors.onPrimary);
+  TextStyle get weekFilterDetail => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 10,
+    fontWeight: FontWeight.w400,
+  );
+  TextStyle get weekFilterDetailSelected => weekFilterDetail.copyWith(
+    color: _colors.onPrimary.withValues(alpha: .62),
+  );
+  TextStyle get weekToggleLabel => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 11,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get weekToggleLabelSelected => weekToggleLabel.copyWith(color: _colors.onSurface);
+  TextStyle get weekToolbarLabel => labelMedium.copyWith(
+    color: _colors.onSurface,
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get weekLegendLabel => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get weekDayLabel => labelMedium.copyWith(
+    color: _colors.onSurface,
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+  );
+  TextStyle get weekDayDate => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 11,
+  );
+  TextStyle get weekDayMeta => weekLegendLabel;
+  TextStyle get weekCardDiscipline => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 10,
+    fontWeight: FontWeight.w800,
+    letterSpacing: .4,
+  );
+  TextStyle get weekCardTitle => labelMedium.copyWith(
+    color: _colors.onSurface,
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+    height: 1.35,
+  );
+  TextStyle get weekCardTitleCompleted => weekCardTitle.copyWith(
+    decoration: TextDecoration.lineThrough,
+  );
+  TextStyle get weekCardMeta => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 10,
+  );
+  TextStyle get weekCardMetaStrong => weekCardMeta.copyWith(fontWeight: FontWeight.w700);
+  TextStyle get weekTagLabel => labelSmall.copyWith(
+    color: _colors.onSurfaceMuted,
+    fontSize: 9,
+    fontWeight: FontWeight.w800,
+    letterSpacing: .35,
+  );
+  TextStyle get weekEmptyLabel => weekCardMeta;
 
   TextStyle get _button => labelLarge.copyWith(
     fontSize: 13,

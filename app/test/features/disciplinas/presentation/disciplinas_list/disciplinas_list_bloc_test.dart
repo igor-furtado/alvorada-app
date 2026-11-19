@@ -15,6 +15,7 @@ void main() {
       final bloc = DisciplinasListBloc(
         getDisciplinas: useCases.getDisciplinas,
         deleteDisciplina: useCases.deleteDisciplina,
+        reorderDisciplinas: useCases.reorderDisciplinas,
         initialQuery: 'direito',
       );
       addTearDown(bloc.close);
@@ -132,6 +133,57 @@ void main() {
         contains('constitucional'),
       );
     });
+
+    test('reordena as Disciplinas de forma otimista e persiste a ordem', () async {
+      final repository = FakeDisciplinasRepository(
+        disciplinas: disciplinasFixture(),
+      );
+      final bloc = _bloc(repository);
+      addTearDown(bloc.close);
+      await _load(bloc);
+
+      final reordered = bloc.stream.firstWhere(
+        (state) => state.feedback == DisciplinasListFeedback.reordered,
+      );
+      bloc.add(
+        const DisciplinasListReorderRequested(oldIndex: 0, newIndex: 2),
+      );
+      final state = await reordered;
+
+      expect(
+        state.items.map((disciplina) => disciplina.id),
+        ['constitucional', 'administrativo', 'portugues'],
+      );
+      final persisted = await repository.getDisciplinas();
+      expect(
+        persisted.map((disciplina) => disciplina.id),
+        ['constitucional', 'administrativo', 'portugues'],
+      );
+    });
+
+    test('restaura a ordem anterior quando a reordenação falha', () async {
+      final repository = FakeDisciplinasRepository(
+        disciplinas: disciplinasFixture(),
+      );
+      final bloc = _bloc(repository);
+      addTearDown(bloc.close);
+      await _load(bloc);
+      repository.failMutation = true;
+
+      final failed = bloc.stream.firstWhere(
+        (state) => state.feedback == DisciplinasListFeedback.operationFailed,
+      );
+      bloc.add(
+        const DisciplinasListReorderRequested(oldIndex: 0, newIndex: 2),
+      );
+      final state = await failed;
+
+      expect(
+        state.items.map((disciplina) => disciplina.id),
+        ['portugues', 'constitucional', 'administrativo'],
+      );
+      expect(state.isReordering, isFalse);
+    });
   });
 }
 
@@ -140,6 +192,7 @@ DisciplinasListBloc _bloc(FakeDisciplinasRepository repository) {
   return DisciplinasListBloc(
     getDisciplinas: useCases.getDisciplinas,
     deleteDisciplina: useCases.deleteDisciplina,
+    reorderDisciplinas: useCases.reorderDisciplinas,
   );
 }
 

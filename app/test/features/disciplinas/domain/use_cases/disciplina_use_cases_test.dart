@@ -121,6 +121,27 @@ void main() {
     );
   });
 
+  test('reordena as Disciplinas na ordem informada', () async {
+    final repository = FakeDisciplinasRepository(
+      disciplinas: disciplinasFixture(),
+    );
+    final useCases = DisciplinasUseCases(repository);
+
+    final result = await useCases.reorderDisciplinas(
+      const ['administrativo', 'portugues', 'constitucional'],
+    );
+    final catalogResult = await useCases.getDisciplinas();
+
+    expect(result, isA<Sucesso<void>>());
+    expect(
+      switch (catalogResult) {
+        Sucesso(:final valor) => valor.map((disciplina) => disciplina.id).toList(),
+        _ => const <String>[],
+      },
+      ['administrativo', 'portugues', 'constitucional'],
+    );
+  });
+
   test('informa falha técnica quando a exclusão não sincroniza o catálogo', () async {
     final repository = FakeDisciplinasRepository()..failSynchronization = true;
     final useCases = DisciplinasUseCases(repository);

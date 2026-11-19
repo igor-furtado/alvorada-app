@@ -52,5 +52,6 @@ abstract final class AppIcons {
   static const attention = LucideIcons.triangleAlert;
   static const info = LucideIcons.info;
   static const minus = LucideIcons.minus;
+  static const play = LucideIcons.play;
   static const arrowRight = LucideIcons.arrowRight;
 }

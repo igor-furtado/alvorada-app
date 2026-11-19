@@ -1114,6 +1114,12 @@ abstract class AppLocalizations {
   /// **'Disciplina excluída.'**
   String get disciplineDeleted;
 
+  /// No description provided for @disciplinesReordered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordem das Disciplinas atualizada.'**
+  String get disciplinesReordered;
+
   /// No description provided for @topicCreated.
   ///
   /// In pt, this message translates to:
@@ -1143,6 +1149,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Arraste para reordenar'**
   String get reorderTopic;
+
+  /// No description provided for @reorderDiscipline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste para reordenar a Disciplina'**
+  String get reorderDiscipline;
 
   /// No description provided for @contentUpdateFailed.
   ///
@@ -1959,6 +1971,342 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'A cor da Disciplina deve estar no formato hexadecimal #RRGGBB.'**
   String get disciplineColorInvalid;
+
+  /// No description provided for @navigationWeek.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semana'**
+  String get navigationWeek;
+
+  /// No description provided for @weekTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semana em trilhos'**
+  String get weekTitle;
+
+  /// No description provided for @weekSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inicie um Tópico para entrar no modo de estudo.'**
+  String get weekSubtitle;
+
+  /// No description provided for @addStudy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar estudo'**
+  String get addStudy;
+
+  /// No description provided for @weekLoadFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar a semana'**
+  String get weekLoadFailed;
+
+  /// No description provided for @weekOperationFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar a alteração na semana.'**
+  String get weekOperationFailed;
+
+  /// No description provided for @all.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get all;
+
+  /// No description provided for @hideCompleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar concluídos'**
+  String get hideCompleted;
+
+  /// No description provided for @showCompleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar concluídos'**
+  String get showCompleted;
+
+  /// No description provided for @topicsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 Tópico} other{{count} Tópicos}}'**
+  String topicsCount(int count);
+
+  /// No description provided for @contestStudyProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 Tópico} other{{count} Tópicos}} · {percent}%'**
+  String contestStudyProgress(int count, int percent);
+
+  /// No description provided for @contestStudyDurationProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min · {percent}%'**
+  String contestStudyDurationProgress(int minutes, int percent);
+
+  /// No description provided for @previousWeek.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semana anterior'**
+  String get previousWeek;
+
+  /// No description provided for @nextWeek.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próxima semana'**
+  String get nextWeek;
+
+  /// No description provided for @noInitialStudy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem estudo inicial'**
+  String get noInitialStudy;
+
+  /// No description provided for @studyCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 estudos} =1{1 estudo} other{{count} estudos}}'**
+  String studyCount(int count);
+
+  /// No description provided for @minutesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} min'**
+  String minutesCount(int count);
+
+  /// No description provided for @noTopicsForDay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem Tópicos'**
+  String get noTopicsForDay;
+
+  /// No description provided for @completeReview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir revisão'**
+  String get completeReview;
+
+  /// No description provided for @chooseTopicToStudy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha um Tópico do Edital para iniciar o modo foco.'**
+  String get chooseTopicToStudy;
+
+  /// No description provided for @saveAndExit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar e sair'**
+  String get saveAndExit;
+
+  /// No description provided for @studyMethodFooter.
+  ///
+  /// In pt, this message translates to:
+  /// **'100 minutos de atividade · 4 blocos fixos · revisões opcionais'**
+  String get studyMethodFooter;
+
+  /// No description provided for @studyStep.
+  ///
+  /// In pt, this message translates to:
+  /// **'ETAPA {current} DE {total}'**
+  String studyStep(int current, int total);
+
+  /// No description provided for @optional.
+  ///
+  /// In pt, this message translates to:
+  /// **'opcional'**
+  String get optional;
+
+  /// No description provided for @theory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Teoria'**
+  String get theory;
+
+  /// No description provided for @memory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Memória'**
+  String get memory;
+
+  /// No description provided for @conference.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferência'**
+  String get conference;
+
+  /// No description provided for @questions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Questões'**
+  String get questions;
+
+  /// No description provided for @reviews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Revisões'**
+  String get reviews;
+
+  /// No description provided for @theoryStudy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estudo da teoria'**
+  String get theoryStudy;
+
+  /// No description provided for @memoryWriting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escrita de memória'**
+  String get memoryWriting;
+
+  /// No description provided for @conferenceAndConsolidation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferência e consolidação'**
+  String get conferenceAndConsolidation;
+
+  /// No description provided for @theoryInstruction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estude o conteúdo teórico do Tópico usando o material disponível.'**
+  String get theoryInstruction;
+
+  /// No description provided for @memoryInstruction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escreva o que aprendeu sem consultar o material.'**
+  String get memoryInstruction;
+
+  /// No description provided for @conferenceInstruction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volte ao material, confira o que lembrou, faça anotações e destaque o que for importante.'**
+  String get conferenceInstruction;
+
+  /// No description provided for @timerRunning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cronômetro em andamento'**
+  String get timerRunning;
+
+  /// No description provided for @timerReady.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pronto para começar'**
+  String get timerReady;
+
+  /// No description provided for @pause.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausar'**
+  String get pause;
+
+  /// No description provided for @completeStage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir etapa'**
+  String get completeStage;
+
+  /// No description provided for @questionsAndErrors.
+  ///
+  /// In pt, this message translates to:
+  /// **'Questões e Caderno de Erros'**
+  String get questionsAndErrors;
+
+  /// No description provided for @questionsInstruction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva questões de bancas variadas e marque cada resposta como certa ou errada.'**
+  String get questionsInstruction;
+
+  /// No description provided for @answeredQuestions.
+  ///
+  /// In pt, this message translates to:
+  /// **'QUESTÕES RESPONDIDAS'**
+  String get answeredQuestions;
+
+  /// No description provided for @answersEnabled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Registre cada resposta enquanto o cronômetro estiver em andamento.'**
+  String get answersEnabled;
+
+  /// No description provided for @startTimerToAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inicie o cronômetro para registrar acertos e erros.'**
+  String get startTimerToAnswer;
+
+  /// No description provided for @chooseReviews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher revisões'**
+  String get chooseReviews;
+
+  /// No description provided for @chooseReviewsDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione qualquer combinação ou conclua sem agendar nenhuma revisão.'**
+  String get chooseReviewsDescription;
+
+  /// No description provided for @completeCoreStagesFirst.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conclua teoria, memória e conferência para agendar revisões.'**
+  String get completeCoreStagesFirst;
+
+  /// No description provided for @reviewAfterDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'Revisar depois de {days} dias'**
+  String reviewAfterDays(int days);
+
+  /// No description provided for @reviewsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Revisões atualizadas.'**
+  String get reviewsSaved;
+
+  /// No description provided for @finishStudyCycle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir ciclo'**
+  String get finishStudyCycle;
+
+  /// No description provided for @cycleCompleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'CICLO CONCLUÍDO'**
+  String get cycleCompleted;
+
+  /// No description provided for @noReviewsScheduled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma revisão agendada'**
+  String get noReviewsScheduled;
+
+  /// No description provided for @scheduledReviewsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 revisão agendada} other{{count} revisões agendadas}}'**
+  String scheduledReviewsCount(int count);
+
+  /// No description provided for @noReviewsScheduledDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você pode agendar revisões depois, se desejar.'**
+  String get noReviewsScheduledDescription;
+
+  /// No description provided for @scheduledReviewsDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Tópico voltará para sua semana nas datas escolhidas.'**
+  String get scheduledReviewsDescription;
+
+  /// No description provided for @backToWeek.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar para a semana'**
+  String get backToWeek;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

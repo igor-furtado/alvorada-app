@@ -4,6 +4,7 @@ abstract final class DisciplinasResultadoCodes {
   static const criacaoFalhou = 'disciplina.criacao_falhou';
   static const atualizacaoFalhou = 'disciplina.atualizacao_falhou';
   static const exclusaoFalhou = 'disciplina.exclusao_falhou';
+  static const disciplinaReordenacaoFalhou = 'disciplina.reordenacao_falhou';
   static const topicoCriacaoFalhou = 'topico.criacao_falhou';
   static const topicoAtualizacaoFalhou = 'topico.atualizacao_falhou';
   static const topicoExclusaoFalhou = 'topico.exclusao_falhou';

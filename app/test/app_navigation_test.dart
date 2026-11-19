@@ -6,9 +6,10 @@ import 'package:material_ui/material_ui.dart';
 
 import 'features/concursos/fakes/fake_concursos_repository.dart';
 import 'features/disciplinas/fakes/fake_disciplinas_repository.dart';
+import 'features/semana/fakes/fake_semana_repository.dart';
 
 void main() {
-  testWidgets('mantém somente Concursos e Disciplinas na navegação principal', (
+  testWidgets('mantém Concursos, Disciplinas e Semana na navegação principal', (
     tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
@@ -21,6 +22,7 @@ void main() {
         dependencies: AppDependencies.fromRepositories(
           concursos: FakeConcursosRepository(),
           disciplinas: FakeDisciplinasRepository(),
+          semana: FakeSemanaRepository(),
         ),
       ),
     );
@@ -28,9 +30,9 @@ void main() {
 
     expect(find.byKey(const ValueKey('shell-destination-0')), findsOneWidget);
     expect(find.byKey(const ValueKey('shell-destination-1')), findsOneWidget);
-    expect(find.byKey(const ValueKey('shell-destination-2')), findsNothing);
+    expect(find.byKey(const ValueKey('shell-destination-2')), findsOneWidget);
     expect(find.bySemanticsLabel('Hoje'), findsNothing);
-    expect(find.bySemanticsLabel('Semana'), findsNothing);
+    expect(find.bySemanticsLabel('Semana'), findsOneWidget);
     expect(find.bySemanticsLabel('Revisões'), findsNothing);
     expect(find.bySemanticsLabel('Caderno'), findsNothing);
     expect(find.byType(EditableText), findsNothing);
@@ -46,7 +48,7 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgets('mantém o seletor de tema no shell compacto', (tester) async {
+  testWidgets('mantém as três rotas principais no shell compacto', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     tester.platformDispatcher.textScaleFactorTestValue = 2;
@@ -58,19 +60,23 @@ void main() {
         dependencies: AppDependencies.fromRepositories(
           concursos: FakeConcursosRepository(),
           disciplinas: FakeDisciplinasRepository(),
+          semana: FakeSemanaRepository(),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
+    expect(find.byKey(const ValueKey('theme-toggle')), findsNothing);
+    expect(find.byKey(const ValueKey('shell-destination-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('shell-destination-1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('shell-destination-2')), findsOneWidget);
     expect(find.byType(AppBreadcrumbs), findsNothing);
     expect(tester.takeException(), isNull);
 
     await tester.tap(find.byKey(const ValueKey('shell-destination-1')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('theme-toggle')), findsOneWidget);
+    expect(find.byKey(const ValueKey('theme-toggle')), findsNothing);
     expect(find.byType(AppBreadcrumbs), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -85,6 +91,7 @@ void main() {
         dependencies: AppDependencies.fromRepositories(
           concursos: FakeConcursosRepository(),
           disciplinas: FakeDisciplinasRepository(),
+          semana: FakeSemanaRepository(),
         ),
       ),
     );

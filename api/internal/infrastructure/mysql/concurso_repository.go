@@ -132,6 +132,7 @@ func (r *ConcursoRepository) loadEditais(ctx context.Context, concursos []domain
 		LEFT JOIN concursos_disciplinas AS relacao
 			ON relacao.concurso_id = vinculo.concurso_id AND relacao.disciplina_id = disciplina.id
 		WHERE BINARY topico.nome <> BINARY 'Revisão de Véspera'
+			AND vinculo.removido_em IS NULL
 		ORDER BY disciplina.posicao, disciplina.criado_em, disciplina.id,
 			topico.posicao, topico.criado_em, topico.id`)
 	if err != nil {
@@ -386,13 +387,14 @@ func (r *ConcursoRepository) AddDisciplinaToEdital(ctx context.Context, concurso
 	}
 	defer tx.Rollback()
 	_, err = tx.ExecContext(ctx, `
-		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
+		INSERT INTO concursos_topicos (concurso_id, topico_id)
 		SELECT concurso.id, topico.id
 		FROM concursos AS concurso
 		INNER JOIN topicos AS topico
 			ON topico.disciplina_id = ?
 			AND BINARY topico.nome <> BINARY 'Revisão de Véspera'
-		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, disciplinaID, concursoID)
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL
+		ON DUPLICATE KEY UPDATE removido_em = NULL`, disciplinaID, concursoID)
 	if err != nil {
 		return fmt.Errorf("add disciplina to edital: %w", err)
 	}
@@ -451,13 +453,14 @@ func (r *ConcursoRepository) AddTopicoToEdital(ctx context.Context, concursoID, 
 	}
 	defer tx.Rollback()
 	_, err = tx.ExecContext(ctx, `
-		INSERT IGNORE INTO concursos_topicos (concurso_id, topico_id)
+		INSERT INTO concursos_topicos (concurso_id, topico_id)
 		SELECT concurso.id, topico.id
 		FROM concursos AS concurso
 		INNER JOIN topicos AS topico
 			ON topico.id = ?
 			AND BINARY topico.nome <> BINARY 'Revisão de Véspera'
-		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL`, topicoID, concursoID)
+		WHERE concurso.id = ? AND concurso.arquivado_em IS NULL
+		ON DUPLICATE KEY UPDATE removido_em = NULL`, topicoID, concursoID)
 	if err != nil {
 		return fmt.Errorf("add topic to edital: %w", err)
 	}
@@ -478,7 +481,9 @@ func (r *ConcursoRepository) AddTopicoToEdital(ctx context.Context, concursoID, 
 func (r *ConcursoRepository) RemoveTopicoFromEdital(ctx context.Context, concursoID, topicoID string) error {
 	if _, err := r.db.ExecContext(
 		ctx,
-		"DELETE FROM concursos_topicos WHERE concurso_id = ? AND topico_id = ?",
+		`UPDATE concursos_topicos
+		SET removido_em = CURRENT_TIMESTAMP, data_planejada = NULL
+		WHERE concurso_id = ? AND topico_id = ? AND removido_em IS NULL`,
 		concursoID,
 		topicoID,
 	); err != nil {

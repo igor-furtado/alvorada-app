@@ -186,7 +186,7 @@ func TestAddDisciplinaToEditalLinksOnlyCurrentCommonTopicsIdempotently(t *testin
 	}
 	defer db.Close()
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT IGNORE INTO concursos_topicos").
+	mock.ExpectExec("INSERT INTO concursos_topicos").
 		WithArgs("disciplina-1", "concurso-1").
 		WillReturnResult(sqlmock.NewResult(0, 2))
 	mock.ExpectExec("INSERT IGNORE INTO concursos_disciplinas").

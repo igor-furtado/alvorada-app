@@ -11,19 +11,31 @@ import (
 
 	apiDocs "concursosapp/api/docs"
 	concursosApplication "concursosapp/api/internal/application/concursos"
+	semanaApplication "concursosapp/api/internal/application/semana"
 	application "concursosapp/api/internal/application/studies"
 	concursosDomain "concursosapp/api/internal/domain/concursos"
+	semanaDomain "concursosapp/api/internal/domain/semana"
 	domain "concursosapp/api/internal/domain/studies"
 )
 
 type Handler struct {
 	studies   *application.Service
 	concursos *concursosApplication.Service
+	semana    *semanaApplication.Service
 	logger    *slog.Logger
 }
 
-func NewHandler(studies *application.Service, concursos *concursosApplication.Service, logger *slog.Logger) *Handler {
-	return &Handler{studies: studies, concursos: concursos, logger: logger}
+func NewHandler(
+	studies *application.Service,
+	concursos *concursosApplication.Service,
+	logger *slog.Logger,
+	semanaServices ...*semanaApplication.Service,
+) *Handler {
+	var semanaService *semanaApplication.Service
+	if len(semanaServices) > 0 {
+		semanaService = semanaServices[0]
+	}
+	return &Handler{studies: studies, concursos: concursos, semana: semanaService, logger: logger}
 }
 
 func (h *Handler) Router() http.Handler {
@@ -47,6 +59,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("DELETE /api/v1/concursos/{id}/edital/topicos/{topicoId}", h.removeTopicoFromEdital)
 	mux.HandleFunc("GET /api/v1/subjects", h.catalog)
 	mux.HandleFunc("POST /api/v1/subjects", h.createSubject)
+	mux.HandleFunc("PUT /api/v1/subjects/order", h.reorderSubjects)
 	mux.HandleFunc("PATCH /api/v1/subjects/{id}", h.updateSubject)
 	mux.HandleFunc("DELETE /api/v1/subjects/{id}", h.deleteSubject)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics", h.createTopic)
@@ -54,7 +67,197 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("PUT /api/v1/subjects/{id}/topics/order", h.reorderTopics)
 	mux.HandleFunc("PATCH /api/v1/topics/{id}", h.updateTopic)
 	mux.HandleFunc("DELETE /api/v1/topics/{id}", h.deleteTopic)
+	mux.HandleFunc("GET /api/v1/semana", h.planejamentoSemanal)
+	mux.HandleFunc("PUT /api/v1/concursos/{concursoId}/topicos/{topicoId}/planejamento", h.planejarTopico)
+	mux.HandleFunc("PATCH /api/v1/concursos/{concursoId}/topicos/{topicoId}/progresso", h.atualizarProgressoTopico)
+	mux.HandleFunc("POST /api/v1/concursos/{concursoId}/topicos/{topicoId}/questoes", h.registrarQuestao)
+	mux.HandleFunc("PUT /api/v1/concursos/{concursoId}/topicos/{topicoId}/revisoes", h.substituirRevisoes)
+	mux.HandleFunc("PATCH /api/v1/revisoes/{id}/planejamento", h.moverRevisao)
+	mux.HandleFunc("PUT /api/v1/revisoes/{id}/conclusao", h.concluirRevisao)
 	return recovery(h.logger, cors(requestLogger(h.logger, mux)))
+}
+
+type semanaItemResponse struct {
+	ID                   string                `json:"id"`
+	Tipo                 semanaDomain.TipoItem `json:"tipo"`
+	ConcursoID           string                `json:"concurso_id"`
+	ConcursoNome         string                `json:"concurso_nome"`
+	ConcursoSigla        *string               `json:"concurso_sigla"`
+	TopicoID             string                `json:"topico_id"`
+	TopicoNome           string                `json:"topico_nome"`
+	DisciplinaNome       string                `json:"disciplina_nome"`
+	DataPlanejada        string                `json:"data_planejada"`
+	PosicaoDia           uint                  `json:"posicao_dia"`
+	TeoriaConcluida      bool                  `json:"teoria_concluida"`
+	MemoriaConcluida     bool                  `json:"memoria_concluida"`
+	ConferenciaConcluida bool                  `json:"conferencia_concluida"`
+	Acertos              uint                  `json:"acertos"`
+	Erros                uint                  `json:"erros"`
+	VersaoMetodologia    *uint16               `json:"versao_metodologia"`
+	Concluido            bool                  `json:"concluido"`
+	IntervaloRevisaoDias *uint8                `json:"intervalo_revisao_dias"`
+}
+
+type topicoDisponivelResponse struct {
+	ConcursoID     string  `json:"concurso_id"`
+	ConcursoNome   string  `json:"concurso_nome"`
+	ConcursoSigla  *string `json:"concurso_sigla"`
+	TopicoID       string  `json:"topico_id"`
+	TopicoNome     string  `json:"topico_nome"`
+	DisciplinaNome string  `json:"disciplina_nome"`
+}
+
+type semanaResponse struct {
+	Inicio      string                     `json:"inicio"`
+	Fim         string                     `json:"fim"`
+	Itens       []semanaItemResponse       `json:"itens"`
+	Disponiveis []topicoDisponivelResponse `json:"disponiveis"`
+}
+
+func (h *Handler) planejamentoSemanal(w http.ResponseWriter, r *http.Request) {
+	inicio, err := time.Parse(time.DateOnly, r.URL.Query().Get("inicio"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "o início deve usar o formato AAAA-MM-DD")
+		return
+	}
+	fim, err := time.Parse(time.DateOnly, r.URL.Query().Get("fim"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "o fim deve usar o formato AAAA-MM-DD")
+		return
+	}
+	plano, err := h.semana.Planejamento(r.Context(), inicio, fim)
+	if err != nil {
+		h.serviceError(w, r, err)
+		return
+	}
+	response := semanaResponse{
+		Inicio:      plano.Inicio.Format(time.DateOnly),
+		Fim:         plano.Fim.Format(time.DateOnly),
+		Itens:       make([]semanaItemResponse, 0, len(plano.Itens)),
+		Disponiveis: make([]topicoDisponivelResponse, 0, len(plano.Disponiveis)),
+	}
+	for _, item := range plano.Itens {
+		response.Itens = append(response.Itens, semanaItemResponse{
+			ID: item.ID, Tipo: item.Tipo,
+			ConcursoID: item.ConcursoID, ConcursoNome: item.ConcursoNome, ConcursoSigla: item.ConcursoSigla,
+			TopicoID: item.TopicoID, TopicoNome: item.TopicoNome, DisciplinaNome: item.DisciplinaNome,
+			DataPlanejada: item.DataPlanejada.Format(time.DateOnly), PosicaoDia: item.PosicaoDia,
+			TeoriaConcluida: item.TeoriaConcluida, MemoriaConcluida: item.MemoriaConcluida,
+			ConferenciaConcluida: item.ConferenciaConcluida,
+			Acertos:              item.Acertos, Erros: item.Erros, VersaoMetodologia: item.VersaoMetodologia,
+			Concluido: item.Concluido, IntervaloRevisaoDias: item.IntervaloRevisaoDias,
+		})
+	}
+	for _, item := range plano.Disponiveis {
+		response.Disponiveis = append(response.Disponiveis, topicoDisponivelResponse{
+			ConcursoID: item.ConcursoID, ConcursoNome: item.ConcursoNome, ConcursoSigla: item.ConcursoSigla,
+			TopicoID: item.TopicoID, TopicoNome: item.TopicoNome, DisciplinaNome: item.DisciplinaNome,
+		})
+	}
+	writeJSON(w, http.StatusOK, response)
+}
+
+type planejamentoRequest struct {
+	DataPlanejada string `json:"data_planejada"`
+	PosicaoDia    uint   `json:"posicao_dia"`
+}
+
+func (h *Handler) planejarTopico(w http.ResponseWriter, r *http.Request) {
+	var body planejamentoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	data, err := time.Parse(time.DateOnly, body.DataPlanejada)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "a data planejada deve usar o formato AAAA-MM-DD")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.semana.PlanejarTopico(
+			r.Context(), r.PathValue("concursoId"), r.PathValue("topicoId"), data, body.PosicaoDia,
+		)
+	})
+}
+
+type progressoTopicoRequest struct {
+	TeoriaConcluida      *bool `json:"teoria_concluida"`
+	MemoriaConcluida     *bool `json:"memoria_concluida"`
+	ConferenciaConcluida *bool `json:"conferencia_concluida"`
+}
+
+func (h *Handler) atualizarProgressoTopico(w http.ResponseWriter, r *http.Request) {
+	var body progressoTopicoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.semana.AtualizarProgresso(
+			r.Context(), r.PathValue("concursoId"), r.PathValue("topicoId"),
+			semanaDomain.ProgressoInput{
+				TeoriaConcluida:      body.TeoriaConcluida,
+				MemoriaConcluida:     body.MemoriaConcluida,
+				ConferenciaConcluida: body.ConferenciaConcluida,
+			},
+		)
+	})
+}
+
+type questaoRequest struct {
+	Resultado semanaDomain.ResultadoQuestao `json:"resultado"`
+}
+
+func (h *Handler) registrarQuestao(w http.ResponseWriter, r *http.Request) {
+	var body questaoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.semana.RegistrarQuestao(
+			r.Context(), r.PathValue("concursoId"), r.PathValue("topicoId"), body.Resultado,
+		)
+	})
+}
+
+type revisoesRequest struct {
+	IntervalosDias []uint8 `json:"intervalos_dias"`
+}
+
+func (h *Handler) substituirRevisoes(w http.ResponseWriter, r *http.Request) {
+	var body revisoesRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.semana.SubstituirRevisoes(
+			r.Context(), r.PathValue("concursoId"), r.PathValue("topicoId"), body.IntervalosDias,
+		)
+	})
+}
+
+func (h *Handler) moverRevisao(w http.ResponseWriter, r *http.Request) {
+	var body planejamentoRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	data, err := time.Parse(time.DateOnly, body.DataPlanejada)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "a data planejada deve usar o formato AAAA-MM-DD")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.semana.MoverRevisao(r.Context(), r.PathValue("id"), data, body.PosicaoDia)
+	})
+}
+
+func (h *Handler) concluirRevisao(w http.ResponseWriter, r *http.Request) {
+	h.runNoContent(w, r, func() error {
+		return h.semana.ConcluirRevisao(r.Context(), r.PathValue("id"))
+	})
 }
 
 func (h *Handler) documentation(w http.ResponseWriter, _ *http.Request) {
@@ -330,6 +533,10 @@ type topicOrderRequest struct {
 	TopicIDs []string `json:"topico_ids"`
 }
 
+type subjectOrderRequest struct {
+	SubjectIDs []string `json:"disciplina_ids"`
+}
+
 func (h *Handler) createSubject(w http.ResponseWriter, r *http.Request) {
 	var body subjectRequest
 	if err := decodeJSON(r, &body); err != nil {
@@ -375,6 +582,17 @@ func (h *Handler) updateSubject(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) deleteSubject(w http.ResponseWriter, r *http.Request) {
 	h.runDelete(w, r, func() error { return h.studies.DeleteSubject(r.Context(), r.PathValue("id")) })
+}
+
+func (h *Handler) reorderSubjects(w http.ResponseWriter, r *http.Request) {
+	var body subjectOrderRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	h.runNoContent(w, r, func() error {
+		return h.studies.ReorderSubjects(r.Context(), body.SubjectIDs)
+	})
 }
 
 func (h *Handler) createTopic(w http.ResponseWriter, r *http.Request) {
@@ -474,10 +692,25 @@ func (h *Handler) serviceError(w http.ResponseWriter, r *http.Request, err error
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	if errors.Is(err, semanaApplication.ErrPeriodoInvalido) ||
+		errors.Is(err, semanaApplication.ErrDataInvalida) ||
+		errors.Is(err, semanaApplication.ErrProgressoVazio) ||
+		errors.Is(err, semanaApplication.ErrResultadoQuestao) ||
+		errors.Is(err, semanaApplication.ErrIntervaloRevisao) ||
+		errors.Is(err, semanaApplication.ErrTopicoNaoConcluido) {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if errors.Is(err, semanaApplication.ErrTopicoNaoEncontrado) ||
+		errors.Is(err, semanaApplication.ErrRevisaoNaoEncontrada) {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
 	if errors.Is(err, application.ErrNameRequired) || errors.Is(err, application.ErrTopicsRequired) ||
 		errors.Is(err, application.ErrNameTooLong) ||
 		errors.Is(err, application.ErrInvalidDifficulty) || errors.Is(err, application.ErrInvalidColor) ||
-		errors.Is(err, domain.ErrMandatoryTopic) || errors.Is(err, domain.ErrInvalidTopicOrder) {
+		errors.Is(err, domain.ErrMandatoryTopic) || errors.Is(err, domain.ErrInvalidSubjectOrder) ||
+		errors.Is(err, domain.ErrInvalidTopicOrder) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
