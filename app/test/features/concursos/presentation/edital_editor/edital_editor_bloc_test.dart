@@ -50,20 +50,34 @@ void main() {
     expect(ready.disciplinaSelecionada, 'portugues');
   });
 
-  test('mantém busca e troca de Disciplina somente no rascunho', () async {
+  test('busca Tópicos globalmente e mantém somente Disciplinas correspondentes', () async {
     final bloc = _bloc(
       disciplinasRepository: FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
     );
     addTearDown(bloc.close);
     await _load(bloc);
 
-    bloc.add(const EditalEditorTopicoSearched('interpretação'));
+    bloc.add(const EditalEditorTopicoSearched('garantias'));
     final searched = await bloc.stream.firstWhere((state) => state.buscaTopico.isNotEmpty);
-    expect(searched.topicosAtivos.single.id, 'interpretacao');
+    expect(searched.disciplinasAtivas.map((item) => item.id), ['constitucional']);
+    expect(searched.disciplinaSelecionada, 'constitucional');
+    expect(searched.topicosAtivos.single.id, 'direitos');
 
-    bloc.add(const EditalEditorDisciplinaSelected('constitucional'));
-    final selected = await bloc.stream.firstWhere((state) => state.disciplinaSelecionada == 'constitucional');
-    expect(selected.buscaTopico, isEmpty);
+    bloc.add(const EditalEditorTopicoSearched('Revisão de Véspera'));
+    final allDisciplines = await bloc.stream.firstWhere(
+      (state) => state.buscaTopico == 'Revisão de Véspera',
+    );
+    expect(allDisciplines.disciplinasAtivas, hasLength(3));
+
+    bloc.add(const EditalEditorTopicoSearched('inexistente'));
+    final empty = await bloc.stream.firstWhere((state) => state.buscaTopico == 'inexistente');
+    expect(empty.disciplinasAtivas, isEmpty);
+    expect(empty.disciplinaSelecionada, isNull);
+
+    bloc.add(const EditalEditorTopicoSearched(''));
+    final cleared = await bloc.stream.firstWhere((state) => state.buscaTopico.isEmpty);
+    expect(cleared.disciplinasAtivas, hasLength(3));
+    expect(cleared.disciplinaSelecionada, 'portugues');
   });
 
   test('altera um Tópico localmente e persiste somente ao salvar', () async {

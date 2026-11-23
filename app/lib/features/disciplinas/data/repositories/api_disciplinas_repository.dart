@@ -72,6 +72,12 @@ class ApiDisciplinasRepository implements DisciplinasRepository {
   );
 
   @override
+  Future<void> replaceTopicos({required String disciplineId, required List<ReplaceTopicoInput> topics}) => _mutate(
+    () => _api.replaceTopicos(disciplineId, topics),
+    'Não foi possível salvar os Tópicos.',
+  );
+
+  @override
   Future<void> updateTopico({required String topicId, required String name}) =>
       _mutate(() => _api.updateTopico(topicId, name), 'Não foi possível atualizar o Tópico.');
 

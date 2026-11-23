@@ -1,5 +1,6 @@
 import 'package:estudos_app/core/result.dart';
 import 'package:estudos_app/features/disciplinas/domain/models/disciplina.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina_input.dart';
 import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_resultado_codes.dart';
 import 'package:estudos_app/features/disciplinas/domain/use_cases/disciplinas_use_cases.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +59,30 @@ void main() {
     expect(
       _topicos(catalogResult, 'portugues'),
       contains('Interpretação textual'),
+    );
+  });
+
+  test('edita, remove e adiciona Tópicos em uma única substituição', () async {
+    final useCases = DisciplinasUseCases(
+      FakeDisciplinasRepository(disciplinas: disciplinasFixture()),
+    );
+
+    final result = await useCases.replaceTopicos(
+      disciplineId: 'portugues',
+      topics: const [
+        ReplaceTopicoInput(
+          id: 'interpretacao',
+          name: ' Interpretação textual ',
+        ),
+        ReplaceTopicoInput(name: 'Pontuação'),
+      ],
+    );
+    final catalogResult = await useCases.getDisciplinas();
+
+    expect(result, isA<Sucesso<void>>());
+    expect(
+      _topicos(catalogResult, 'portugues'),
+      ['Interpretação textual', 'Pontuação', nomeTopicoRevisaoVespera],
     );
   });
 

@@ -96,6 +96,29 @@ func (s *Service) CreateTopics(ctx context.Context, subjectID string, names []st
 	return s.repository.CreateTopics(ctx, subjectID, values)
 }
 
+func (s *Service) ReplaceTopics(ctx context.Context, subjectID string, topics []domain.ReplaceTopicInput) error {
+	values := make([]domain.ReplaceTopicInput, 0, len(topics))
+	seenIDs := make(map[string]struct{}, len(topics))
+	for _, topic := range topics {
+		name, err := validateName(topic.Name)
+		if err != nil {
+			return err
+		}
+		if name == domain.MandatoryReviewTopicName {
+			return domain.ErrMandatoryTopic
+		}
+		id := strings.TrimSpace(topic.ID)
+		if id != "" {
+			if _, exists := seenIDs[id]; exists {
+				return domain.ErrInvalidTopicOrder
+			}
+			seenIDs[id] = struct{}{}
+		}
+		values = append(values, domain.ReplaceTopicInput{ID: id, Name: name})
+	}
+	return s.repository.ReplaceTopics(ctx, subjectID, values)
+}
+
 func (s *Service) UpdateTopic(ctx context.Context, id, name string) error {
 	value, err := validateName(name)
 	if err != nil {

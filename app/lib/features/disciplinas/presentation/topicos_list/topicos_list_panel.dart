@@ -46,12 +46,13 @@ class TopicosListPanel extends StatelessWidget {
         children: [
           TopicosListHeader(
             disciplina: disciplina,
-            canAdd: state.canMutate,
+            canEditTopics: state.canMutate,
             canMutateDiscipline: canMutateDiscipline,
-            onAdd: () => TopicosListActions.add(
+            onEditTopics: () => TopicosListActions.manage(
               context,
               disciplineId,
               disciplina.name,
+              state.items,
             ),
             onRenameDiscipline: onRenameDiscipline,
             onDeleteDiscipline: onDeleteDiscipline,
@@ -76,14 +77,6 @@ class TopicosListPanel extends StatelessWidget {
                   index: index + 1,
                   reorderIndex: canReorder ? index : null,
                   topico: regularItems[index],
-                  canMutate: state.canMutate,
-                  onRename: () => TopicosListActions.rename(
-                    context,
-                    disciplineId,
-                    disciplina.name,
-                    regularItems[index],
-                  ),
-                  onDelete: () => TopicosListActions.delete(context, regularItems[index]),
                 ),
                 const AppDivider(margin: EdgeInsets.zero),
               ],
@@ -94,9 +87,6 @@ class TopicosListPanel extends StatelessWidget {
               key: ValueKey('topic-${mandatoryItems[index].id}'),
               index: regularItems.length + index + 1,
               topico: mandatoryItems[index],
-              canMutate: false,
-              onRename: () {},
-              onDelete: () {},
             ),
             if (index < mandatoryItems.length - 1) const AppDivider(margin: EdgeInsets.zero),
           ],

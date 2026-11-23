@@ -63,8 +63,9 @@ class _EditalEditorContent extends StatelessWidget {
       }
     },
     builder: (context, state) => AppDrawer(
+      eyebrow: institution,
       title: context.l10n.syllabusTriageTitle,
-      description: context.l10n.syllabusTriageDescription(institution, role),
+      description: role,
       width: _editorWidth,
       scrollable: false,
       bodyPadding: EdgeInsets.zero,
@@ -97,29 +98,57 @@ class _TriageWorkspace extends StatelessWidget {
   final EditalEditorState state;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      if (constraints.maxWidth >= _desktopSplit) {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              width: _disciplineRailWidth,
-              child: _DisciplineRail(state: state),
-            ),
-            Expanded(child: _TopicPane(state: state)),
-          ],
-        );
-      }
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: 208, child: _DisciplineRail(state: state, compact: true)),
-          Expanded(child: _TopicPane(state: state, compact: true)),
-        ],
-      );
-    },
-  );
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            tokens.spacing.xxl,
+            tokens.spacing.md,
+            tokens.spacing.xxl,
+            tokens.spacing.lg,
+          ),
+          child: AppSearchField(
+            key: const ValueKey('catalog-topic-search'),
+            placeholder: context.l10n.filterCatalogTopics,
+            enabled: !state.saving,
+            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorTopicoSearched(value)),
+          ),
+        ),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= _desktopSplit) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: _disciplineRailWidth,
+                      child: _DisciplineRail(state: state),
+                    ),
+                    Expanded(child: _TopicPane(state: state)),
+                  ],
+                );
+              }
+              final railHeight = (constraints.maxHeight * 0.45).clamp(140.0, 208.0);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: railHeight,
+                    child: _DisciplineRail(state: state, compact: true),
+                  ),
+                  Expanded(child: _TopicPane(state: state, compact: true)),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _DisciplineRail extends StatelessWidget {
@@ -141,38 +170,85 @@ class _DisciplineRail extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              tokens.spacing.xxl,
-              tokens.spacing.sm,
-              tokens.spacing.xl,
-              tokens.spacing.md,
-            ),
-            child: Text(
-              context.l10n.navigationDisciplines.toUpperCase(),
-              style: tokens.typography.catalogOverline,
-            ),
-          ),
           Expanded(
-            child: ListView.builder(
+            child: ListView(
               scrollDirection: compact ? Axis.horizontal : Axis.vertical,
               padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
-              itemCount: state.catalogo.length,
-              itemBuilder: (context, index) {
-                final disciplina = state.catalogo[index];
-                return SizedBox(
-                  width: compact ? 248 : null,
-                  child: _DisciplineItem(
-                    disciplina: disciplina,
-                    selectedCount: state.quantidadeSelecionada(disciplina),
-                    active: disciplina.id == state.disciplinaSelecionada,
-                    disabled: state.saving,
+              children: [
+                if (state.disciplinasNoEdital.isNotEmpty) ...[
+                  _DisciplineSectionLabel(
+                    label: context.l10n.syllabusIncludedDisciplines,
+                    compact: compact,
                   ),
-                );
-              },
+                  for (final disciplina in state.disciplinasNoEdital) _item(disciplina),
+                ],
+                if (state.demaisDisciplinas.isNotEmpty) ...[
+                  _DisciplineSectionLabel(
+                    label: context.l10n.otherDisciplines,
+                    compact: compact,
+                    separated: state.disciplinasNoEdital.isNotEmpty,
+                  ),
+                  for (final disciplina in state.demaisDisciplinas) _item(disciplina),
+                ],
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _item(Disciplina disciplina) => SizedBox(
+    width: compact ? 248 : null,
+    child: _DisciplineItem(
+      disciplina: disciplina,
+      selectedCount: state.quantidadeSelecionada(disciplina),
+      active: disciplina.id == state.disciplinaSelecionada,
+      disabled: state.saving,
+    ),
+  );
+}
+
+class _DisciplineSectionLabel extends StatelessWidget {
+  const _DisciplineSectionLabel({
+    required this.label,
+    required this.compact,
+    this.separated = false,
+  });
+
+  final String label;
+  final bool compact;
+  final bool separated;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return SizedBox(
+      key: ValueKey('discipline-section-$label'),
+      width: compact ? 184 : null,
+      child: Padding(
+        padding: compact
+            ? EdgeInsets.fromLTRB(
+                separated ? tokens.spacing.lg : tokens.spacing.md,
+                tokens.spacing.sm,
+                tokens.spacing.md,
+                tokens.spacing.sm,
+              )
+            : EdgeInsets.fromLTRB(
+                tokens.spacing.md,
+                separated ? tokens.spacing.lg : tokens.spacing.xs,
+                tokens.spacing.md,
+                tokens.spacing.sm,
+              ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            label.toUpperCase(),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: tokens.typography.catalogOverline,
+          ),
+        ),
       ),
     );
   }
@@ -258,10 +334,11 @@ class _TopicPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final disciplina = state.disciplinaAtiva;
     if (disciplina == null) {
+      final hasSearch = state.buscaTopico.trim().isNotEmpty;
       return AppStateView(
         variant: AppStateVariant.empty,
-        title: context.l10n.noDiscipline,
-        message: context.l10n.noDisciplineMessage,
+        title: hasSearch ? context.l10n.noTopics : context.l10n.noDiscipline,
+        message: hasSearch ? context.l10n.noTopicsMessage : context.l10n.noDisciplineMessage,
       );
     }
     final tokens = context.tokens;
@@ -378,13 +455,6 @@ class _TopicPane extends StatelessWidget {
                 ],
               ),
             ],
-          ),
-          SizedBox(height: tokens.spacing.lg),
-          AppSearchField(
-            key: ValueKey('topic-search-${disciplina.id}'),
-            placeholder: context.l10n.filterDisciplineTopics,
-            enabled: !state.saving,
-            onChanged: (value) => context.read<EditalEditorBloc>().add(EditalEditorTopicoSearched(value)),
           ),
         ],
       ),

@@ -286,6 +286,161 @@ func (r *StudyRepository) CreateTopics(ctx context.Context, subjectID string, na
 	return nil
 }
 
+func (r *StudyRepository) ReplaceTopics(
+	ctx context.Context,
+	subjectID string,
+	topics []domain.ReplaceTopicInput,
+) error {
+	resolved := make([]domain.ReplaceTopicInput, len(topics))
+	copy(resolved, topics)
+	for index := range resolved {
+		if resolved[index].ID != "" {
+			continue
+		}
+		id, err := newUUID()
+		if err != nil {
+			return err
+		}
+		resolved[index].ID = id
+	}
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin replace topics transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	var lockedSubjectID string
+	if err := tx.QueryRowContext(
+		ctx,
+		"SELECT id FROM disciplinas WHERE id = ? FOR UPDATE",
+		subjectID,
+	).Scan(&lockedSubjectID); err != nil {
+		return fmt.Errorf("lock subject for topic replacement: %w", err)
+	}
+
+	rows, err := tx.QueryContext(ctx, `
+		SELECT id
+		FROM topicos
+		WHERE disciplina_id = ? AND BINARY nome <> BINARY ?
+		ORDER BY posicao, criado_em
+		FOR UPDATE`, subjectID, domain.MandatoryReviewTopicName)
+	if err != nil {
+		return fmt.Errorf("lock topics for replacement: %w", err)
+	}
+	currentIDs := make(map[string]struct{})
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			rows.Close()
+			return fmt.Errorf("scan topic for replacement: %w", err)
+		}
+		currentIDs[id] = struct{}{}
+	}
+	if err := rows.Close(); err != nil {
+		return fmt.Errorf("close topics for replacement: %w", err)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate topics for replacement: %w", err)
+	}
+
+	retainedIDs := make(map[string]struct{}, len(resolved))
+	for index, topic := range resolved {
+		if _, exists := currentIDs[topic.ID]; exists {
+			retainedIDs[topic.ID] = struct{}{}
+			continue
+		}
+		if topics[index].ID != "" {
+			return domain.ErrInvalidTopicOrder
+		}
+	}
+
+	removedIDs := make([]string, 0)
+	for id := range currentIDs {
+		if _, retained := retainedIDs[id]; !retained {
+			removedIDs = append(removedIDs, id)
+		}
+	}
+	for _, id := range removedIDs {
+		var hasProgress bool
+		if err := tx.QueryRowContext(ctx, `
+			SELECT EXISTS(
+				SELECT 1
+				FROM concursos_topicos
+				WHERE topico_id = ?
+					AND (
+						teoria_concluida = 1 OR memoria_concluida = 1 OR conferencia_concluida = 1
+						OR acertos > 0 OR erros > 0 OR concluido_em IS NOT NULL
+					)
+			)`, id).Scan(&hasProgress); err != nil {
+			return fmt.Errorf("check replaced topic study progress: %w", err)
+		}
+		if hasProgress {
+			return domain.ErrContentLinked
+		}
+		if _, err := tx.ExecContext(ctx, "DELETE FROM concursos_topicos WHERE topico_id = ?", id); err != nil {
+			return fmt.Errorf("unlink replaced topic from editais: %w", err)
+		}
+		if _, err := tx.ExecContext(ctx, "DELETE FROM topicos WHERE id = ?", id); err != nil {
+			return fmt.Errorf("delete replaced topic: %w", err)
+		}
+	}
+
+	for index, topic := range resolved {
+		position := index + 1
+		if _, exists := currentIDs[topic.ID]; exists {
+			if _, err := tx.ExecContext(
+				ctx,
+				"UPDATE topicos SET nome = ?, posicao = ? WHERE id = ? AND disciplina_id = ?",
+				topic.Name,
+				position,
+				topic.ID,
+				subjectID,
+			); err != nil {
+				return fmt.Errorf("update replaced topic: %w", err)
+			}
+			continue
+		}
+		if _, err := tx.ExecContext(
+			ctx,
+			"INSERT INTO topicos (id, disciplina_id, nome, posicao) VALUES (?, ?, ?, ?)",
+			topic.ID,
+			subjectID,
+			topic.Name,
+			position,
+		); err != nil {
+			return fmt.Errorf("insert replaced topic: %w", err)
+		}
+	}
+	if _, err := tx.ExecContext(
+		ctx,
+		"UPDATE topicos SET posicao = ? WHERE disciplina_id = ? AND BINARY nome = BINARY ?",
+		len(resolved)+1,
+		subjectID,
+		domain.MandatoryReviewTopicName,
+	); err != nil {
+		return fmt.Errorf("position mandatory topic after replacement: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `
+		DELETE relacao
+		FROM concursos_disciplinas AS relacao
+		WHERE relacao.disciplina_id = ?
+			AND NOT EXISTS (
+				SELECT 1
+				FROM concursos_topicos AS vinculo
+				INNER JOIN topicos AS topico ON topico.id = vinculo.topico_id
+				WHERE vinculo.concurso_id = relacao.concurso_id
+					AND vinculo.removido_em IS NULL
+					AND topico.disciplina_id = relacao.disciplina_id
+			)`, subjectID); err != nil {
+		return fmt.Errorf("delete empty edital discipline metadata after replacement: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit replace topics transaction: %w", err)
+	}
+	return nil
+}
+
 func (r *StudyRepository) UpdateTopic(ctx context.Context, id, name string) error {
 	return execMutableTopic(
 		ctx,

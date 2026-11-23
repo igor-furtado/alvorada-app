@@ -74,12 +74,7 @@ class EditalEditorBloc extends Bloc<EditalEditorEvent, EditalEditorState> {
 
   void _onSelectDisciplina(EditalEditorDisciplinaSelected event, Emitter<EditalEditorState> emit) {
     if (state.saving) return;
-    emit(
-      state.copyWith(
-        disciplinaSelecionada: event.disciplinaId,
-        buscaTopico: '',
-      ),
-    );
+    emit(state.copyWith(disciplinaSelecionada: event.disciplinaId));
   }
 
   void _onChangeDisciplinaSelection(
@@ -95,7 +90,17 @@ class EditalEditorBloc extends Bloc<EditalEditorEvent, EditalEditorState> {
 
   void _onSearchTopico(EditalEditorTopicoSearched event, Emitter<EditalEditorState> emit) {
     if (state.saving) return;
-    emit(state.copyWith(buscaTopico: event.query));
+    final searched = state.copyWith(buscaTopico: event.query);
+    final selectionMatches = searched.disciplinasAtivas.any(
+      (disciplina) => disciplina.id == searched.disciplinaSelecionada,
+    );
+    emit(
+      searched.copyWith(
+        disciplinaSelecionada: selectionMatches
+            ? searched.disciplinaSelecionada
+            : searched.disciplinasAtivas.firstOrNull?.id,
+      ),
+    );
   }
 
   Future<void> _onSave(EditalEditorSaved event, Emitter<EditalEditorState> emit) async {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../domain/models/disciplina_input.dart';
 import '../models/disciplina_api_model.dart';
 
 const defaultApiBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8080');
@@ -18,6 +19,8 @@ abstract interface class DisciplinasApi {
   Future<void> reorderDisciplinas(List<String> disciplinaIds);
 
   Future<void> createTopicos(String disciplineId, List<String> names);
+
+  Future<void> replaceTopicos(String disciplineId, List<ReplaceTopicoInput> topics);
 
   Future<void> updateTopico(String topicId, String name);
 
@@ -78,6 +81,17 @@ class DisciplinasApiService implements DisciplinasApi {
   Future<void> createTopicos(String disciplineId, List<String> names) => _sendCreated(
     '/api/v1/subjects/${Uri.encodeComponent(disciplineId)}/topics/batch',
     {'nomes': names},
+  );
+
+  @override
+  Future<void> replaceTopicos(String disciplineId, List<ReplaceTopicoInput> topics) => _sendEmpty(
+    'PUT',
+    '/api/v1/subjects/${Uri.encodeComponent(disciplineId)}/topics',
+    body: {
+      'topicos': [
+        for (final topic in topics) {'id': ?topic.id, 'nome': topic.name},
+      ],
+    },
   );
 
   @override

@@ -21,3 +21,10 @@ class UpdateDisciplinaInput {
 
   bool get hasChanges => name != null || difficulty != null || color != null;
 }
+
+class ReplaceTopicoInput {
+  const ReplaceTopicoInput({required this.name, this.id});
+
+  final String? id;
+  final String name;
+}

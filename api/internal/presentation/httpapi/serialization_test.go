@@ -123,6 +123,30 @@ func TestReorderTopicsAcceptsPortugueseJSONFields(t *testing.T) {
 	}
 }
 
+func TestReplaceTopicsAcceptsPortugueseJSONFields(t *testing.T) {
+	repository := &serializationRepository{}
+	handler := NewHandler(
+		application.NewService(repository),
+		nil,
+		slog.New(slog.NewTextHandler(&strings.Builder{}, nil)),
+	).Router()
+	request := httptest.NewRequest(
+		http.MethodPut,
+		"/api/v1/subjects/disciplina-1/topics",
+		strings.NewReader(`{"topicos":[{"id":"topico-1","nome":"Pontuação"},{"nome":"Concordância"}]}`),
+	)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusNoContent, response.Body.String())
+	}
+	if len(repository.replacedTopics) != 2 || repository.replacedTopics[0].ID != "topico-1" || repository.replacedTopics[1].Name != "Concordância" {
+		t.Fatalf("replaced topics = %#v", repository.replacedTopics)
+	}
+}
+
 func TestReorderSubjectsAcceptsPortugueseJSONFields(t *testing.T) {
 	repository := &serializationRepository{}
 	handler := NewHandler(
@@ -207,6 +231,7 @@ type serializationRepository struct {
 	catalog           []domain.Subject
 	createdSubject    domain.CreateSubjectInput
 	createdTopics     []string
+	replacedTopics    []domain.ReplaceTopicInput
 	reorderedSubjects []string
 	reorderedTopics   []string
 	deleteTopicError  error
@@ -234,6 +259,11 @@ func (r *serializationRepository) ReorderSubjects(_ context.Context, subjectIDs 
 
 func (r *serializationRepository) CreateTopics(_ context.Context, _ string, names []string) error {
 	r.createdTopics = names
+	return nil
+}
+
+func (r *serializationRepository) ReplaceTopics(_ context.Context, _ string, topics []domain.ReplaceTopicInput) error {
+	r.replacedTopics = topics
 	return nil
 }
 

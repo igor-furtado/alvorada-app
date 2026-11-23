@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:estudos_app/features/disciplinas/data/services/disciplinas_api_service.dart';
+import 'package:estudos_app/features/disciplinas/domain/models/disciplina_input.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -48,6 +49,32 @@ void main() {
     final service = DisciplinasApiService(client, baseUri: Uri.parse('http://api.test'));
 
     await service.createTopicos('discipline-1', ['Pontuação', 'Concordância']);
+  });
+
+  test('substitui todos os Tópicos editáveis em uma única chamada', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/api/v1/subjects/discipline-1/topics');
+      expect(jsonDecode(request.body), {
+        'topicos': [
+          {'id': 'topic-1', 'nome': 'Interpretação textual'},
+          {'nome': 'Pontuação'},
+        ],
+      });
+      return http.Response('', 204);
+    });
+    final service = DisciplinasApiService(
+      client,
+      baseUri: Uri.parse('http://api.test'),
+    );
+
+    await service.replaceTopicos('discipline-1', const [
+      ReplaceTopicoInput(
+        id: 'topic-1',
+        name: 'Interpretação textual',
+      ),
+      ReplaceTopicoInput(name: 'Pontuação'),
+    ]);
   });
 
   test('envia a ordem completa dos Tópicos editáveis', () async {

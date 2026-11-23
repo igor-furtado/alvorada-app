@@ -74,6 +74,31 @@ class FakeDisciplinasRepository implements DisciplinasRepository {
   }
 
   @override
+  Future<void> replaceTopicos({
+    required String disciplineId,
+    required List<ReplaceTopicoInput> topics,
+  }) async {
+    _throwIfMutationFails();
+    _replaceDisciplina(
+      disciplineId,
+      (disciplina) {
+        final currentById = {
+          for (final topic in disciplina.topics.where((item) => !item.mandatory)) topic.id: topic,
+        };
+        return [
+          for (final input in topics)
+            Topico(
+              id: input.id ?? _id('topico'),
+              name: input.name,
+              mandatory: currentById[input.id]?.mandatory ?? false,
+            ),
+          ...disciplina.topics.where((item) => item.mandatory),
+        ];
+      },
+    );
+  }
+
+  @override
   Future<void> updateTopico({required String topicId, required String name}) async {
     _throwIfMutationFails();
     _mapTopico(

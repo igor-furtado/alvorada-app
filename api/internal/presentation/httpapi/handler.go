@@ -64,6 +64,7 @@ func (h *Handler) Router() http.Handler {
 	mux.HandleFunc("DELETE /api/v1/subjects/{id}", h.deleteSubject)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics", h.createTopic)
 	mux.HandleFunc("POST /api/v1/subjects/{id}/topics/batch", h.createTopics)
+	mux.HandleFunc("PUT /api/v1/subjects/{id}/topics", h.replaceTopics)
 	mux.HandleFunc("PUT /api/v1/subjects/{id}/topics/order", h.reorderTopics)
 	mux.HandleFunc("PATCH /api/v1/topics/{id}", h.updateTopic)
 	mux.HandleFunc("DELETE /api/v1/topics/{id}", h.deleteTopic)
@@ -529,6 +530,15 @@ type namesRequest struct {
 	Names []string `json:"nomes"`
 }
 
+type replaceTopicRequest struct {
+	ID   string `json:"id"`
+	Name string `json:"nome"`
+}
+
+type replaceTopicsRequest struct {
+	Topics []replaceTopicRequest `json:"topicos"`
+}
+
 type topicOrderRequest struct {
 	TopicIDs []string `json:"topico_ids"`
 }
@@ -610,6 +620,21 @@ func (h *Handler) createTopics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, map[string]any{})
+}
+
+func (h *Handler) replaceTopics(w http.ResponseWriter, r *http.Request) {
+	var body replaceTopicsRequest
+	if err := decodeJSON(r, &body); err != nil {
+		writeError(w, http.StatusBadRequest, "corpo da requisição inválido")
+		return
+	}
+	topics := make([]domain.ReplaceTopicInput, 0, len(body.Topics))
+	for _, topic := range body.Topics {
+		topics = append(topics, domain.ReplaceTopicInput{ID: topic.ID, Name: topic.Name})
+	}
+	h.runNoContent(w, r, func() error {
+		return h.studies.ReplaceTopics(r.Context(), r.PathValue("id"), topics)
+	})
 }
 
 func (h *Handler) reorderTopics(w http.ResponseWriter, r *http.Request) {

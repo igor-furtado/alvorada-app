@@ -409,6 +409,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newTopic => 'New Topic';
 
   @override
+  String get editTopics => 'Edit Topics';
+
+  @override
+  String get editTopicsDescription => 'Edit, add, or remove Topics from this Subject.';
+
+  @override
+  String get existingTopics => 'Current Topics';
+
+  @override
+  String get newTopics => 'New Topics';
+
+  @override
+  String get newTopicsDescription => 'Type or paste one Topic per line. They will be added to the end of the list.';
+
+  @override
+  String get noEditableTopics => 'No editable Topics. Add one or more below.';
+
+  @override
+  String topicNumber(int number) {
+    return 'Topic $number';
+  }
+
+  @override
   String get difficultyVeryEasy => 'very easy';
 
   @override
@@ -561,7 +584,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get topicCreated => 'Topics added.';
 
   @override
-  String get topicUpdated => 'Topic updated.';
+  String get topicUpdated => 'Topics updated.';
 
   @override
   String get topicDeleted => 'Topic deleted.';
@@ -949,11 +972,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syllabusTriageTitle => 'Syllabus Content';
 
   @override
-  String syllabusTriageDescription(String institution, String role) {
-    return '$institution · $role';
-  }
-
-  @override
   String syllabusTriageDisciplineProgress(int selected, int total) {
     return '$selected/$total Topics';
   }
@@ -965,7 +983,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAll => 'Select all';
 
   @override
-  String get filterDisciplineTopics => 'Filter Topics in this Subject';
+  String get filterCatalogTopics => 'Search topics';
+
+  @override
+  String get syllabusIncludedDisciplines => 'In the syllabus';
+
+  @override
+  String get otherDisciplines => 'Other Subjects';
 
   @override
   String get inSyllabus => 'In Syllabus';

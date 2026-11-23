@@ -409,6 +409,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newTopic => 'Novo Tópico';
 
   @override
+  String get editTopics => 'Editar Tópicos';
+
+  @override
+  String get editTopicsDescription => 'Edite, adicione ou remova os Tópicos desta Disciplina.';
+
+  @override
+  String get existingTopics => 'Tópicos atuais';
+
+  @override
+  String get newTopics => 'Novos Tópicos';
+
+  @override
+  String get newTopicsDescription => 'Digite ou cole um Tópico por linha. Eles serão adicionados ao final da lista.';
+
+  @override
+  String get noEditableTopics => 'Nenhum Tópico editável. Adicione um ou mais abaixo.';
+
+  @override
+  String topicNumber(int number) {
+    return 'Tópico $number';
+  }
+
+  @override
   String get difficultyVeryEasy => 'muito fácil';
 
   @override
@@ -560,7 +583,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get topicCreated => 'Tópicos adicionados.';
 
   @override
-  String get topicUpdated => 'Tópico atualizado.';
+  String get topicUpdated => 'Tópicos atualizados.';
 
   @override
   String get topicDeleted => 'Tópico excluído.';
@@ -948,11 +971,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syllabusTriageTitle => 'Conteúdo Programático do Edital';
 
   @override
-  String syllabusTriageDescription(String institution, String role) {
-    return '$institution · $role';
-  }
-
-  @override
   String syllabusTriageDisciplineProgress(int selected, int total) {
     return '$selected/$total Tópicos';
   }
@@ -964,7 +982,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get selectAll => 'Selecionar todos';
 
   @override
-  String get filterDisciplineTopics => 'Filtrar Tópicos desta Disciplina';
+  String get filterCatalogTopics => 'Buscar tópicos';
+
+  @override
+  String get syllabusIncludedDisciplines => 'No Edital';
+
+  @override
+  String get otherDisciplines => 'Demais Disciplinas';
 
   @override
   String get inSyllabus => 'No Edital';

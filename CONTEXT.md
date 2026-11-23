@@ -22,6 +22,8 @@ _Evitar_: Pauta, mapa, grade, lista de matérias
 
 **Conteúdo Programático do Edital**:
 O título da tela usada para selecionar, no catálogo compartilhado, os Tópicos cobrados no Edital de um Concurso.
+Sua lista separa as Disciplinas que já possuem Tópicos selecionados no conteúdo programático das demais Disciplinas. A busca percorre os Tópicos de todas as Disciplinas e, enquanto houver uma consulta, exibe somente as Disciplinas que possuam Tópicos correspondentes, preservando essa separação.
+No drawer de edição, o eyebrow mostra o órgão ou instituição do Concurso de origem e a descrição sob o título mostra o cargo; nos drawers de criação e edição de Tópico, o eyebrow identifica a Disciplina de origem.
 
 **Vínculo do Edital**:
 A associação entre um Edital e um Tópico do catálogo. A presença da Disciplina é derivada dos Tópicos vinculados.
@@ -40,7 +42,7 @@ _Evitar_: Matéria, curso, módulo
 
 **Tópico**:
 A unidade de conteúdo compartilhável entre Editais. Um Tópico é mantido uma única vez no catálogo. Excluí-lo do catálogo também remove seus vínculos de todos os Editais quando ainda não houver progresso de estudo; depois que algum progresso for registrado, o Tópico deve ser preservado.
-Ao adicionar Tópicos a uma Disciplina, a pessoa pode digitar ou colar um Tópico por linha e revisar a lista resultante antes de salvar todos de uma vez.
+Ao editar os Tópicos de uma Disciplina, a pessoa trabalha em um único formulário com toda a lista: pode alterar nomes diretamente, remover itens e digitar ou colar um ou vários Tópicos novos, um por linha. As mudanças permanecem como rascunho até serem salvas juntas em uma única operação.
 A ordem dos Tópicos editáveis pode ser reorganizada no catálogo por arrastar e soltar; Revisão de Véspera permanece sempre na última posição.
 _Evitar_: Capítulo, assunto duplicado, unidade por edital
 

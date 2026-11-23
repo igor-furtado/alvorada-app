@@ -9,18 +9,18 @@ enum _DisciplineAction { edit, delete }
 class TopicosListHeader extends StatelessWidget {
   const TopicosListHeader({
     required this.disciplina,
-    required this.canAdd,
+    required this.canEditTopics,
     required this.canMutateDiscipline,
-    required this.onAdd,
+    required this.onEditTopics,
     required this.onRenameDiscipline,
     required this.onDeleteDiscipline,
     super.key,
   });
 
   final DisciplinaListItemData disciplina;
-  final bool canAdd;
+  final bool canEditTopics;
   final bool canMutateDiscipline;
-  final VoidCallback onAdd;
+  final VoidCallback onEditTopics;
   final VoidCallback? onRenameDiscipline;
   final VoidCallback? onDeleteDiscipline;
 
@@ -91,10 +91,10 @@ class TopicosListHeader extends StatelessWidget {
           ),
         ],
       );
-      final addButton = AppButton(
-        label: context.l10n.newTopic,
-        icon: AppIcons.add,
-        onPressed: canAdd ? onAdd : null,
+      final editTopicsButton = AppButton(
+        label: context.l10n.editTopics,
+        icon: AppIcons.edit,
+        onPressed: canEditTopics ? onEditTopics : null,
       );
       if (constraints.maxWidth < tokens.layout.toolbar) {
         return Column(
@@ -106,7 +106,7 @@ class TopicosListHeader extends StatelessWidget {
               children: [
                 editMenu,
                 SizedBox(width: tokens.spacing.xs),
-                Expanded(child: addButton),
+                Expanded(child: editTopicsButton),
               ],
             ),
           ],
@@ -119,7 +119,7 @@ class TopicosListHeader extends StatelessWidget {
           SizedBox(width: tokens.spacing.lg),
           editMenu,
           SizedBox(width: tokens.spacing.xs),
-          addButton,
+          editTopicsButton,
         ],
       );
     },

@@ -20,8 +20,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Conteúdo Programático do Edital'), findsOneWidget);
-    expect(find.text('Receita Federal · Auditor-Fiscal'), findsOneWidget);
-    expect(find.text('DISCIPLINAS'), findsOneWidget);
+    expect(find.text('Receita Federal'), findsOneWidget);
+    expect(find.text('Auditor-Fiscal'), findsOneWidget);
+    expect(find.text('Receita Federal · Auditor-Fiscal'), findsNothing);
+    expect(
+      tester.getTopLeft(find.text('Receita Federal')).dy,
+      lessThan(tester.getTopLeft(find.text('Conteúdo Programático do Edital')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Conteúdo Programático do Edital')).dy,
+      lessThan(tester.getTopLeft(find.text('Auditor-Fiscal')).dy),
+    );
+    expect(find.text('DISCIPLINAS'), findsNothing);
     expect(find.text('Língua Portuguesa'), findsWidgets);
     expect(find.text('Selecionar todos'), findsOneWidget);
     expect(find.text('Salvar'), findsOneWidget);
@@ -36,9 +46,10 @@ void main() {
     expect(revisionCheckbox.value, isTrue);
     expect(revisionCheckbox.onChanged, isNull);
 
-    final railLabel = tester.getTopLeft(find.text('DISCIPLINAS'));
-    final search = tester.getTopLeft(find.byType(EditableText));
-    expect(railLabel.dx, lessThan(search.dx));
+    final railLabel = tester.getTopLeft(find.text('DEMAIS DISCIPLINAS'));
+    final search = tester.getTopLeft(find.byKey(const ValueKey('catalog-topic-search')));
+    expect(search.dy, lessThan(railLabel.dy));
+    expect(find.text('Buscar tópicos'), findsOneWidget);
     expect(tester.getSize(find.byKey(const ValueKey('app-drawer-surface'))).width, 980);
   });
 
@@ -68,7 +79,38 @@ void main() {
     expect(discipline('constitucional').style?.color, tokens.colors.onSurface);
   });
 
-  testWidgets('filtra Tópicos, seleciona em lote e salva o rascunho', (tester) async {
+  testWidgets('separa Disciplinas do conteúdo programático e atualiza as seções no rascunho', (tester) async {
+    await _pumpLauncher(
+      tester,
+      width: 1440,
+      height: 900,
+      concurso: _concursoComTopico(),
+    );
+
+    await tester.tap(find.text('Abrir editor'));
+    await tester.pumpAndSettle();
+
+    final includedSection = find.text('NO EDITAL');
+    final otherSection = find.text('DEMAIS DISCIPLINAS');
+    final portugues = find.byKey(const ValueKey('discipline-name-portugues'));
+    final constitucional = find.byKey(const ValueKey('discipline-name-constitucional'));
+
+    expect(includedSection, findsOneWidget);
+    expect(otherSection, findsOneWidget);
+    expect(tester.getTopLeft(includedSection).dy, lessThan(tester.getTopLeft(portugues).dy));
+    expect(tester.getTopLeft(portugues).dy, lessThan(tester.getTopLeft(otherSection).dy));
+    expect(tester.getTopLeft(otherSection).dy, lessThan(tester.getTopLeft(constitucional).dy));
+
+    await tester.tap(constitucional);
+    await tester.pump();
+    await tester.tap(find.text('Selecionar todos'));
+    await tester.pump();
+
+    expect(tester.getTopLeft(constitucional).dy, lessThan(tester.getTopLeft(otherSection).dy));
+    expect(find.text('Salvar 3 Tópicos'), findsOneWidget);
+  });
+
+  testWidgets('busca em todas as Disciplinas, seleciona em lote e salva o rascunho', (tester) async {
     final repository = FakeConcursosRepository();
     await _pumpLauncher(
       tester,
@@ -80,10 +122,13 @@ void main() {
     await tester.tap(find.text('Abrir editor'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(EditableText), 'morfossintática');
+    await tester.enterText(find.byType(EditableText), 'garantias');
     await tester.pump();
-    expect(find.text('Domínio da estrutura morfossintática'), findsOneWidget);
+    expect(find.text('Direitos e garantias fundamentais'), findsOneWidget);
     expect(find.text('Compreensão e interpretação de textos'), findsNothing);
+    expect(find.byKey(const ValueKey('discipline-name-constitucional')), findsOneWidget);
+    expect(find.byKey(const ValueKey('discipline-name-portugues')), findsNothing);
+    expect(find.byKey(const ValueKey('discipline-name-administrativo')), findsNothing);
 
     await tester.tap(find.text('Selecionar todos'));
     await tester.pump();
@@ -122,6 +167,7 @@ Future<void> _pumpLauncher(
   required double width,
   required double height,
   FakeConcursosRepository? concursosRepository,
+  Concurso? concurso,
   TextScaler textScaler = TextScaler.noScaling,
 }) async {
   tester.view.devicePixelRatio = 1;
@@ -154,7 +200,7 @@ Future<void> _pumpLauncher(
                 onPressed: () async {
                   final saved = await showAppDrawerBuilder<bool>(
                     context,
-                    builder: (_) => EditalEditorView(concurso: _concurso()),
+                    builder: (_) => EditalEditorView(concurso: concurso ?? _concurso()),
                   );
                   if (saved == true && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Salvo')));
@@ -178,4 +224,32 @@ Concurso _concurso() => Concurso(
   dataProva: null,
   prioritario: false,
   progressoEdital: 0,
+);
+
+Concurso _concursoComTopico() => Concurso(
+  id: 'concurso-1',
+  instituicao: 'Receita Federal',
+  cargo: 'Auditor-Fiscal',
+  banca: null,
+  dataProva: null,
+  prioritario: false,
+  progressoEdital: 0,
+  disciplinas: [
+    DisciplinaEdital(
+      id: 'portugues',
+      nome: 'Língua Portuguesa',
+      topicos: [
+        TopicoEdital(
+          id: 'interpretacao',
+          nome: 'Compreensão e interpretação de textos',
+          obrigatorio: false,
+        ),
+        TopicoEdital(
+          id: 'revisao-portugues',
+          nome: 'Revisão de Véspera',
+          obrigatorio: true,
+        ),
+      ],
+    ),
+  ],
 );

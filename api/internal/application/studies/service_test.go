@@ -62,6 +62,32 @@ func TestCreateTopicsRejectsEmptyBatch(t *testing.T) {
 	}
 }
 
+func TestReplaceTopicsNormalizesNamesAndPreservesIDs(t *testing.T) {
+	repository := &fakeRepository{}
+	service := NewService(repository)
+	err := service.ReplaceTopics(context.Background(), "subject-id", []domain.ReplaceTopicInput{
+		{ID: "topic-1", Name: "  Pontuação  "},
+		{Name: "Concordância"},
+	})
+	if err != nil {
+		t.Fatalf("ReplaceTopics() error = %v", err)
+	}
+	if len(repository.replacedTopics) != 2 || repository.replacedTopics[0].ID != "topic-1" || repository.replacedTopics[0].Name != "Pontuação" {
+		t.Fatalf("ReplaceTopics() persisted %#v", repository.replacedTopics)
+	}
+}
+
+func TestReplaceTopicsRejectsDuplicateIDs(t *testing.T) {
+	service := NewService(&fakeRepository{})
+	err := service.ReplaceTopics(context.Background(), "subject-id", []domain.ReplaceTopicInput{
+		{ID: "topic-1", Name: "Pontuação"},
+		{ID: "topic-1", Name: "Concordância"},
+	})
+	if !errors.Is(err, domain.ErrInvalidTopicOrder) {
+		t.Fatalf("ReplaceTopics() error = %v, want %v", err, domain.ErrInvalidTopicOrder)
+	}
+}
+
 func TestReorderTopicsRejectsDuplicateIDs(t *testing.T) {
 	service := NewService(&fakeRepository{})
 	err := service.ReorderTopics(context.Background(), "subject-id", []string{"topic-1", "topic-1"})
@@ -117,6 +143,7 @@ func TestCreateSubjectRejectsInvalidDifficulty(t *testing.T) {
 type fakeRepository struct {
 	createdSubject    domain.CreateSubjectInput
 	createdTopics     []string
+	replacedTopics    []domain.ReplaceTopicInput
 	reorderedSubjects []string
 	reorderedTopics   []string
 }
@@ -140,6 +167,10 @@ func (f *fakeRepository) ReorderSubjects(_ context.Context, subjectIDs []string)
 }
 func (f *fakeRepository) CreateTopics(_ context.Context, _ string, names []string) error {
 	f.createdTopics = names
+	return nil
+}
+func (f *fakeRepository) ReplaceTopics(_ context.Context, _ string, topics []domain.ReplaceTopicInput) error {
+	f.replacedTopics = topics
 	return nil
 }
 func (f *fakeRepository) ReorderTopics(_ context.Context, _ string, topicIDs []string) error {

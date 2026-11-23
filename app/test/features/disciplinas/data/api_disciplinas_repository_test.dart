@@ -35,6 +35,22 @@ void main() {
     expect(api.getCalls, 2);
   });
 
+  test('encaminha a substituição completa dos Tópicos', () async {
+    final api = _FakeApi();
+    final repository = ApiDisciplinasRepository(api);
+
+    await repository.replaceTopicos(
+      disciplineId: 'discipline-1',
+      topics: const [
+        ReplaceTopicoInput(id: 'topic-1', name: 'Interpretação textual'),
+        ReplaceTopicoInput(name: 'Pontuação'),
+      ],
+    );
+
+    expect(api.replacedTopicos?.first.id, 'topic-1');
+    expect(api.replacedTopicos?.last.name, 'Pontuação');
+  });
+
   test('distingue mutação confirmada de falha ao sincronizar o catálogo', () async {
     final api = _FakeApi();
     final repository = ApiDisciplinasRepository(api);
@@ -95,6 +111,7 @@ void main() {
 class _FakeApi implements DisciplinasApi {
   int getCalls = 0;
   List<String>? createdTopicos;
+  List<ReplaceTopicoInput>? replacedTopicos;
   Map<String, Object?>? createdDisciplina;
   bool failGet = false;
   Exception? mutationError;
@@ -117,6 +134,14 @@ class _FakeApi implements DisciplinasApi {
     final error = mutationError;
     if (error != null) throw error;
     createdTopicos = names;
+  }
+
+  @override
+  Future<void> replaceTopicos(
+    String disciplineId,
+    List<ReplaceTopicoInput> topics,
+  ) async {
+    replacedTopicos = topics;
   }
 
   @override

@@ -53,14 +53,36 @@ class EditalEditorState {
     return null;
   }
 
+  List<Disciplina> get disciplinasAtivas {
+    final query = _queryNormalizada;
+    if (query.isEmpty) return catalogo;
+    return List.unmodifiable(
+      catalogo.where(
+        (disciplina) => disciplina.topics.any(
+          (topico) => topico.name.toLowerCase().contains(query),
+        ),
+      ),
+    );
+  }
+
+  List<Disciplina> get disciplinasNoEdital => List.unmodifiable(
+    disciplinasAtivas.where((disciplina) => quantidadeSelecionada(disciplina) > 0),
+  );
+
+  List<Disciplina> get demaisDisciplinas => List.unmodifiable(
+    disciplinasAtivas.where((disciplina) => quantidadeSelecionada(disciplina) == 0),
+  );
+
   List<Topico> get topicosAtivos {
-    final query = buscaTopico.trim().toLowerCase();
+    final query = _queryNormalizada;
     return List.unmodifiable(
       (disciplinaAtiva?.topics ?? const <Topico>[]).where(
         (topico) => query.isEmpty || topico.name.toLowerCase().contains(query),
       ),
     );
   }
+
+  String get _queryNormalizada => buscaTopico.trim().toLowerCase();
 
   int quantidadeSelecionada(Disciplina disciplina) =>
       disciplina.topics.where((topico) => !topico.mandatory && topicosVinculados.contains(topico.id)).length;

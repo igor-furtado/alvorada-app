@@ -856,6 +856,48 @@ abstract class AppLocalizations {
   /// **'Novo Tópico'**
   String get newTopic;
 
+  /// No description provided for @editTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar Tópicos'**
+  String get editTopics;
+
+  /// No description provided for @editTopicsDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Edite, adicione ou remova os Tópicos desta Disciplina.'**
+  String get editTopicsDescription;
+
+  /// No description provided for @existingTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tópicos atuais'**
+  String get existingTopics;
+
+  /// No description provided for @newTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novos Tópicos'**
+  String get newTopics;
+
+  /// No description provided for @newTopicsDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite ou cole um Tópico por linha. Eles serão adicionados ao final da lista.'**
+  String get newTopicsDescription;
+
+  /// No description provided for @noEditableTopics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum Tópico editável. Adicione um ou mais abaixo.'**
+  String get noEditableTopics;
+
+  /// No description provided for @topicNumber.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tópico {number}'**
+  String topicNumber(int number);
+
   /// No description provided for @difficultyVeryEasy.
   ///
   /// In pt, this message translates to:
@@ -1129,7 +1171,7 @@ abstract class AppLocalizations {
   /// No description provided for @topicUpdated.
   ///
   /// In pt, this message translates to:
-  /// **'Tópico atualizado.'**
+  /// **'Tópicos atualizados.'**
   String get topicUpdated;
 
   /// No description provided for @topicDeleted.
@@ -1684,12 +1726,6 @@ abstract class AppLocalizations {
   /// **'Conteúdo Programático do Edital'**
   String get syllabusTriageTitle;
 
-  /// Identificação do Concurso no editor do Edital.
-  ///
-  /// In pt, this message translates to:
-  /// **'{institution} · {role}'**
-  String syllabusTriageDescription(String institution, String role);
-
   /// Progresso de seleção de uma Disciplina no editor do Edital.
   ///
   /// In pt, this message translates to:
@@ -1708,11 +1744,23 @@ abstract class AppLocalizations {
   /// **'Selecionar todos'**
   String get selectAll;
 
-  /// No description provided for @filterDisciplineTopics.
+  /// No description provided for @filterCatalogTopics.
   ///
   /// In pt, this message translates to:
-  /// **'Filtrar Tópicos desta Disciplina'**
-  String get filterDisciplineTopics;
+  /// **'Buscar tópicos'**
+  String get filterCatalogTopics;
+
+  /// No description provided for @syllabusIncludedDisciplines.
+  ///
+  /// In pt, this message translates to:
+  /// **'No Edital'**
+  String get syllabusIncludedDisciplines;
+
+  /// No description provided for @otherDisciplines.
+  ///
+  /// In pt, this message translates to:
+  /// **'Demais Disciplinas'**
+  String get otherDisciplines;
 
   /// No description provided for @inSyllabus.
   ///

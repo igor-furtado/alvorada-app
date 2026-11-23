@@ -37,6 +37,11 @@ type Topic struct {
 	Mandatory bool   `json:"obrigatorio"`
 }
 
+type ReplaceTopicInput struct {
+	ID   string
+	Name string
+}
+
 type CreateSubjectInput struct {
 	Name       string
 	Difficulty Difficulty

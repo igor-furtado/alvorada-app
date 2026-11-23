@@ -37,6 +37,8 @@ void main() {
         expect(find.byKey(const ValueKey('compact-master-detail-back')), findsNothing);
       }
       expect(find.text('Obrigação tributária'), findsOneWidget, reason: 'largura $width');
+      expect(find.text('Editar Tópicos'), findsOneWidget, reason: 'largura $width');
+      expect(find.text('Novo Tópico'), findsNothing, reason: 'largura $width');
       expect(find.byTooltip('Arraste para reordenar'), findsNWidgets(2), reason: 'largura $width');
       expect(find.text('Revisão de Véspera'), findsOneWidget, reason: 'largura $width');
       expect(tester.takeException(), isNull, reason: 'largura $width');

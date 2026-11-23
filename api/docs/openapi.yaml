@@ -478,6 +478,26 @@ paths:
           $ref: '#/components/responses/ErroValidacao'
         '500':
           $ref: '#/components/responses/ErroInterno'
+    put:
+      tags: [Tópicos]
+      summary: Substitui os tópicos editáveis de uma disciplina
+      description: Cria, renomeia, remove e ordena os Tópicos editáveis em uma única transação. O Tópico Revisão de Véspera permanece protegido.
+      operationId: substituirTopicos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubstituicaoTopicos'
+      responses:
+        '204':
+          description: Tópicos substituídos
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '409':
+          $ref: '#/components/responses/Conflito'
+        '500':
+          $ref: '#/components/responses/ErroInterno'
   /api/v1/subjects/{id}/topics/batch:
     parameters:
       - $ref: '#/components/parameters/IdRecurso'
@@ -870,6 +890,24 @@ components:
             maxLength: 120
           examples:
             - [Controle de constitucionalidade, Direitos fundamentais]
+    SubstituicaoTopicos:
+      type: object
+      required: [topicos]
+      properties:
+        topicos:
+          type: array
+          description: Lista completa dos Tópicos editáveis na ordem desejada. Itens sem id serão criados.
+          items:
+            type: object
+            required: [nome]
+            properties:
+              id:
+                type: string
+                format: uuid
+              nome:
+                type: string
+                minLength: 1
+                maxLength: 120
     OrdemTopicos:
       type: object
       required: [topico_ids]
